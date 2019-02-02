@@ -15,6 +15,6 @@ Start the app with
     conda activate miiit
     jupyter notebook --no-browser
 
-Then navigate to 
+Then navigate to the following ULR with your browser:
 
     http://localhost:8888/apps/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
