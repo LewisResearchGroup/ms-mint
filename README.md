@@ -5,8 +5,8 @@ A jupyter notebook based app for summing up intensity values in mass spectrometr
 
 ## Installation
 
-Here we use `conda` from the `miniconda` (or `anaconda`) package to install dependencies in a virtual environment.
-[conda](https://conda.io/en/latest/miniconda.html)
+Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.html) (or alternatively `anaconda`) package to install dependencies in a virtual environment.
+
 
     conda env create -f requirements.txt
 
