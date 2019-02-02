@@ -1,4 +1,4 @@
 .localhistory
 *.csv
 .ipynb_checkpoints
-.Metabolomics_Interactive_Intensity_Integration_Tool-0.ipynb .Metabolomics_Interactive_Intensity_Integration_Tool-1.ipynb .Metabolomics_Interactive_Intensity_Integration_Tool-2.ipynb .Metabolomics_Interactive_Intensity_Integration_Tool-3.ipynb .Metabolomics_Interactive_Intensity_Integration_Tool-4.ipynb
+.*.ipynb
