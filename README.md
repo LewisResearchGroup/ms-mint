@@ -13,7 +13,7 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
 Start the app with
 
     conda activate miiit
-    jupyter notebook Metabolomics_Interactive_Intensity_Integration_Tool.ipynb --no-browser
+    jupyter notebook --no-browser
 
 Then navigate to 
 
