@@ -107,7 +107,7 @@ def get_peaklistfrom(filenames):
         filenames = [filenames]
     peaklist = []
     for file in filenames:
-        if file.endswith('.csv'):
+        if str(file).endswith('.csv'):
             df = pd.read_csv(file, usecols=['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'])
             df['peakListFile'] = file
             peaklist.append(df)
@@ -161,7 +161,7 @@ class App():
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
         #self.peaklist.files = [str(P(MIIIT_ROOT)/P('static/Standard_Peaklist.csv'))]
-        self.peaklist.files = [P(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv')]
+        self.peaklist.files = [P(os.path.abspath(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
