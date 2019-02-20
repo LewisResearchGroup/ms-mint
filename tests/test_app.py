@@ -11,6 +11,6 @@ def test_peakArea():
     x = df.peakArea_real
     y = df.peakArea_calc
     df['peakAreaError'] = df.peakArea_calc - df.peakArea_real
-    from sklearn.metrics import r2_score
     R2 = r2_score(df.peakArea_real, df.peakArea_calc)
-    assert R2 > 0.999 
+    assert R2 > 0.999
+    assert max_error < 0.001

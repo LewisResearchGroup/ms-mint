@@ -16,6 +16,13 @@ from IPython.display import clear_output
 from ipywidgets import Button, HBox, VBox, Textarea, HTML
 import time
 
+from pathlib import Path as P
+
+display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
+display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
+
+MIIIT_ROOT = os.path.dirname(__file__)
+
 class SelectFilesButton(widgets.Button):
     """A file widget that leverages tkinter.filedialog."""
 
@@ -152,6 +159,7 @@ class App():
     def __init__(self):
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
+        self.peaklist.files = [str(P(MIIIT_ROOT)/P('static/Standard_Peaks.csv'))]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
@@ -168,6 +176,7 @@ class App():
         self.download_html = HTML("""Nothing to download""")
         self.out = widgets.Output(layout={'border': '1px solid black'})
         self.progress = Progress(min=0, max=100)
+        #os.chdir(os.getenv("HOME"))
         
     def run(self, b):
         # print('Running')
@@ -202,23 +211,14 @@ class App():
             text += '\nNo'
         self.message_box.value = text
         
-    def download_old(self, b):
-        if self.results is None:
-            print('First you have to create some results.')
-        else:
-            uid = str(uuid.uuid4()).split('-')[-1]
-            now = datetime.datetime.now().strftime("%Y-%m-%d")
-            filename = '{}-metabolomics_peak_intensity-{}.csv'.format(now, uid)
-            self.results.to_csv(filename)
-            self.download_html.value = """<a download='{}' href='{}'>Download</a>""".format(filename, filename)
-            
     def download(self, b):
         if self.results is None:
             print('First you have to create some results.')
         else:
             uid = str(uuid.uuid4()).split('-')[-1]
             now = datetime.datetime.now().strftime("%Y-%m-%d")
-            filename = '{}-metabolomics_peak_intensity-{}.xlsx'.format(now, uid)
+            os.makedirs('output', exist_ok=True)
+            filename = P('output') / P('{}-metabolomics_peak_intensity-{}.xlsx'.format(now, uid))
             writer = pd.ExcelWriter(filename)
             self.results.to_excel(writer, 'MainTable', index=False)
             self.results_crosstab('peakArea').to_excel(writer, 'peakArea', index=True)
