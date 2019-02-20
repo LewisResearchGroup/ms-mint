@@ -17,7 +17,7 @@ Start the app with
 
 Then navigate to the following ULR with your browser:
 
-    http://localhost:8888/apps/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
+    http://localhost:8888/apps/notebooks/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
 
 
 ![Demo Image](./image/MIIIT.png "Demo image")
