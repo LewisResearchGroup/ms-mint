@@ -1,23 +1,10 @@
-# MIIIT
-Metabolomics Interactive Intensity Integration Tool
+# A skeleton for python modules. 
+# Create a git repository. Make a first commit and install versioneer.
+git init
+git add --all
+git commit -am 'first commit'
 
-A jupyter notebook based app for summing up intensity values in mass spectrometry mzXML files in specified windows of retention time and m/z.
+versioneer install
 
-## Installation
-
-Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.html) (or alternatively `anaconda`) package to install dependencies in a virtual environment.
-
-
-    conda env create -f requirements.txt
-
-Start the app with
-
-    conda activate miiit
-    jupyter notebook --no-browser
-
-Then navigate to the following ULR with your browser:
-
-    http://localhost:8888/apps/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
-
-
-![Demo Image](./image/MIIIT.png "Demo image")
+# Replace occurences of NAME in setup.cfg 
+# and add value to variable NAME in setup.py

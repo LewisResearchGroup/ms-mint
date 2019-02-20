@@ -2,3 +2,7 @@
 *.csv
 .ipynb_checkpoints
 .*.ipynb
+.pytest_cache
+*egg-info*
+__pycache__
+.*

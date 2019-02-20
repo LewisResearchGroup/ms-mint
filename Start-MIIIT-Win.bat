@@ -7,5 +7,5 @@ if exist C:\Users\%USERNAME%\AppData\Local\Continuum\miniconda3\Scripts\activate
     call activate miiit
 )
 
-start "" http://localhost:8888/apps/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
+start "" http://localhost:8888/apps/notebooks/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
 jupyter notebook --no-browser &
