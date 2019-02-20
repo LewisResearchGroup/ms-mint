@@ -18,8 +18,6 @@ import time
 
 from pathlib import Path as P
 
-display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
-display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
 
 MIIIT_ROOT = os.path.dirname(__file__)
 
@@ -36,7 +34,10 @@ class SelectFilesButton(widgets.Button):
         self.style.button_color = "orange"
         # Set on click behavior.
         self.on_click(self.do_stuff)
-        self.callback = callback   
+        self.callback = callback
+        display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
+        display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
+   
     
     def do_stuff(self, b):
         self.select_files(b)
@@ -159,7 +160,8 @@ class App():
     def __init__(self):
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
-        self.peaklist.files = [str(P(MIIIT_ROOT)/P('static/Standard_Peaks.csv'))]
+        #self.peaklist.files = [str(P(MIIIT_ROOT)/P('static/Standard_Peaklist.csv'))]
+        self.peaklist.files = [P(f'{MIIIT_ROOT}/static/Standard_Peaklist.csv')]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
@@ -179,25 +181,30 @@ class App():
         #os.chdir(os.getenv("HOME"))
         
     def run(self, b):
-        # print('Running')
-        time.sleep(1)
-        results = []
-        peaklist = self.peaklist.files
-        n_files = len(self.mzxml.files)
-        processed_files = []
-        with self.out:
-            for i, filename in enumerate(self.mzxml.files):
-                processed_files.append(filename)
-                run_text = 'Processing: \n' + '\n'.join(processed_files[-20:])
-                self.message_box.value = run_text
-                self.progress.value = 100 * (i+1) / n_files
-                self.progress.description = f'{i+1}/{n_files}'
-                result = integrate_peaks(filename, peaklist)
-                results.append(result)
-        self.results = pd.concat(results)
-        self.message_box.value = self.results_crosstab().to_string()
-        self.download(None)
-        return self.results
+        try:
+            # print('Running')
+            # time.sleep(1)
+            results = []
+            peaklist = self.peaklist.files
+            for i in peaklist:
+                self.message_box.value = check_peaklist(i)
+            n_files = len(self.mzxml.files)
+            processed_files = []
+            with self.out:
+                for i, filename in enumerate(self.mzxml.files):
+                    processed_files.append(filename)
+                    run_text = 'Processing: \n' + '\n'.join(processed_files[-20:])
+                    self.message_box.value = run_text
+                    self.progress.value = 100 * (i+1) / n_files
+                    self.progress.description = f'{i+1}/{n_files}'
+                    result = integrate_peaks(filename, peaklist)
+                    results.append(result)
+            self.results = pd.concat(results)
+            self.message_box.value = self.results_crosstab().to_string()
+            self.download(None)
+            return self.results
+        except Exception as e:
+            self.message_box.value = str(e)
 
     def list_files(self, b=None):
         text = 'mzXML files to process:\n'
@@ -206,9 +213,9 @@ class App():
             text += line+'\n'
         text += '\n\nUsing peak list:\n'
         if len(self.peaklist.files) != 0:
-            text += '\n'.join(self.peaklist.files)
+            text += '\n'.join([str(i) for i in self.peaklist.files])
         else:
-            text += '\nNo'
+            text += '\nNo peaklist defined.'
         self.message_box.value = text
         
     def download(self, b):
@@ -235,5 +242,20 @@ class App():
               self.message_box,
               self.progress,
               self.download_html])
+
+def check_peaklist(filename):
+    if not os.path.isfile(filename):
+        raise FileNotFoundError(f'Where is that damn file ({filename})?')
+    try:
+        df = pd.read_csv(P(filename))
+    except:
+        return f'Cannot open peaklist {filename}'
+    try:
+        df[['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax']]
+    except:
+        return f"Not all columns found.\n\
+ Please make sure the peaklist file has at least:\
+ 'peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'"
+    return f'Peaklist file ok ({filename})'
 
 app = App()
