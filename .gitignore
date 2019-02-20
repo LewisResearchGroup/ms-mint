@@ -1,5 +1,5 @@
 .localhistory
-*.csv
+#*.csv
 .ipynb_checkpoints
 .*.ipynb
 .pytest_cache
