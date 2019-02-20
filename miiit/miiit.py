@@ -161,7 +161,7 @@ class App():
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
         #self.peaklist.files = [str(P(MIIIT_ROOT)/P('static/Standard_Peaklist.csv'))]
-        self.peaklist.files = [P(f'{MIIIT_ROOT}/static/Standard_Peaklist.csv')]
+        self.peaklist.files = [P(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv')]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
@@ -245,7 +245,7 @@ class App():
 
 def check_peaklist(filename):
     if not os.path.isfile(filename):
-        raise FileNotFoundError(f'Where is that damn file ({filename})?')
+        raise FileNotFoundError(f'Cannot find peaklist ({filename}).')
     try:
         df = pd.read_csv(P(filename))
     except:
