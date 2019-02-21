@@ -12,5 +12,6 @@ dependencies:
   - lxml=4.3.0
   - pip:
     - pyteomics==4.0.1
+    - openpyxl==2.6.0
 prefix: /home/swacker/miniconda3/envs/miiit
 
