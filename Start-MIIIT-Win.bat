@@ -8,4 +8,4 @@ if exist C:\Users\%USERNAME%\AppData\Local\Continuum\miniconda3\Scripts\activate
 )
 
 start "" http://localhost:9831/apps/notebooks/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
-jupyter notebook --no-browser --port=PORT=9831 &
+jupyter notebook --no-browser --port=9831 &
