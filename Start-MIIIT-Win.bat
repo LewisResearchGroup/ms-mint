@@ -7,5 +7,5 @@ if exist C:\Users\%USERNAME%\AppData\Local\Continuum\miniconda3\Scripts\activate
     call activate miiit
 )
 
-start "" http://localhost:8888/apps/notebooks/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
-jupyter notebook --no-browser &
+start "" http://localhost:9831/apps/notebooks/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
+jupyter notebook --no-browser --port=PORT=9831 &
