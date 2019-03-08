@@ -1,166 +1,30 @@
 import os
 import uuid
+import time
 import datetime
 import traitlets
+
 import ipywidgets as widgets
 import pandas as pd
 
-from ipywidgets import Button
 from ipywidgets import interact, interactive, fixed, interact_manual
-from IPython.display import display
+from ipywidgets import Button, HBox, VBox, Textarea, HTML
+from ipywidgets import IntProgress as Progress
+from IPython.display import display, clear_output
 from tkinter import Tk, filedialog
 from tqdm import tqdm_notebook
 from pyteomics import mzxml
-
-from IPython.display import clear_output
-from ipywidgets import Button, HBox, VBox, Textarea, HTML
-import time
-
 from pathlib import Path as P
 
 
 MIIIT_ROOT = os.path.dirname(__file__)
+STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peaklist.csv')))
 
-class SelectFilesButton(widgets.Button):
-    """A file widget that leverages tkinter.filedialog."""
-
-    def __init__(self, text='Button', callback=None):
-        super(SelectFilesButton, self).__init__()
-        # Add the selected_files trait
-        self.add_traits(files=traitlets.traitlets.List())
-        # Create the button.
-        self.description = text
-        self.icon = "square-o"
-        self.style.button_color = "orange"
-        # Set on click behavior.
-        self.on_click(self.do_stuff)
-        self.callback = callback
-        display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
-        display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
-   
-    
-    def do_stuff(self, b):
-        self.select_files(b)
-        self.callback()
-        if len(self.files) > 0:
-            self.style.button_color = "lightgreen"
-        else:
-            self.style.button_color = "red"
-        
-    @staticmethod
-    def select_files(b):
-        """Generate instance of tkinter.filedialog.
-
-        Parameters
-        ----------
-        b : obj:
-            An instance of ipywidgets.widgets.Button 
-        """
-        try:
-            # Create Tk root
-            root = Tk()
-            # Hide the main window
-            root.withdraw()
-            # Raise the root to the top of all windows.
-            root.call('wm', 'attributes', '.', '-topmost', True)
-            # List of selected fileswill be set to b.value
-            b.files = filedialog.askopenfilename(multiple=True)
-        except:
-            pass
-
-def integrate_peaks(filename, peaklist):
-    df = mzxml_to_pandas_df(filename)
-    peaklist = get_peaklistfrom(peaklist)
-    peaklist.index = range(len(peaklist))
-    results = []
-    for peak in to_peaks(peaklist):
-        result = integrate_peak(df, *peak)
-        results.append(result)
-    results = pd.concat(results)
-    results.index = range(len(results))
-    results['mzxmlFile'] = os.path.basename(filename)
-    results['mzxmlPath'] = os.path.dirname(filename)
-    return pd.merge(peaklist, results, right_index=True, left_index=True)
-
-
-def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel=None):
-    slizE =slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz)
-    peakArea = slizE['intensity array'].sum()
-    peakAreaTop10 = slizE['intensity array'].sort_values().tail(10).sum()
-    peakAreaTop3 = slizE['intensity array'].sort_values().tail(3).sum()
-    peakAreaTop = slizE['intensity array'].sort_values().tail(1).sum()
-    peakNumberOfPoints = len(slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz))
-    result = pd.DataFrame({'rtmin': [rtmin], 
-                           'rtmax': [rtmax],
-                           'peakMz': [mz],
-                           'peakMzWidth[ppm]': [dmz],
-                           'peakArea': [peakArea],
-                           'peakAreaTop': [peakAreaTop],
-                           'peakAreaTop3': [peakAreaTop3],                
-                           'peakAreaTop10': [peakAreaTop10],
-                           'peakNumberOfPoints': [peakNumberOfPoints]})
-    return result[['peakArea', 'peakAreaTop', 'peakAreaTop3', 'peakAreaTop10', 'peakNumberOfPoints']]
-
-
-def get_peaklistfrom(filenames):
-    if isinstance(filenames, str):
-        filenames = [filenames]
-    peaklist = []
-    for file in filenames:
-        if str(file).endswith('.csv'):
-            df = pd.read_csv(file, usecols=['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'])
-            df['peakListFile'] = file
-            peaklist.append(df)
-    return pd.concat(peaklist)
-
-
-def to_peaks(peaklist):
-    return [list(i) for i in list(peaklist[['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']].values)]
-
-def mzxml_to_pandas_df(filename):
-    slices = []
-    file = mzxml.MzXML(filename)
-    while True:
-        try:
-            slices.append(pd.DataFrame(file.next()))
-        except:
-            break
-    df = pd.concat(slices)
-    df_to_numeric(df)
-    return df
-
-
-def df_to_numeric(df):
-    for col in df:
-        df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
-
-
-def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
-    '''
-    Returns a slize of a metabolomics mzXML file.
-    df - pandas.DataFrame that has columns 
-            * 'retentionTime'
-            * 'm/z array'
-            * 'rtmin'
-            * 'rtmax'
-    rtmin - minimal retention time
-    rtmax - maximal retention time
-    mz - center of mass (m/z)
-    dmz - width of the mass window in ppm
-    '''
-    df_slice = df.loc[(rtmin <= df.retentionTime) &
-                      (df.retentionTime <= rtmax) &
-                      (mz-0.0001*dmz <= df['m/z array']) & 
-                      (df['m/z array'] <= mz+0.0001*dmz)]
-    return df_slice
-
-from ipywidgets import IntProgress as Progress
 
 class App():
     def __init__(self):
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
-        #self.peaklist.files = [str(P(MIIIT_ROOT)/P('static/Standard_Peaklist.csv'))]
         self.peaklist.files = [P(os.path.abspath(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
         self.message_box = Textarea(
             value='',
@@ -243,6 +107,141 @@ class App():
               self.progress,
               self.download_html])
 
+
+class SelectFilesButton(widgets.Button):
+    """A file widget that leverages tkinter.filedialog."""
+
+    def __init__(self, text='Button', callback=None):
+        super(SelectFilesButton, self).__init__()
+        # Add the selected_files trait
+        self.add_traits(files=traitlets.traitlets.List())
+        # Create the button.
+        self.description = text
+        self.icon = "square-o"
+        self.style.button_color = "orange"
+        # Set on click behavior.
+        self.on_click(self.do_stuff)
+        self.callback = callback
+        display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
+        display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
+   
+    
+    def do_stuff(self, b):
+        self.select_files(b)
+        self.callback()
+        if len(self.files) > 0:
+            self.style.button_color = "lightgreen"
+        else:
+            self.style.button_color = "red"
+        
+    @staticmethod
+    def select_files(b):
+        """Generate instance of tkinter.filedialog.
+
+        Parameters
+        ----------
+        b : obj:
+            An instance of ipywidgets.widgets.Button 
+        """
+        try:
+            # Create Tk root
+            root = Tk()
+            # Hide the main window
+            root.withdraw()
+            # Raise the root to the top of all windows.
+            root.call('wm', 'attributes', '.', '-topmost', True)
+            # List of selected fileswill be set to b.value
+            b.files = filedialog.askopenfilename(multiple=True)
+        except:
+            pass
+
+
+def integrate_peaks(filename, peaklist=STANDARD_PEAKLIST):
+    df = mzxml_to_pandas_df(filename)
+    peaklist = get_peaklistfrom(peaklist)
+    peaklist.index = range(len(peaklist))
+    results = []
+    for peak in to_peaks(peaklist):
+        result = integrate_peak(df, *peak)
+        results.append(result)
+    results = pd.concat(results)
+    results.index = range(len(results))
+    results['mzxmlFile'] = os.path.basename(filename)
+    results['mzxmlPath'] = os.path.dirname(filename)
+    return pd.merge(peaklist, results, right_index=True, left_index=True)
+
+
+def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel=None):
+    slizE =slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz)
+    peakArea = slizE['intensity array'].sum()
+    #peakAreaTop10 = slizE['intensity array'].sort_values().tail(10).sum()
+    #peakAreaTop3 = slizE['intensity array'].sort_values().tail(3).sum()
+    peakAreaTop = slizE['intensity array'].sort_values().tail(1).sum()
+    peakNumberOfPoints = len(slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz))
+    result = pd.DataFrame({'rtmin': [rtmin], 
+                           'rtmax': [rtmax],
+                           'peakMz': [mz],
+                           'peakMzWidth[ppm]': [dmz],
+                           'peakArea': [peakArea],
+                           'peakAreaTop': [peakAreaTop],
+                           'peakNumberOfPoints': [peakNumberOfPoints]})
+    return result[['peakArea', 'peakAreaTop', 'peakNumberOfPoints']]
+
+
+def get_peaklistfrom(filenames):
+    if isinstance(filenames, str):
+        filenames = [filenames]
+    peaklist = []
+    for file in filenames:
+        if str(file).endswith('.csv'):
+            df = pd.read_csv(file, usecols=['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'])
+            df['peakListFile'] = file
+            peaklist.append(df)
+    return pd.concat(peaklist)
+
+
+def to_peaks(peaklist):
+    return [list(i) for i in list(peaklist[['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']].values)]
+
+
+def mzxml_to_pandas_df(filename):
+    slices = []
+    file = mzxml.MzXML(filename)
+    while True:
+        try:
+            slices.append(pd.DataFrame(file.next()))
+        except:
+            break
+    df = pd.concat(slices)
+    df_to_numeric(df)
+    return df
+
+
+def df_to_numeric(df):
+    for col in df:
+        df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
+
+
+def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
+    '''
+    Returns a slize of a metabolomics mzXML file.
+    df - pandas.DataFrame that has columns 
+            * 'retentionTime'
+            * 'm/z array'
+            * 'rtmin'
+            * 'rtmax'
+    rtmin - minimal retention time
+    rtmax - maximal retention time
+    mz - center of mass (m/z)
+    dmz - width of the mass window in ppm
+    '''
+    df_slice = df.loc[(rtmin <= df.retentionTime) &
+                      (df.retentionTime <= rtmax) &
+                      (mz-0.0001*dmz <= df['m/z array']) & 
+                      (df['m/z array'] <= mz+0.0001*dmz)]
+    return df_slice
+
+
 def check_peaklist(filename):
     if not os.path.isfile(filename):
         raise FileNotFoundError(f'Cannot find peaklist ({filename}).')
@@ -257,5 +256,3 @@ def check_peaklist(filename):
  Please make sure the peaklist file has at least:\
  'peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'"
     return f'Peaklist file ok ({filename})'
-
-app = App()
