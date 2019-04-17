@@ -16,6 +16,12 @@ from tqdm import tqdm_notebook
 from pyteomics import mzxml
 from pathlib import Path as P
 
+from bokeh.plotting import figure, output_file, show
+from bokeh.io import output_notebook
+from bokeh.models import HoverTool, PanTool, ResetTool, WheelZoomTool, ZoomInTool, ZoomOutTool
+from bokeh.layouts import gridplot
+
+from IPython.display import clear_output
 
 MIIIT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peaklist.csv')))
@@ -23,6 +29,7 @@ STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peak
 
 class App():
     def __init__(self):
+        output_notebook(hide_banner=True)
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
         self.peaklist.files = [P(os.path.abspath(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
@@ -40,16 +47,32 @@ class App():
         self.download_button.on_click(self.download)
         self.results = None
         self.download_html = HTML("""Nothing to download""")
-        self.out = widgets.Output(layout={'border': '1px solid black'})
+        self.out = widgets.Output(layout={'border': '0px solid black'})
         self.progress = Progress(min=0, max=100)
+        self.peaks = []
+        self.rt_projections = None
+        self.plot_button = Button(description="Plot Peaks")
+        self.plot_button.on_click(self.plot_button_on_click)
+        self.plot_n_colums_slider = widgets.IntSlider(
+                                            value=1,
+                                            min=1,
+                                            max=5,
+                                            step=1,
+                                            description='Colums:',
+                                            disabled=False,
+                                            continuous_update=False,
+                                            orientation='horizontal',
+                                            readout=True,
+                                            readout_format='d'
+                                        )
         #os.chdir(os.getenv("HOME"))
         
-    def run(self, b):
+    def run(self, b=None):
         try:
-            # print('Running')
-            # time.sleep(1)
             results = []
+            rt_projections = {}
             peaklist = self.peaklist.files
+            self.peaks
             for i in peaklist:
                 self.message_box.value = check_peaklist(i)
             n_files = len(self.mzxml.files)
@@ -61,12 +84,17 @@ class App():
                     self.message_box.value = run_text
                     self.progress.value = 100 * (i+1) / n_files
                     self.progress.description = f'{i+1}/{n_files}'
-                    result = integrate_peaks(filename, peaklist)
+                    df = mzxml_to_pandas_df(filename)
+                    result = integrate_peaks(df, peaklist)
+                    result['mzxmlFile'] = os.path.basename(filename)
+                    result['mzxmlPath'] = os.path.dirname(filename)
                     results.append(result)
+                    rt_projection = peak_rt_projections(df, peaklist)
+                    rt_projections[filename] = rt_projection
             self.results = pd.concat(results)
-            self.message_box.value = self.results_crosstab().to_string()
+            self.rt_projections = rt_projections
+            self.message_box.value = self.results.to_string()
             self.download(None)
-            return self.results
         except Exception as e:
             self.message_box.value = str(e)
 
@@ -105,8 +133,33 @@ class App():
         return VBox([HBox([self.mzxml, self.peaklist, self.run_button]),
               self.message_box,
               self.progress,
-              self.download_html])
-
+              self.download_html,
+              self.plot_button])
+    
+    def plot_button_on_click(self, b=None):
+        self.out.clear_output()
+        with self.out:
+            self.plot()
+        display(self.out)
+    
+    def plot(self):
+        if self.rt_projections is None:
+            return None
+        rt_proj_data = restructure_rt_projections(self.rt_projections)
+        plots = []
+        hover_tool = HoverTool(tooltips=[('File', '$name')])
+        tools = [hover_tool, WheelZoomTool(), PanTool(), ResetTool(), ZoomInTool(), ZoomOutTool()]
+        for label in list(rt_proj_data.keys()):# [:4]:
+            tmp_data = rt_proj_data[label]
+            p = figure(title=f'PeakLabel: {label}', x_axis_label='Retention Time', 
+                    y_axis_label='Intensity', tools=tools )
+            for file, rt_proj in tmp_data.items():
+                    x = rt_proj.index
+                    y = rt_proj.values
+                    c = p.line(x, y, name=file, line_width=2)
+            plots.append(p)
+        grid = gridplot(plots, ncols=1, plot_width=800, plot_height=250)
+        show(grid)
 
 class SelectFilesButton(widgets.Button):
     """A file widget that leverages tkinter.filedialog."""
@@ -156,37 +209,44 @@ class SelectFilesButton(widgets.Button):
             pass
 
 
-def integrate_peaks(filename, peaklist=STANDARD_PEAKLIST):
-    df = mzxml_to_pandas_df(filename)
+def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     peaklist = get_peaklistfrom(peaklist)
     peaklist.index = range(len(peaklist))
     results = []
     for peak in to_peaks(peaklist):
-        result = integrate_peak(df, *peak)
+        result = integrate_peak(df, **peak)
         results.append(result)
     results = pd.concat(results)
     results.index = range(len(results))
-    results['mzxmlFile'] = os.path.basename(filename)
-    results['mzxmlPath'] = os.path.dirname(filename)
     return pd.merge(peaklist, results, right_index=True, left_index=True)
 
-
-def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel=None):
-    slizE =slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz)
+def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel):
+    slizE =slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
     peakArea = slizE['intensity array'].sum()
-    #peakAreaTop10 = slizE['intensity array'].sort_values().tail(10).sum()
-    #peakAreaTop3 = slizE['intensity array'].sort_values().tail(3).sum()
-    peakAreaTop = slizE['intensity array'].sort_values().tail(1).sum()
-    peakNumberOfPoints = len(slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz))
-    result = pd.DataFrame({'rtmin': [rtmin], 
+    result = pd.DataFrame({'peakLabel': peaklabel,
+                           'rtmin': [rtmin], 
                            'rtmax': [rtmax],
                            'peakMz': [mz],
                            'peakMzWidth[ppm]': [dmz],
-                           'peakArea': [peakArea],
-                           'peakAreaTop': [peakAreaTop],
-                           'peakNumberOfPoints': [peakNumberOfPoints]})
-    return result[['peakArea', 'peakAreaTop', 'peakNumberOfPoints']]
+                           'peakArea': [peakArea]})
+    return result[['peakArea']]
 
+def peak_rt_projections(df, peaklist=STANDARD_PEAKLIST):
+    peaklist = get_peaklistfrom(peaklist)
+    peaklist.index = range(len(peaklist))
+    results = []
+    for peak in to_peaks(peaklist):
+        result = peak_rt_projection(df, **peak)
+        results.append(result)
+    return results
+
+def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
+    slizE = slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
+    rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
+                    .set_index(['retentionTime', 'm/z array'])\
+                    .unstack()\
+                    .sum(axis=1)
+    return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
 
 def get_peaklistfrom(filenames):
     if isinstance(filenames, str):
@@ -201,8 +261,9 @@ def get_peaklistfrom(filenames):
 
 
 def to_peaks(peaklist):
-    return [list(i) for i in list(peaklist[['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']].values)]
-
+    tmp = [list(i) for i in list(peaklist[['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax', 'peakLabel']].values)]
+    output = [{'mz': el[0], 'dmz': el[1], 'rtmin': el[2], 'rtmax': el[3], 'peaklabel': el[4]} for el in tmp]
+    return output
 
 def mzxml_to_pandas_df(filename):
     slices = []
@@ -256,3 +317,14 @@ def check_peaklist(filename):
  Please make sure the peaklist file has at least:\
  'peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'"
     return f'Peaklist file ok ({filename})'
+
+def restructure_rt_projections(data):
+    output = {}
+    for el in list(data.values())[0]:
+        output[el[4]] = {}
+    for filename in data.keys():
+        for item in data[filename]:
+            peaklabel = item[4]
+            rt_proj = item[5]
+            output[peaklabel][filename] = rt_proj
+    return output
