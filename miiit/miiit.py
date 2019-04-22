@@ -2,34 +2,35 @@ import os
 import uuid
 import time
 import datetime
-import traitlets
 
-import ipywidgets as widgets
 import pandas as pd
 
+import ipywidgets as widgets    
 from ipywidgets import interact, interactive, fixed, interact_manual
 from ipywidgets import Button, HBox, VBox, Textarea, HTML
 from ipywidgets import IntProgress as Progress
 from IPython.display import display, clear_output
-from tkinter import Tk, filedialog
+
 from tqdm import tqdm_notebook
 from pyteomics import mzxml
 from pathlib import Path as P
 
 from bokeh.plotting import figure, output_file, show
 from bokeh.io import output_notebook
-from bokeh.models import HoverTool, PanTool, ResetTool, WheelZoomTool, ZoomInTool, ZoomOutTool
+from bokeh.models import HoverTool, PanTool, ResetTool,\
+    WheelZoomTool, ZoomInTool, ZoomOutTool, SaveTool
 from bokeh.layouts import gridplot
 
-from IPython.display import clear_output
+from .SelectFilesButton import SelectFilesButton
 
 MIIIT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peaklist.csv')))
 
+devel = True
 
 class App():
     def __init__(self):
-        output_notebook(hide_banner=True)
+        output_notebook(hide_banner=False)
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
         self.peaklist.files = [P(os.path.abspath(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
@@ -92,7 +93,7 @@ class App():
                     rt_projection = peak_rt_projections(df, peaklist)
                     rt_projections[filename] = rt_projection
             self.results = pd.concat(results)
-            self.rt_projections = rt_projections
+            self.rt_projections = restructure_rt_projections(rt_projections)
             self.message_box.value = self.results.to_string()
             self.download(None)
         except Exception as e:
@@ -125,8 +126,15 @@ class App():
             self.download_html.value = """<a download='{}' href='{}'>Download</a>""".format(filename, filename)
     
     def results_crosstab(self, varName='peakArea'):
-        return pd.merge(self.results[['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']].drop_duplicates(),
-                        pd.crosstab(self.results.peakLabel, self.results.mzxmlFile, self.results[varName], aggfunc=sum),
+        '''
+        Returns a comprehensive dataframe with the
+        extraction results of one or more files.
+        '''
+        cols = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']
+        return pd.merge(self.results[cols].drop_duplicates(),
+                        pd.crosstab(self.results.peakLabel, 
+                                    self.results.mzxmlFile, 
+                                    self.results[varName], aggfunc=sum),
                         on='peakLabel')    
     
     def gui(self):
@@ -145,10 +153,16 @@ class App():
     def plot(self):
         if self.rt_projections is None:
             return None
-        rt_proj_data = restructure_rt_projections(self.rt_projections)
+        rt_proj_data = self.rt_projections
         plots = []
         hover_tool = HoverTool(tooltips=[('File', '$name')])
-        tools = [hover_tool, WheelZoomTool(), PanTool(), ResetTool(), ZoomInTool(), ZoomOutTool()]
+        tools = [hover_tool, 
+                 WheelZoomTool(), 
+                 PanTool(), 
+                 ResetTool(), 
+                 ZoomInTool(), 
+                 ZoomOutTool(), 
+                 SaveTool()]
         for label in list(rt_proj_data.keys()):# [:4]:
             tmp_data = rt_proj_data[label]
             p = figure(title=f'PeakLabel: {label}', x_axis_label='Retention Time', 
@@ -161,55 +175,11 @@ class App():
         grid = gridplot(plots, ncols=1, plot_width=800, plot_height=250)
         show(grid)
 
-class SelectFilesButton(widgets.Button):
-    """A file widget that leverages tkinter.filedialog."""
-
-    def __init__(self, text='Button', callback=None):
-        super(SelectFilesButton, self).__init__()
-        # Add the selected_files trait
-        self.add_traits(files=traitlets.traitlets.List())
-        # Create the button.
-        self.description = text
-        self.icon = "square-o"
-        self.style.button_color = "orange"
-        # Set on click behavior.
-        self.on_click(self.do_stuff)
-        self.callback = callback
-        display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
-        display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
-   
-    
-    def do_stuff(self, b):
-        self.select_files(b)
-        self.callback()
-        if len(self.files) > 0:
-            self.style.button_color = "lightgreen"
-        else:
-            self.style.button_color = "red"
-        
-    @staticmethod
-    def select_files(b):
-        """Generate instance of tkinter.filedialog.
-
-        Parameters
-        ----------
-        b : obj:
-            An instance of ipywidgets.widgets.Button 
-        """
-        try:
-            # Create Tk root
-            root = Tk()
-            # Hide the main window
-            root.withdraw()
-            # Raise the root to the top of all windows.
-            root.call('wm', 'attributes', '.', '-topmost', True)
-            # List of selected fileswill be set to b.value
-            b.files = filedialog.askopenfilename(multiple=True)
-        except:
-            pass
-
-
 def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
+    '''
+    Takes the output of mzxml_to_pandas_df() and
+    batch-calculates peak properties.
+    '''
     peaklist = get_peaklistfrom(peaklist)
     peaklist.index = range(len(peaklist))
     results = []
@@ -221,6 +191,11 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     return pd.merge(peaklist, results, right_index=True, left_index=True)
 
 def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel):
+    '''
+    Takes the output of mzxml_to_pandas_df() and 
+    calculates peak properties of one peak specified by
+    the input arguements.
+    '''
     slizE =slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
     peakArea = slizE['intensity array'].sum()
     result = pd.DataFrame({'peakLabel': peaklabel,
@@ -232,6 +207,11 @@ def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel):
     return result[['peakArea']]
 
 def peak_rt_projections(df, peaklist=STANDARD_PEAKLIST):
+    '''
+    Takes the output of mzxml_to_pandas_df() and 
+    batch-calcualtes the projections of peaks onto
+    the RT dimension to visualize peak shapes.
+    '''
     peaklist = get_peaklistfrom(peaklist)
     peaklist.index = range(len(peaklist))
     results = []
@@ -241,6 +221,12 @@ def peak_rt_projections(df, peaklist=STANDARD_PEAKLIST):
     return results
 
 def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
+    '''
+    Takes the output of mzxml_to_pandas_df() and 
+    calcualtes the projections of one peak, 
+    specicied by the input parameters, onto
+    the RT dimension to visualize peak shapes.
+    '''
     slizE = slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
     rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
                     .set_index(['retentionTime', 'm/z array'])\
@@ -249,20 +235,33 @@ def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
     return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
 
 def get_peaklistfrom(filenames):
+    '''
+    Extracts peak data from csv file.
+    '''
     if isinstance(filenames, str):
         filenames = [filenames]
     peaklist = []
+    cols_to_import = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax']
     for file in filenames:
         if str(file).endswith('.csv'):
-            df = pd.read_csv(file, usecols=['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'])
+            df = pd.read_csv(file, usecols=cols_to_import, dtype={'peakLabel': str})
             df['peakListFile'] = file
             peaklist.append(df)
     return pd.concat(peaklist)
 
 
 def to_peaks(peaklist):
-    tmp = [list(i) for i in list(peaklist[['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax', 'peakLabel']].values)]
-    output = [{'mz': el[0], 'dmz': el[1], 'rtmin': el[2], 'rtmax': el[3], 'peaklabel': el[4]} for el in tmp]
+    cols_to_import = ['peakMz', 
+                      'peakMzWidth[ppm]',
+                      'rtmin', 
+                      'rtmax', 
+                      'peakLabel']
+    tmp = [list(i) for i in list(peaklist[cols_to_import].values)]
+    output = [{'mz': el[0],
+               'dmz': el[1], 
+               'rtmin': el[2],
+               'rtmax': el[3], 
+               'peaklabel': el[4]} for el in tmp]
     return output
 
 def mzxml_to_pandas_df(filename):
