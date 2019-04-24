@@ -5,7 +5,7 @@ except ImportError:
 
 NAME = 'miiit'
 config = {
-    'description': 'My Project',
+    'description': 'Metabolomics INtegration Tool (Mint)',
     'author': 'Soren Wacker',
     'url': 'https://github.com/soerendip',
     'download_url': f'https://github.com/soerendip/{NAME}',
@@ -14,7 +14,8 @@ config = {
     'install_requires': [],
     'packages': [f'{NAME}'],
     'scripts': [],
-    'name': f'{NAME}'
+    'name': f'{NAME}',
+    'data_files': [('static', ['static/Standard_Peaklist.csv'])]
 }
 
 setup(**config)
