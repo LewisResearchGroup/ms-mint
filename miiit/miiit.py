@@ -6,8 +6,8 @@ import datetime
 import pandas as pd
 
 import ipywidgets as widgets    
-from ipywidgets import interact, interactive, fixed, interact_manual
-from ipywidgets import Button, HBox, VBox, Textarea, HTML
+from ipywidgets import Button, HBox, VBox, Textarea, HTML,\
+    SelectMultiple, Select, Layout, Label, IntSlider
 from ipywidgets import IntProgress as Progress
 from IPython.display import display, clear_output
 
@@ -21,64 +21,88 @@ from bokeh.models import HoverTool, PanTool, ResetTool,\
     WheelZoomTool, ZoomInTool, ZoomOutTool, SaveTool
 from bokeh.layouts import gridplot
 
+#from functools import lru_cache
+
+
+
 from .SelectFilesButton import SelectFilesButton
 
 MIIIT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peaklist.csv')))
 
-devel = True
+DEVEL = True
+
+rt_projections_test_data = {
+    'TestLabel1': {
+        'File1': pd.Series([1, 0, 0], 
+                           index=pd.Index([1, 2, 3], 
+                                          name='retentionTime')),
+        'File2': pd.Series([0, 1, 0], 
+                           index=pd.Index([1, 2.4, 2.8], 
+                                          name='retentionTime'))
+        },
+    'TestLabel2': {
+        'File1': pd.Series([7., .8, .8], 
+                           index=pd.Index([4, 5, 6], 
+                                          name='retentionTime')),
+        'File2': pd.Series([53., .56, .12], 
+                           index=pd.Index([4, 5.4, 6], 
+                                          name='retentionTime'))
+        }
+    }
 
 class App():
     def __init__(self):
-        output_notebook(hide_banner=False)
+        output_notebook(hide_banner=True)
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
-        self.peaklist = SelectFilesButton(text='Peaklist', callback=self.list_files)
+        self.peaklist = SelectFilesButton(text='Peaklist', default_color='lightgreen', callback=self.list_files)
         self.peaklist.files = [P(os.path.abspath(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
             description='',
             disabled=True,
-            layout={'width': '95%', 'height': '500px', 'font_family': 'monospace'})
+            layout={'width': '90%', 
+                    'height': '500px', 
+                    'font_family': 'monospace'})
         self.list_button = Button(description="List Files")
         self.list_button.on_click(self.list_files)
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run)
         self.download_button = Button(description="Download")
         self.download_button.on_click(self.download)
-        self.results = None
-        self.download_html = HTML("""Nothing to download""")
-        self.out = widgets.Output(layout={'border': '0px solid black'})
-        self.progress = Progress(min=0, max=100)
+        self._results = None
+        self.progress = Progress(min=0, max=100, layout=Layout(width='90%'))
         self.peaks = []
-        self.rt_projections = None
+        self._rt_projections = None
         self.plot_button = Button(description="Plot Peaks")
         self.plot_button.on_click(self.plot_button_on_click)
-        self.plot_n_colums_slider = widgets.IntSlider(
-                                            value=1,
-                                            min=1,
-                                            max=5,
-                                            step=1,
-                                            description='Colums:',
-                                            disabled=False,
-                                            continuous_update=False,
-                                            orientation='horizontal',
-                                            readout=True,
-                                            readout_format='d'
-                                        )
-        #os.chdir(os.getenv("HOME"))
-        
+        self.plot_peak_selector = SelectMultiple(
+            options=[], layout=Layout(width='30%', height='90px', Label='test'))
+        self.plot_file_selector = SelectMultiple(
+            options=[], layout=Layout(width='30%', height='90px'))
+        self.plot_highlight_selector = SelectMultiple(
+            options=[], layout=Layout(width='30%', height='90px'))
+        self.download_html = HTML("""Nothing to download""")
+        self.output = widgets.Output()
+        self.peakLabels = []
+        self.plot_ncol_slider = IntSlider(min=1, max=5, step=1, value=1)
+
+
+
+        if DEVEL:
+            self.rt_projections = rt_projections_test_data
+
     def run(self, b=None):
         try:
             results = []
             rt_projections = {}
             peaklist = self.peaklist.files
-            self.peaks
             for i in peaklist:
                 self.message_box.value = check_peaklist(i)
             n_files = len(self.mzxml.files)
             processed_files = []
-            with self.out:
+            with self.output:
                 for i, filename in enumerate(self.mzxml.files):
                     processed_files.append(filename)
                     run_text = 'Processing: \n' + '\n'.join(processed_files[-20:])
@@ -94,10 +118,44 @@ class App():
                     rt_projections[filename] = rt_projection
             self.results = pd.concat(results)
             self.rt_projections = restructure_rt_projections(rt_projections)
-            self.message_box.value = self.results.to_string()
+            if len(processed_files) == 1:
+                self.message_box.value = self.results.to_string()
+            else:
+                self.message_box.value = self.results_crosstab().to_string()
             self.download(None)
+            self.update_highlight_selector()
+            self.update_peak_selector()
         except Exception as e:
             self.message_box.value = str(e)
+
+    def update_peak_selector(self):
+        new_values =  tuple(self.rt_projections.keys())
+        self.plot_peak_selector.options = new_values
+
+    def update_highlight_selector(self):
+        new_values = tuple(list(self.rt_projections.values())[0].keys())
+        self.plot_highlight_selector.options = new_values
+        self.plot_file_selector.options = new_values
+
+
+    @property
+    def results(self):
+        return self._results_df
+    
+    @results.setter 
+    def results(self, df):
+        self._results_df = df
+    
+    @property
+    def rt_projections(self):
+        return self._rt_projections
+    
+    @rt_projections.setter
+    def rt_projections(self, data):
+        self._rt_projections = data
+        self.update_peak_selector()
+        self.update_highlight_selector()
+
 
     def list_files(self, b=None):
         text = 'mzXML files to process:\n'
@@ -118,12 +176,16 @@ class App():
             uid = str(uuid.uuid4()).split('-')[-1]
             now = datetime.datetime.now().strftime("%Y-%m-%d")
             os.makedirs('output', exist_ok=True)
-            filename = P('output') / P('{}-metabolomics_peak_intensity-{}.xlsx'.format(now, uid))
+            filename = P('output') / P('{}-metabolomics_peak_intensity-{}.xlsx'\
+                .format(now, uid))
             writer = pd.ExcelWriter(filename)
             self.results.to_excel(writer, 'MainTable', index=False)
-            self.results_crosstab('peakArea').to_excel(writer, 'peakArea', index=True)
+            self.results_crosstab('peakArea')\
+                .to_excel(writer, 'peakArea', index=True)
             writer.save()
-            self.download_html.value = """<a download='{}' href='{}'>Download</a>""".format(filename, filename)
+            self.download_html.value = \
+                """<a download='{}' href='{}'>Download</a>"""\
+                .format(filename, filename)
     
     def results_crosstab(self, varName='peakArea'):
         '''
@@ -134,26 +196,41 @@ class App():
         return pd.merge(self.results[cols].drop_duplicates(),
                         pd.crosstab(self.results.peakLabel, 
                                     self.results.mzxmlFile, 
-                                    self.results[varName], aggfunc=sum),
+                                    self.results[varName], 
+                                    aggfunc=sum),
                         on='peakLabel')    
     
     def gui(self):
-        return VBox([HBox([self.mzxml, self.peaklist, self.run_button]),
-              self.message_box,
-              self.progress,
-              self.download_html,
-              self.plot_button])
-    
-    def plot_button_on_click(self, b=None):
-        self.out.clear_output()
-        with self.out:
-            self.plot()
-        display(self.out)
+        return VBox([HBox([self.mzxml, 
+                           self.peaklist, 
+                           self.run_button, 
+                           self.download_html]),
+                    self.message_box,
+                    self.progress,
+                    HBox([Label('Peak', layout=Layout(width='30%')),
+                          Label('File', layout=Layout(width='30%')), 
+                          Label('Highlight', layout=Layout(width='30%'))]),
+                    HBox([self.plot_peak_selector,
+                          self.plot_file_selector,
+                          self.plot_highlight_selector]),
+                    self.plot_button,
+                    HBox([Label('N columns'), self.plot_ncol_slider])
+                ])
+
+    def display_output(self):
+        display(self.output)
+
+    def plot_button_on_click(self, button):
+        self.plot()
     
     def plot(self):
-        if self.rt_projections is None:
-            return None
         rt_proj_data = self.rt_projections
+        peakLabels = self.plot_peak_selector.value
+        files = self.plot_file_selector.value
+        highlight = self.plot_highlight_selector.value
+        n_cols = self.plot_ncol_slider.value
+        if (len(peakLabels) == 0) or (len(files) == 0):
+            return None
         plots = []
         hover_tool = HoverTool(tooltips=[('File', '$name')])
         tools = [hover_tool, 
@@ -161,19 +238,32 @@ class App():
                  PanTool(), 
                  ResetTool(), 
                  ZoomInTool(), 
-                 ZoomOutTool(), 
+                 ZoomOutTool(),
                  SaveTool()]
-        for label in list(rt_proj_data.keys()):# [:4]:
-            tmp_data = rt_proj_data[label]
-            p = figure(title=f'PeakLabel: {label}', x_axis_label='Retention Time', 
-                    y_axis_label='Intensity', tools=tools )
-            for file, rt_proj in tmp_data.items():
-                    x = rt_proj.index
-                    y = rt_proj.values
-                    c = p.line(x, y, name=file, line_width=2)
-            plots.append(p)
-        grid = gridplot(plots, ncols=1, plot_width=800, plot_height=250)
-        show(grid)
+        with self.output:
+            clear_output()
+            for label in list(peakLabels):
+                tmp_data = rt_proj_data[label]
+                p = figure(title=f'Peak: {label}', x_axis_label='Retention Time', 
+                           y_axis_label='Intensity', tools=tools)
+                for file, rt_proj in tmp_data.items():
+                        x = rt_proj.index
+                        y = rt_proj.values
+                        if not file in files:
+                            continue
+                        if file in highlight:
+                            color = 'red'
+                            legend = os.path.basename(file)
+                        else:
+                            color = 'blue'
+                            name = None
+                        p.line(x, y, color=color, name=file, line_width=2, legend=legend)
+                        if legend is not None:
+                            p.legend.label_text_font_size = "8pt"
+
+                plots.append(p)
+            grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
+            show(grid)
 
 def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     '''
@@ -241,16 +331,26 @@ def get_peaklistfrom(filenames):
     if isinstance(filenames, str):
         filenames = [filenames]
     peaklist = []
-    cols_to_import = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax']
+    cols_to_import = ['peakLabel',
+                      'peakMz',
+                      'peakMzWidth[ppm]',
+                      'rtmin',
+                      'rtmax']
     for file in filenames:
         if str(file).endswith('.csv'):
-            df = pd.read_csv(file, usecols=cols_to_import, dtype={'peakLabel': str})
+            df = pd.read_csv(file, usecols=cols_to_import,
+                             dtype={'peakLabel': str})
             df['peakListFile'] = file
             peaklist.append(df)
     return pd.concat(peaklist)
 
 
 def to_peaks(peaklist):
+    '''
+    Takes a dataframe with at least the columns:
+    ['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax', 'peakLabel'].
+    Returns a list of dictionaries that define peaks.
+    '''
     cols_to_import = ['peakMz', 
                       'peakMzWidth[ppm]',
                       'rtmin', 
@@ -265,6 +365,9 @@ def to_peaks(peaklist):
     return output
 
 def mzxml_to_pandas_df(filename):
+    '''
+    Reads mzXML file and returns a pandas.DataFrame.
+    '''
     slices = []
     file = mzxml.MzXML(filename)
     while True:
@@ -278,7 +381,10 @@ def mzxml_to_pandas_df(filename):
 
 
 def df_to_numeric(df):
-    for col in df:
+    '''
+    Converts dataframe to numeric types if possible.
+    '''
+    for col in df.columns:
         df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
 
 
