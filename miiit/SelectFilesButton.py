@@ -7,14 +7,14 @@ from tkinter import Tk, filedialog
 class SelectFilesButton(widgets.Button):
     """A file widget that leverages tkinter.filedialog."""
 
-    def __init__(self, text='Button', callback=None):
+    def __init__(self, text='Button', default_color='orange', callback=None):
         super(SelectFilesButton, self).__init__()
         # Add the selected_files trait
         self.add_traits(files=traitlets.traitlets.List())
         # Create the button.
         self.description = text
         self.icon = "square-o"
-        self.style.button_color = "orange"
+        self.style.button_color = default_color
         # Set on click behavior.
         self.on_click(self.do_stuff)
         self.callback = callback
