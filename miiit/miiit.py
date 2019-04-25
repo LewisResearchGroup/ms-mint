@@ -256,10 +256,12 @@ class App():
                             legend = os.path.basename(file)
                         else:
                             color = 'blue'
-                            name = None
+                            legend = None
                         p.line(x, y, color=color, name=file, line_width=2, legend=legend)
                         if legend is not None:
                             p.legend.label_text_font_size = "8pt"
+                p.legend.click_policy = "mute"
+
 
                 plots.append(p)
             grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
