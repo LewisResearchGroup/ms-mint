@@ -10,10 +10,11 @@ config = {
     'url': 'https://github.com/soerendip/mint',
     'author_email': 'swacker@ucalgary.ca',
     'version': 0.1,
-    'install_requires': [],
+    'scripts': ['scripts/mint-start-Linux.py'],
     'packages': [f'{NAME}'],
     'name': f'{NAME}',
-    'data_files': [('static', ['static/Standard_Peaklist.csv'])]
+    'data_files': [('static', ['static/Standard_Peaklist.csv']),
+                   ('notebooks', ['notebooks/mint.ipynb'])]
 }
 
 setup(**config)
