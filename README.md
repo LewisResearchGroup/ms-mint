@@ -1,25 +1,26 @@
-# MIIIT
-Metabolomics Interactive Intensity Integration Tool
+# Metabolomics Integration Tool (Mint)
 
 A jupyter notebook based app for summing up intensity values in mass spectrometry mzXML files in specified windows of retention time and m/z.
 
 ## Installation
 
-Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.html) (or alternatively `anaconda`) package to install dependencies in a virtual environment.
-
+Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.html) 
+(or alternatively `anaconda`) package to install dependencies in a virtual environment.
 
     conda env create -f requirements.txt
     conda activate mint
-    pip install pyteomics openpyxl 
+    python setup.py install
+
+## Start the application
 
 Start the app with
 
-    conda activate miiit
-    jupyter notebook --no-browser
+    conda activate mint
+    jupyter notebook --no-browser --port 9999
 
 Then navigate to the following ULR with your browser:
 
-    http://localhost:8888/apps/notebooks/Metabolomics_Interactive_Intensity_Integration_Tool.ipynb?appmode_scroll=0
+    http://localhost:9999/apps/notebooks/mint.ipynb?appmode_scroll=0
 
 
-![Demo Image](./image/MIIIT.png "Demo image")
+![Demo Image](./image/mint.png "Demo image")

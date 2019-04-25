@@ -1,4 +1,4 @@
-name: miiit
+name: mint
 channels:
   - conda-forge
   - defaults
@@ -14,5 +14,5 @@ dependencies:
   - pip:
     - pyteomics==4.0.1
     - openpyxl==2.6.0
-prefix: /home/swacker/miniconda3/envs/miiit
+prefix: /home/swacker/miniconda3/envs/mint
 
