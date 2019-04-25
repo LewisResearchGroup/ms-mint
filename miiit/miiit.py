@@ -267,6 +267,12 @@ class App():
             grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
             show(grid)
 
+def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
+    df = mzxml_to_pandas_df(mzxml)
+    peaks = integrate_peaks(df)
+    peaks['mzxmlFile'] = mzxml
+    return peaks 
+
 def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     '''
     Takes the output of mzxml_to_pandas_df() and
