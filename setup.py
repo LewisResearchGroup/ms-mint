@@ -11,8 +11,8 @@ config = {
     'author_email': 'swacker@ucalgary.ca',
     'version': 0.1,
     'scripts': ['scripts/mint-start-Linux.py'],
-    'packages': [f'{NAME}'],
-    'name': f'{NAME}',
+    'packages': ['mint'],
+    'name': 'mint',
     'data_files': [('static', ['static/Standard_Peaklist.csv']),
                    ('notebooks', ['notebooks/mint.ipynb'])]
 }
