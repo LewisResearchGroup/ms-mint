@@ -5,6 +5,7 @@ channels:
 dependencies:
   - appmode=0.5.0
   - jupyter=1.0.0
+  - notebook=5.7.5
   - pandas=0.24.0
   - pip=18.1
   - python=3.7.2
