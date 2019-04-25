@@ -9,6 +9,8 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
 
 
     conda env create -f requirements.txt
+    conda activate mint
+    pip install pyteomics openpyxl 
 
 Start the app with
 
