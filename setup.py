@@ -13,7 +13,8 @@ config = {
     'scripts': ['scripts/Mint', 'scripts/Mint__windows.bat'],
     'packages': ['mint'],
     'name': 'mint',
-    'data_files': [('static', ['static/Standard_Peaklist.csv']),
+    'data_files': [('scripts', ['scripts/Mint', 'scripts/Mint__windows.bat']),
+                   ('static', ['static/Standard_Peaklist.csv']),
                    ('notebooks', ['notebooks/Mint.ipynb'])]
 }
 
