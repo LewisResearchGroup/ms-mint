@@ -1,31 +1,33 @@
 import os
 import uuid
-import time
 import datetime
-
+import itertools
 import pandas as pd
 
 import ipywidgets as widgets    
 from ipywidgets import Button, HBox, VBox, Textarea, HTML,\
-    SelectMultiple, Select, Layout, Label, IntSlider
+    SelectMultiple, Layout, Label, IntSlider
 from ipywidgets import IntProgress as Progress
 from IPython.display import display, clear_output
 
-from tqdm import tqdm_notebook
-from pyteomics import mzxml
 from pathlib import Path as P
 
-from bokeh.plotting import figure, output_file, show
+from bokeh.plotting import figure, show
 from bokeh.io import output_notebook
 from bokeh.models import HoverTool, PanTool, ResetTool,\
     WheelZoomTool, ZoomInTool, ZoomOutTool, SaveTool
 from bokeh.layouts import gridplot
-
-#from functools import lru_cache
-
-
+from bokeh.palettes import Dark2_5 as palette
+from bokeh.models import DataTable
+from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
+from bokeh.models import ColumnDataSource
 
 from .SelectFilesButton import SelectFilesButton
+
+from .tools import integrate_peaks, peak_rt_projections,\
+    mzxml_to_pandas_df, check_peaklist,\
+    restructure_rt_projections
+import warnings
 
 MIIIT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peaklist.csv')))
@@ -51,19 +53,21 @@ rt_projections_test_data = {
         }
     }
 
-class App():
+class Mint():
     def __init__(self):
         output_notebook(hide_banner=True)
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
-        self.peaklist = SelectFilesButton(text='Peaklist', default_color='lightgreen', callback=self.list_files)
-        self.peaklist.files = [P(os.path.abspath(f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
+        self.peaklist = SelectFilesButton(text='Peaklist', 
+            default_color='lightgreen', callback=self.list_files)
+        self.peaklist.files = [P(os.path.abspath(
+            f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
             description='',
             disabled=True,
-            layout={'width': '90%', 
-                    'height': '500px', 
+            layout={'width': '99%', 
+                    'height': '200px', 
                     'font_family': 'monospace'})
         self.list_button = Button(description="List Files")
         self.list_button.on_click(self.list_files)
@@ -71,27 +75,28 @@ class App():
         self.run_button.on_click(self.run)
         self.download_button = Button(description="Download")
         self.download_button.on_click(self.download)
-        self._results = None
-        self.progress = Progress(min=0, max=100, layout=Layout(width='90%'))
+        self._results_df = None
+        self.progress = Progress(min=0, max=100, layout=Layout(width='99%'))
         self.peaks = []
         self._rt_projections = None
+
+        self.download_html = HTML("""Nothing to download""")
+        self.output = widgets.Output(layout=Layout(width='99%'))
+        self.peakLabels = []
+        # Plotting stuff
+        self.plot_button_results = Button(description="Show Results Table")
+        self.plot_button_results.on_click(self.show_results)
         self.plot_button = Button(description="Plot Peaks")
         self.plot_button.on_click(self.plot_button_on_click)
         self.plot_peak_selector = SelectMultiple(
-            options=[], layout=Layout(width='30%', height='90px', Label='test'))
+            options=[], layout=Layout(width='33%', height='90px', Label='test'))
         self.plot_file_selector = SelectMultiple(
-            options=[], layout=Layout(width='30%', height='90px'))
+            options=[], layout=Layout(width='33%', height='90px'))
         self.plot_highlight_selector = SelectMultiple(
-            options=[], layout=Layout(width='30%', height='90px'))
-        self.download_html = HTML("""Nothing to download""")
-        self.output = widgets.Output()
-        self.peakLabels = []
-        self.plot_ncol_slider = IntSlider(min=1, max=5, step=1, value=1)
-
-
-
-        if DEVEL:
-            self.rt_projections = rt_projections_test_data
+            options=[], layout=Layout(width='33%', height='90px'))
+        self.plot_ncol_slider = IntSlider(min=1, max=5, step=1, value=3)
+        self.plot_legend_font_size = IntSlider(min=1, max=20, step=1, value=6)
+        warnings.filterwarnings('ignore')
 
     def run(self, b=None):
         try:
@@ -116,15 +121,16 @@ class App():
                     results.append(result)
                     rt_projection = peak_rt_projections(df, peaklist)
                     rt_projections[filename] = rt_projection
-            self.results = pd.concat(results)
+            self.results = pd.concat(results)[[
+                'peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
+                'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
             self.rt_projections = restructure_rt_projections(rt_projections)
             if len(processed_files) == 1:
-                self.message_box.value = self.results.to_string()
-            else:
-                self.message_box.value = self.results_crosstab().to_string()
+                self.message_box.value = 'Done'
             self.download(None)
             self.update_highlight_selector()
             self.update_peak_selector()
+            self.show_results()
         except Exception as e:
             self.message_box.value = str(e)
 
@@ -213,8 +219,9 @@ class App():
                     HBox([self.plot_peak_selector,
                           self.plot_file_selector,
                           self.plot_highlight_selector]),
-                    self.plot_button,
-                    HBox([Label('N columns'), self.plot_ncol_slider])
+                    HBox([self.plot_button_results, self.plot_button]),
+                    HBox([Label('N columns'), self.plot_ncol_slider, 
+                          Label('Legend fontsize'), self.plot_legend_font_size])
                 ])
 
     def display_output(self):
@@ -239,205 +246,49 @@ class App():
                  ResetTool(), 
                  ZoomInTool(), 
                  ZoomOutTool(),
-                 SaveTool()]
+                 SaveTool(),
+                 'tap']
         with self.output:
             clear_output()
             for label in list(peakLabels):
                 tmp_data = rt_proj_data[label]
                 p = figure(title=f'Peak: {label}', x_axis_label='Retention Time', 
                            y_axis_label='Intensity', tools=tools)
+                colors = itertools.cycle(palette)    
                 for file, rt_proj in tmp_data.items():
                         x = rt_proj.index
                         y = rt_proj.values
                         if not file in files:
                             continue
                         if file in highlight:
-                            color = 'red'
+                            color = next(colors)
                             legend = os.path.basename(file)
                         else:
                             color = 'blue'
                             legend = None
-                        p.line(x, y, color=color, name=file, line_width=2, legend=legend)
+                        p.line(x, y,
+                               name=file, 
+                               line_width=2, 
+                               legend=legend,
+                               selection_color="firebrick",
+                               color=color)
                         if legend is not None:
-                            p.legend.label_text_font_size = "8pt"
+                            p.legend.label_text_font_size = "{}pt".format(self.plot_legend_font_size.value)
                 p.legend.click_policy = "mute"
-
-
                 plots.append(p)
             grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
             show(grid)
+            self.show_results() 
 
-def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
-    df = mzxml_to_pandas_df(mzxml)
-    peaks = integrate_peaks(df)
-    peaks['mzxmlFile'] = mzxml
-    return peaks 
-
-def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
-    '''
-    Takes the output of mzxml_to_pandas_df() and
-    batch-calculates peak properties.
-    '''
-    peaklist = get_peaklistfrom(peaklist)
-    peaklist.index = range(len(peaklist))
-    results = []
-    for peak in to_peaks(peaklist):
-        result = integrate_peak(df, **peak)
-        results.append(result)
-    results = pd.concat(results)
-    results.index = range(len(results))
-    return pd.merge(peaklist, results, right_index=True, left_index=True)
-
-def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel):
-    '''
-    Takes the output of mzxml_to_pandas_df() and 
-    calculates peak properties of one peak specified by
-    the input arguements.
-    '''
-    slizE =slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
-    peakArea = slizE['intensity array'].sum()
-    result = pd.DataFrame({'peakLabel': peaklabel,
-                           'rtmin': [rtmin], 
-                           'rtmax': [rtmax],
-                           'peakMz': [mz],
-                           'peakMzWidth[ppm]': [dmz],
-                           'peakArea': [peakArea]})
-    return result[['peakArea']]
-
-def peak_rt_projections(df, peaklist=STANDARD_PEAKLIST):
-    '''
-    Takes the output of mzxml_to_pandas_df() and 
-    batch-calcualtes the projections of peaks onto
-    the RT dimension to visualize peak shapes.
-    '''
-    peaklist = get_peaklistfrom(peaklist)
-    peaklist.index = range(len(peaklist))
-    results = []
-    for peak in to_peaks(peaklist):
-        result = peak_rt_projection(df, **peak)
-        results.append(result)
-    return results
-
-def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
-    '''
-    Takes the output of mzxml_to_pandas_df() and 
-    calcualtes the projections of one peak, 
-    specicied by the input parameters, onto
-    the RT dimension to visualize peak shapes.
-    '''
-    slizE = slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
-    rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
-                    .set_index(['retentionTime', 'm/z array'])\
-                    .unstack()\
-                    .sum(axis=1)
-    return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
-
-def get_peaklistfrom(filenames):
-    '''
-    Extracts peak data from csv file.
-    '''
-    if isinstance(filenames, str):
-        filenames = [filenames]
-    peaklist = []
-    cols_to_import = ['peakLabel',
-                      'peakMz',
-                      'peakMzWidth[ppm]',
-                      'rtmin',
-                      'rtmax']
-    for file in filenames:
-        if str(file).endswith('.csv'):
-            df = pd.read_csv(file, usecols=cols_to_import,
-                             dtype={'peakLabel': str})
-            df['peakListFile'] = file
-            peaklist.append(df)
-    return pd.concat(peaklist)
-
-
-def to_peaks(peaklist):
-    '''
-    Takes a dataframe with at least the columns:
-    ['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax', 'peakLabel'].
-    Returns a list of dictionaries that define peaks.
-    '''
-    cols_to_import = ['peakMz', 
-                      'peakMzWidth[ppm]',
-                      'rtmin', 
-                      'rtmax', 
-                      'peakLabel']
-    tmp = [list(i) for i in list(peaklist[cols_to_import].values)]
-    output = [{'mz': el[0],
-               'dmz': el[1], 
-               'rtmin': el[2],
-               'rtmax': el[3], 
-               'peaklabel': el[4]} for el in tmp]
-    return output
-
-def mzxml_to_pandas_df(filename):
-    '''
-    Reads mzXML file and returns a pandas.DataFrame.
-    '''
-    slices = []
-    file = mzxml.MzXML(filename)
-    while True:
-        try:
-            slices.append(pd.DataFrame(file.next()))
-        except:
-            break
-    df = pd.concat(slices)
-    df_to_numeric(df)
-    return df
-
-
-def df_to_numeric(df):
-    '''
-    Converts dataframe to numeric types if possible.
-    '''
-    for col in df.columns:
-        df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
-
-
-def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
-    '''
-    Returns a slize of a metabolomics mzXML file.
-    df - pandas.DataFrame that has columns 
-            * 'retentionTime'
-            * 'm/z array'
-            * 'rtmin'
-            * 'rtmax'
-    rtmin - minimal retention time
-    rtmax - maximal retention time
-    mz - center of mass (m/z)
-    dmz - width of the mass window in ppm
-    '''
-    df_slice = df.loc[(rtmin <= df.retentionTime) &
-                      (df.retentionTime <= rtmax) &
-                      (mz-0.0001*dmz <= df['m/z array']) & 
-                      (df['m/z array'] <= mz+0.0001*dmz)]
-    return df_slice
-
-
-def check_peaklist(filename):
-    if not os.path.isfile(filename):
-        raise FileNotFoundError(f'Cannot find peaklist ({filename}).')
-    try:
-        df = pd.read_csv(P(filename))
-    except:
-        return f'Cannot open peaklist {filename}'
-    try:
-        df[['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax']]
-    except:
-        return f"Not all columns found.\n\
- Please make sure the peaklist file has at least:\
- 'peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'"
-    return f'Peaklist file ok ({filename})'
-
-def restructure_rt_projections(data):
-    output = {}
-    for el in list(data.values())[0]:
-        output[el[4]] = {}
-    for filename in data.keys():
-        for item in data[filename]:
-            peaklabel = item[4]
-            rt_proj = item[5]
-            output[peaklabel][filename] = rt_proj
-    return output
+    def show_results(self, b=None):
+        if self.results is None:
+            return None
+        df = self.results.astype(str)
+        columns = [TableColumn(field=col, title=col) for col in df.columns]
+        data_table = DataTable(columns=columns, 
+                               source=ColumnDataSource(df), 
+                               sizing_mode='stretch_both')
+        with self.output:
+            if b is not None:
+                clear_output()
+            show(data_table)
