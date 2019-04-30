@@ -5,9 +5,9 @@ import pandas as pd
 app = Mint()
 
 def test_peakArea():
-    app.mzxml.files = ['tests/test1.mzXML']
-    app.peaklist.files = ['tests/test1_peaklist.csv']
-    df_test = pd.read_csv('tests/test1_peaklist.csv', dtype={'peakLabel': str})
+    app.mzxml.files = ['static/test.mzXML']
+    app.peaklist.files = ['static/test_peaklist.csv']
+    df_test = pd.read_csv('static/test_peaklist.csv', dtype={'peakLabel': str})
     app.run()
     df = pd.merge(df_test, app.results, on='peakLabel', suffixes=('_real', '_calc'))
     df['peakAreaError'] = df.peakArea_calc - df.peakArea_real

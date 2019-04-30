@@ -51,20 +51,23 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     results.index = range(len(results))
     return pd.merge(peaklist, results, right_index=True, left_index=True)
 
-def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel):
+def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calculates peak properties of one peak specified by
     the input arguements.
     '''
-    slizE = slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
+    slizE = slice_ms1_mzxml(mzxml_df, 
+                rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz
+                )
     peakArea = slizE['intensity array'].sum()
     result = pd.DataFrame({'peakLabel': peaklabel,
                            'rtmin': [rtmin], 
                            'rtmax': [rtmax],
                            'peakMz': [mz],
                            'peakMzWidth[ppm]': [dmz],
-                           'peakArea': [peakArea]})
+                           'peakArea': [peakArea]}
+                         )
     return result[['peakArea']]
 
 def peak_rt_projections(df, peaklist):
