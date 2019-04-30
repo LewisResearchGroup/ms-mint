@@ -25,13 +25,13 @@ from bokeh.models import ColumnDataSource
 from .SelectFilesButton import SelectFilesButton
 
 from .tools import integrate_peaks, peak_rt_projections,\
-    mzxml_to_pandas_df, check_peaklist,\
-    restructure_rt_projections
+    mzxml_to_pandas_df, check_peaklist, STANDARD_PEAKLIST,\
+    restructure_rt_projections, STANDARD_PEAKFILE,\
+    read_peaklists
+
 import warnings
 
 MIIIT_ROOT = os.path.dirname(__file__)
-STANDARD_PEAKLIST = os.path.abspath(str(P(MIIIT_ROOT)/P('../static/Standard_Peaklist.csv')))
-
 DEVEL = True
 
 rt_projections_test_data = {
@@ -59,8 +59,7 @@ class Mint():
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', 
             default_color='lightgreen', callback=self.list_files)
-        self.peaklist.files = [P(os.path.abspath(
-            f'{MIIIT_ROOT}/../static/Standard_Peaklist.csv'))]
+        self.peaklist.files = [STANDARD_PEAKFILE]
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
@@ -79,7 +78,6 @@ class Mint():
         self.progress = Progress(min=0, max=100, layout=Layout(width='99%'))
         self.peaks = []
         self._rt_projections = None
-
         self.download_html = HTML("""Nothing to download""")
         self.output = widgets.Output(layout=Layout(width='99%'))
         self.output_plotting = widgets.Output(layout=Layout(width='99%'))
@@ -103,9 +101,9 @@ class Mint():
         try:
             results = []
             rt_projections = {}
-            peaklist = self.peaklist.files
-            for i in peaklist:
+            for i in self.peaklist.files:
                 self.message_box.value = check_peaklist(i)
+            peaklist = read_peaklists(self.peaklist.files)
             n_files = len(self.mzxml.files)
             processed_files = []
             with self.output:
@@ -273,7 +271,7 @@ class Mint():
                             if file in highlight:
                                 color = next(colors)
                                 legend = os.path.basename(file)
-                                alpha = 1
+                                alpha = 1   
                                 if not high_:
                                     continue
                             else:

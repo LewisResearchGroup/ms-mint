@@ -5,12 +5,36 @@ from pyteomics import mzxml
 from pathlib import Path as P
 
 MINT_ROOT = os.path.dirname(__file__)
-STANDARD_PEAKLIST = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
+STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
+
+def read_peaklists(filenames):
+    '''
+    Extracts peak data from csv file.
+    '''
+    if isinstance(filenames, str):
+        filenames = [filenames]
+    peaklist = []
+    cols_to_import = ['peakLabel',
+                      'peakMz',
+                      'peakMzWidth[ppm]',
+                      'rtmin',
+                      'rtmax']
+    for file in filenames:
+        if str(file).endswith('.csv'):
+            df = pd.read_csv(file, usecols=cols_to_import,
+                             dtype={'peakLabel': str})
+            df['peakListFile'] = file
+            peaklist.append(df)
+    peaklist = pd.concat(peaklist)
+    peaklist.index = range(len(peaklist))
+    return peaklist
+
+STANDARD_PEAKLIST = read_peaklists(STANDARD_PEAKFILE)
 DEVEL = True
 
 def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
     df = mzxml_to_pandas_df(mzxml)
-    peaks = integrate_peaks(df)
+    peaks = integrate_peaks(df, peaklist)
     peaks['mzxmlFile'] = mzxml
     return peaks 
 
@@ -19,8 +43,6 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     Takes the output of mzxml_to_pandas_df() and
     batch-calculates peak properties.
     '''
-    peaklist = get_peaklistfrom(peaklist)
-    peaklist.index = range(len(peaklist))
     results = []
     for peak in to_peaks(peaklist):
         result = integrate_peak(df, **peak)
@@ -45,13 +67,12 @@ def integrate_peak(df, mz, dmz, rtmin, rtmax, peaklabel):
                            'peakArea': [peakArea]})
     return result[['peakArea']]
 
-def peak_rt_projections(df, peaklist=STANDARD_PEAKLIST):
+def peak_rt_projections(df, peaklist):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     batch-calcualtes the projections of peaks onto
     the RT dimension to visualize peak shapes.
     '''
-    peaklist = get_peaklistfrom(peaklist)
     peaklist.index = range(len(peaklist))
     results = []
     for peak in to_peaks(peaklist):
@@ -72,27 +93,6 @@ def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
                     .unstack()\
                     .sum(axis=1)
     return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
-
-def get_peaklistfrom(filenames):
-    '''
-    Extracts peak data from csv file.
-    '''
-    if isinstance(filenames, str):
-        filenames = [filenames]
-    peaklist = []
-    cols_to_import = ['peakLabel',
-                      'peakMz',
-                      'peakMzWidth[ppm]',
-                      'rtmin',
-                      'rtmax']
-    for file in filenames:
-        if str(file).endswith('.csv'):
-            df = pd.read_csv(file, usecols=cols_to_import,
-                             dtype={'peakLabel': str})
-            df['peakListFile'] = file
-            peaklist.append(df)
-    return pd.concat(peaklist)
-
 
 def to_peaks(peaklist):
     '''
@@ -128,14 +128,12 @@ def mzxml_to_pandas_df(filename):
     df_to_numeric(df)
     return df
 
-
 def df_to_numeric(df):
     '''
     Converts dataframe to numeric types if possible.
     '''
     for col in df.columns:
         df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
-
 
 def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
     '''
@@ -156,10 +154,9 @@ def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
                       (df['m/z array'] <= mz+0.0001*dmz)]
     return df_slice
 
-
 def check_peaklist(filename):
     if not os.path.isfile(filename):
-        raise FileNotFoundError(f'Cannot find peaklist ({filename}).')
+        raise FileNotFoundError(f'Cannot find peaklist file ({filename}).')
     try:
         df = pd.read_csv(P(filename))
     except:
@@ -182,3 +179,4 @@ def restructure_rt_projections(data):
             rt_proj = item[5]
             output[peaklabel][filename] = rt_proj
     return output
+

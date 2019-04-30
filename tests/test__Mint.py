@@ -1,4 +1,4 @@
-from miiit.miiit import Mint
+from mint.Mint import Mint
 from sklearn.metrics import r2_score
 import pandas as pd
 
