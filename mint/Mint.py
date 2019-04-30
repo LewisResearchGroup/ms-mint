@@ -82,12 +82,13 @@ class Mint():
 
         self.download_html = HTML("""Nothing to download""")
         self.output = widgets.Output(layout=Layout(width='99%'))
+        self.output_plotting = widgets.Output(layout=Layout(width='99%'))
         self.peakLabels = []
         # Plotting stuff
-        self.plot_button_results = Button(description="Show Results Table")
-        self.plot_button_results.on_click(self.show_results)
-        self.plot_button = Button(description="Plot Peaks")
-        self.plot_button.on_click(self.plot_button_on_click)
+        self.button_show_table = Button(description="Show Results Table")
+        self.button_show_table.on_click(self.show_table)
+        self.button_show_plots = Button(description="Plot Peaks")
+        self.button_show_plots.on_click(self.button_show_plots_on_click)
         self.plot_peak_selector = SelectMultiple(
             options=[], layout=Layout(width='33%', height='90px', Label='test'))
         self.plot_file_selector = SelectMultiple(
@@ -130,7 +131,7 @@ class Mint():
             self.download(None)
             self.update_highlight_selector()
             self.update_peak_selector()
-            self.show_results()
+            self.show_table()
         except Exception as e:
             self.message_box.value = str(e)
 
@@ -213,21 +214,29 @@ class Mint():
                            self.download_html]),
                     self.message_box,
                     self.progress,
-                    HBox([Label('Peak', layout=Layout(width='30%')),
+                    HBox([self.button_show_table]),
+                    ])
+
+    def gui_plotting(self):
+        gui = VBox([HBox([Label('Peak', layout=Layout(width='30%')),
                           Label('File', layout=Layout(width='30%')), 
                           Label('Highlight', layout=Layout(width='30%'))]),
                     HBox([self.plot_peak_selector,
                           self.plot_file_selector,
                           self.plot_highlight_selector]),
-                    HBox([self.plot_button_results, self.plot_button]),
                     HBox([Label('N columns'), self.plot_ncol_slider, 
-                          Label('Legend fontsize'), self.plot_legend_font_size])
-                ])
+                          Label('Legend fontsize'), self.plot_legend_font_size]),
+                    HBox([self.button_show_plots])
+                    ])
+        return gui
 
     def display_output(self):
         display(self.output)
 
-    def plot_button_on_click(self, button):
+    def display_plots(self):
+        display(self.output_plotting)
+
+    def button_show_plots_on_click(self, b=None):
         self.plot()
     
     def plot(self):
@@ -248,39 +257,45 @@ class Mint():
                  ZoomOutTool(),
                  SaveTool(),
                  'tap']
-        with self.output:
+        with self.output_plotting:
             clear_output()
             for label in list(peakLabels):
                 tmp_data = rt_proj_data[label]
                 p = figure(title=f'Peak: {label}', x_axis_label='Retention Time', 
                            y_axis_label='Intensity', tools=tools)
-                colors = itertools.cycle(palette)    
-                for file, rt_proj in tmp_data.items():
-                        x = rt_proj.index
-                        y = rt_proj.values
-                        if not file in files:
-                            continue
-                        if file in highlight:
-                            color = next(colors)
-                            legend = os.path.basename(file)
-                        else:
-                            color = 'blue'
-                            legend = None
-                        p.line(x, y,
-                               name=file, 
-                               line_width=2, 
-                               legend=legend,
-                               selection_color="firebrick",
-                               color=color)
-                        if legend is not None:
-                            p.legend.label_text_font_size = "{}pt".format(self.plot_legend_font_size.value)
+                colors = itertools.cycle(palette)
+                for high_ in [False, True]:
+                    for file, rt_proj in tmp_data.items():
+                            x = rt_proj.index
+                            y = rt_proj.values
+                            if not file in files:
+                                continue
+                            if file in highlight:
+                                color = next(colors)
+                                legend = os.path.basename(file)
+                                alpha = 1
+                                if not high_:
+                                    continue
+                            else:
+                                color = 'blue'
+                                legend = None
+                                alpha = 0.5
+                                if high_:
+                                    continue
+                            p.line(x, y,
+                                name=file, 
+                                line_width=2, 
+                                legend=legend,
+                                selection_color="firebrick",
+                                color=color, alpha=alpha)
+                            if legend is not None:
+                                p.legend.label_text_font_size = "{}pt".format(self.plot_legend_font_size.value)
                 p.legend.click_policy = "mute"
                 plots.append(p)
             grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
             show(grid)
-            self.show_results() 
 
-    def show_results(self, b=None):
+    def show_table(self, b=None):
         if self.results is None:
             return None
         df = self.results.astype(str)
@@ -289,6 +304,5 @@ class Mint():
                                source=ColumnDataSource(df), 
                                sizing_mode='stretch_both')
         with self.output:
-            if b is not None:
-                clear_output()
+            clear_output()
             show(data_table)
