@@ -25,5 +25,4 @@ Then navigate to the following ULR with your browser:
 
     http://localhost:9999/apps/Mint.ipynb?appmode_scroll=0
 
-
 ![Demo Image](./image/mint.png "Demo image")
