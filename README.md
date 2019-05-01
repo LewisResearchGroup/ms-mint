@@ -11,7 +11,7 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
     cd mint
     conda env create -f requirements.txt
     conda activate mint
-    pip install .
+    python setup.py install
 
 ## Start the application
 
