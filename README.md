@@ -9,7 +9,7 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
 
     git clone https://github.com/LSARP/mint
     cd mint
-    conda env create -f environment.txt
+    conda env create -f environment.yml
     conda activate mint
     python setup.py install
 
