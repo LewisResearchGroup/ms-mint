@@ -124,8 +124,7 @@ class Mint():
                 'peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
                 'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
             self.rt_projections = restructure_rt_projections(rt_projections)
-            if len(processed_files) == 1:
-                self.message_box.value = 'Done'
+            self.message_box.value = 'Done'
             self.download(None)
             self.update_highlight_selector()
             self.update_peak_selector()
