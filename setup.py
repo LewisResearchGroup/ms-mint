@@ -9,11 +9,11 @@ config = {
     'author': 'Soren Wacker',
     'url': 'https://github.com/soerendip/mint',
     'author_email': 'swacker@ucalgary.ca',
-    'version': 0.1,
-    'scripts': ['scripts/Mint', 'scripts/Mint__windows.bat'],
+    'version': 0.2,
+    'scripts': ['scripts/Mint.py', 'scripts/Mint__windows.bat'],
     'packages': ['mint'],
     'name': 'mint',
-    'data_files': [('scripts', ['scripts/Mint', 'scripts/Mint__windows.bat']),
+    'data_files': [('scripts', ['scripts/Mint.py', 'scripts/Mint__windows.bat']),
                    ('static', ['static/Standard_Peaklist.csv']),
                    ('notebooks', ['notebooks/Mint.ipynb'])]
 }

@@ -409,7 +409,7 @@ class Mint():
 
         with self.output:
             clear_output()
-            show(app)
+            show(app, notebook_url='localhost:9999')
 
 def process(args):
     '''Pickleable function for parallel processing.'''
