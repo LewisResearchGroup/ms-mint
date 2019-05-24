@@ -63,7 +63,7 @@ rt_projections_test_data = {
     }
 
 class Mint():
-    def __init__(self):
+    def __init__(self, port=None):
         output_notebook(hide_banner=True)
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', 
@@ -74,7 +74,7 @@ class Mint():
         self.stop_button.on_click(self.stop)   
         self.download_button = Button(description="Download")
         self.download_button.on_click(self.download)
-
+        self.port = port
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
@@ -409,7 +409,10 @@ class Mint():
 
         with self.output:
             clear_output()
-            show(app, notebook_url='localhost:9999')
+            if self.port is not None:
+                show(app, notebook_url=f'localhost:{self.port}')
+            else:
+                show(app)
 
 def process(args):
     '''Pickleable function for parallel processing.'''

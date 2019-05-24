@@ -9,4 +9,4 @@ if exist C:\Users\%USERNAME%\AppData\Local\Continuum\miniconda3\Scripts\activate
     call activate mint
 )
 
-python Mint
+python Mint.py
