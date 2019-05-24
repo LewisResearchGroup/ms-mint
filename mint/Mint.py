@@ -31,6 +31,9 @@ from .tools import integrate_peaks, peak_rt_projections,\
 
 import warnings
 
+from multiprocessing import Process, Queue, Pool, cpu_count
+
+
 MIIIT_ROOT = os.path.dirname(__file__)
 DEVEL = True
 
@@ -97,7 +100,7 @@ class Mint():
         self.plot_legend_font_size = IntSlider(min=1, max=20, step=1, value=6)
         warnings.filterwarnings('ignore')
 
-    def run(self, b=None):
+    def run_simple(self, b=None):
         try:
             results = []
             rt_projections = {}
@@ -129,6 +132,43 @@ class Mint():
             self.update_highlight_selector()
             self.update_peak_selector()
             self.show_table()
+        except Exception as e:
+            self.message_box.value = str(e)
+
+    def run(self, b=None, nthreads=None):
+        try:
+            with self.output:
+                if nthreads is None:
+                    nthreads = cpu_count()
+                    self.message_box.value = f'Using {nthreads} cores.'
+                
+                results = []
+                rt_projections = {}
+                for i in self.peaklist.files:
+                    self.message_box.value = check_peaklist(i)
+                peaklist = read_peaklists(self.peaklist.files)
+                n_files = len(self.mzxml.files)
+                processed_files = []
+                args = []
+                for i, filename in enumerate(self.mzxml.files):
+                    args.append({'filename': filename,
+                                    'peaklist': peaklist})
+                q = Queue()
+                pool = Pool(processes=nthreads)
+                results = pool.map_async(process, args)
+                pool.close()
+                pool.join()
+                results = results.get()
+                self.results = pd.concat([i[0] for i in results])[[
+                    'peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
+                    'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
+                [rt_projections.update(i[1]) for i in results]
+                self.rt_projections = restructure_rt_projections(rt_projections)
+                self.message_box.value = 'Done'
+                self.download(None)
+                self.update_highlight_selector()
+                self.update_peak_selector()
+                self.show_table()
         except Exception as e:
             self.message_box.value = str(e)
 
@@ -303,3 +343,13 @@ class Mint():
         with self.output:
             clear_output()
             show(data_table)
+
+def process(args):
+    filename = args['filename']
+    peaklist = args['peaklist']
+    df = mzxml_to_pandas_df(filename)
+    result = integrate_peaks(df, peaklist)
+    result['mzxmlFile'] = os.path.basename(filename)
+    result['mzxmlPath'] = os.path.dirname(filename)
+    rt_projection = {filename: peak_rt_projections(df, peaklist)}
+    return result, rt_projection
