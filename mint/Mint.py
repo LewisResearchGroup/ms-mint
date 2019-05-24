@@ -3,6 +3,7 @@ import uuid
 import datetime
 import itertools
 import pandas as pd
+import time
 
 import ipywidgets as widgets    
 from ipywidgets import Button, HBox, VBox, Textarea, HTML,\
@@ -22,6 +23,11 @@ from bokeh.models import DataTable
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
 from bokeh.models import ColumnDataSource
 
+from bokeh.layouts import row
+from bokeh.io import show, output_notebook
+from bokeh.application.handlers import FunctionHandler
+from bokeh.application import Application
+
 from .SelectFilesButton import SelectFilesButton
 
 from .tools import integrate_peaks, peak_rt_projections,\
@@ -31,7 +37,7 @@ from .tools import integrate_peaks, peak_rt_projections,\
 
 import warnings
 
-from multiprocessing import Process, Queue, Pool, cpu_count
+from multiprocessing import Process, Pool, Manager, cpu_count
 
 
 MIIIT_ROOT = os.path.dirname(__file__)
@@ -62,30 +68,30 @@ class Mint():
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
         self.peaklist = SelectFilesButton(text='Peaklist', 
             default_color='lightgreen', callback=self.list_files)
-        self.peaklist.files = [STANDARD_PEAKFILE]
+        self.run_button = Button(description="Run")
+        self.run_button.on_click(self.run)    
+        self.stop_button = Button(description="STOP")
+        self.stop_button.on_click(self.stop)   
+        self.download_button = Button(description="Download")
+        self.download_button.on_click(self.download)
+
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
             description='',
             disabled=True,
             layout={'width': '99%', 
-                    'height': '200px', 
+                    'height': '400px', 
                     'font_family': 'monospace'})
+
         self.list_button = Button(description="List Files")
         self.list_button.on_click(self.list_files)
-        self.run_button = Button(description="Run")
-        self.run_button.on_click(self.run)
-        self.download_button = Button(description="Download")
-        self.download_button.on_click(self.download)
-        self._results_df = None
+        self.report_issue = HTML("""<a href="https://github.com/LSARP/mint/issues" target="_blank">Report an issue</a>""")
         self.progress = Progress(min=0, max=100, layout=Layout(width='99%'))
-        self.peaks = []
-        self._rt_projections = None
         self.download_html = HTML("""Nothing to download""")
         self.output = widgets.Output(layout=Layout(width='99%'))
         self.output_plotting = widgets.Output(layout=Layout(width='99%'))
-        self.peakLabels = []
-        # Plotting stuff
+        # Plotting elements
         self.button_show_table = Button(description="Show Results Table")
         self.button_show_table.on_click(self.show_table)
         self.button_show_plots = Button(description="Plot Peaks")
@@ -99,6 +105,16 @@ class Mint():
         self.plot_ncol_slider = IntSlider(min=1, max=5, step=1, value=3)
         self.plot_legend_font_size = IntSlider(min=1, max=20, step=1, value=6)
         warnings.filterwarnings('ignore')
+        # default values
+        self.peaklist.files = [STANDARD_PEAKFILE]
+        self._results_df = None
+        self.peaks = []
+        self._rt_projections = None
+        self.peakLabels = []
+        self._stop = False
+
+    def stop(self, b=None):
+        self._stop = True
 
     def run_simple(self, b=None):
         try:
@@ -132,16 +148,20 @@ class Mint():
             self.update_highlight_selector()
             self.update_peak_selector()
             self.show_table()
+
+            def selector_callback(widget):
+                self.plot_highlight_selector.options = self.plot_file_selector.value
+
+            self.plot_file_selector.on_trait_change(selector_callback)
+
         except Exception as e:
             self.message_box.value = str(e)
 
     def run(self, b=None, nthreads=None):
-        try:
+            self._stop = False
             with self.output:
                 if nthreads is None:
                     nthreads = cpu_count()
-                    self.message_box.value = f'Using {nthreads} cores.'
-                
                 results = []
                 rt_projections = {}
                 for i in self.peaklist.files:
@@ -150,14 +170,34 @@ class Mint():
                 n_files = len(self.mzxml.files)
                 processed_files = []
                 args = []
+
+                self.message_box.value += f'\n\nUsing {nthreads} cores.'
+                pool = Pool(processes=nthreads)
+                m = Manager()
+                q = m.Queue()
+
                 for i, filename in enumerate(self.mzxml.files):
                     args.append({'filename': filename,
-                                    'peaklist': peaklist})
-                q = Queue()
-                pool = Pool(processes=nthreads)
+                                 'peaklist': peaklist,
+                                 'q':q})
                 results = pool.map_async(process, args)
+
+                # monitor progress
+                while True:
+                    if results.ready():
+                        break
+                    elif self._stop:
+                        pool.terminate()
+                        return None
+                    else:
+                        size = q.qsize()
+                        self.progress.value = 100 * size / n_files
+                        self.progress.description = f'{size}/{n_files}'
+                        time.sleep(1)
+
                 pool.close()
                 pool.join()
+
                 results = results.get()
                 self.results = pd.concat([i[0] for i in results])[[
                     'peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
@@ -169,8 +209,6 @@ class Mint():
                 self.update_highlight_selector()
                 self.update_peak_selector()
                 self.show_table()
-        except Exception as e:
-            self.message_box.value = str(e)
 
     def update_peak_selector(self):
         new_values =  tuple(self.rt_projections.keys())
@@ -181,6 +219,10 @@ class Mint():
         self.plot_highlight_selector.options = new_values
         self.plot_file_selector.options = new_values
 
+    def update_file_selector(self):
+        new_values = tuple(list(self.rt_projections.values())[0].keys())
+        self.plot_highlight_selector.options = new_values
+        self.plot_file_selector.options = new_values
 
     @property
     def results(self):
@@ -200,10 +242,10 @@ class Mint():
         self.update_peak_selector()
         self.update_highlight_selector()
 
-
     def list_files(self, b=None):
-        text = 'mzXML files to process:\n'
         self.mzxml.files = [i for i in self.mzxml.files if i.endswith('.mzXML')]
+        text = '{} mzXML files to process:\n'.format(len(self.mzxml.files))
+
         for line in self.mzxml.files:
             text += line+'\n'
         text += '\n\nUsing peak list:\n'
@@ -248,16 +290,17 @@ class Mint():
         return VBox([HBox([self.mzxml, 
                            self.peaklist, 
                            self.run_button, 
+                           self.stop_button,
                            self.download_html]),
                     self.message_box,
                     self.progress,
-                    HBox([self.button_show_table]),
+                    HBox([self.button_show_table, self.report_issue]),
                     ])
 
     def gui_plotting(self):
         gui = VBox([HBox([Label('Peak', layout=Layout(width='30%')),
                           Label('File', layout=Layout(width='30%')), 
-                          Label('Highlight', layout=Layout(width='30%'))]),
+                          Label('Highlight', layout=Layout(width='30%'))], layout=Layout(hight='200px')),
                     HBox([self.plot_peak_selector,
                           self.plot_file_selector,
                           self.plot_highlight_selector]),
@@ -332,24 +375,51 @@ class Mint():
             grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
             show(grid)
 
+    
+
+
     def show_table(self, b=None):
         if self.results is None:
             return None
+
         df = self.results.astype(str)
         columns = [TableColumn(field=col, title=col) for col in df.columns]
+        source = ColumnDataSource(df)
+
+        def callback(attrname, old, new):
+            selectionIndex = source.selected.indices
+            peakLabels = tuple(self.results.iloc[selectionIndex]['peakLabel'].drop_duplicates())
+            mzxmlFiles = tuple(self.results.iloc[selectionIndex]['mzxmlFile'].drop_duplicates())
+            self.plot_peak_selector.value = peakLabels
+            self.plot_file_selector.value = mzxmlFiles
+
+        source.selected.on_change('indices', callback)
+
         data_table = DataTable(columns=columns, 
-                               source=ColumnDataSource(df), 
+                               source=source, 
                                sizing_mode='stretch_both')
+
+        # Create the Document Application
+        def modify_doc(doc):
+            layout = row(data_table)
+            doc.add_root(layout)      
+
+        handler = FunctionHandler(modify_doc)
+        app = Application(handler)                       
+
         with self.output:
             clear_output()
-            show(data_table)
+            show(app)
 
 def process(args):
+    '''Pickleable function for parallel processing.'''
     filename = args['filename']
     peaklist = args['peaklist']
+    q = args['q']
+    q.put('filename')
     df = mzxml_to_pandas_df(filename)
     result = integrate_peaks(df, peaklist)
-    result['mzxmlFile'] = os.path.basename(filename)
+    result['mzxmlFile'] = filename
     result['mzxmlPath'] = os.path.dirname(filename)
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
     return result, rt_projection

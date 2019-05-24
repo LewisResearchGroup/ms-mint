@@ -38,14 +38,14 @@ class SelectFilesButton(widgets.Button):
         b : obj:
             An instance of ipywidgets.widgets.Button 
         """
-        # try:
-        # Create Tk root
-        root = Tk()
-        # Hide the main window
-        root.withdraw()
-        # Raise the root to the top of all windows.
-        root.call('wm', 'attributes', '.', '-topmost', True)
-        # List of selected fileswill be set to b.value
-        b.files = filedialog.askopenfilename(multiple=True)
-        # except:
-        #     pass
+        try:
+            # Create Tk root
+            root = Tk()
+            # Hide the main window
+            root.withdraw()
+            # Raise the root to the top of all windows.
+            root.call('wm', 'attributes', '.', '-topmost', True)
+            # List of selected fileswill be set to b.value
+            b.files = filedialog.askopenfilename(multiple=True)
+        except:
+            pass
