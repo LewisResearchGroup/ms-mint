@@ -11,15 +11,15 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
     cd mint
     conda env create -f environment.yml
     conda activate mint
-    python setup.py install
+    python setup.py install  # Don't use pip to install it.
 
 ## Start the application
 
 Start the app with
 
     conda activate mint
-    Mint  # Under Linux
-    python scripts/Mint  # Under Windows
+    Mint.py  # Under Linux
+    python scripts/Mint.py  # Under Windows
 
 Then navigate to the following ULR with your browser:
 
