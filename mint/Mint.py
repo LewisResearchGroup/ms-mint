@@ -97,11 +97,11 @@ class Mint():
         self.button_show_plots = Button(description="Plot Peaks")
         self.button_show_plots.on_click(self.button_show_plots_on_click)
         self.plot_peak_selector = SelectMultiple(
-            options=[], layout=Layout(width='33%', height='90px', Label='test'))
+            options=[], layout=Layout(width='33%', height='200px', Label='test'))
         self.plot_file_selector = SelectMultiple(
-            options=[], layout=Layout(width='33%', height='90px'))
+            options=[], layout=Layout(width='33%', height='200px'))
         self.plot_highlight_selector = SelectMultiple(
-            options=[], layout=Layout(width='33%', height='90px'))
+            options=[], layout=Layout(width='33%', height='200px'))
         self.plot_ncol_slider = IntSlider(min=1, max=5, step=1, value=3)
         self.plot_legend_font_size = IntSlider(min=1, max=20, step=1, value=6)
         warnings.filterwarnings('ignore')
@@ -300,7 +300,7 @@ class Mint():
     def gui_plotting(self):
         gui = VBox([HBox([Label('Peak', layout=Layout(width='30%')),
                           Label('File', layout=Layout(width='30%')), 
-                          Label('Highlight', layout=Layout(width='30%'))], layout=Layout(hight='200px')),
+                          Label('Highlight', layout=Layout(width='30%'))]),
                     HBox([self.plot_peak_selector,
                           self.plot_file_selector,
                           self.plot_highlight_selector]),
