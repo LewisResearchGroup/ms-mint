@@ -375,9 +375,6 @@ class Mint():
             grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
             show(grid)
 
-    
-
-
     def show_table(self, b=None):
         if self.results is None:
             return None
