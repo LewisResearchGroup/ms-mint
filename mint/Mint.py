@@ -29,6 +29,7 @@ from bokeh.application.handlers import FunctionHandler
 from bokeh.application import Application
 
 from .SelectFilesButton import SelectFilesButton
+from .SelectFolderButton import SelectFolderButton
 
 from .tools import integrate_peaks, peak_rt_projections,\
     mzxml_to_pandas_df, check_peaklist, STANDARD_PEAKLIST,\
@@ -38,7 +39,7 @@ from .tools import integrate_peaks, peak_rt_projections,\
 import warnings
 
 from multiprocessing import Process, Pool, Manager, cpu_count
-
+from glob import glob
 
 MIIIT_ROOT = os.path.dirname(__file__)
 DEVEL = True
@@ -66,6 +67,7 @@ class Mint():
     def __init__(self, port=None):
         output_notebook(hide_banner=True)
         self.mzxml = SelectFilesButton(text='Select mzXML', callback=self.list_files)
+        self.mzxml_folder = SelectFolderButton(text='Select Directory', callback=self.list_files_from_folder)
         self.peaklist = SelectFilesButton(text='Peaklist', 
             default_color='lightgreen', callback=self.list_files)
         self.run_button = Button(description="Run")
@@ -115,47 +117,6 @@ class Mint():
 
     def stop(self, b=None):
         self._stop = True
-
-    def run_simple(self, b=None):
-        try:
-            results = []
-            rt_projections = {}
-            for i in self.peaklist.files:
-                self.message_box.value = check_peaklist(i)
-            peaklist = read_peaklists(self.peaklist.files)
-            n_files = len(self.mzxml.files)
-            processed_files = []
-            with self.output:
-                for i, filename in enumerate(self.mzxml.files):
-                    processed_files.append(filename)
-                    run_text = 'Processing: \n' + '\n'.join(processed_files[-20:])
-                    self.message_box.value = run_text
-                    self.progress.value = 100 * (i+1) / n_files
-                    self.progress.description = f'{i+1}/{n_files}'
-                    df = mzxml_to_pandas_df(filename)
-                    result = integrate_peaks(df, peaklist)
-                    result['mzxmlFile'] = os.path.basename(filename)
-                    result['mzxmlPath'] = os.path.dirname(filename)
-                    results.append(result)
-                    rt_projection = peak_rt_projections(df, peaklist)
-                    rt_projections[filename] = rt_projection
-            self.results = pd.concat(results)[[
-                'peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
-                'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
-            self.rt_projections = restructure_rt_projections(rt_projections)
-            self.message_box.value = 'Done'
-            self.download(None)
-            self.update_highlight_selector()
-            self.update_peak_selector()
-            self.show_table()
-
-            def selector_callback(widget):
-                self.plot_highlight_selector.options = self.plot_file_selector.value
-
-            self.plot_file_selector.on_trait_change(selector_callback)
-
-        except Exception as e:
-            self.message_box.value = str(e)
 
     def run(self, b=None, nthreads=None):
             self._stop = False
@@ -254,7 +215,18 @@ class Mint():
         else:
             text += '\nNo peaklist defined.'
         self.message_box.value = text
-        
+        if len(self.mzxml.files) > 0:
+            self.mzxml.style.button_color = 'lightgreen'
+        else: 
+            self.mzxml.style.button_color = 'red'
+            self.mzxml_folder.files = []
+            self.mzxml_folder.style.button_color = 'red'
+
+    def list_files_from_folder(self, b=None):
+        pattern = self.mzxml_folder.files[0]+'/**/*.mzXML'
+        self.mzxml.files = glob(pattern, recursive=True)
+        self.list_files()
+
     def download(self, b):
         if self.results is None:
             print('First you have to create some results.')
@@ -287,7 +259,8 @@ class Mint():
                         on='peakLabel')    
     
     def gui(self):
-        return VBox([HBox([self.mzxml, 
+        return VBox([HBox([self.mzxml,
+                           self.mzxml_folder,
                            self.peaklist, 
                            self.run_button, 
                            self.stop_button,
