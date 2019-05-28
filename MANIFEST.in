@@ -1,0 +1,2 @@
+include versioneer.py
+include mint/_version.py
