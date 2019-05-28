@@ -41,28 +41,6 @@ import warnings
 from multiprocessing import Process, Pool, Manager, cpu_count
 from glob import glob
 
-MIIIT_ROOT = os.path.dirname(__file__)
-DEVEL = True
-
-rt_projections_test_data = {
-    'TestLabel1': {
-        'File1': pd.Series([1, 0, 0], 
-                           index=pd.Index([1, 2, 3], 
-                                          name='retentionTime')),
-        'File2': pd.Series([0, 1, 0], 
-                           index=pd.Index([1, 2.4, 2.8], 
-                                          name='retentionTime'))
-        },
-    'TestLabel2': {
-        'File1': pd.Series([7., .8, .8], 
-                           index=pd.Index([4, 5, 6], 
-                                          name='retentionTime')),
-        'File2': pd.Series([53., .56, .12], 
-                           index=pd.Index([4, 5.4, 6], 
-                                          name='retentionTime'))
-        }
-    }
-
 class Mint():
     def __init__(self, port=None):
         output_notebook(hide_banner=True)
@@ -136,7 +114,7 @@ class Mint():
                 pool = Pool(processes=nthreads)
                 m = Manager()
                 q = m.Queue()
-
+                
                 for i, filename in enumerate(self.mzxml.files):
                     args.append({'filename': filename,
                                  'peaklist': peaklist,
@@ -223,9 +201,12 @@ class Mint():
             self.mzxml_folder.style.button_color = 'red'
 
     def list_files_from_folder(self, b=None):
-        pattern = self.mzxml_folder.files[0]+'/**/*.mzXML'
-        self.mzxml.files = glob(pattern, recursive=True)
-        self.list_files()
+        try:
+            pattern = self.mzxml_folder.files[0]+'/**/*.mzXML'
+            self.mzxml.files = glob(pattern, recursive=True)
+            self.list_files()
+        except:
+            pass
 
     def download(self, b):
         if self.results is None:
