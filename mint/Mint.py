@@ -40,6 +40,10 @@ import warnings
 
 from multiprocessing import Process, Pool, Manager, cpu_count
 from glob import glob
+import mint
+
+from datetime import date
+
 
 class Mint():
     def __init__(self, port=None):
@@ -220,7 +224,10 @@ class Mint():
             writer = pd.ExcelWriter(filename)
             self.results.to_excel(writer, 'MainTable', index=False)
             self.results_crosstab('peakArea')\
-                .to_excel(writer, 'peakArea', index=True)
+                .to_excel(writer, 'peakArea', index=False)
+            meta = pd.DataFrame({'Version': [mint.__version__], 
+                                 'Date': [str(date.today())]}).T
+            meta.to_excel(writer, 'MetaData', index=False)
             writer.save()
             self.download_html.value = \
                 """<a download='{}' href='{}'>Download</a>"""\

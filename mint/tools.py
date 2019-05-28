@@ -94,7 +94,7 @@ def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
     '''
     slizE = slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
     rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
-                    .set_index(['retentionTime', 'm/z array'])\
+                    .groupby(['retentionTime', 'm/z array']).sum()\
                     .unstack()\
                     .sum(axis=1)
     return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
