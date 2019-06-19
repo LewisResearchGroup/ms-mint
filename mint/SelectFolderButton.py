@@ -4,11 +4,11 @@ import traitlets
 from IPython.display import display
 from tkinter import Tk, filedialog
 
-class SelectFilesButton(widgets.Button):
+class SelectFolderButton(widgets.Button):
     """A file widget that leverages tkinter.filedialog."""
 
     def __init__(self, text='Button', default_color='orange', callback=None):
-        super(SelectFilesButton, self).__init__()
+        super(SelectFolderButton, self).__init__()
         # Add the selected_files trait
         self.add_traits(files=traitlets.traitlets.List())
         # Create the button.
@@ -46,6 +46,6 @@ class SelectFilesButton(widgets.Button):
             # Raise the root to the top of all windows.
             root.call('wm', 'attributes', '.', '-topmost', True)
             # List of selected fileswill be set to b.value
-            b.files = filedialog.askopenfilename(multiple=True)
+            b.files = [filedialog.askdirectory()]
         except:
             pass
