@@ -1,13 +1,19 @@
 import os
 import pandas as pd
+import numpy as np
 
 from pyteomics import mzxml
 from pathlib import Path as P
 
 from multiprocessing import Process, Queue, Pool
+from scipy.optimize import curve_fit
+
 
 MINT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
+
+def gaus(x,a,x0,sigma):
+    return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
 def read_peaklists(filenames):
     '''
@@ -62,15 +68,36 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
     slizE = slice_ms1_mzxml(mzxml_df, 
                 rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz
                 )
+    
+    rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
+                    .groupby(['retentionTime', 'm/z array']).sum()\
+                    .unstack()\
+                    .sum(axis=1)
+    intensity_median = rt_projection.median()
+    intensity_max =  rt_projection.max()
+    intensity_min =  rt_projection.min()
+    try:
+        max_intensity_rt = max(rt_projection.index)
+    except:
+        max_intensity_rt = None
+    try:
+        popt, pcov = curve_fit(gaus,rt_projection.index, rt_projection.values, p0=[intensity_max,max_intensity_rt,1], maxfev=1000)
+    except:
+        popt = [None, None, None]
+    gauss_fit_intensity = popt[0]
+    gauss_fit_rt = popt[1]
+        
     peakArea = slizE['intensity array'].sum()
-    result = pd.DataFrame({'peakLabel': peaklabel,
-                           'rtmin': [rtmin], 
-                           'rtmax': [rtmax],
-                           'peakMz': [mz],
-                           'peakMzWidth[ppm]': [dmz],
-                           'peakArea': [peakArea]}
+    result = pd.DataFrame({'peakArea': peakArea,
+                           'max_intensity_rt': max_intensity_rt,
+                           'gauss_fit_intensity': gauss_fit_intensity,
+                           'gauss_fit_rt': gauss_fit_rt,
+                           'intensity_median': intensity_median,
+                           'intensity_max': intensity_max,
+                           'intensity_min': intensity_min,
+                          }, index=[0]
                          )
-    return result[['peakArea']]
+    return result
 
 def peak_rt_projections(df, peaklist):
     '''
