@@ -89,7 +89,7 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
         
     peakArea = slizE['intensity array'].sum()
     result = pd.DataFrame({'peakArea': peakArea,
-                           'max_intensity_rt': max_intensity_rt,
+                           'rt_max_intensity': max_intensity_rt,
                            'gauss_fit_intensity': gauss_fit_intensity,
                            'gauss_fit_rt': gauss_fit_rt,
                            'intensity_median': intensity_median,
