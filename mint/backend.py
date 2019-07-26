@@ -19,15 +19,19 @@ import mint
 from datetime import date
 
 class Mint(object):
-    def __init__(self, callback_progress=None):
+    def __init__(self):
         self._mzxml_files = []
         self._peaklist_files = []
         self._peaklist = pd.DataFrame([])
         self._rt_projections = None
-        self._results = pd.DataFrame([])
+        columns = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 
+                  'rtmin', 'rtmax', 'peakArea', 'mzxmlFile', 'mzxmlPath', 
+                  'peakListFile']
+        self._results = pd.DataFrame({i: [] for i in columns})
         self._n_files = 0
         self._n_files_processed = 0
-        self._callback_progress = callback_progress
+        self._callback_progress = None
+        self._all_df = None
 
     def process_files(self, nthreads=None):
         if nthreads is None:
@@ -67,7 +71,8 @@ class Mint(object):
             'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
         rt_projections = {}
         [rt_projections.update(i[1]) for i in results]
-        self.rt_projections = restructure_rt_projections(rt_projections)   
+        self.rt_projections = restructure_rt_projections(rt_projections)  
+        self.all_df = pd.concat([i[2] for i in results])
 
     @property
     def mzxml_files(self):
@@ -121,7 +126,13 @@ class Mint(object):
                                     self.results.mzxmlFile, 
                                     self.results['peakArea'], 
                                     aggfunc=sum)
-
+    @property
+    def callback_progress(self):
+        return self._callback_progress
+    
+    @callback_progress.setter
+    def callback_progress(self, func):
+        self._callback_progress = func
 
 
 def process_in_parallel(args):
@@ -131,9 +142,10 @@ def process_in_parallel(args):
     q = args['q']
     q.put('filename')
     df = mzxml_to_pandas_df(filename)
+    df['mzxmlFile'] = filename
     result = integrate_peaks(df, peaklist)
     result['mzxmlFile'] = filename
     result['mzxmlPath'] = os.path.dirname(filename)
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection
+    return result, rt_projection, df
 
