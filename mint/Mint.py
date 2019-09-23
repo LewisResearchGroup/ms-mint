@@ -44,6 +44,16 @@ import mint
 
 from datetime import date
 
+import plotly.graph_objects as go
+from ipywidgets import interact, interactive, fixed, interact_manual
+import ipywidgets as widgets
+import numpy as np
+from os.path import basename
+
+from scipy.cluster.hierarchy import linkage, dendrogram
+from scipy.spatial.distance import pdist, squareform
+
+import plotly.express as px
 
 class Mint():
     def __init__(self, port=None):
@@ -58,7 +68,7 @@ class Mint():
         self.peaklist = SelectFilesButton(
             text='Peaklist', default_color='lightgreen', callback=self.list_files)
 
-        self.output_folder = SelectFolderButton(text='Output Directory', callback=self.export)
+        self.output_folder = SelectFolderButton(text='Export', callback=self.export)
 
         self.run_button = Button(description="Run", style=ButtonStyle(button_color ='lightgreen'))
         self.run_button.on_click(self.run)    
@@ -87,6 +97,10 @@ class Mint():
         self.button_show_table.on_click(self.show_table)
         self.button_show_plots = Button(description="Plot Peaks")
         self.button_show_plots.on_click(self.button_show_plots_on_click)
+        self.button_show_histogram = Button(description="Histogram")
+        self.button_show_histogram.on_click(self.button_show_histogram_on_click)
+        self.button_show_3dproj = Button(description="3D Peaks")
+        self.button_show_3dproj.on_click(self.button_show_3dproj_on_click)
         self.plot_peak_selector = SelectMultiple(
             options=[], layout=Layout(width='33%', height='200px', Label='test'))
         self.plot_file_selector = SelectMultiple(
@@ -106,6 +120,28 @@ class Mint():
 
     def stop(self, b=None):
         self._stop = True
+
+    def gui(self):
+        return VBox([HBox([self.mzxml,
+                           self.mzxml_folder,
+                           self.peaklist,
+                           self.report_issue]),
+                    self.message_box,
+                    HBox([self.run_button, self.output_folder, self.progress]),
+                    ])
+
+    def gui_plotting(self):
+        gui = VBox([HBox([Label('Peak', layout=Layout(width='33%')),
+                          Label('File', layout=Layout(width='33%')), 
+                          Label('Highlight', layout=Layout(width='33%'))]),
+                    HBox([self.plot_peak_selector,
+                          self.plot_file_selector,
+                          self.plot_highlight_selector]),
+                    HBox([Label('N columns'), self.plot_ncol_slider, 
+                          Label('Legend fontsize'), self.plot_legend_font_size]),
+                    HBox([self.button_show_plots, self.button_show_histogram, self.button_show_3dproj])
+                    ])
+        return gui
 
     def run(self, b=None, nthreads=None):
             self._stop = False
@@ -157,6 +193,7 @@ class Mint():
                 self.message_box.value = 'Done'
                 self.update_highlight_selector()
                 self.update_peak_selector()
+                self.peakLabels = list(self.rt_projections.keys())
                 self.show_table()
 
     def update_peak_selector(self):
@@ -227,7 +264,9 @@ class Mint():
         uid = str(uuid.uuid4()).split('-')[-1]
         now = datetime.datetime.now().strftime("%Y-%m-%d")
         folder = self.output_folder.files[0]
-
+        if isinstance(folder, tuple):
+            return None
+        
         filename = P(folder) / P('Mint-{}-{}.xlsx'\
                 .format(now, uid))
 
@@ -245,37 +284,14 @@ class Mint():
         Returns a comprehensive dataframe with the
         extraction results of one or more files.
         '''
-        cols = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']
+        cols = ['peakLabel']
         return pd.merge(self.results[cols].drop_duplicates(),
                         pd.crosstab(self.results.peakLabel, 
                                     self.results.mzxmlFile, 
                                     self.results[varName], 
                                     aggfunc=sum),
-                        on='peakLabel')    
+                        on='peakLabel').set_index('peakLabel').T
     
-    def gui(self):
-        return VBox([HBox([self.mzxml,
-                           self.mzxml_folder,
-                           self.peaklist, 
-                           self.output_folder,
-                           self.report_issue]),
-                    self.message_box,
-                    HBox([self.run_button, self.progress]),
-                    ])
-
-    def gui_plotting(self):
-        gui = VBox([HBox([Label('Peak', layout=Layout(width='33%')),
-                          Label('File', layout=Layout(width='33%')), 
-                          Label('Highlight', layout=Layout(width='33%'))]),
-                    HBox([self.plot_peak_selector,
-                          self.plot_file_selector,
-                          self.plot_highlight_selector]),
-                    HBox([Label('N columns'), self.plot_ncol_slider, 
-                          Label('Legend fontsize'), self.plot_legend_font_size]),
-                    HBox([self.button_show_plots])
-                    ])
-        return gui
-
     def display_output(self):
         display(self.output)
 
@@ -284,7 +300,75 @@ class Mint():
 
     def button_show_plots_on_click(self, b=None):
         self.plot()
-    
+
+    def button_show_histogram_on_click(self, b=None):
+        with self.output_plotting:
+            clear_output()
+            height = widgets.IntSlider(
+                min=500, max=5000, step=50, value=10, 
+                description='Figure height', continuous_update=False)
+            interact(self.get_heatmap, 
+                color = ['linear', 'log'],
+                height=height,
+                normalize_columns=False, 
+                show_abs_path=False,
+                clustering=False, 
+                show_dendrogram=False)
+
+    def get_heatmap(self, 
+            color='linear', 
+            height=500,
+            show_abs_path=False, 
+            normalize_columns=False, 
+            clustering=True, 
+            show_dendrogram=False):
+
+        assert color in ['linear',  'log']
+        data = self.results_crosstab()
+
+        if normalize_columns:
+            data = (data / data.max()).fillna(0)
+
+        if not show_abs_path:
+            data.index = [basename(i) for i in data.index]
+
+        if clustering:
+            D = squareform(pdist(data, metric='euclidean'))
+            Y = linkage(D, method='complete')
+            Z = dendrogram(Y, orientation='left', no_plot=(not show_dendrogram))['leaves']
+            data = data.iloc[Z,:]
+
+        if color == 'log':
+            data = data.apply(np.log1p) 
+
+        fig = go.Figure(
+            data=go.Heatmap(
+            z=data.values,
+            x=data.columns,
+            y=data.index),
+            )
+        fig.update_layout(height=height, 
+            yaxis={'title': 'mzXML', 'tickmode': 'array', 'automargin': True})
+        fig.show()
+
+    def button_show_3dproj_on_click(self, b=None):
+        with self.output_plotting:
+            clear_output()
+            interact(self.get_rt_3d_plots, peakLabel=self.peakLabels)
+
+    def get_rt_3d_plots(self, peakLabel):
+        data = self.rt_projections[peakLabel]
+        samples = []
+        for i, key in enumerate(list(data.keys())):
+            sample = data[key].to_frame().reset_index()
+            sample.columns = ['retentionTime', 'intensity']
+            sample['y'] = sample.intensity.sum()
+            sample['Filename'] = os.path.basename(key)
+            samples.append(sample)
+        samples = pd.concat(samples)
+        fig = px.line_3d(samples, x='retentionTime', y='y' ,z='intensity', color='Filename')
+        return fig
+
     def plot(self):
         rt_proj_data = self.rt_projections
         peakLabels = self.plot_peak_selector.value

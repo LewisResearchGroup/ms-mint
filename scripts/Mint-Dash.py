@@ -14,7 +14,8 @@ import pandas as pd
 
 mint = Mint()
 
-mint.mzxml_files = ['/data/MOC-demo_files/17-11-13_GAPP_CLS_SA__BI_16_0013__I15_R0M0_T4.mzXML',
+mint.mzxml_files = [
+ '/data/MOC-demo_files/17-11-13_GAPP_CLS_SA__BI_16_0013__I15_R0M0_T4.mzXML',
  '/data/MOC-demo_files/18-04-20_GAPP_CLS_CANALB__BI_14_0578__I741_R1M1_T4.mzXML',
  '/data/MOC-demo_files/18-02-16_GAPP_CLS_GAS__BI_16_3170__I552_R1M0_T4.mzXML',
  '/data/MOC-demo_files/18-04-20_GAPP_CLS_KLEPNE__BI_16_2090__I965_R1M1_T4.mzXML',
@@ -24,7 +25,7 @@ mint.mzxml_files = ['/data/MOC-demo_files/17-11-13_GAPP_CLS_SA__BI_16_0013__I15_
  '/data/MOC-demo_files/18-02-16_GAPP_CLS_ENTFAES__BI_16_1847__I474_R1M0_T4.mzXML']
 
 
-mint.peaklist_files = ['/home/swacker/workspace/mint/static/Standard_Peaklist.csv']
+mint.peaklist_files = ['/home/swacker/workspace/ms-mint/static/Standard_Peaklist.csv']
 
 mint._results = pd.DataFrame({'peakLabel': {0: '1',
   1: '2',
@@ -1591,11 +1592,11 @@ def plot_selected_peaks(n_clicks):
             histfunc='sum',
             range_x=[0, mint.all_df['retentionTime'].max()],
             range_y=[0, mint.all_df['m/z array'].max()],
-            nbinsx=100,
-            nbinsy=100,
+            nbinsx=150,
+            nbinsy=150,
             marginal_x='histogram',
             marginal_y='histogram',
-                    )
+            title='Plot 3')
     return fig
 
 @app.callback(
@@ -1618,12 +1619,11 @@ def plot_selected_peaks(n_clicks):
             histfunc='sum',
             range_x=[0, mint.all_df['retentionTime'].max()],
             range_y=[0, mint.all_df['m/z array'].max()],
-            nbinsx=100,
-            nbinsy=100,
+            nbinsx=150,
+            nbinsy=150,
             marginal_x='histogram',
             marginal_y='histogram',
-                    )
-
+            title='Plot 4')
     fig.update_layout(legend_orientation="h")        
     return fig
 
