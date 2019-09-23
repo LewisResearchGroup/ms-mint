@@ -44,6 +44,7 @@ import mint
 
 from datetime import date
 
+<<<<<<< HEAD
 import plotly.graph_objects as go
 from ipywidgets import interact, interactive, fixed, interact_manual
 import ipywidgets as widgets
@@ -54,6 +55,8 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
 import plotly.express as px
+=======
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
 
 class Mint():
     def __init__(self, port=None):
@@ -68,7 +71,11 @@ class Mint():
         self.peaklist = SelectFilesButton(
             text='Peaklist', default_color='lightgreen', callback=self.list_files)
 
+<<<<<<< HEAD
         self.output_folder = SelectFolderButton(text='Export', callback=self.export)
+=======
+        self.output_folder = SelectFolderButton(text='Output Directory', callback=self.export)
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
 
         self.run_button = Button(description="Run", style=ButtonStyle(button_color ='lightgreen'))
         self.run_button.on_click(self.run)    
@@ -97,10 +104,13 @@ class Mint():
         self.button_show_table.on_click(self.show_table)
         self.button_show_plots = Button(description="Plot Peaks")
         self.button_show_plots.on_click(self.button_show_plots_on_click)
+<<<<<<< HEAD
         self.button_show_histogram = Button(description="Histogram")
         self.button_show_histogram.on_click(self.button_show_histogram_on_click)
         self.button_show_3dproj = Button(description="3D Peaks")
         self.button_show_3dproj.on_click(self.button_show_3dproj_on_click)
+=======
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
         self.plot_peak_selector = SelectMultiple(
             options=[], layout=Layout(width='33%', height='200px', Label='test'))
         self.plot_file_selector = SelectMultiple(
@@ -121,6 +131,7 @@ class Mint():
     def stop(self, b=None):
         self._stop = True
 
+<<<<<<< HEAD
     def gui(self):
         return VBox([HBox([self.mzxml,
                            self.mzxml_folder,
@@ -143,6 +154,8 @@ class Mint():
                     ])
         return gui
 
+=======
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
     def run(self, b=None, nthreads=None):
             self._stop = False
             with self.output:
@@ -193,7 +206,10 @@ class Mint():
                 self.message_box.value = 'Done'
                 self.update_highlight_selector()
                 self.update_peak_selector()
+<<<<<<< HEAD
                 self.peakLabels = list(self.rt_projections.keys())
+=======
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
                 self.show_table()
 
     def update_peak_selector(self):
@@ -264,9 +280,13 @@ class Mint():
         uid = str(uuid.uuid4()).split('-')[-1]
         now = datetime.datetime.now().strftime("%Y-%m-%d")
         folder = self.output_folder.files[0]
+<<<<<<< HEAD
         if isinstance(folder, tuple):
             return None
         
+=======
+
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
         filename = P(folder) / P('Mint-{}-{}.xlsx'\
                 .format(now, uid))
 
@@ -284,14 +304,46 @@ class Mint():
         Returns a comprehensive dataframe with the
         extraction results of one or more files.
         '''
+<<<<<<< HEAD
         cols = ['peakLabel']
+=======
+        cols = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
         return pd.merge(self.results[cols].drop_duplicates(),
                         pd.crosstab(self.results.peakLabel, 
                                     self.results.mzxmlFile, 
                                     self.results[varName], 
                                     aggfunc=sum),
+<<<<<<< HEAD
                         on='peakLabel').set_index('peakLabel').T
     
+=======
+                        on='peakLabel')    
+    
+    def gui(self):
+        return VBox([HBox([self.mzxml,
+                           self.mzxml_folder,
+                           self.peaklist, 
+                           self.output_folder,
+                           self.report_issue]),
+                    self.message_box,
+                    HBox([self.run_button, self.progress]),
+                    ])
+
+    def gui_plotting(self):
+        gui = VBox([HBox([Label('Peak', layout=Layout(width='33%')),
+                          Label('File', layout=Layout(width='33%')), 
+                          Label('Highlight', layout=Layout(width='33%'))]),
+                    HBox([self.plot_peak_selector,
+                          self.plot_file_selector,
+                          self.plot_highlight_selector]),
+                    HBox([Label('N columns'), self.plot_ncol_slider, 
+                          Label('Legend fontsize'), self.plot_legend_font_size]),
+                    HBox([self.button_show_plots])
+                    ])
+        return gui
+
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
     def display_output(self):
         display(self.output)
 
@@ -300,6 +352,7 @@ class Mint():
 
     def button_show_plots_on_click(self, b=None):
         self.plot()
+<<<<<<< HEAD
 
     def button_show_histogram_on_click(self, b=None):
         with self.output_plotting:
@@ -369,6 +422,9 @@ class Mint():
         fig = px.line_3d(samples, x='retentionTime', y='y' ,z='intensity', color='Filename')
         return fig
 
+=======
+    
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
     def plot(self):
         rt_proj_data = self.rt_projections
         peakLabels = self.plot_peak_selector.value
@@ -472,4 +528,8 @@ def process(args):
     result['mzxmlFile'] = filename
     result['mzxmlPath'] = os.path.dirname(filename)
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
+<<<<<<< HEAD
     return result, rt_projection
+=======
+    return result, rt_projection
+>>>>>>> 5d77bc03de2172397c39f85961361644e3a34a1e
