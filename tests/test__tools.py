@@ -8,6 +8,7 @@ from mint.tools import MINT_ROOT, slice_ms1_mzxml,\
     integrate_peaks_from_filename, STANDARD_PEAKLIST, integrate_peak
 
 TEST_MZXML = os.path.abspath(str(P(MINT_ROOT)/P('../static/test.mzXML')))
+TEST_PEAKLIST = os.path.abspath(str(P(MINT_ROOT)/P('../static/test_peaklist.mzXML')))
 
 def test__find_test_mzxml():
     assert os.path.isfile(TEST_MZXML),\
