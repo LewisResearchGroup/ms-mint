@@ -24,10 +24,6 @@ class SelectFilesButton(widgets.Button):
     def do_stuff(self, b):
         self.select_files(b)
         self.callback()
-        if len(self.files) > 0:
-            self.style.button_color = "lightgreen"
-        else:
-            self.style.button_color = "red"
 
     @staticmethod
     def select_files(b):
