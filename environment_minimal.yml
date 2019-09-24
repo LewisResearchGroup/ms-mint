@@ -10,6 +10,7 @@ dependencies:
   - lxml
   - notebook
   - numpy
+  - matplotlib
   - pandas
   - pandoc
   - pip
