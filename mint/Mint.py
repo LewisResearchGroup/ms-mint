@@ -423,11 +423,11 @@ class Mint():
         for i, key in enumerate(list(data.keys())):
             sample = data[key].to_frame().reset_index()
             sample.columns = ['retentionTime', 'intensity']
-            sample['y'] = sample.intensity.sum()
+            sample['peakArea'] = sample.intensity.sum()
             sample['Filename'] = os.path.basename(key)
             samples.append(sample)
         samples = pd.concat(samples)
-        fig = px.line_3d(samples, x='retentionTime', y='y' ,z='intensity', color='Filename')
+        fig = px.line_3d(samples, x='retentionTime', y='peakArea' ,z='intensity', color='Filename')
         return fig
 
     def plot(self):
