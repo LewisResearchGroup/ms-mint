@@ -18,6 +18,8 @@ import mint
 
 from datetime import date
 
+from .tools import process_in_parallel
+
 class Mint(object):
     def __init__(self):
         self._mzxml_files = []
@@ -133,19 +135,3 @@ class Mint(object):
     @callback_progress.setter
     def callback_progress(self, func):
         self._callback_progress = func
-
-
-def process_in_parallel(args):
-    '''Pickleable function for peak integration.'''
-    filename = args['filename']
-    peaklist = args['peaklist']
-    q = args['q']
-    q.put('filename')
-    df = mzxml_to_pandas_df(filename)
-    df['mzxmlFile'] = filename
-    result = integrate_peaks(df, peaklist)
-    result['mzxmlFile'] = filename
-    result['mzxmlPath'] = os.path.dirname(filename)
-    rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection, df
-

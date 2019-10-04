@@ -57,6 +57,7 @@ from scipy.spatial.distance import pdist, squareform
 
 import plotly.express as px
 
+from .tools import process_in_parallel
 
 class Mint():
     def __init__(self, port=None):
@@ -133,6 +134,8 @@ class Mint():
         self._rt_projections = None
         self.peakLabels = []
         self._stop = False
+        self._raw_data = None
+
 
     def stop(self, b=None):
         self._stop = True
@@ -215,7 +218,7 @@ class Mint():
                                 'peaklist': peaklist,
                                 'q':q})
 
-            results = pool.map_async(process, args)
+            results = pool.map_async(process_in_parallel, args)
 
             # monitor progress
             while True:
@@ -235,6 +238,7 @@ class Mint():
 
             results = results.get()
             self.results = pd.concat([i[0] for i in results])
+            self.raw_data = pd.concat([i[2] for i in results])
             # [['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
             #   'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
             rt_projections = {}
@@ -322,10 +326,11 @@ class Mint():
         writer = pd.ExcelWriter(filename)
         self.results.to_excel(writer, 'MainTable', index=False)
         self.results_crosstab('peakArea')\
-            .to_excel(writer, 'peakArea', index=False)
+            .to_excel(writer, 'peakArea', index=True)
         meta = pd.DataFrame({'Version': [mint.__version__], 
                                 'Date': [str(date.today())]}).T[0]
-        meta.to_excel(writer, 'MetaData', index=True)
+        meta.to_excel(writer, 'MetaData', index=True, header=False)
+        
         try:
             writer.save()
             self.message_box.value = f'Exported results to {filename}!'
@@ -372,7 +377,8 @@ class Mint():
                 normalize_columns=False, 
                 show_abs_path=False,
                 clustering=False, 
-                show_dendrogram=False)
+                show_dendrogram=False,
+                transpose=False)
 
     def get_heatmap(self, 
             color='linear', 
@@ -380,7 +386,8 @@ class Mint():
             show_abs_path=False, 
             normalize_columns=False, 
             clustering=True, 
-            show_dendrogram=False):
+            show_dendrogram=False,
+            transpose=False):
 
         assert color in ['linear',  'log']
         data = self.results_crosstab()
@@ -400,6 +407,9 @@ class Mint():
         if color == 'log':
             data = data.apply(np.log1p) 
 
+        if transpose:
+            data = data.T
+            
         fig = go.Figure(
             data=go.Heatmap(
             z=data.values,
@@ -521,16 +531,3 @@ class Mint():
                 show(app, notebook_url=f'localhost:{self.port}')
             else:
                 show(app)
-
-def process(args):
-    '''Pickleable function for parallel processing.'''
-    filename = args['filename']
-    peaklist = args['peaklist']
-    q = args['q']
-    q.put('filename')
-    df = mzxml_to_pandas_df(filename)
-    result = integrate_peaks(df, peaklist)
-    result['mzxmlFile'] = filename
-    result['mzxmlPath'] = os.path.dirname(filename)
-    rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection
