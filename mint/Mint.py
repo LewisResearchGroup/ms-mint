@@ -135,6 +135,9 @@ class Mint():
         self.peakLabels = []
         self._stop = False
         self._raw_data = None
+        
+        # Extra features
+        self.store_raw_data = False
 
 
     def stop(self, b=None):
@@ -238,7 +241,8 @@ class Mint():
 
             results = results.get()
             self.results = pd.concat([i[0] for i in results])
-            self.raw_data = pd.concat([i[2] for i in results])
+            if self.store_raw_data:
+                self.raw_data = pd.concat([i[2] for i in results])
             # [['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax',
             #   'peakArea', 'mzxmlFile', 'mzxmlPath', 'peakListFile']]
             rt_projections = {}

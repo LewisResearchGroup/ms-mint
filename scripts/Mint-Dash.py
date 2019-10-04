@@ -14,6 +14,12 @@ import pandas as pd
 
 mint = Mint()
 
+DEVEL = True
+
+if DEVEL:
+    from glob import glob
+    mint.mzxml_files = glob('/data/Mint_Demo_Files/**/*.mzXML', recursive=True)
+
 app = dash.Dash(
     __name__, external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 )

@@ -40,11 +40,13 @@ def read_peaklists(filenames):
 STANDARD_PEAKLIST = read_peaklists(STANDARD_PEAKFILE)
 DEVEL = True
 
+
 def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
     df = mzxml_to_pandas_df(mzxml)
     peaks = integrate_peaks(df, peaklist)
     peaks['mzxmlFile'] = mzxml
     return peaks 
+
 
 def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     '''
@@ -58,6 +60,7 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     results = pd.concat(results)
     results.index = range(len(results))
     return pd.merge(peaklist, results, right_index=True, left_index=True)
+
 
 def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
     '''
@@ -81,7 +84,7 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
     except:
         max_intensity_rt = None
     try:
-        popt, pcov = curve_fit(gaus,rt_projection.index, rt_projection.values, p0=[intensity_max,max_intensity_rt,1], maxfev=1000)
+        popt, pcov = curve_fit(gaus, rt_projection.index, rt_projection.values, p0=[intensity_max, max_intensity_rt,1], maxfev=1000)
     except:
         popt = [None, None, None]
     gauss_fit_intensity = popt[0]
@@ -99,6 +102,7 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
                          )
     return result
 
+
 def peak_rt_projections(df, peaklist):
     '''
     Takes the output of mzxml_to_pandas_df() and 
@@ -111,6 +115,7 @@ def peak_rt_projections(df, peaklist):
         result = peak_rt_projection(df, **peak)
         results.append(result)
     return results
+
 
 def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
     '''
@@ -125,6 +130,7 @@ def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
                     .unstack()\
                     .sum(axis=1)
     return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
+
 
 def to_peaks(peaklist):
     '''
@@ -145,6 +151,7 @@ def to_peaks(peaklist):
                'peaklabel': el[4]} for el in tmp]
     return output
 
+
 def mzxml_to_pandas_df(filename):
     '''
     Reads mzXML file and returns a pandas.DataFrame.
@@ -160,12 +167,14 @@ def mzxml_to_pandas_df(filename):
     df_to_numeric(df)
     return df
 
+
 def df_to_numeric(df):
     '''
     Converts dataframe to numeric types if possible.
     '''
     for col in df.columns:
         df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
+
 
 def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
     '''
@@ -186,6 +195,7 @@ def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
                       (df['m/z array'] <= mz+0.0001*dmz)]
     return df_slice
 
+
 def check_peaklist(filename):
     if not os.path.isfile(filename):
         raise FileNotFoundError(f'Cannot find peaklist file ({filename}).')
@@ -201,6 +211,7 @@ def check_peaklist(filename):
  'peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'"
     return f'Peaklist file ok ({filename})'
 
+
 def restructure_rt_projections(data):
     output = {}
     for el in list(data.values())[0]:
@@ -212,13 +223,14 @@ def restructure_rt_projections(data):
             output[peaklabel][filename] = rt_proj
     return output
 
+
 def process_in_parallel(args):
     '''Pickleable function for parallel processing.'''
     filename = args['filename']
     peaklist = args['peaklist']
     q = args['q']
     q.put('filename')
-    df = mzxml_to_pandas_df(filename)
+    df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
     df['mzxmlFile'] = filename
     result = integrate_peaks(df, peaklist)
     result['mzxmlFile'] = filename
@@ -226,5 +238,5 @@ def process_in_parallel(args):
     result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
     result['intensity sum'] = df['intensity array'].sum()
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection, df[['mzxmlFile', 'retentionTime', 'm/z array', 'intensity array']]
+    return result, rt_projection #, df[['mzxmlFile', 'retentionTime', 'm/z array', 'intensity array']]
 
