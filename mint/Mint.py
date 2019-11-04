@@ -61,6 +61,8 @@ from .tools import process_in_parallel
 
 class Mint():
     def __init__(self, port=None):
+        '''The port needs to be the same as the port of the Jupyter notebook 
+        that runs Mint.'''
         output_notebook(hide_banner=True)
         self._b_color_default = 'lightgreen'
         self._b_color_warning = 'red'
@@ -141,16 +143,16 @@ class Mint():
 
 
     def stop(self, b=None):
+        '''Not yet implemented.'''
         self._stop = True
 
-    def clear_files(self, b=None):
-        self.mzxmls = []
-        self.update_status()
 
+    ### Input files
+    
     @property
     def mzxmls(self):
         return self._mzxmls
-    
+
     @mzxmls.setter
     def mzxmls(self, a_list):
         self._mzxmls = a_list
@@ -164,10 +166,21 @@ class Mint():
         self.B_add_mzxmls.files = []
         self.B_add_mzxmls_dir.files = []
    
-    @staticmethod
-    def valid_mzxmls(filenames):
-        return valid
-
+    @property
+    def peaklists(self):
+        return self.B_peaklist.files
+    
+    @peaklists.setter
+    def peaklists(self, a_list):
+        self.B_peaklist.files = a_list
+   
+    def clear_files(self, b=None):
+        self.mzxmls = []
+        self.update_status()
+        
+        
+    ### GUI
+   
     def gui(self):
         return VBox([HBox([self.B_add_mzxmls,
                            self.B_add_mzxmls_dir,
@@ -192,11 +205,10 @@ class Mint():
                     ])
         return gui
 
-    @property
-    def peaklists(self):
-        return self.B_peaklist.files
-
+    ### Run procedures
+        
     def run(self, b=None, nthreads=None):
+        '''Main procedure for data extraction.'''
         self._stop = False
         with self.output:
             if nthreads is None:
@@ -253,7 +265,7 @@ class Mint():
             self.update_peak_selector()
             self.peakLabels = list(self.rt_projections.keys())
             self.show_table()
-
+    
     def update_peak_selector(self):
         new_values =  tuple(self.rt_projections.keys())
         self.plot_peak_selector.options = new_values
@@ -472,18 +484,9 @@ class Mint():
                         'tools': tools,
                         'colors': itertools.cycle(palette),
                         'files': files,
-                        'highlight': highlight}
-                #jobs.append(args)
-                plots.append(plot_peaks_parallel(args))
-            
-            #pool = Pool(processes=cpu_count())
-            #m = Manager()
-            #q = m.Queue()
-            #plots = pool.map_async(plot_peaks_parallel, jobs)
-            #pool.close()
-            #pool.join()    
-            #plots = plots.get()
-                
+                        'highlight': highlight,
+                        'legend_font_size': self.plot_legend_font_size.value}
+                plots.append(plot_peaks(args))
             grid = gridplot(plots, ncols=n_cols, 
                             sizing_mode='stretch_both', 
                             plot_height=250)
@@ -525,18 +528,19 @@ class Mint():
             else:
                 show(app)
 
-def plot_peaks_parallel(args):
+def plot_peaks(args):
     data = args['data']
     label = args['label']
     colors = args['colors']
     tools = args['tools']
     files = args['files']
     highlight = args['highlight']
-    
+    legend_font_size = args['legend_font_size']
+
     p = figure(title=f'Peak: {label}', 
-               x_axis_label='Retention Time', 
-               y_axis_label='Intensity',
-               tools=tools)
+            x_axis_label='Retention Time', 
+            y_axis_label='Intensity',
+            tools=tools)
     
     for high_ in [False, True]:
         for file, rt_proj in data.items():
@@ -562,9 +566,9 @@ def plot_peaks_parallel(args):
                     legend=legend,
                     selection_color="firebrick",
                     color=color, alpha=alpha)
-                #if legend is not None: 
-                    #txt = "{}pt".format(self.plot_legend_font_size.value)
-                    #p.legend.label_text_font_size = txt
-                   
+                if legend is not None: 
+                    txt = "{}pt".format(legend_font_size)
+                    p.legend.label_text_font_size = txt
+                    
     p.legend.click_policy = "mute"
     return p
