@@ -329,7 +329,7 @@ class Mint():
 
         writer = pd.ExcelWriter(filename)
         self.results.to_excel(writer, 'MainTable', index=False)
-        self.results_crosstab('peakArea')\
+        self.results_crosstab.T('peakArea')\
             .to_excel(writer, 'peakArea', index=True)
         meta = pd.DataFrame({'Version': [mint.__version__], 
                                 'Date': [str(date.today())]}).T[0]
@@ -464,40 +464,29 @@ class Mint():
                  'tap']
         with self.output_plotting:
             clear_output()
-            for label in list(peakLabels):
-                tmp_data = rt_proj_data[label]
-                p = figure(title=f'Peak: {label}', x_axis_label='Retention Time', 
-                           y_axis_label='Intensity', tools=tools)
-                colors = itertools.cycle(palette)
-                for high_ in [False, True]:
-                    for file, rt_proj in tmp_data.items():
-                            x = rt_proj.index
-                            y = rt_proj.values
-                            if not file in files:
-                                continue
-                            if file in highlight:
-                                color = next(colors)
-                                legend = os.path.basename(file)
-                                alpha = 1   
-                                if not high_:
-                                    continue
-                            else:
-                                color = 'blue'
-                                legend = None
-                                alpha = 0.5
-                                if high_:
-                                    continue
-                            p.line(x, y,
-                                name=file, 
-                                line_width=2, 
-                                legend=legend,
-                                selection_color="firebrick",
-                                color=color, alpha=alpha)
-                            if legend is not None:
-                                p.legend.label_text_font_size = "{}pt".format(self.plot_legend_font_size.value)
-                p.legend.click_policy = "mute"
-                plots.append(p)
-            grid = gridplot(plots, ncols=n_cols, sizing_mode='stretch_both', plot_height=250)
+            jobs = []
+            plots = []
+            for label in list(peakLabels):  
+                args = {'data': rt_proj_data[label],
+                        'label': label,
+                        'tools': tools,
+                        'colors': itertools.cycle(palette),
+                        'files': files,
+                        'highlight': highlight}
+                #jobs.append(args)
+                plots.append(plot_peaks_parallel(args))
+            
+            #pool = Pool(processes=cpu_count())
+            #m = Manager()
+            #q = m.Queue()
+            #plots = pool.map_async(plot_peaks_parallel, jobs)
+            #pool.close()
+            #pool.join()    
+            #plots = plots.get()
+                
+            grid = gridplot(plots, ncols=n_cols, 
+                            sizing_mode='stretch_both', 
+                            plot_height=250)
             show(grid)
 
     def show_table(self, b=None):
@@ -535,3 +524,47 @@ class Mint():
                 show(app, notebook_url=f'localhost:{self.port}')
             else:
                 show(app)
+
+def plot_peaks_parallel(args):
+    data = args['data']
+    label = args['label']
+    colors = args['colors']
+    tools = args['tools']
+    files = args['files']
+    highlight = args['highlight']
+    
+    p = figure(title=f'Peak: {label}', 
+               x_axis_label='Retention Time', 
+               y_axis_label='Intensity',
+               tools=tools)
+    
+    for high_ in [False, True]:
+        for file, rt_proj in data.items():
+                x = rt_proj.index
+                y = rt_proj.values
+                if not file in files:
+                    continue
+                if file in highlight:
+                    color = next(colors)
+                    legend = os.path.basename(file)
+                    alpha = 1   
+                    if not high_:
+                        continue
+                else:
+                    color = 'blue'
+                    legend = None
+                    alpha = 0.5
+                    if high_:
+                        continue
+                p.line(x, y,
+                    name=file, 
+                    line_width=2, 
+                    legend=legend,
+                    selection_color="firebrick",
+                    color=color, alpha=alpha)
+                #if legend is not None: 
+                    #txt = "{}pt".format(self.plot_legend_font_size.value)
+                    #p.legend.label_text_font_size = txt
+                   
+    p.legend.click_policy = "mute"
+    return p
