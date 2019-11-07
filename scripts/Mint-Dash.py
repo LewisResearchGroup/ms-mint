@@ -368,8 +368,9 @@ def plot_1(n_clicks, n_cols, options):
 @app.callback(
     Output('peakShape3d', 'figure'),
     [Input('b_peakShapes3d', 'n_clicks'),
-     Input('peak-select', 'value')])
-def plot_3d(n_clicks, peakLabel):
+     Input('peak-select', 'value'),
+     Input('check_peakShapes3d', 'value')])
+def plot_3d(n_clicks, peakLabel, options):
     if (n_clicks is None) or (mint.rt_projections is None) or (peakLabel is None):
         raise PreventUpdate
     data = mint.rt_projections[peakLabel]
@@ -383,6 +384,11 @@ def plot_3d(n_clicks, peakLabel):
     samples = pd.concat(samples)
     fig = px.line_3d(samples, x='retentionTime', y='peakArea' , z='intensity', color='FileName')
     fig.update_layout({'height': 800})
+    if 'legend_horizontal' in options:
+        fig.update_layout(legend_orientation="h")
+
+    if not 'legend' in options:
+        fig.update_layout(showlegend=False)
     return fig
 
 app.run_server(debug=True, port=9995)
