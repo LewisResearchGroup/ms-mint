@@ -1,13 +1,18 @@
-from mint.backend import Mint
+from mint.backend import Mint, STANDARD_PEAKFILE
 
+import os
 from os.path import basename, isfile
 
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
-import plotly.express as px
+
+from dash.exceptions import PreventUpdate
+
 import plotly.graph_objects as go
+import plotly.figure_factory as ff
+import plotly.express as px
 
 import colorlover as cl
 import numpy as np
@@ -17,7 +22,7 @@ import re
 from dash_table import DataTable
 from plotly.subplots import make_subplots
 
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from tkinter import Tk, filedialog
 
 from multiprocessing import cpu_count
@@ -26,16 +31,26 @@ from functools import lru_cache
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
+from io import StringIO
+
 mint = Mint()
 
 DEVEL = True
 
 if DEVEL:
     from glob import glob
-    mint.files = glob('/data/metabolomics_storage/Mint*/**/*.mzXML', recursive=True)
-    mint.peaklist = ['/data/metabolomics_storage/Peaklists/19-05-30-sw_peaklist.csv']
+    mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-3:]
+    mint.peaklist = STANDARD_PEAKFILE
     if isfile('/tmp/mint_results.csv'):
         mint._results = pd.read_csv('/tmp/mint_results.csv')
+    print('Loaded mzXML files:')
+    for i in mint.files:
+        print(i)
+        assert isfile(i)
+    print('Loaded peaklist file:')
+    for i in mint.peaklist_files:
+        print(i)
+        assert isfile(i)
 
 app = dash.Dash(
     __name__, external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"]
@@ -50,9 +65,8 @@ n_cpus = cpu_count()
 
 app.layout = html.Div(
     [   
-     
-        html.H1("Mint-Dash"),
-        
+        html.H1("Mint-Dash", style={'margin-top': '10%'}),
+        html.Div(id='storage', style={'display': 'none'}),
         html.Button('Select file(s)', id='files', style=button_style),
         html.Button('Select peaklist file(s)', id='peaklist', style=button_style),
         html.Button('Run', id='run', style=button_style),
@@ -93,15 +107,25 @@ app.layout = html.Div(
         html.H2("Peak Shapes"),
         html.Button('Peak Shapes', id='b_peakShapes', style=button_style),
         dcc.Checklist(id='check_peakShapes', 
-                      options=[{'label': 'Show Legend', 'value': 'legend'}], 
+                      options=[{'label': 'Show Legend', 'value': 'legend'},
+                               {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
                       value=['legend'], style={'display': 'inline-block'}),
           
         html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
                             marks={i: f'{i} columns' for i in range(1, 6)}),
                  style=slider_style),
-        dcc.Graph(id='peakShape', figure={})
+        dcc.Graph(id='peakShape', figure={}),
+        
+        html.H2("Peak Shapes 3D"),
+        html.Button('Peak Shapes 3D', id='b_peakShapes3d', style=button_style),
+        dcc.Checklist(id='check_peakShapes3d', 
+                      options=[{'label': 'Show Legend', 'value': 'legend'},
+                               {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
+                      value=['legend'], style={'display': 'inline-block'}),
+        dcc.Dropdown(id='peak-select', options=[]),
+        dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}),
 
-    ], style={'max-width': '80%', 'margin': 'auto'}
+    ], style={'max-width': '80%', 'margin': 'auto', 'margin-bottom': '10%'}
 )
 
 @app.callback(
@@ -147,22 +171,25 @@ def run_mint(value):
 
 
 @app.callback(
-    Output('run-out', 'children'),
-    [Input('run', 'n_clicks'),
-     Input('label-regex', 'value')] )
-def run_mint(n_clicks, label_regex):
+    Output('storage', 'children'),
+    [Input('run', 'n_clicks')])
+def run_mint(n_clicks):
     if n_clicks is not None:
         mint.run()
         mint.results.to_csv('/tmp/mint_results.csv')
-    try:
-        df = mint.crosstab.round(0).T
-        df.index.name = 'FileName'
-        df.reset_index(inplace=True)
-        df['FileName'] = df['FileName'].apply(basename).apply(lambda x: x.split('.')[0])
-    except:
-        df = mint.results.round(2)
-        df['peakListFile'] = df['peakListFile'].apply(basename)
-    print(label_regex)
+    return mint.crosstab.T.to_json(orient='split')
+
+@app.callback(
+    [Output('run-out', 'children'),
+     Output('peak-select', 'options')],
+    [Input('storage', 'children'),
+     Input('label-regex', 'value')] )
+def run_mint(json, label_regex):
+    df = pd.read_json(json, orient='split').round(0)
+    labels = df.columns
+    df.index.name = 'FileName'
+    df.reset_index(inplace=True)
+    df['FileName'] = df['FileName'].apply(basename).apply(lambda x: x.split('.')[0])
     if label_regex is not None:
         try:
             labels = [ i.split('_')[int(label_regex)] for i in df.FileName ]
@@ -170,7 +197,7 @@ def run_mint(n_clicks, label_regex):
             df['FileName'] = labels
         except:
             pass
-    return DataTable(
+    table = DataTable(
                 id='table',
                 columns=[{"name": i, "id": i, "selectable": True} for i in df.columns],
                 data=df.to_dict('records'),
@@ -187,42 +214,39 @@ def run_mint(n_clicks, label_regex):
                 style_header={'backgroundColor': 'white',
                               'fontWeight': 'bold'},
             )
-
-import plotly.graph_objects as go
-import plotly.figure_factory as ff
-
+    return table, [ {'label': i, 'value': i} for i in labels]
 
 @app.callback(
     Output('peakAreas', 'figure'),
     [Input('b_peakAreas', 'n_clicks'),
-     Input('table', 'derived_virtual_indices'),
-     Input('checklist', 'value')])
-def plot_0(n_clicks, ndxs, options):
+     Input('checklist', 'value')],
+    [State('table', 'derived_virtual_indices'),
+     State('table', 'data')])
+def plot_0(n_clicks, options,ndxs, data):
+    if n_clicks is None:
+        raise PreventUpdate
     title = 'Heatmap'
+    df = pd.DataFrame(data).set_index('FileName')
     if n_clicks is None:
         return {}
-    df = mint.crosstab.T.iloc[ndxs]
-    df.index = [basename(i).replace('.mzXML', '') for i in df.index]
-    
-    if 'normed' in options:
-        df = df / df.max()
-        title = f'Normalized {title}'
         
-
-          
+    if 'normed' in options:
+        df = (df / df.max()).fillna(0)
+        title = f'Normalized {title}'
+                    
     if 'clustered' in options:
         D = squareform(pdist(df, metric='euclidean'))
         Y = linkage(D, method='complete')
         Z = dendrogram(Y, orientation='left', no_plot=True)['leaves']
         df = df.iloc[Z,:]
         dendro_side = ff.create_dendrogram(df, orientation='right')
-        
+
     heatmap = go.Heatmap(z=df.values,
                          x=df.columns,
                          y=df.index,
                          colorscale = 'Blues')
     
-    if not 'dendrogram' in options:
+    if (not 'dendrogram' in options) or (not 'clustered' in options):
         fig = go.Figure(heatmap)
         fig.update_layout(
             title={'text': title,  },
@@ -231,7 +255,6 @@ def plot_0(n_clicks, ndxs, options):
                 'automargin': True}) 
         fig.update_layout({'height':800, 
                            'hovermode': 'closest'})
-
         return fig
     
     fig = go.Figure()
@@ -243,7 +266,6 @@ def plot_0(n_clicks, ndxs, options):
         fig.add_trace(data)
         
     y_labels = heatmap['y']
-    
     
     heatmap['y'] = dendro_side['layout']['yaxis']['tickvals']
     dendro_side['layout']['yaxis']['ticktext'] = y_labels
@@ -279,11 +301,12 @@ def plot_0(n_clicks, ndxs, options):
                              'showgrid': False,
                              'showline': False,
                              'zeroline': False,
-                             'showticklabels': True,
+                             'showticklabels': False,
                             })
     
     fig.update_layout(yaxis_ticktext=y_labels)
-    
+    fig.update_layout({'paper_bgcolor': 'white',
+                       'plot_bgcolor': 'white'})
     print(fig.layout['yaxis'])
     return fig
 
@@ -294,46 +317,72 @@ def plot_0(n_clicks, ndxs, options):
      Input('n_cols', 'value'),
      Input('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
-    
+    if (n_clicks is None) or (mint.rt_projections is None):
+        raise PreventUpdate
     files = mint.crosstab.columns
     labels = mint.crosstab.index
-    fig = make_subplots(rows=len(labels)//n_cols+1, cols=n_cols, subplot_titles=labels)
+    fig = make_subplots(rows=len(labels)//n_cols+1, 
+                        cols=n_cols, 
+                            subplot_titles=labels)
     
     if len(files) < 13:
         # largest color set in colorlover is 12
         colors = cl.scales['12']['qual']['Paired']
     else:
         colors = cl.interp( cl.scales['12']['qual']['Paired'], len(files))
-
-    if mint.rt_projections is None:
-        return go.Figure()
             
     for label_i, label in enumerate(labels):
         for file_i, file in enumerate(files):
 
             data = mint.rt_projections[label][file]
-            
             ndx_r = (label_i // n_cols)+1
             ndx_c = label_i % n_cols + 1
             
             fig.add_trace(
                 go.Scatter(x=data.index, 
-                        y=data.values,
-                        name=basename(file),
-                        mode='lines',
-                        legendgroup=file_i,
-                        showlegend=(label_i == 0),  
-                        marker_color=colors[file_i],
-                        text=file),
+                           y=data.values,
+                           name=basename(file),
+                           mode='lines',
+                           legendgroup=file_i,
+                           showlegend=(label_i == 0),  
+                           marker_color=colors[file_i],
+                           text=file),
                 row=ndx_r,
                 col=ndx_c,
             )
+            
+            fig.update_xaxes(title_text="Retention Time", row=ndx_r, col=ndx_c)
+            fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
 
     fig.update_layout(height=200*len(labels), title_text="Peak Shapes")
+    fig.update_layout(xaxis={'title': 'test'})
+    
+    if 'legend_horizontal' in options:
+        fig.update_layout(legend_orientation="h")
+
     if 'legend' in options:
         fig.update_layout(showlegend=True)
     return fig
 
-
+@lru_cache(maxsize=32)
+@app.callback(
+    Output('peakShape3d', 'figure'),
+    [Input('b_peakShapes3d', 'n_clicks'),
+     Input('peak-select', 'value')])
+def plot_3d(n_clicks, peakLabel):
+    if (n_clicks is None) or (mint.rt_projections is None) or (peakLabel is None):
+        raise PreventUpdate
+    data = mint.rt_projections[peakLabel]
+    samples = []
+    for i, key in enumerate(list(data.keys())):
+        sample = data[key].to_frame().reset_index()
+        sample.columns = ['retentionTime', 'intensity']
+        sample['peakArea'] = sample.intensity.sum()
+        sample['FileName'] = os.path.basename(key)
+        samples.append(sample)
+    samples = pd.concat(samples)
+    fig = px.line_3d(samples, x='retentionTime', y='peakArea' , z='intensity', color='FileName')
+    fig.update_layout({'height': 800})
+    return fig
 
 app.run_server(debug=True, port=9995)
