@@ -1,5 +1,6 @@
-from os.path import basename, isfile
+from mint.backend import Mint
 
+from os.path import basename, isfile
 
 import dash
 import dash_html_components as html
@@ -11,6 +12,7 @@ import plotly.graph_objects as go
 import colorlover as cl
 import numpy as np
 import pandas as pd
+import re
 
 from dash_table import DataTable
 from plotly.subplots import make_subplots
@@ -18,13 +20,11 @@ from plotly.subplots import make_subplots
 from dash.dependencies import Input, Output
 from tkinter import Tk, filedialog
 
-from mint.backend import Mint
-
 from multiprocessing import cpu_count
+from functools import lru_cache
 
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
-
 
 mint = Mint()
 
@@ -59,7 +59,13 @@ app.layout = html.Div(
         
         html.Div(id='files-text', children='', style=text_style),
         html.Div(id='peaklist-text', children='', style=text_style),
+        html.Br(),
 
+        dcc.Input(
+            id="label-regex",
+            type='text',
+            placeholder="Regular Expression for Labels",
+        ),
         html.Br(),
         html.P("Select number of cores:", style={'display': 'inline-block'}),
         html.Div(dcc.Slider( id='cpu-select', 
@@ -142,8 +148,9 @@ def run_mint(value):
 
 @app.callback(
     Output('run-out', 'children'),
-    [Input('run', 'n_clicks')] )
-def run_mint(n_clicks):
+    [Input('run', 'n_clicks'),
+     Input('label-regex', 'value')] )
+def run_mint(n_clicks, label_regex):
     if n_clicks is not None:
         mint.run()
         mint.results.to_csv('/tmp/mint_results.csv')
@@ -151,11 +158,18 @@ def run_mint(n_clicks):
         df = mint.crosstab.round(0).T
         df.index.name = 'FileName'
         df.reset_index(inplace=True)
-        df['FileName'] = df['FileName'].apply(basename)
-        
+        df['FileName'] = df['FileName'].apply(basename).apply(lambda x: x.split('.')[0])
     except:
         df = mint.results.round(2)
         df['peakListFile'] = df['peakListFile'].apply(basename)
+    print(label_regex)
+    if label_regex is not None:
+        try:
+            labels = [ i.split('_')[int(label_regex)] for i in df.FileName ]
+            print('Labels:', labels)
+            df['FileName'] = labels
+        except:
+            pass
     return DataTable(
                 id='table',
                 columns=[{"name": i, "id": i, "selectable": True} for i in df.columns],
@@ -215,6 +229,9 @@ def plot_0(n_clicks, ndxs, options):
             yaxis={'title': '', 
                 'tickmode': 'array', 
                 'automargin': True}) 
+        fig.update_layout({'height':800, 
+                           'hovermode': 'closest'})
+
         return fig
     
     fig = go.Figure()
@@ -270,7 +287,7 @@ def plot_0(n_clicks, ndxs, options):
     print(fig.layout['yaxis'])
     return fig
 
-
+@lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape', 'figure'),
     [Input('b_peakShapes', 'n_clicks'),
