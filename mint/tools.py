@@ -76,9 +76,9 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
                     .groupby(['retentionTime', 'm/z array']).sum()\
                     .unstack()\
                     .sum(axis=1)
-    intensity_median = rt_projection.median()
-    intensity_max =  rt_projection.max()
-    intensity_min =  rt_projection.min()
+    intensity_median = np.float64(rt_projection.median())
+    intensity_max = np.float64(rt_projection.max())
+    intensity_min = np.float64(rt_projection.min())
     try:
         max_intensity_rt = max(rt_projection.index)
     except:
@@ -231,7 +231,7 @@ def process_in_parallel(args):
     q = args['q']
     q.put('filename')
     df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    df = df[df['intensity array'] > 10000]
+    #df = df[df['intensity array'] > 10000]
     df['mzxmlFile'] = filename
     result = integrate_peaks(df, peaklist)
     result['mzxmlFile'] = filename
