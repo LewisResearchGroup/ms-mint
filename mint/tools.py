@@ -62,7 +62,7 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     return pd.merge(peaklist, results, right_index=True, left_index=True)
 
 
-def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
+def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel, fit_gauss=False):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calculates peak properties of one peak specified by
@@ -76,6 +76,7 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
                     .groupby(['retentionTime', 'm/z array']).sum()\
                     .unstack()\
                     .sum(axis=1)
+                    
     intensity_median = np.float64(rt_projection.median())
     intensity_max = np.float64(rt_projection.max())
     intensity_min = np.float64(rt_projection.min())
@@ -83,23 +84,25 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel):
         max_intensity_rt = max(rt_projection.index)
     except:
         max_intensity_rt = None
-    try:
-        popt, pcov = curve_fit(gaus, rt_projection.index, rt_projection.values, p0=[intensity_max, max_intensity_rt,1], maxfev=1000)
-    except:
-        popt = [None, None, None]
-    gauss_fit_intensity = popt[0]
-    gauss_fit_rt = popt[1]
         
     peakArea = slizE['intensity array'].sum()
     result = pd.DataFrame({'peakArea': peakArea,
                            'rt_max_intensity': max_intensity_rt,
-                           'gauss_fit_intensity': gauss_fit_intensity,
-                           'gauss_fit_rt': gauss_fit_rt,
                            'intensity_median': intensity_median,
                            'intensity_max': intensity_max,
                            'intensity_min': intensity_min,
                           }, index=[0]
                          )
+    if fit_gauss:
+        try:
+            popt, pcov = curve_fit(gaus, rt_projection.index, rt_projection.values, p0=[intensity_max, max_intensity_rt,1], maxfev=1000)
+        except:
+            popt = [None, None, None]
+        gauss_fit_intensity = popt[0]
+        gauss_fit_rt = popt[1]
+        result['gauss_fit_intensity'] =gauss_fit_intensity
+        result['gauss_fit_rt'] = gauss_fit_rt
+        
     return result
 
 
@@ -156,14 +159,15 @@ def mzxml_to_pandas_df(filename):
     '''
     Reads mzXML file and returns a pandas.DataFrame.
     '''
+    cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
     file = mzxml.MzXML(filename)
     while True:
         try:
-            slices.append(pd.DataFrame(file.next()))
+            slices.append( pd.DataFrame(file.next()) ) 
         except:
             break
-    df = pd.concat(slices)
+    df = pd.concat(slices)[cols]
     df_to_numeric(df)
     return df
 
@@ -231,7 +235,6 @@ def process_in_parallel(args):
     q = args['q']
     q.put('filename')
     df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    #df = df[df['intensity array'] > 10000]
     df['mzxmlFile'] = filename
     result = integrate_peaks(df, peaklist)
     result['mzxmlFile'] = filename
@@ -239,5 +242,5 @@ def process_in_parallel(args):
     result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
     result['intensity sum'] = df['intensity array'].sum()
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection #, df[['mzxmlFile', 'retentionTime', 'm/z array', 'intensity array']]
+    return result, rt_projection
 
