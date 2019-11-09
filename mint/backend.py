@@ -1,41 +1,23 @@
+import io
 import os
 import uuid
-import datetime
 import itertools
 import pandas as pd
 import numpy as np
 import time
 
+
 from .tools import integrate_peaks, peak_rt_projections,\
     mzxml_to_pandas_df, check_peaklist, STANDARD_PEAKLIST,\
     restructure_rt_projections, STANDARD_PEAKFILE,\
-    read_peaklists
+    read_peaklists, process_in_parallel
 
 import warnings
 
 from multiprocessing import Process, Pool, Manager, cpu_count
 from glob import glob
+
 import mint
-
-from datetime import date
-
-
-def process_in_parallel(args):
-    '''Pickleable function for parallel processing.'''
-    filename = args['filename']
-    peaklist = args['peaklist']
-    q = args['q']
-    q.put('filename')
-    df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    df['mzxmlFile'] = filename
-    result = integrate_peaks(df, peaklist)
-    result['mzxmlFile'] = filename
-    result['mzxmlPath'] = os.path.dirname(filename)
-    result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
-    result['intensity sum'] = df['intensity array'].sum()
-    rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection
-
 
 class Mint(object):
     def __init__(self):
@@ -47,16 +29,27 @@ class Mint(object):
                   'rtmin', 'rtmax', 'peakArea', 'mzxmlFile', 'mzxmlPath', 
                   'peakListFile']
         self._results = pd.DataFrame({i: [] for i in columns})
-        self._n_files = 0
-        self._n_files_processed = 0
         self._callback_progress = None
         self._all_df = None
+        self.version = mint.__version__
+        self.progress = 0
+        self.runtime = None
 
     def run(self, nthreads=None):
+        if (self.n_files == 0) or (self.n_peaklist_files == 0):
+            return None
         if nthreads is None:
-            nthreads = min(cpu_count(), self._n_files)
+            nthreads = min(cpu_count(), self.n_files)
+        print('Run MINT')
+        start = time.time()
         self.run_parallel(nthreads)
+        end = time.time()
+        self.runtime = ( end - start )
+        self.runtime_per_file = (self.runtime / self.n_files)
+        print(f'Total runtime: {self.runtime:.2f}s')
+        print(f'Runtime per file: {self.runtime_per_file:.2f}s')
 
+        
     def run_parallel(self, nthreads=1):
         pool = Pool(processes=nthreads)
         m = Manager()
@@ -68,7 +61,17 @@ class Mint(object):
                          'q':q})
         
         results = pool.map_async(process_in_parallel, args)
-        
+        # monitor progress
+        while True:
+            if results.ready():
+                break
+            else:
+                size = q.qsize()
+                self.progress = 100 * (size - (nthreads//2)) // self.n_files
+                time.sleep(1)
+
+        self.progress = 100
+
         pool.close()
         pool.join()
         self._process_results_data_(results.get())
@@ -83,17 +86,24 @@ class Mint(object):
     def files(self):
         return self._files
     
+    @property
+    def n_files(self):
+        return len(self.files)
+    
     @files.setter
     def files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         self._files = list_of_files
-        self._n_files = len(list_of_files)
 
     @property
     def peaklist_files(self):
         return self._peaklist_files
 
+    @property
+    def n_peaklist_files(self):
+        return len(self.peaklist_files)
+    
     @property
     def peaklist(self):
         return self._peaklist
@@ -122,11 +132,10 @@ class Mint(object):
         self._rt_projections = data 
 
     @property
-    def crosstab(self):
-        cols = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax']
+    def crosstab(self, col_name='peakArea'):
         return pd.crosstab(self.results.peakLabel, 
                            self.results.mzxmlFile, 
-                           self.results['peakArea'], 
+                           self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
     @property
     def callback_progress(self):
@@ -135,3 +144,8 @@ class Mint(object):
     @callback_progress.setter
     def callback_progress(self, func=None):
         self._callback_progress = func
+        
+    
+         
+       
+

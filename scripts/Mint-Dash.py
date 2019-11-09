@@ -18,7 +18,14 @@ import colorlover as cl
 import numpy as np
 import pandas as pd
 import re
+import io
+from datetime import date, datetime
+import time
 
+from flask import send_file
+import uuid
+
+from glob import glob
 from dash_table import DataTable
 from plotly.subplots import make_subplots
 
@@ -39,7 +46,7 @@ DEVEL = True
 
 if DEVEL:
     from glob import glob
-    mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-3:]
+    mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]
     mint.peaklist = STANDARD_PEAKFILE
     if isfile('/tmp/mint_results.csv'):
         mint._results = pd.read_csv('/tmp/mint_results.csv')
@@ -57,42 +64,56 @@ app = dash.Dash(
 )
 
 button_color = 'lightgreen'
-button_style = style={'margin-right': 20, 'margin-bottom': '1.5em','background-color': button_color}
+button_color_warn = '#DC7633'
+button_style = {'margin-right': 20, 'margin-bottom': '1.5em','background-color': button_color}
+button_style_warn = button_style.copy()
+button_style_warn['background-color'] = button_color_warn
 slider_style = {'marginBottom': '3em'}
-text_style = {'margin-top': 10, 'margin-bottom': 5, 'margin-left': 10, 'display': 'inline-block'}
+info_style = {'margin-top': 10, 'margin-bottom': 5, 'margin-left': 10, 'display': 'inline-block', 'float': 'right', 'color': 'grey'}
 n_cpus = cpu_count()
-
 
 app.layout = html.Div(
     [   
         html.H1("Mint-Dash", style={'margin-top': '10%'}),
         html.Div(id='storage', style={'display': 'none'}),
-        html.Button('Select file(s)', id='files', style=button_style),
+        html.Button('Add file(s)', id='files', style=button_style),
+       
         html.Button('Select peaklist file(s)', id='peaklist', style=button_style),
-        html.Button('Run', id='run', style=button_style),
+        html.Button('Clear files', id='files-clear', style=button_style_warn),
+        html.Br(),
+        dcc.Checklist(id='files-check', 
+                      options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
+                      value=['by-dir'], style={'display': 'inline-block'}),
+        html.Br(),
         
-        html.Div(id='files-text', children='', style=text_style),
-        html.Div(id='peaklist-text', children='', style=text_style),
+        html.Div(id='files-text', children='', style=info_style),
+        html.Div(id='peaklist-text', children='', style=info_style),
+        html.Div(id='cpu-text', children='', style=info_style),
         html.Br(),
 
+        html.P("Select number of cores:", style={'display': 'inline-block', 'margin-top': 30}),
+        html.Div(dcc.Slider( id='n_cpus', 
+                             min=1, max=n_cpus,
+                             step=1, value=n_cpus,
+                             marks={i: f'{i} cpus' for i in [1, n_cpus]}),
+                 style=slider_style),
+        html.Button('Run', id='run', style=button_style),
+        dcc.Interval(id="progress-interval", n_intervals=0, interval=10000),
+        dbc.Progress(id="progress-bar"),
+        html.Div(id='progress', children=[], style=info_style),
+        
+        html.H2("Table View", style={'margin-top': 100}),
+        dcc.Dropdown(id='table-value-select', options=[ {'label': i, 'value': i} for i in ['peakArea', 'rt_max_intensity',
+                            'intensity_median', 'intensity_max', 'intensity_min'] ], value='peakArea'),
+        html.Div(id='run-out', 
+                 style={'min-height':  0, 'margin-top': 10},
+                 children=[DataTable(id='table', data=np.array([]))]),
         dcc.Input(
             id="label-regex",
             type='text',
             placeholder="Regular Expression for Labels",
         ),
-        html.Br(),
-        html.P("Select number of cores:", style={'display': 'inline-block'}),
-        html.Div(dcc.Slider( id='cpu-select', 
-                             min=1, max=n_cpus,
-                             step=1, value=n_cpus,
-                             marks={i: f'{i} cpus' for i in [1, n_cpus//2, n_cpus]}),
-                 style=slider_style),
-        html.Div(id='cpu-text', children='', style=text_style),
-
-        html.Div(id='run-out', 
-                 style={'min-height':  400, 'margin-top': 100},
-                 children=[DataTable(id='table', data=np.array([]))]),
-        html.Button('Export', id='export', style={'float': 'right', 'background-color': button_color}),
+        html.A(html.Button('Export', id='export', style={'float': 'right', 'background-color': button_color}), href="export") ,
 
         html.H2("Heatmap"),
         html.Button('Heatmap', id='b_peakAreas', style=button_style),
@@ -128,75 +149,122 @@ app.layout = html.Div(
     ], style={'max-width': '80%', 'margin': 'auto', 'margin-bottom': '10%'}
 )
 
+
 @app.callback(
-    Output('files-text', 'children'),
-    [Input('files', 'n_clicks')] )
-def select_files(n_clicks):
+    [Output("progress", "children")],
+    [Input("progress-interval", "n_intervals")],
+)
+def update_progress(n):
+    progress = mint.progress
+    # only add text after 5% progress to ensure text isn't squashed too much
+    return [f"Progress: {progress} %" if progress >= 5 else ""]
+
+### Load MS-files
+@app.callback(
+    Output('files', 'value'),
+    [Input('files', 'n_clicks')],
+    [State('files-check', 'value')] )
+def select_files(n_clicks, options):
     if n_clicks is not None:
         root = Tk()
         root.withdraw()
         root.call('wm', 'attributes', '.', '-topmost', True)
-        files = filedialog.askopenfilename(multiple=True)
+        if 'by-dir' not in options:
+            files = filedialog.askopenfilename(multiple=True)
+        else:
+            dir_ = filedialog.askdirectory()
+            if len(dir_) != 0:
+                files = glob(os.path.join(dir_, '**/*.mzXML'), recursive=True)
+            else:
+                files = []
         if len(files) != 0:
-            mint.files = files
+            mint.files += files
         root.destroy()
-    if len(mint.files) == 0:
-        return 'Select data file(s)'
-    else:
-        return '{} data files selected'.format(len(mint.files))
+    return str(n_clicks)
 
+### Clear files
+@app.callback(
+    Output('files-clear', 'value'),
+    [Input('files-clear', 'n_clicks')])
+def clear_files(n_clicks):
+    if n_clicks is None:
+        raise PreventUpdate
+    mint.files = []
+    return str(n_clicks)
+    
+### Update n-files text when files added or cleared
+@app.callback(
+    Output('files-text', 'children'),
+    [Input('files', 'value'),
+     Input('files-clear', 'value')])    
+def update_files_text(n,k):
+        return '{} data files selected.'.format(mint.n_files)
+
+
+
+### Load peaklist files
 @app.callback(
     Output('peaklist-text', 'children'),
     [Input('peaklist', 'n_clicks')] )
 def select_peaklist(n_clicks):
     if n_clicks is not None:
+        print('Select Peaklist')
         root = Tk()
         root.withdraw()
         root.call('wm', 'attributes', '.', '-topmost', True)
         files = filedialog.askopenfilename(multiple=True)
         files = [i  for i in files if i.endswith('.csv')]
+        print('Selected:', files)
         if len(files) != 0:
-            mint.peaklists = files
+            mint.peaklist = files
+        print(f'Stored {mint.n_peaklist_files} files: {mint.peaklist_files}')
         root.destroy()
-    if len(mint.peaklist_files) == 0:
-        return 'Select peaklist file(s)'
-    else:
-        return '{} peaklist-files selected'.format(len(mint.peaklist_files))
+    return '{} peaklist-files selected.'.format(mint.n_peaklist_files)
 
 @app.callback(
     Output('cpu-text', 'children'),
-    [Input('cpu-select', 'value')] )
+    [Input('n_cpus', 'value')] )
 def run_mint(value):
     return f'Using {value} cores.'
 
-
 @app.callback(
     Output('storage', 'children'),
-    [Input('run', 'n_clicks')])
-def run_mint(n_clicks):
+    [Input('run', 'n_clicks')],
+    [State('n_cpus', 'value')])
+def run_mint(n_clicks, n_cpus):
     if n_clicks is not None:
-        mint.run()
+        mint.run(nthreads=n_cpus)
         mint.results.to_csv('/tmp/mint_results.csv')
-    return mint.crosstab.T.to_json(orient='split')
+    return mint.results.to_json(orient='split')
 
+
+### Data Table
 @app.callback(
     [Output('run-out', 'children'),
      Output('peak-select', 'options')],
     [Input('storage', 'children'),
-     Input('label-regex', 'value')] )
-def run_mint(json, label_regex):
+     Input('label-regex', 'value'),
+     Input('table-value-select', 'value')])
+def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split').round(0)
-    labels = df.columns
+    print(df.columns)
+    df = pd.crosstab(df.peakLabel, 
+                     df.mzxmlFile, 
+                     df[col_value], 
+                     aggfunc=sum).astype(np.float64).T
+    
+    biomarker_names = df.columns
     df.index.name = 'FileName'
     df.reset_index(inplace=True)
     df['FileName'] = df['FileName'].apply(basename).apply(lambda x: x.split('.')[0])
     if label_regex is not None:
         try:
             labels = [ i.split('_')[int(label_regex)] for i in df.FileName ]
-            print('Labels:', labels)
             df['FileName'] = labels
         except:
             pass
+    df.columns = df.columns.astype(str)
+    
     table = DataTable(
                 id='table',
                 columns=[{"name": i, "id": i, "selectable": True} for i in df.columns],
@@ -214,7 +282,7 @@ def run_mint(json, label_regex):
                 style_header={'backgroundColor': 'white',
                               'fontWeight': 'bold'},
             )
-    return table, [ {'label': i, 'value': i} for i in labels]
+    return table, [ {'label': i, 'value': i} for i in biomarker_names]
 
 @app.callback(
     Output('peakAreas', 'figure'),
@@ -389,6 +457,31 @@ def plot_3d(n_clicks, peakLabel, options):
 
     if not 'legend' in options:
         fig.update_layout(showlegend=False)
+    fig.update_layout({'title': peakLabel})
     return fig
+
+
+## Results Export (Download)
+@app.server.route('/export/')
+def download_csv():
+    file_buffer = io.BytesIO()
+    writer = pd.ExcelWriter(file_buffer) #, engine='xlsxwriter')
+    
+    mint.results.to_excel(writer, 'Results Complete', index=False)
+    mint.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
+    meta = pd.DataFrame({'Version': [mint.version], 
+                            'Date': [str(date.today())]}).T[0]
+    meta.to_excel(writer, 'MetaData', index=True, header=False)
+
+    writer.close()
+    file_buffer.seek(0)
+
+    now = datetime.now().strftime("%Y-%m-%d")
+    uid = str(uuid.uuid4()).split('-')[-1]
+    return send_file(file_buffer,
+                     #mimetype='application/vnd.ms-excel',
+                     attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
+                     as_attachment=True,
+                     cache_timeout=0)
 
 app.run_server(debug=True, port=9995)
