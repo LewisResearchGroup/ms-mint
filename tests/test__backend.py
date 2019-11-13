@@ -2,7 +2,7 @@ import pandas as pd
 
 from sklearn.metrics import r2_score
 
-from mint.backend import Mint, STANDARD_PEAKFILE
+from ms_mint.backend import Mint, STANDARD_PEAKFILE
 
 
 app = Mint()

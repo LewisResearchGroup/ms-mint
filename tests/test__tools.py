@@ -4,7 +4,7 @@ import os
 
 from pathlib import Path as P
 
-from mint.tools import MINT_ROOT, slice_ms1_mzxml,\
+from ms_mint.tools import MINT_ROOT, slice_ms1_mzxml,\
     integrate_peaks_from_filename, STANDARD_PEAKLIST, integrate_peak
 
 TEST_MZXML = os.path.abspath(str(P(MINT_ROOT)/P('../tests/data/test.mzXML')))
