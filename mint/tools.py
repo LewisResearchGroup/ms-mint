@@ -228,7 +228,7 @@ def restructure_rt_projections(data):
     return output
 
 
-def process_in_parallel(args):
+def process_parallel(args):
     '''Pickleable function for parallel processing.'''
     filename = args['filename']
     peaklist = args['peaklist']
@@ -244,3 +244,17 @@ def process_in_parallel(args):
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
     return result, rt_projection
 
+
+def process_serial(args):
+    '''Pickleable function for parallel processing.'''
+    filename = args['filename']
+    peaklist = args['peaklist']
+    df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
+    df['mzxmlFile'] = filename
+    result = integrate_peaks(df, peaklist)
+    result['mzxmlFile'] = filename
+    result['mzxmlPath'] = os.path.dirname(filename)
+    result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
+    result['intensity sum'] = df['intensity array'].sum()
+    rt_projection = {filename: peak_rt_projections(df, peaklist)}
+    return result, rt_projection

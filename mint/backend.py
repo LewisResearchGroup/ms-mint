@@ -10,7 +10,7 @@ import time
 from .tools import integrate_peaks, peak_rt_projections,\
     mzxml_to_pandas_df, check_peaklist, STANDARD_PEAKLIST,\
     restructure_rt_projections, STANDARD_PEAKFILE,\
-    read_peaklists, process_in_parallel
+    read_peaklists, process_parallel, process_serial
 
 import warnings
 
@@ -41,15 +41,29 @@ class Mint(object):
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
         print('Run MINT')
+        print(self.files)
         start = time.time()
-        self.run_parallel(nthreads)
+        
+        if nthreads > 1:
+            self.run_parallel(nthreads)
+        else:
+            results = []
+            for i, filename in enumerate(self.files):
+                args = {'filename': filename,
+                        'peaklist': self.peaklist,
+                        'q':None}
+                results.append(process_serial(args))
+                self.progress = int(100 * (i - (nthreads/2)) // self.n_files)
+            self._process_results_data_(results)
+            self.progress = 100
+            
         end = time.time()
         self.runtime = ( end - start )
         self.runtime_per_file = (self.runtime / self.n_files)
         print(f'Total runtime: {self.runtime:.2f}s')
         print(f'Runtime per file: {self.runtime_per_file:.2f}s')
-
         
+
     def run_parallel(self, nthreads=1):
         pool = Pool(processes=nthreads)
         m = Manager()
@@ -60,7 +74,7 @@ class Mint(object):
                          'peaklist': self.peaklist,
                          'q':q})
         
-        results = pool.map_async(process_in_parallel, args)
+        results = pool.map_async(process_parallel, args)
         # monitor progress
         while True:
             if results.ready():
@@ -94,7 +108,11 @@ class Mint(object):
     def files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
+        
+        for f in list_of_files:
+            assert os.path.isfile(f), f'File not found ({f})'
         self._files = list_of_files
+        print('Got files:', self._files)
 
     @property
     def peaklist_files(self):
@@ -112,8 +130,11 @@ class Mint(object):
     def peaklist(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
+        for f in list_of_files:
+            assert os.path.isfile(f), f'File not found ({f})'    
         self._peaklist_files = list_of_files
         self._peaklist = read_peaklists(list_of_files)
+        print('Got peaklist files:', self._peaklist_files)
         
     @property
     def results(self):

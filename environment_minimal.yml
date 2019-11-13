@@ -4,11 +4,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - appmode
-  - bokeh
-  - jupyter
   - lxml
-  - notebook
   - numpy
   - matplotlib
   - pandas
@@ -24,11 +20,8 @@ dependencies:
   - setuptools
   - sqlite
   - statsmodels
-  - tqdm
-  - widgetsnbextension
   - pip:
     - openpyxl==2.6.0
     - pyteomics==4.0.1
     - colorlover
-prefix: /home/swacker/miniconda3/envs/mint
 

@@ -9,8 +9,13 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
 
     git clone https://github.com/LSARP/mint
     cd mint
-    conda env create -f environment.yml
+
+    conda create -n mint -c plotly lxml matplotlib pandas pandoc pip plotly plotly_express dash dash-bootstrap-components pyqt python=3 scipy setuptools sqlite statsmodels
+
     conda activate mint
+
+    pip install pyteomics openpyxl colorlover
+    
     python setup.py install  # Don't use pip to install it.
 
 ## Start the application
