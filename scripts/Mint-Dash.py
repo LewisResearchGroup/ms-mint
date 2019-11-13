@@ -40,14 +40,16 @@ from scipy.spatial.distance import pdist, squareform
 
 from io import StringIO
 
-mint = Mint()
 
-DEVEL = True
+
+mint = Mint()
+mint.peaklist = STANDARD_PEAKFILE
+
+DEVEL = False
 
 if DEVEL:
     from glob import glob
     mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]
-    mint.peaklist = STANDARD_PEAKFILE
     if isfile('/tmp/mint_results.csv'):
         mint._results = pd.read_csv('/tmp/mint_results.csv')
     print('Loaded mzXML files:')
@@ -60,7 +62,7 @@ if DEVEL:
         assert isfile(i)
 
 app = dash.Dash(
-    __name__, external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"]
+    __name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"]
 )
 
 button_color = 'lightgreen'
@@ -74,16 +76,16 @@ n_cpus = cpu_count()
 
 app.layout = html.Div(
     [   
-        html.H1("Mint-Dash", style={'margin-top': '10%'}),
+        html.H1("MINT", style={'margin-top': '10%'}),
         html.Div(id='storage', style={'display': 'none'}),
         html.Button('Add file(s)', id='files', style=button_style),
-       
+    
         html.Button('Select peaklist file(s)', id='peaklist', style=button_style),
         html.Button('Clear files', id='files-clear', style=button_style_warn),
         html.Br(),
         dcc.Checklist(id='files-check', 
-                      options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
-                      value=['by-dir'], style={'display': 'inline-block'}),
+                    options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
+                    value=['by-dir'], style={'display': 'inline-block'}),
         html.Br(),
         
         html.Div(id='files-text', children='', style=info_style),
@@ -93,21 +95,21 @@ app.layout = html.Div(
 
         html.P("Select number of cores:", style={'display': 'inline-block', 'margin-top': 30}),
         html.Div(dcc.Slider( id='n_cpus', 
-                             min=1, max=n_cpus,
-                             step=1, value=n_cpus,
-                             marks={i: f'{i} cpus' for i in [1, n_cpus]}),
-                 style=slider_style),
+                            min=1, max=n_cpus,
+                            step=1, value=n_cpus,
+                            marks={i: f'{i} cpus' for i in [1, n_cpus]}),
+                style=slider_style),
         html.Button('Run', id='run', style=button_style),
-        dcc.Interval(id="progress-interval", n_intervals=0, interval=10000),
-        dbc.Progress(id="progress-bar"),
+        dcc.Interval(id="progress-interval", n_intervals=0, interval=1000),
+        dbc.Progress(id="progress-bar", value=50),
         html.Div(id='progress', children=[], style=info_style),
         
         html.H2("Table View", style={'margin-top': 100}),
         dcc.Dropdown(id='table-value-select', options=[ {'label': i, 'value': i} for i in ['peakArea', 'rt_max_intensity',
                             'intensity_median', 'intensity_max', 'intensity_min'] ], value='peakArea'),
         html.Div(id='run-out', 
-                 style={'min-height':  0, 'margin-top': 10},
-                 children=[DataTable(id='table', data=np.array([]))]),
+                style={'min-height':  0, 'margin-top': 10},
+                children=[DataTable(id='table', data=np.array([]))]),
         dcc.Input(
             id="label-regex",
             type='text',
@@ -118,31 +120,31 @@ app.layout = html.Div(
         html.H2("Heatmap"),
         html.Button('Heatmap', id='b_peakAreas', style=button_style),
         dcc.Checklist(id='checklist', 
-                      options=[{ 'label': 'Normalized', 'value': 'normed'},
-                               { 'label': 'Cluster', 'value': 'clustered'},
-                               { 'label': 'Dendrogram', 'value': 'dendrogram'}], 
-                      value=['normed'], style={'display': 'inline-block'}),
+                    options=[{ 'label': 'Normalized', 'value': 'normed'},
+                            { 'label': 'Cluster', 'value': 'clustered'},
+                            { 'label': 'Dendrogram', 'value': 'dendrogram'}], 
+                    value=['normed'], style={'display': 'inline-block'}),
         dcc.Graph(id='peakAreas', figure={}),
         
         
         html.H2("Peak Shapes"),
         html.Button('Peak Shapes', id='b_peakShapes', style=button_style),
         dcc.Checklist(id='check_peakShapes', 
-                      options=[{'label': 'Show Legend', 'value': 'legend'},
-                               {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
-                      value=['legend'], style={'display': 'inline-block'}),
-          
+                    options=[{'label': 'Show Legend', 'value': 'legend'},
+                            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
+                    value=['legend'], style={'display': 'inline-block'}),
+        
         html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
                             marks={i: f'{i} columns' for i in range(1, 6)}),
-                 style=slider_style),
+                style=slider_style),
         dcc.Graph(id='peakShape', figure={}),
         
         html.H2("Peak Shapes 3D"),
         html.Button('Peak Shapes 3D', id='b_peakShapes3d', style=button_style),
         dcc.Checklist(id='check_peakShapes3d', 
-                      options=[{'label': 'Show Legend', 'value': 'legend'},
-                               {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
-                      value=['legend'], style={'display': 'inline-block'}),
+                    options=[{'label': 'Show Legend', 'value': 'legend'},
+                            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
+                    value=['legend'], style={'display': 'inline-block'}),
         dcc.Dropdown(id='peak-select', options=[]),
         dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}),
 
@@ -151,13 +153,14 @@ app.layout = html.Div(
 
 
 @app.callback(
-    [Output("progress", "children")],
+    [Output("progress-bar", "value"), 
+    Output("progress", 'children')],
     [Input("progress-interval", "n_intervals")],
 )
 def update_progress(n):
     progress = mint.progress
     # only add text after 5% progress to ensure text isn't squashed too much
-    return [f"Progress: {progress} %" if progress >= 5 else ""]
+    return progress, (f"Progress: {progress} %" if progress >= 5 else "")
 
 ### Load MS-files
 @app.callback(
@@ -171,10 +174,13 @@ def select_files(n_clicks, options):
         root.call('wm', 'attributes', '.', '-topmost', True)
         if 'by-dir' not in options:
             files = filedialog.askopenfilename(multiple=True)
+            files = [os.path.abspath(i) for i in files]
+            for i in files:
+                assert os.path.isfile(i)
         else:
-            dir_ = filedialog.askdirectory()
+            dir_ = os.path.abspath(filedialog.askdirectory())
             if len(dir_) != 0:
-                files = glob(os.path.join(dir_, '**/*.mzXML'), recursive=True)
+                files = glob(os.path.join(dir_, os.path.join('**', '*.mzXML')), recursive=True)
             else:
                 files = []
         if len(files) != 0:
@@ -196,7 +202,7 @@ def clear_files(n_clicks):
 @app.callback(
     Output('files-text', 'children'),
     [Input('files', 'value'),
-     Input('files-clear', 'value')])    
+    Input('files-clear', 'value')])    
 def update_files_text(n,k):
         return '{} data files selected.'.format(mint.n_files)
 
@@ -234,24 +240,27 @@ def run_mint(value):
 def run_mint(n_clicks, n_cpus):
     if n_clicks is not None:
         mint.run(nthreads=n_cpus)
-        mint.results.to_csv('/tmp/mint_results.csv')
+        #mint.results.to_csv('/tmp/mint_results.csv')
     return mint.results.to_json(orient='split')
 
 
 ### Data Table
 @app.callback(
     [Output('run-out', 'children'),
-     Output('peak-select', 'options')],
+    Output('peak-select', 'options')],
     [Input('storage', 'children'),
-     Input('label-regex', 'value'),
-     Input('table-value-select', 'value')])
+    Input('label-regex', 'value'),
+    Input('table-value-select', 'value')])
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split').round(0)
-    print(df.columns)
+    
+    if len(df) == 0:
+        raise PreventUpdate
+    
     df = pd.crosstab(df.peakLabel, 
-                     df.mzxmlFile, 
-                     df[col_value], 
-                     aggfunc=sum).astype(np.float64).T
+                    df.mzxmlFile, 
+                    df[col_value], 
+                    aggfunc=sum).astype(np.float64).T
     
     biomarker_names = df.columns
     df.index.name = 'FileName'
@@ -280,16 +289,16 @@ def get_table(json, label_regex, col_value):
                 style_as_list_view=True,
                 style_cell={'padding': '5px'},
                 style_header={'backgroundColor': 'white',
-                              'fontWeight': 'bold'},
+                            'fontWeight': 'bold'},
             )
     return table, [ {'label': i, 'value': i} for i in biomarker_names]
 
 @app.callback(
     Output('peakAreas', 'figure'),
     [Input('b_peakAreas', 'n_clicks'),
-     Input('checklist', 'value')],
+    Input('checklist', 'value')],
     [State('table', 'derived_virtual_indices'),
-     State('table', 'data')])
+    State('table', 'data')])
 def plot_0(n_clicks, options,ndxs, data):
     if n_clicks is None:
         raise PreventUpdate
@@ -310,9 +319,9 @@ def plot_0(n_clicks, options,ndxs, data):
         dendro_side = ff.create_dendrogram(df, orientation='right')
 
     heatmap = go.Heatmap(z=df.values,
-                         x=df.columns,
-                         y=df.index,
-                         colorscale = 'Blues')
+                        x=df.columns,
+                        y=df.index,
+                        colorscale = 'Blues')
     
     if (not 'dendrogram' in options) or (not 'clustered' in options):
         fig = go.Figure(heatmap)
@@ -322,7 +331,7 @@ def plot_0(n_clicks, options,ndxs, data):
                 'tickmode': 'array', 
                 'automargin': True}) 
         fig.update_layout({'height':800, 
-                           'hovermode': 'closest'})
+                        'hovermode': 'closest'})
         return fig
     
     fig = go.Figure()
@@ -344,37 +353,37 @@ def plot_0(n_clicks, options,ndxs, data):
     fig.update_layout(
             title={'text': title,  },
             yaxis={'title': '', 
-                   'tickmode': 'array', 
-                   'automargin': True}) 
+                'tickmode': 'array', 
+                'automargin': True}) 
 
 
     fig.update_layout(xaxis2={'domain': [0, .1],
-                              'mirror': False,
-                              'showgrid': True,
-                              'showline': False,
-                              'zeroline': False,
-                              'showticklabels': False,
-                              'ticks':""})        
+                            'mirror': False,
+                            'showgrid': True,
+                            'showline': False,
+                            'zeroline': False,
+                            'showticklabels': False,
+                            'ticks':""})        
     
     fig.update_layout(xaxis={'domain': [.11, 1],
-                             'mirror': False,
-                             'showgrid': False,
-                             'showline': False,
-                             'zeroline': False,
-                             'showticklabels': True,
-                             'ticks':""})
+                            'mirror': False,
+                            'showgrid': False,
+                            'showline': False,
+                            'zeroline': False,
+                            'showticklabels': True,
+                            'ticks':""})
     # Edit yaxis
     fig.update_layout(yaxis={'domain': [0, 1],
-                             'mirror': False,
-                             'showgrid': False,
-                             'showline': False,
-                             'zeroline': False,
-                             'showticklabels': False,
+                            'mirror': False,
+                            'showgrid': False,
+                            'showline': False,
+                            'zeroline': False,
+                            'showticklabels': False,
                             })
     
     fig.update_layout(yaxis_ticktext=y_labels)
     fig.update_layout({'paper_bgcolor': 'white',
-                       'plot_bgcolor': 'white'})
+                    'plot_bgcolor': 'white'})
     print(fig.layout['yaxis'])
     return fig
 
@@ -382,8 +391,8 @@ def plot_0(n_clicks, options,ndxs, data):
 @app.callback(
     Output('peakShape', 'figure'),
     [Input('b_peakShapes', 'n_clicks'),
-     Input('n_cols', 'value'),
-     Input('check_peakShapes', 'value')])
+    Input('n_cols', 'value'),
+    Input('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
     if (n_clicks is None) or (mint.rt_projections is None):
         raise PreventUpdate
@@ -408,13 +417,13 @@ def plot_1(n_clicks, n_cols, options):
             
             fig.add_trace(
                 go.Scatter(x=data.index, 
-                           y=data.values,
-                           name=basename(file),
-                           mode='lines',
-                           legendgroup=file_i,
-                           showlegend=(label_i == 0),  
-                           marker_color=colors[file_i],
-                           text=file),
+                        y=data.values,
+                        name=basename(file),
+                        mode='lines',
+                        legendgroup=file_i,
+                        showlegend=(label_i == 0),  
+                        marker_color=colors[file_i],
+                        text=file),
                 row=ndx_r,
                 col=ndx_c,
             )
@@ -436,8 +445,8 @@ def plot_1(n_clicks, n_cols, options):
 @app.callback(
     Output('peakShape3d', 'figure'),
     [Input('b_peakShapes3d', 'n_clicks'),
-     Input('peak-select', 'value'),
-     Input('check_peakShapes3d', 'value')])
+    Input('peak-select', 'value'),
+    Input('check_peakShapes3d', 'value')])
 def plot_3d(n_clicks, peakLabel, options):
     if (n_clicks is None) or (mint.rt_projections is None) or (peakLabel is None):
         raise PreventUpdate
@@ -479,9 +488,44 @@ def download_csv():
     now = datetime.now().strftime("%Y-%m-%d")
     uid = str(uuid.uuid4()).split('-')[-1]
     return send_file(file_buffer,
-                     #mimetype='application/vnd.ms-excel',
-                     attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
-                     as_attachment=True,
-                     cache_timeout=0)
+                    #mimetype='application/vnd.ms-excel',
+                    attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
+                    as_attachment=True,
+                    cache_timeout=0)
 
-app.run_server(debug=True, port=9995)
+
+def startServer(s, dash):
+    def run():
+        dash.scripts.config.serve_locally = True
+        dash.run_server(
+            port=9995,
+            debug=False,
+            processes=4,
+            threaded=False
+        )
+
+    # Run on a separate process so that it doesn't block
+    s.server_process = multiprocessing.Process(target=run)
+    s.server_process.start()
+    time.sleep(0.5)
+
+    # Visit the dash page
+    s.driver.get('http://localhost:9995')
+    time.sleep(0.5)
+
+    # Inject an error and warning logger
+    logger = None
+
+
+if __name__ == '__main__':
+    app.run_server(debug=True, port=9995)
+#import multiprocessing 
+
+def start_server(app, **kwargs):
+    def run():
+        app.run_server(**kwargs)
+        
+    server_process = multiprocessing.Process(target=run)
+    server_process.start()
+
+#start_server(app, port=9995)

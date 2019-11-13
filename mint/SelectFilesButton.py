@@ -1,6 +1,8 @@
-import ipywidgets as widgets
-from ipywidgets import HTML
+import os
 import traitlets
+import ipywidgets as widgets
+
+from ipywidgets import HTML
 from IPython.display import display
 from tkinter import Tk, filedialog
 
@@ -42,6 +44,6 @@ class SelectFilesButton(widgets.Button):
             # Raise the root to the top of all windows.
             root.call('wm', 'attributes', '.', '-topmost', True)
             # List of selected fileswill be set to b.value
-            b.files = filedialog.askopenfilename(multiple=True)
+            b.files = [ os.path.abspath(i) for i in filedialog.askopenfilename(multiple=True) ]
         except:
             pass
