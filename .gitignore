@@ -10,3 +10,5 @@ devel
 output
 build
 dist
+dist
+*.spec
