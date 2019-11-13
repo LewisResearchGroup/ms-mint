@@ -1,69 +1,51 @@
-from mint.backend import Mint, STANDARD_PEAKFILE
+import io
+import re
 
-import os
-from os.path import basename, isfile
+import colorlover as cl
+import time
+import numpy as np
+import pandas as pd
+import uuid
+
+from mint.backend import Mint, STANDARD_PEAKFILE
+from datetime import date, datetime
+from flask import send_file
+from functools import lru_cache
+from glob import glob
+from multiprocessing import cpu_count
+from plotly.subplots import make_subplots
+from tkinter import Tk, filedialog
+
+from os.path import basename, isfile, abspath, join
 
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 
+from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+from dash_table import DataTable
 
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.express as px
 
-import colorlover as cl
-import numpy as np
-import pandas as pd
-import re
-import io
-from datetime import date, datetime
-import time
-
-from flask import send_file
-import uuid
-
-from glob import glob
-from dash_table import DataTable
-from plotly.subplots import make_subplots
-
-from dash.dependencies import Input, Output, State
-from tkinter import Tk, filedialog
-
-from multiprocessing import cpu_count
-from functools import lru_cache
-
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
-from io import StringIO
-
+from ms_mint.backend import Mint, STANDARD_PEAKFILE
 
 
 mint = Mint()
 mint.peaklist = STANDARD_PEAKFILE
 
-DEVEL = False
-
-if DEVEL:
-    from glob import glob
-    mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]
-    if isfile('/tmp/mint_results.csv'):
-        mint._results = pd.read_csv('/tmp/mint_results.csv')
-    print('Loaded mzXML files:')
-    for i in mint.files:
-        print(i)
-        assert isfile(i)
-    print('Loaded peaklist file:')
-    for i in mint.peaklist_files:
-        print(i)
-        assert isfile(i)
+DEBUG = False
 
 app = dash.Dash(
     __name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"]
 )
+app.title = 'MINT'
 
 button_color = 'lightgreen'
 button_color_warn = '#DC7633'
@@ -113,7 +95,7 @@ app.layout = html.Div(
         dcc.Input(
             id="label-regex",
             type='text',
-            placeholder="Regular Expression for Labels",
+            placeholder="Label Selector",
         ),
         html.A(html.Button('Export', id='export', style={'float': 'right', 'background-color': button_color}), href="export") ,
 
@@ -174,13 +156,13 @@ def select_files(n_clicks, options):
         root.call('wm', 'attributes', '.', '-topmost', True)
         if 'by-dir' not in options:
             files = filedialog.askopenfilename(multiple=True)
-            files = [os.path.abspath(i) for i in files]
+            files = [abspath(i) for i in files]
             for i in files:
-                assert os.path.isfile(i)
+                assert isfile(i)
         else:
-            dir_ = os.path.abspath(filedialog.askdirectory())
+            dir_ = abspath(filedialog.askdirectory())
             if len(dir_) != 0:
-                files = glob(os.path.join(dir_, os.path.join('**', '*.mzXML')), recursive=True)
+                files = glob(join(dir_, join('**', '*.mzXML')), recursive=True)
             else:
                 files = []
         if len(files) != 0:
@@ -214,16 +196,13 @@ def update_files_text(n,k):
     [Input('peaklist', 'n_clicks')] )
 def select_peaklist(n_clicks):
     if n_clicks is not None:
-        print('Select Peaklist')
         root = Tk()
         root.withdraw()
         root.call('wm', 'attributes', '.', '-topmost', True)
         files = filedialog.askopenfilename(multiple=True)
         files = [i  for i in files if i.endswith('.csv')]
-        print('Selected:', files)
         if len(files) != 0:
             mint.peaklist = files
-        print(f'Stored {mint.n_peaklist_files} files: {mint.peaklist_files}')
         root.destroy()
     return '{} peaklist-files selected.'.format(mint.n_peaklist_files)
 
@@ -296,9 +275,9 @@ def get_table(json, label_regex, col_value):
 @app.callback(
     Output('peakAreas', 'figure'),
     [Input('b_peakAreas', 'n_clicks'),
-    Input('checklist', 'value')],
+     Input('checklist', 'value')],
     [State('table', 'derived_virtual_indices'),
-    State('table', 'data')])
+     State('table', 'data')])
 def plot_0(n_clicks, options,ndxs, data):
     if n_clicks is None:
         raise PreventUpdate
@@ -384,15 +363,14 @@ def plot_0(n_clicks, options,ndxs, data):
     fig.update_layout(yaxis_ticktext=y_labels)
     fig.update_layout({'paper_bgcolor': 'white',
                     'plot_bgcolor': 'white'})
-    print(fig.layout['yaxis'])
     return fig
 
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape', 'figure'),
-    [Input('b_peakShapes', 'n_clicks'),
-    Input('n_cols', 'value'),
-    Input('check_peakShapes', 'value')])
+    [Input('b_peakShapes', 'n_clicks')],
+    [State('n_cols', 'value'),
+     State('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
     if (n_clicks is None) or (mint.rt_projections is None):
         raise PreventUpdate
@@ -456,7 +434,7 @@ def plot_3d(n_clicks, peakLabel, options):
         sample = data[key].to_frame().reset_index()
         sample.columns = ['retentionTime', 'intensity']
         sample['peakArea'] = sample.intensity.sum()
-        sample['FileName'] = os.path.basename(key)
+        sample['FileName'] = basename(key)
         samples.append(sample)
     samples = pd.concat(samples)
     fig = px.line_3d(samples, x='retentionTime', y='peakArea' , z='intensity', color='FileName')
@@ -474,15 +452,15 @@ def plot_3d(n_clicks, peakLabel, options):
 @app.server.route('/export/')
 def download_csv():
     file_buffer = io.BytesIO()
-    writer = pd.ExcelWriter(file_buffer) #, engine='xlsxwriter')
     
+    writer = pd.ExcelWriter(file_buffer) #, engine='xlsxwriter')
     mint.results.to_excel(writer, 'Results Complete', index=False)
     mint.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
     meta = pd.DataFrame({'Version': [mint.version], 
                             'Date': [str(date.today())]}).T[0]
     meta.to_excel(writer, 'MetaData', index=True, header=False)
-
     writer.close()
+    
     file_buffer.seek(0)
 
     now = datetime.now().strftime("%Y-%m-%d")
@@ -494,38 +472,15 @@ def download_csv():
                     cache_timeout=0)
 
 
-def startServer(s, dash):
-    def run():
-        dash.scripts.config.serve_locally = True
-        dash.run_server(
-            port=9995,
-            debug=False,
-            processes=4,
-            threaded=False
-        )
-
-    # Run on a separate process so that it doesn't block
-    s.server_process = multiprocessing.Process(target=run)
-    s.server_process.start()
-    time.sleep(0.5)
-
-    # Visit the dash page
-    s.driver.get('http://localhost:9995')
-    time.sleep(0.5)
-
-    # Inject an error and warning logger
-    logger = None
-
-
 if __name__ == '__main__':
-    app.run_server(debug=True, port=9995)
-#import multiprocessing 
-
-def start_server(app, **kwargs):
-    def run():
-        app.run_server(**kwargs)
-        
-    server_process = multiprocessing.Process(target=run)
-    server_process.start()
-
-#start_server(app, port=9995)
+    
+    if DEBUG:
+        mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]
+        if isfile('/tmp/mint_results.csv'):
+            mint._results = pd.read_csv('/tmp/mint_results.csv')
+        for i in mint.files:
+            assert isfile(i)
+        for i in mint.peaklist_files:
+            assert isfile(i)
+    
+    app.run_server(debug=DEBUG, port=9999)
