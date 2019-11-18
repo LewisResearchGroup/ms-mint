@@ -10,7 +10,7 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
     git clone https://github.com/soerendip/ms-mint
     cd ms-mint
 
-    conda create -n ms-mint -c plotly lxml matplotlib pandas pandoc pip plotly plotly_express dash dash-bootstrap-components pyqt python=3 scipy setuptools sqlite statsmodels
+    conda create -n ms-mint -c plotly lxml matplotlib pandas pandoc pip plotly plotly_express dash dash-bootstrap-components pyqt python=3 scipy setuptools sqlite statsmodels flask
 
     conda activate ms-mint
     pip install pyteomics openpyxl colorlover
@@ -28,6 +28,7 @@ Then navigate to the following ULR with your browser:
 
     http://localhost:9999/apps/Mint.ipynb?appmode_scroll=0
 
+# A typical workflow
 ![Demo Image](./image/mint1.png "Demo image")
 ![Demo Image](./image/mint2.png "Demo image")
 ![Demo Image](./image/mint3.png "Demo image")

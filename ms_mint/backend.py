@@ -17,7 +17,7 @@ import warnings
 from multiprocessing import Process, Pool, Manager, cpu_count
 from glob import glob
 
-import mint
+import ms_mint
 
 class Mint(object):
     def __init__(self):
@@ -31,7 +31,7 @@ class Mint(object):
         self._results = pd.DataFrame({i: [] for i in columns})
         self._callback_progress = None
         self._all_df = None
-        self.version = mint.__version__
+        self.version = ms_mint.__version__
         self.progress = 0
         self.runtime = None
 
