@@ -14,8 +14,7 @@ config = {
     'packages': ['ms_mint'],
     'name': 'mint',
     'data_files': [('scripts', ['scripts/Mint.py', 'scripts/Mint__windows.bat']),
-                   ('static', ['static/Standard_Peaklist.csv']),
-                   ('notebooks', ['notebooks/Mint.ipynb'])]
+                   ('static', ['static/Standard_Peaklist.csv'])]
 }
 
 setup(**config)

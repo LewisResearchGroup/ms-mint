@@ -1,5 +1,6 @@
 import io
 import re
+import sys
 
 import colorlover as cl
 import time
@@ -7,7 +8,6 @@ import numpy as np
 import pandas as pd
 import uuid
 
-from mint.backend import Mint, STANDARD_PEAKFILE
 from datetime import date, datetime
 from flask import send_file
 from functools import lru_cache
@@ -36,11 +36,8 @@ from scipy.spatial.distance import pdist, squareform
 
 from ms_mint.backend import Mint, STANDARD_PEAKFILE
 
-
 mint = Mint()
 mint.peaklist = STANDARD_PEAKFILE
-
-DEBUG = False
 
 app = dash.Dash(
     __name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"]
@@ -53,7 +50,9 @@ button_style = {'margin-right': 20, 'margin-bottom': '1.5em','background-color':
 button_style_warn = button_style.copy()
 button_style_warn['background-color'] = button_color_warn
 slider_style = {'marginBottom': '3em'}
-info_style = {'margin-top': 10, 'margin-bottom': 5, 'margin-left': 10, 'display': 'inline-block', 'float': 'right', 'color': 'grey'}
+info_style = {'margin-top': 10, 'margin-bottom': 5, 'margin-left': 10,
+              'display': 'inline-block', 'float': 'right', 'color': 'grey'}
+
 n_cpus = cpu_count()
 
 app.layout = html.Div(
@@ -97,7 +96,8 @@ app.layout = html.Div(
             type='text',
             placeholder="Label Selector",
         ),
-        html.A(html.Button('Export', id='export', style={'float': 'right', 'background-color': button_color}), href="export") ,
+        html.A(html.Button('Export', id='export', 
+                           style={'float': 'right', 'background-color': button_color}), href="export") ,
 
         html.H2("Heatmap"),
         html.Button('Heatmap', id='b_peakAreas', style=button_style),
@@ -133,12 +133,10 @@ app.layout = html.Div(
     ], style={'max-width': '80%', 'margin': 'auto', 'margin-bottom': '10%'}
 )
 
-
 @app.callback(
     [Output("progress-bar", "value"), 
-    Output("progress", 'children')],
-    [Input("progress-interval", "n_intervals")],
-)
+     Output("progress", 'children')],
+    [Input("progress-interval", "n_intervals")])
 def update_progress(n):
     progress = mint.progress
     # only add text after 5% progress to ensure text isn't squashed too much
@@ -160,7 +158,9 @@ def select_files(n_clicks, options):
             for i in files:
                 assert isfile(i)
         else:
-            dir_ = abspath(filedialog.askdirectory())
+            dir_ = filedialog.askdirectory()
+            if isinstance(dir_ , tuple):
+                dir_ = []
             if len(dir_) != 0:
                 files = glob(join(dir_, join('**', '*.mzXML')), recursive=True)
             else:
@@ -226,10 +226,10 @@ def run_mint(n_clicks, n_cpus):
 ### Data Table
 @app.callback(
     [Output('run-out', 'children'),
-    Output('peak-select', 'options')],
+     Output('peak-select', 'options')],
     [Input('storage', 'children'),
-    Input('label-regex', 'value'),
-    Input('table-value-select', 'value')])
+     Input('label-regex', 'value'),
+     Input('table-value-select', 'value')])
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split').round(0)
     
@@ -466,13 +466,19 @@ def download_csv():
     now = datetime.now().strftime("%Y-%m-%d")
     uid = str(uuid.uuid4()).split('-')[-1]
     return send_file(file_buffer,
-                    #mimetype='application/vnd.ms-excel',
-                    attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
-                    as_attachment=True,
-                    cache_timeout=0)
+                     attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
+                     as_attachment=True,
+                     cache_timeout=0)
 
 
 if __name__ == '__main__':
+    
+    args = sys.argv
+    
+    if '--debug' in args:
+        DEBUG = True
+    else:
+        DEBUG = False
     
     if DEBUG:
         mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]

@@ -44,4 +44,4 @@ class SelectFolderButton(widgets.Button):
             # List of selected fileswill be set to b.value
             b.files = [filedialog.askdirectory()]
         except:
-            pass
+            b.files = []
