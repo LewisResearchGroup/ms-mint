@@ -5,7 +5,6 @@ import numpy as np
 from pyteomics import mzxml
 from pathlib import Path as P
 
-from multiprocessing import Process, Queue, Pool
 from scipy.optimize import curve_fit
 
 
@@ -193,10 +192,11 @@ def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
     mz - center of mass (m/z)
     dmz - width of the mass window in ppm
     '''
+    delta_mass = dmz*mz*1e-6
     df_slice = df.loc[(rtmin <= df.retentionTime) &
                       (df.retentionTime <= rtmax) &
-                      (mz-0.0001*dmz <= df['m/z array']) & 
-                      (df['m/z array'] <= mz+0.0001*dmz)]
+                      (mz-delta_mass<= df['m/z array']) & 
+                      (df['m/z array'] <= mz+delta_mass)]
     return df_slice
 
 
