@@ -15,7 +15,7 @@ button_style_warn['background-color'] = button_color_warn
 
 
 slider_style = {'marginBottom': '3em'}
-info_style = {'margin-top': 10, 'margin-bottom': 5, 'margin-left': 10,
+info_style = {'margin-top': 10, 'margin-bottom': 10, 'margin-left': 10,
               'display': 'inline-block', 'float': 'right', 'color': 'grey'}
 
 n_cpus = cpu_count()
@@ -57,12 +57,19 @@ Layout = html.Div(
         
         html.Button('Run', id='run', style=button_style),
         
+        html.A(html.Button('Export', id='export', 
+                        style={'background-color': button_color}),
+        href="export"),
+        
         dcc.Interval(id="progress-interval", n_intervals=0, interval=1000),
         
-        dbc.Progress(id="progress-bar", value=50),
+        dbc.Progress(id="progress-bar", value=100),
         
         html.Div(id='progress', children=[], style=info_style),
-
+        
+        html.Br(),
+        
+   
         
         html.H2("Table View", style={'margin-top': 100}),
         
@@ -82,18 +89,18 @@ Layout = html.Div(
         
         dcc.Input(id="label-regex", type='text', placeholder="Label Selector"),
         
-        html.A(html.Button('Export', id='export', 
-                           style={'float': 'right', 'background-color': button_color}),
-               href="export"),
-
+        
         html.H2("Heatmap"),
+        
         html.Button('Heatmap', id='B_peakAreas', style=button_style),
+        
         dcc.Checklist(id='checklist', 
                     options=[{ 'label': 'Normalized', 'value': 'normed'},
                             { 'label': 'Cluster', 'value': 'clustered'},
                             { 'label': 'Dendrogram', 'value': 'dendrogram'}], 
                     value=['normed'], style={'display': 'inline-block'}),
-        dcc.Graph(id='peakAreas', figure={}),
+        
+        dcc.Graph(id='heatmap', figure={}),
         
         
         html.H2("Peak Shapes"),

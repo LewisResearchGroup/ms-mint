@@ -50,9 +50,12 @@ class Mint(object):
         end = time.time()
         self.runtime = ( end - start )
         self.runtime_per_file = (self.runtime / self.n_files)
+        self.runtime_per_peak = (self.runtime / self.n_files / len(self.peaklist))
+        
         print(f'Total runtime: {self.runtime:.2f}s')
         print(f'Runtime per file: {self.runtime_per_file:.2f}s')
-        
+        print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s')
+
 
     def run_parallel(self, nthreads=1):
         pool = Pool(processes=nthreads)
@@ -143,7 +146,7 @@ class Mint(object):
     @property
     def crosstab(self, col_name='peakArea'):
         return pd.crosstab(self.results.peakLabel, 
-                           self.results.mzxmlFile, 
+                           self.results.msFile, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
     @property

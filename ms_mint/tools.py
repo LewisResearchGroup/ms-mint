@@ -43,7 +43,7 @@ DEVEL = True
 def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
     df = mzxml_to_pandas_df(mzxml)
     peaks = integrate_peaks(df, peaklist)
-    peaks['mzxmlFile'] = mzxml
+    peaks['msFile'] = mzxml
     return peaks 
 
 
@@ -235,10 +235,10 @@ def process_parallel(args):
     q = args['q']
     q.put('filename')
     df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    df['mzxmlFile'] = filename
+    df['msFile'] = filename
     result = integrate_peaks(df, peaklist)
-    result['mzxmlFile'] = filename
-    result['mzxmlPath'] = os.path.dirname(filename)
+    result['msFile'] = filename
+    result['msPath'] = os.path.dirname(filename)
     result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
     result['intensity sum'] = df['intensity array'].sum()
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
@@ -250,10 +250,10 @@ def process_serial(args):
     filename = args['filename']
     peaklist = args['peaklist']
     df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    df['mzxmlFile'] = filename
+    df['msFile'] = filename
     result = integrate_peaks(df, peaklist)
-    result['mzxmlFile'] = filename
-    result['mzxmlPath'] = os.path.dirname(filename)
+    result['msFile'] = filename
+    result['msPath'] = os.path.dirname(filename)
     result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
     result['intensity sum'] = df['intensity array'].sum()
     rt_projection = {filename: peak_rt_projections(df, peaklist)}
