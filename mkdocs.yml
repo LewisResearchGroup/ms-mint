@@ -4,4 +4,3 @@ site_author: Soren Wacker
 nav:
   - Home: 'index.md'
   - Peaklists: 'peaklists.md'
-  - License: 'license.md'
