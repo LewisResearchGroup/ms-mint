@@ -29,14 +29,5 @@ Start the app with
 
 Then navigate to the following ULR with your browser: `http://localhost:9999/`
 
-
 # The GUI
-Individual files can be added to an in worklist using the `ADD FILE(S)` button. If the checkbox `Add files from directory` is checked, all files from a directory and its subdirectories are imported that end on `mzXML` or `mzML` (not yet supported). The box is checked by default. Note that files are always added to the worklist. The worklist can be cleared with the `CLEAR FILES` button, which has no effect on the selected peaklists.
-
-A standard peaklist is provided. A user defined peaklist can be selected and used with the `SELECT PEAKLIST FILE(S)` button. Peaklists are explained in more detail [here](peaklists.md).
-
-![Demo Image](./image/mint1.png "Demo image")
-![Demo Image](./image/mint2.png "Demo image")
-![Demo Image](./image/mint3.png "Demo image")
-![Demo Image](./image/mint4.png "Demo image")
-
+The graphical user interface is explained in more detail [here](gui.md)
