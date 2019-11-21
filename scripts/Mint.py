@@ -41,7 +41,6 @@ app.title = 'MINT'
 app.layout = Layout
 
 
-
 @app.callback(
     [Output("progress-bar", "value"), 
      Output("progress", 'children')],
@@ -140,13 +139,11 @@ def run_mint(n_clicks, n_cpus):
      Input('table-value-select', 'value')])
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split')
-    print(df.columns)
     if len(df) == 0:
         raise PreventUpdate
     
-    print('Create table:', col_value)
     if col_value == 'peakArea':
-        df = pd.crosstab(df.peakLabel, df.mzxmlFile, df[col_value], aggfunc=sum).astype(np.float64).T.round(0)
+        df = pd.crosstab(df.peakLabel, df.msFile, df[col_value], aggfunc=sum).astype(np.float64).T.round(0)
         biomarker_names = df.columns
         df.index.name = 'FileName'
         df.reset_index(inplace=True)
@@ -159,7 +156,7 @@ def get_table(json, label_regex, col_value):
             labels = [ i.split('_')[int(label_regex)] for i in df.FileName ]
             df['Label'] = labels
         except:
-            pass
+            df['Label'] = df.FileName
     df.columns = df.columns.astype(str)
     
     table = DataTable(
@@ -182,23 +179,24 @@ def get_table(json, label_regex, col_value):
     return table, [ {'label': i, 'value': i} for i in biomarker_names]
 
 @app.callback(
-    Output('peakAreas', 'figure'),
+    Output('heatmap', 'figure'),
     [Input('B_peakAreas', 'n_clicks'),
      Input('checklist', 'value')],
     [State('table', 'derived_virtual_indices'),
      State('table', 'data'),
      State('table-value-select', 'value')])
-def plot_0(n_clicks, options,ndxs, data, column):
-    if n_clicks is None or column == 'full':
+def plot_0(n_clicks, options, ndxs, data, column):
+    if (n_clicks is None) or (column == 'full') or (len(data) == 0):
         raise PreventUpdate
     
-    title = 'Heatmap of {}'.format(column)
     df = pd.DataFrame(data).set_index('FileName')
+    
     if n_clicks is None:
         return {}
-        
+    
+    title = 'Heatmap of {}'.format(column)    
     if 'normed' in options:
-        df = (df / df.max()).fillna(0)
+        df = df.divide(df.max()).fillna(0)
         title = f'Normalized {title}'
                     
     if 'clustered' in options:
@@ -209,19 +207,19 @@ def plot_0(n_clicks, options,ndxs, data, column):
         dendro_side = ff.create_dendrogram(df, orientation='right')
 
     heatmap = go.Heatmap(z=df.values,
-                        x=df.columns,
-                        y=df.index,
-                        colorscale = 'Blues')
+                         x=df.columns,
+                         y=df.index,
+                         colorscale = 'Blues')
     
     if (not 'dendrogram' in options) or (not 'clustered' in options):
         fig = go.Figure(heatmap)
         fig.update_layout(
             title={'text': title,  },
             yaxis={'title': '', 
-                'tickmode': 'array', 
-                'automargin': True}) 
+                   'tickmode': 'array', 
+                   'automargin': True}) 
         fig.update_layout({'height':800, 
-                        'hovermode': 'closest'})
+                           'hovermode': 'closest'})
         return fig
     
     fig = go.Figure()
@@ -273,7 +271,7 @@ def plot_0(n_clicks, options,ndxs, data, column):
     
     fig.update_layout(yaxis_ticktext=y_labels)
     fig.update_layout({'paper_bgcolor': 'white',
-                    'plot_bgcolor': 'white'})
+                       'plot_bgcolor': 'white'})
     return fig
 
 @lru_cache(maxsize=32)
@@ -388,11 +386,11 @@ if __name__ == '__main__':
     
     if '--debug' in args:
         DEBUG = True
+        mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]
     else:
         DEBUG = False
 
     if '--data' in args:
-        mint.files = glob('/data/metabolomics_storage/**/*.mzXML', recursive=True)[-4:]
         if isfile('/tmp/mint_results.csv'):
             mint._results = pd.read_csv('/tmp/mint_results.csv')
         for i in mint.files:
