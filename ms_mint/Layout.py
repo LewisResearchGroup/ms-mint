@@ -26,11 +26,11 @@ Layout = html.Div(
         html.H1("MINT", style={'margin-top': '10%'}),
         
         html.Div(id='storage', style={'display': 'none'}),
-        
-        html.Button('Add file(s)', id='B_add-files', style=button_style),
     
         html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style),
-        
+    
+        html.Button('Add MS-file(s)', id='B_add-files', style=button_style),
+            
         html.Button('Clear files', id='B_files-clear', style=button_style_warn),
         html.Br(),
         
@@ -73,7 +73,7 @@ Layout = html.Div(
         
         html.H2("Table View", style={'margin-top': 100}),
         
-        dcc.Dropdown(id='table-value-select', value='peakArea',
+        dcc.Dropdown(id='table-value-select', value='full',
                      options=[ 
                               {'label': 'Full Table', 'value': 'full'},
                               {'label': 'Peak Area', 'value': 'peakArea'},
@@ -95,10 +95,12 @@ Layout = html.Div(
         html.Button('Heatmap', id='B_peakAreas', style=button_style),
         
         dcc.Checklist(id='checklist', 
-                    options=[{ 'label': 'Normalized', 'value': 'normed'},
-                            { 'label': 'Cluster', 'value': 'clustered'},
-                            { 'label': 'Dendrogram', 'value': 'dendrogram'}], 
-                    value=['normed'], style={'display': 'inline-block'}),
+                      options=[{ 'label': 'Normalized by peak', 'value': 'normed'},
+                               { 'label': 'Cluster', 'value': 'clustered'},
+                               { 'label': 'Dendrogram', 'value': 'dendrogram'},
+                               { 'label': 'Transposed', 'value': 'transposed'},
+                               { 'label': 'Correlation', 'value': 'corr'} ], 
+                      value=['normed'], style={'display': 'inline-block'}),
         
         dcc.Graph(id='heatmap', figure={}),
         
