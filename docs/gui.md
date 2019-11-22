@@ -13,10 +13,10 @@ A standard peaklist is provided. A user defined peaklist can be selected and use
 
 
 ## Run MINT 
-
+The number of cores used for MINT can be selected with the `Select number of cores` slider. The maximum number shown here depends on the computer on which MINT is running. The `RUN` button starts mint and a progress bar monitors the progress and can be used to estimate the remaining time.
 
 ## Interactive Table
-
+The results
 
 ## Heatmap Tool
 ![Demo Image](./image/mint2.png "Demo image")
