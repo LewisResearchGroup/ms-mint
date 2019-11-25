@@ -1,3 +1,5 @@
+import platform
+
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
@@ -6,6 +8,7 @@ from dash_table import DataTable
 import numpy as np
 
 from multiprocessing import cpu_count
+from ms_mint import __version__
 
 button_color = 'lightgreen'
 button_color_warn = '#DC7633'
@@ -18,7 +21,18 @@ slider_style = {'marginBottom': '3em'}
 info_style = {'margin-top': 10, 'margin-bottom': 10, 'margin-left': 10,
               'display': 'inline-block', 'float': 'right', 'color': 'grey'}
 
+help_button_style = button_style.copy()
+help_button_style.update({'float': 'right', 
+                          'background-color': 'white'})
+
 n_cpus = cpu_count()
+
+
+ISSUE_TEXT = f'''
+%0A%0A%0A%0A%0A%0A%0A%0A%0A
+MINT: {__version__}%0A
+OS: {platform.platform()}%0A
+'''
 
 Layout = html.Div(
     [   
@@ -32,6 +46,11 @@ Layout = html.Div(
         html.Button('Add MS-file(s)', id='B_add-files', style=button_style),
             
         html.Button('Clear files', id='B_files-clear', style=button_style_warn),
+        
+        html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
+               children=[html.Button('Help / Issues', id='B_help', style=help_button_style)],
+               target="_blank"),
+
         html.Br(),
         
         dcc.Checklist(id='files-check', 
@@ -74,7 +93,7 @@ Layout = html.Div(
         html.H2("Table View", style={'margin-top': 100}),
         
         dcc.Dropdown(id='table-value-select', value='full',
-                     options=[ 
+                     optioReportns=[ 
                               {'label': 'Full Table', 'value': 'full'},
                               {'label': 'Peak Area', 'value': 'peakArea'},
                               {'label': 'Retention time of peak maximum', 'value': 'rt_max_intensity'}

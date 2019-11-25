@@ -7,6 +7,7 @@ from .tools import read_peaklists, process_parallel,\
     process_serial, restructure_rt_projections
 
 from multiprocessing import Pool, Manager, cpu_count
+from datetime import date
 
 import ms_mint
 
@@ -157,7 +158,20 @@ class Mint(object):
     def callback_progress(self, func=None):
         self._callback_progress = func
         
-    
-         
+    def export(self, outfile=None):
+        if outfile is None:
+            file_buffer = io.BytesIO()
+            writer = pd.ExcelWriter(file_buffer)
+        else:
+            writer = pd.ExcelWriter(outfile)#, engine='xlsxwriter')
+        self.results.to_excel(writer, 'Results Complete', index=False)
+        self.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
+        meta = pd.DataFrame({'Version': [self.version], 
+                                'Date': [str(date.today())]}).T[0]
+        meta.to_excel(writer, 'MetaData', index=True, header=False)
+        writer.close()
+        if outfile is None:
+            return file_buffer.seek(0)
+
        
 
