@@ -93,7 +93,7 @@ Layout = html.Div(
         html.H2("Table View", style={'margin-top': 100}),
         
         dcc.Dropdown(id='table-value-select', value='full',
-                     optioReportns=[ 
+                     options=[ 
                               {'label': 'Full Table', 'value': 'full'},
                               {'label': 'Peak Area', 'value': 'peakArea'},
                               {'label': 'Retention time of peak maximum', 'value': 'rt_max_intensity'}
