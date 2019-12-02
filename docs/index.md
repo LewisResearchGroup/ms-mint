@@ -9,10 +9,10 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
     git clone https://github.com/soerendip/ms-mint
     cd ms-mint
 
-    conda create -n ms-mint -c plotly lxml matplotlib pandas pandoc pip plotly plotly_express dash dash-bootstrap-components pyqt python=3 scipy setuptools sqlite statsmodels flask
+    conda create -n ms-mint -c plotly lxml matplotlib pandas pandoc pip plotly plotly_express dash pyqt python=3 scipy setuptools sqlite statsmodels flask
 
     conda activate ms-mint
-    pip install pyteomics openpyxl colorlover
+    pip install pyteomics openpyxl colorlover dash-bootstrap-components
     python setup.py install  # Don't use pip to install it.
 
 
