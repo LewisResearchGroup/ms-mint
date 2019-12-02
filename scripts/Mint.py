@@ -1,3 +1,5 @@
+#!/usr/env python
+
 import io
 import sys
 
