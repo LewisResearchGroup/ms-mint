@@ -3,8 +3,7 @@ import pandas as pd
 import numpy as np
 import time
 
-from .tools import read_peaklists, process_parallel,\
-    process_serial, restructure_rt_projections
+from .tools import read_peaklists, process, restructure_rt_projections
 
 from multiprocessing import Pool, Manager, cpu_count
 from datetime import date
@@ -21,20 +20,20 @@ class Mint(object):
                   'rtmin', 'rtmax', 'peakArea', 'mzxmlFile', 'mzxmlPath', 
                   'peakListFile']
         self._results = pd.DataFrame({i: [] for i in columns})
-        self._callback_progress = None
         self._all_df = None
         self.version = ms_mint.__version__
         self.progress = 0
         self.runtime = None
 
     def run(self, nthreads=None):
+        '''Process files in self.files with self.peaklist. If nthreads != 1 use
+        multiprocessing.'''
         if (self.n_files == 0) or (self.n_peaklist_files == 0):
             return None
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
         print('Run MINT')
         start = time.time()
-        
         if nthreads > 1:
             self.run_parallel(nthreads)
         else:
@@ -43,43 +42,40 @@ class Mint(object):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q':None}
-                results.append(process_serial(args))
+                results.append(process(args))
                 self.progress = int(100 * (i - (nthreads/2)) // self.n_files)
             self._process_results_data_(results)
             self.progress = 100
-            
         end = time.time()
         self.runtime = ( end - start )
         self.runtime_per_file = (self.runtime / self.n_files)
         self.runtime_per_peak = (self.runtime / self.n_files / len(self.peaklist))
-        
         print(f'Total runtime: {self.runtime:.2f}s')
         print(f'Runtime per file: {self.runtime_per_file:.2f}s')
         print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s')
 
 
     def run_parallel(self, nthreads=1):
+        '''Create multiprocessing queue and process all files in
+           self.files with self.peaklist in parallel.'''
         pool = Pool(processes=nthreads)
-        m = Manager()
-        q = m.Queue()
+        manager = Manager()
+        queue = manager.Queue()
         args = []
         for i, filename in enumerate(self.files):
             args.append({'filename': filename,
                          'peaklist': self.peaklist,
-                         'q':q})
-        
-        results = pool.map_async(process_parallel, args)
+                         'queue': queue})
+        results = pool.map_async(process, args)
         # monitor progress
         while True:
             if results.ready():
                 break
             else:
-                size = q.qsize()
+                size = queue.qsize()
                 self.progress = 100 * (size - (nthreads//2)) // self.n_files
                 time.sleep(1)
-
         self.progress = 100
-
         pool.close()
         pool.join()
         self._process_results_data_(results.get())
@@ -102,7 +98,6 @@ class Mint(object):
     def files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
-        
         for f in list_of_files:
             assert os.path.isfile(f), f'File not found ({f})'
         self._files = list_of_files
@@ -150,20 +145,13 @@ class Mint(object):
                            self.results.msFile, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
-    @property
-    def callback_progress(self):
-        return self._callback_progress
-    
-    @callback_progress.setter
-    def callback_progress(self, func=None):
-        self._callback_progress = func
-        
+       
     def export(self, outfile=None):
         if outfile is None:
             file_buffer = io.BytesIO()
             writer = pd.ExcelWriter(file_buffer)
         else:
-            writer = pd.ExcelWriter(outfile)#, engine='xlsxwriter')
+            writer = pd.ExcelWriter(outfile)
         self.results.to_excel(writer, 'Results Complete', index=False)
         self.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
         meta = pd.DataFrame({'Version': [self.version], 
@@ -172,6 +160,3 @@ class Mint(object):
         writer.close()
         if outfile is None:
             return file_buffer.seek(0)
-
-       
-

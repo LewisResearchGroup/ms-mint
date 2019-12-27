@@ -54,8 +54,8 @@ Layout = html.Div(
         html.Br(),
         
         dcc.Checklist(id='files-check', 
-                    options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
-                    value=['by-dir'], style={'display': 'inline-block'}),
+                      options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
+                      value=['by-dir'], style={'display': 'inline-block'}),
         html.Br(),
         
         html.Div(id='files-text', children='', style=info_style),
