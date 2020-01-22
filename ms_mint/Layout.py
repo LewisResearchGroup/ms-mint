@@ -10,22 +10,13 @@ import numpy as np
 from multiprocessing import cpu_count
 from ms_mint import __version__
 
-button_color = 'lightgreen'
-button_color_warn = '#DC7633'
-button_style = {'margin-right': 20, 'margin-bottom': '1.5em','background-color': button_color}
-button_style_warn = button_style.copy()
-button_style_warn['background-color'] = button_color_warn
+from .button_style import button_style
 
+n_cpus = cpu_count()
 
 slider_style = {'marginBottom': '3em'}
 info_style = {'margin-top': 10, 'margin-bottom': 10, 'margin-left': 10,
               'display': 'inline-block', 'float': 'right', 'color': 'grey'}
-
-help_button_style = button_style.copy()
-help_button_style.update({'float': 'right', 
-                          'background-color': 'white'})
-
-n_cpus = cpu_count()
 
 
 ISSUE_TEXT = f'''
@@ -43,14 +34,14 @@ Layout = html.Div(
         
         html.Div(id='n_peaklist_selected', children=1, style={'display': 'none'}),
     
-        html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style),
+        html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style()),
     
-        html.Button('Add MS-file(s)', id='B_add-files', style=button_style),
+        html.Button('Add MS-file(s)', id='B_add-files', style=button_style()),
             
-        html.Button('Clear files', id='B_files-clear', style=button_style_warn),
+        html.Button('Clear files', id='B_files-clear', style=button_style('warn')),
         
         html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
-               children=[html.Button('Help / Issues', id='B_help', style=help_button_style)],
+               children=[html.Button('Help / Issues', id='B_help', style=button_style('help'))],
                target="_blank"),
 
         html.Br(),
@@ -76,16 +67,15 @@ Layout = html.Div(
                             marks={i: f'{i} cpus' for i in [1, n_cpus]}),
                 style=slider_style),
         
-        html.Button('Run', id='run', style=button_style),
+        html.Button('Run', id='run', style=button_style()),
         
         html.A(html.Button('Export', id='export', 
-                           style={'background-color': button_color}),
+                           style=button_style()),
         href="export"),
         
-        dcc.Interval(id="progress-interval", n_intervals=0, interval=1000, disabled=True),
-        
+        # Progress bar
+        dcc.Interval(id="progress-interval", n_intervals=0, interval=5000, disabled=False),
         dbc.Progress(id="progress-bar", value=100),
-        
         html.Div(id='progress', children=[], style=info_style),
         
         html.Br(),
@@ -113,7 +103,7 @@ Layout = html.Div(
         
         html.H2("Heatmap"),
         
-        html.Button('Heatmap', id='B_peakAreas', style=button_style),
+        html.Button('Heatmap', id='B_peakAreas', style=button_style()),
         
         dcc.Checklist(id='checklist', 
                       options=[{ 'label': 'Normalized by peak', 'value': 'normed'},
@@ -128,7 +118,7 @@ Layout = html.Div(
         
         html.H2("Peak Shapes"),
         
-        html.Button('Peak Shapes', id='B_peakShapes', style=button_style),
+        html.Button('Peak Shapes', id='B_peakShapes', style=button_style()),
         
         dcc.Checklist(id='check_peakShapes', 
                       options=[{'label': 'Show Legend', 'value': 'legend'},
@@ -141,10 +131,9 @@ Layout = html.Div(
         
         dcc.Graph(id='peakShape', figure={}),
         
-        
         html.H2("Peak Shapes 3D"),
         
-        html.Button('Peak Shapes 3D', id='B_peakShapes3d', style=button_style),
+        html.Button('Peak Shapes 3D', id='B_peakShapes3d', style=button_style()),
         
         dcc.Checklist(id='check_peakShapes3d', 
                     options=[{'label': 'Show Legend', 'value': 'legend'},

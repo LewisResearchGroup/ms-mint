@@ -34,6 +34,7 @@ from scipy.spatial.distance import pdist, squareform
 from ms_mint.Mint import Mint
 from ms_mint.tools import STANDARD_PEAKFILE
 from ms_mint.Layout import Layout
+from ms_mint.button_style import button_style
 
 mint = Mint()
 mint.peaklist = STANDARD_PEAKFILE
@@ -121,9 +122,9 @@ def select_peaklist(n_clicks):
     [Input('n_peaklist_selected', 'children')])
 def run_button_style(n_peaklists):
     if n_peaklists > 0:
-        return button_style_ok
+        return button_style('ready')
     else:
-        return button_style_warn
+        return button_style('warn')
 
 
 @app.callback(
