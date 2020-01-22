@@ -32,16 +32,17 @@ Layout = html.Div(
         
         html.Div(id='storage', style={'display': 'none'}),
         
-        html.Div(id='n_peaklist_selected', children=1, style={'display': 'none'}),
-    
+        # Status
+        html.Div(id='n_peaklist_selected', children=0, style={'display': 'none'}),
+        html.Div(id='n_files_selected', children=0, style={'display': 'none'}),
+
+        # Buttons
         html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style()),
-    
         html.Button('Add MS-file(s)', id='B_add-files', style=button_style()),
-            
         html.Button('Clear files', id='B_files-clear', style=button_style('warn')),
         
         html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
-               children=[html.Button('Help / Issues', id='B_help', style=button_style('help'))],
+               children=[html.Button('Help / Issues', id='B_help', style=button_style('help', float="right"))],
                target="_blank"),
 
         html.Br(),
@@ -67,7 +68,7 @@ Layout = html.Div(
                             marks={i: f'{i} cpus' for i in [1, n_cpus]}),
                 style=slider_style),
         
-        html.Button('Run', id='run', style=button_style()),
+        html.Button('Run', id='run'),
         
         html.A(html.Button('Export', id='export', 
                            style=button_style()),

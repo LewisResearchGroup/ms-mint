@@ -93,11 +93,12 @@ def clear_files(n_clicks):
     
 ### Update n-files text when files added or cleared
 @app.callback(
-    Output('files-text', 'children'),
+    [Output('files-text', 'children'),
+     Output('n_files_selected', 'children')],
     [Input('B_add-files', 'value'),
     Input('B_files-clear', 'value')])    
 def update_files_text(n,k):
-        return '{} data files selected.'.format(mint.n_files)
+        return '{} data files selected.'.format(mint.n_files), mint.n_files
 
 
 ### Load peaklist files
@@ -118,14 +119,25 @@ def select_peaklist(n_clicks):
     return '{} peaklist-files selected.'.format(mint.n_peaklist_files), mint.n_peaklist_files
 
 @app.callback(
-    Output('run', 'style'),
-    [Input('n_peaklist_selected', 'children')])
-def run_button_style(n_peaklists):
-    if n_peaklists > 0:
-        return button_style('ready')
+    [Output('B_select-peaklists', 'style'),
+     Output('B_add-files', 'style'),
+     Output('run', 'style')],
+    [Input('n_peaklist_selected', 'children'),
+     Input('n_files_selected', 'children')])
+def run_button_style(n_peaklists, n_files):
+    if n_peaklists == 0:
+        style_peaklists = button_style('next')
+        style_files = button_style()
+        style_run = button_style('wait')
+    elif n_files == 0:
+        style_peaklists = button_style('ready')
+        style_files= button_style('next')
+        style_run = button_style('wait')
     else:
-        return button_style('warn')
-
+        style_peaklists = button_style('ready')
+        style_files = button_style('ready')
+        style_run = button_style('next')
+    return style_peaklists, style_files, style_run
 
 @app.callback(
     Output('cpu-text', 'children'),
