@@ -3,7 +3,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-NAME = 'mint'
 config = {
     'description': 'Metabolomics Integration Tool (Mint)',
     'author': 'Soren Wacker',

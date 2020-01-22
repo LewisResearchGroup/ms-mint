@@ -40,6 +40,8 @@ Layout = html.Div(
         html.H1("MINT", style={'margin-top': '10%'}),
         
         html.Div(id='storage', style={'display': 'none'}),
+        
+        html.Div(id='n_peaklist_selected', children=1, style={'display': 'none'}),
     
         html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style),
     
@@ -54,8 +56,8 @@ Layout = html.Div(
         html.Br(),
         
         dcc.Checklist(id='files-check', 
-                    options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
-                    value=['by-dir'], style={'display': 'inline-block'}),
+                      options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
+                      value=['by-dir'], style={'display': 'inline-block'}),
         html.Br(),
         
         html.Div(id='files-text', children='', style=info_style),
@@ -77,10 +79,10 @@ Layout = html.Div(
         html.Button('Run', id='run', style=button_style),
         
         html.A(html.Button('Export', id='export', 
-                        style={'background-color': button_color}),
+                           style={'background-color': button_color}),
         href="export"),
         
-        dcc.Interval(id="progress-interval", n_intervals=0, interval=1000),
+        dcc.Interval(id="progress-interval", n_intervals=0, interval=1000, disabled=True),
         
         dbc.Progress(id="progress-bar", value=100),
         
