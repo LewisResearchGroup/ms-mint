@@ -31,7 +31,7 @@ import plotly.express as px
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
-from ms_mint.backend import Mint
+from ms_mint.Mint import Mint
 from ms_mint.tools import STANDARD_PEAKFILE
 from ms_mint.Layout import Layout
 

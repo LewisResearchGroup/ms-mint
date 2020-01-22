@@ -12,7 +12,7 @@ config = {
     'version': 0.4,
     'scripts': ['scripts/Mint.py', 'scripts/Mint__windows.bat'],
     'packages': ['ms_mint'],
-    'name': 'mint',
+    'name': 'ms_mint',
     'data_files': [('scripts', ['scripts/Mint.py', 'scripts/Mint__windows.bat']),
                    ('static', ['static/Standard_Peaklist.csv'])]
 }
