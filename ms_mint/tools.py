@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from pyteomics import mzxml
+from pyteomics import mzxml, mzml
 from pathlib import Path as P
 
 from scipy.optimize import curve_fit
@@ -16,7 +16,18 @@ def gaus(x,a,x0,sigma):
 
 def read_peaklists(filenames):
     '''
-    Extracts peak data from csv file.
+    Extracts peak data from csv files that contain peak definitions.
+    CSV files must contain columns: 
+        - 'peakLabel': str, unique identifier
+        - 'peakMz': float, center of mass to be extracted in [Da]
+        - 'peakMzWidth[ppm]': float, with of mass window in [ppm]
+        - 'rtmin': float, minimum retention time in [min]
+        - 'rtmax': float, maximum retention time in [min]
+    -----
+    Args:
+        - filenames: str or PosixPath or list of such with path to csv-file(s)
+    Returns:
+        pandas.DataFrame in peaklist format
     '''
     if isinstance(filenames, str):
         filenames = [filenames]
@@ -41,6 +52,15 @@ DEVEL = True
 
 
 def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
+    '''
+    Peak integration using a filename as input.
+    -----
+    Args:
+        - mzxml: str or PosixPath, path to mzxml filename
+        - peaklist: pandas.DataFrame(), DataFrame in peaklist format
+    Returns:
+        pandas.DataFrame(), DataFrame with integrated peak intensities
+    '''
     df = mzxml_to_pandas_df(mzxml)
     peaks = integrate_peaks(df, peaklist)
     peaks['msFile'] = mzxml
@@ -64,7 +84,7 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
 def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel, fit_gauss=False):
     '''
     Takes the output of mzxml_to_pandas_df() and 
-    calculates peak properties of one peak specified by
+    calculates peak properties of a single peak specified by
     the input arguements.
     '''
     slizE = slice_ms1_mzxml(mzxml_df, 
@@ -94,7 +114,10 @@ def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel, fit_gauss=False):
                          )
     if fit_gauss:
         try:
-            popt, pcov = curve_fit(gaus, rt_projection.index, rt_projection.values, p0=[intensity_max, max_intensity_rt,1], maxfev=1000)
+            popt, pcov = curve_fit(gaus, rt_projection.index, 
+                                   rt_projection.values, 
+                                   p0=[intensity_max, max_intensity_rt,1], 
+                                   maxfev=1000)
         except:
             popt = [None, None, None]
         gauss_fit_intensity = popt[0]
@@ -195,7 +218,7 @@ def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
     delta_mass = dmz*mz*1e-6
     df_slice = df.loc[(rtmin <= df.retentionTime) &
                       (df.retentionTime <= rtmax) &
-                      (mz-delta_mass<= df['m/z array']) & 
+                      (mz-delta_mass <= df['m/z array']) & 
                       (df['m/z array'] <= mz+delta_mass)]
     return df_slice
 
@@ -228,27 +251,25 @@ def restructure_rt_projections(data):
     return output
 
 
-def process_parallel(args):
-    '''Pickleable function for parallel processing.'''
+def process(args):
+    '''
+    Pickleable function for (parallel) peak integration.
+    Expects a dictionary with keys:
+        Mandatory:
+        - 'filename': 'path to file to be processed',
+        - 'peaklist': 'dataframe containing the peaklist'
+        Optional:
+        -  'queue': instance of multiprocessing.Manager().Queue()
+
+    Returns tuple with two elements:
+        1) results, dataframe with integration results
+        2) rt_projection, dictionary of dictionaries with peak shapes
+    '''
     filename = args['filename']
     peaklist = args['peaklist']
-    q = args['q']
-    q.put('filename')
-    df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    df['msFile'] = filename
-    result = integrate_peaks(df, peaklist)
-    result['msFile'] = filename
-    result['msPath'] = os.path.dirname(filename)
-    result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
-    result['intensity sum'] = df['intensity array'].sum()
-    rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection
-
-
-def process_serial(args):
-    '''Pickleable function for parallel processing.'''
-    filename = args['filename']
-    peaklist = args['peaklist']
+    if 'queue' in args.keys():
+        q = args['queue']
+        q.put('filename')
     df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
     df['msFile'] = filename
     result = integrate_peaks(df, peaklist)
