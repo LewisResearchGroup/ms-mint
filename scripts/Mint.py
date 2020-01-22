@@ -99,10 +99,10 @@ def update_files_text(n,k):
         return '{} data files selected.'.format(mint.n_files)
 
 
-
 ### Load peaklist files
 @app.callback(
-    Output('peaklist-text', 'children'),
+    [Output('peaklist-text', 'children'),
+     Output('n_peaklist_selected', 'children')],
     [Input('B_select-peaklists', 'n_clicks')] )
 def select_peaklist(n_clicks):
     if n_clicks is not None:
@@ -112,9 +112,19 @@ def select_peaklist(n_clicks):
         files = filedialog.askopenfilename(multiple=True)
         files = [i  for i in files if i.endswith('.csv')]
         if len(files) != 0:
-            mint.peaklist = files
+            mint.peaklist_files = files
         root.destroy()
-    return '{} peaklist-files selected.'.format(mint.n_peaklist_files)
+    return '{} peaklist-files selected.'.format(mint.n_peaklist_files), mint.n_peaklist_files
+
+@app.callback(
+    Output('run', 'style'),
+    [Input('n_peaklist_selected', 'children')])
+def run_button_style(n_peaklists):
+    if n_peaklists > 0:
+        return button_style_ok
+    else:
+        return button_style_warn
+
 
 @app.callback(
     Output('cpu-text', 'children'),
@@ -248,7 +258,6 @@ def plot_0(n_clicks, options, ndxs, data, column):
                          y=df.index,
                          colorscale = colorscale)
     
-    
     title = f'{plot_type} of {",".join(plot_attributes)} {column}'
 
     # Figure without side-dendrogram
@@ -315,6 +324,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
         fig['layout']['yaxis']['tickvals'] = np.asarray(dendro_side['layout']['yaxis']['tickvals'])
     return fig
 
+
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape', 'figure'),
@@ -369,6 +379,7 @@ def plot_1(n_clicks, n_cols, options):
         fig.update_layout(showlegend=True)
     return fig
 
+
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape3d', 'figure'),
@@ -412,11 +423,11 @@ def download_csv():
     writer.close()
     
     file_buffer.seek(0)
-
+    
     now = datetime.now().strftime("%Y-%m-%d")
     uid = str(uuid.uuid4()).split('-')[-1]
     return send_file(file_buffer,
-                     attachment_msFile=f'MINT__results_{now}-{uid}.xlsx',
+                     attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
                      as_attachment=True,
                      cache_timeout=0)
 
