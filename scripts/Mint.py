@@ -78,17 +78,18 @@ def select_files(n_clicks, options):
                 files = []
         if len(files) != 0:
             mint.files += files
+            mint.progress = 0
         root.destroy()
     return str(n_clicks)
 
 ### Clear files
 @app.callback(
-    Output('B_files-clear', 'value'),
-    [Input('B_files-clear', 'n_clicks')])
+    Output('B_clear', 'value'),
+    [Input('B_clear', 'n_clicks')])
 def clear_files(n_clicks):
     if n_clicks is None:
         raise PreventUpdate
-    mint.files = []
+    mint.reset()
     return str(n_clicks)
     
 ### Update n-files text when files added or cleared
@@ -96,7 +97,7 @@ def clear_files(n_clicks):
     [Output('files-text', 'children'),
      Output('n_files_selected', 'children')],
     [Input('B_add-files', 'value'),
-    Input('B_files-clear', 'value')])    
+     Input('B_clear', 'value')])    
 def update_files_text(n,k):
         return '{} data files selected.'.format(mint.n_files), mint.n_files
 
@@ -105,9 +106,11 @@ def update_files_text(n,k):
 @app.callback(
     [Output('peaklist-text', 'children'),
      Output('n_peaklist_selected', 'children')],
-    [Input('B_select-peaklists', 'n_clicks')] )
-def select_peaklist(n_clicks):
-    if n_clicks is not None:
+    [Input('B_select-peaklists', 'n_clicks'),
+     Input('B_clear', 'value')] )
+def select_peaklist(n_clicks, n_clicks_clear):
+    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_clear')
+    if (n_clicks is not None) and (not clear):
         root = Tk()
         root.withdraw()
         root.call('wm', 'attributes', '.', '-topmost', True)
@@ -118,14 +121,17 @@ def select_peaklist(n_clicks):
         root.destroy()
     return '{} peaklist-files selected.'.format(mint.n_peaklist_files), mint.n_peaklist_files
 
+### Button styles
 @app.callback(
     [Output('B_select-peaklists', 'style'),
      Output('B_add-files', 'style'),
-     Output('run', 'style')],
+     Output('run', 'style'),
+     Output('export', 'style')],
     [Input('n_peaklist_selected', 'children'),
      Input('n_files_selected', 'children'),
      Input('progress-bar', 'value')])
 def run_button_style(n_peaklists, n_files, progress):
+    style_export = button_style('wait')
     if n_peaklists == 0:
         style_peaklists = button_style('next')
         style_files = button_style()
@@ -138,23 +144,28 @@ def run_button_style(n_peaklists, n_files, progress):
         style_peaklists = button_style('ready')
         style_files = button_style('ready')
         style_run = button_style('next')
-        print(progress)
         if progress == 100:
             style_run = button_style('ready')
-    return style_peaklists, style_files, style_run
+            style_export = button_style('next')
+    return style_peaklists, style_files, style_run, style_export
 
+### CPU text
 @app.callback(
     Output('cpu-text', 'children'),
     [Input('n_cpus', 'value')] )
 def mint_cpu_info(value):
     return f'Using {value} cores.'
 
+
+### Storage
 @app.callback(
     Output('storage', 'children'),
-    [Input('run', 'n_clicks')],
+    [Input('run', 'n_clicks'),
+     Input('B_clear', 'value')],
     [State('n_cpus', 'value')])
-def run_mint(n_clicks, n_cpus):
-    if n_clicks is not None:
+def run_mint(n_clicks, n_clicks_clear, n_cpus):
+    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_clear')
+    if (n_clicks is not None) and (not clear):
         mint.run(nthreads=n_cpus)
     return mint.results.to_json(orient='split')
 
@@ -168,8 +179,16 @@ def run_mint(n_clicks, n_cpus):
      Input('table-value-select', 'value')])
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split')
+    
+    cols = ['Label', 'peakLabel',
+            'peakArea', 'rt_max_intensity', 'intensity_median',
+            'intensity_max', 'intensity_min', 'msPath', 'msFile', 'fileSize[MB]',
+            'intensity sum', 'peakListFile', 'peakMz', 'peakMzWidth[ppm]',
+            'rtmin', 'rtmax']     
+    
     if len(df) == 0:
-        raise PreventUpdate
+        return None, []
+        #df = pd.DataFrame(columns=cols)
     
     if df['msFile'].apply(basename).value_counts().max() > 1:
         df['msFile'] = df['msFile'].apply(basename)
@@ -181,11 +200,7 @@ def get_table(json, label_regex, col_value):
     except:
         df['Label'] = df.msFile
     
-    cols = ['Label', 'peakLabel',
-            'peakArea', 'rt_max_intensity', 'intensity_median',
-            'intensity_max', 'intensity_min', 'msPath', 'msFile', 'fileSize[MB]',
-            'intensity sum', 'peakListFile', 'peakMz', 'peakMzWidth[ppm]',
-            'rtmin', 'rtmax'] 
+
                
     df = df[cols]
     biomarker_names = df.peakLabel.drop_duplicates().sort_values().values
