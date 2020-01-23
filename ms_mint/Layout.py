@@ -39,7 +39,7 @@ Layout = html.Div(
         # Buttons
         html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style()),
         html.Button('Add MS-file(s)', id='B_add-files', style=button_style()),
-        html.Button('Clear files', id='B_files-clear', style=button_style('warn')),
+        html.Button('Reset', id='B_clear', style=button_style('warn')),
         
         html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
                children=[html.Button('Help / Issues', id='B_help', style=button_style('help', float="right"))],
@@ -70,18 +70,15 @@ Layout = html.Div(
         
         html.Button('Run', id='run'),
         
-        html.A(html.Button('Export', id='export', 
-                           style=button_style()),
+        html.A(html.Button('Export', id='export'),
         href="export"),
         
         # Progress bar
-        dcc.Interval(id="progress-interval", n_intervals=0, interval=5000, disabled=False),
-        dbc.Progress(id="progress-bar", value=100),
+        dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
+        dbc.Progress(id="progress-bar", value=0),
         html.Div(id='progress', children=[], style=info_style),
         
         html.Br(),
-        
-   
         
         html.H2("Table View", style={'margin-top': 100}),
         

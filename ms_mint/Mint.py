@@ -13,6 +13,9 @@ import ms_mint
 
 class Mint(object):
     def __init__(self):
+        self.reset()
+    
+    def reset(self):
         self._files = []
         self._peaklist_files = []
         self._peaklist = pd.DataFrame([])
