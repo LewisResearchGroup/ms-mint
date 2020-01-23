@@ -123,8 +123,9 @@ def select_peaklist(n_clicks):
      Output('B_add-files', 'style'),
      Output('run', 'style')],
     [Input('n_peaklist_selected', 'children'),
-     Input('n_files_selected', 'children')])
-def run_button_style(n_peaklists, n_files):
+     Input('n_files_selected', 'children'),
+     Input('progress-bar', 'value')])
+def run_button_style(n_peaklists, n_files, progress):
     if n_peaklists == 0:
         style_peaklists = button_style('next')
         style_files = button_style()
@@ -137,6 +138,9 @@ def run_button_style(n_peaklists, n_files):
         style_peaklists = button_style('ready')
         style_files = button_style('ready')
         style_run = button_style('next')
+        print(progress)
+        if progress == 100:
+            style_run = button_style('ready')
     return style_peaklists, style_files, style_run
 
 @app.callback(
