@@ -41,6 +41,6 @@ def test__integrate_peak():
     rtmin = 0
     rtmax = 10
     peaklabel = 'Label'
-    result = integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel).peakArea.values
-    expected = np.array([11])
+    result = integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel)
+    expected = 11
     assert result == expected, f'{result} != {expected}'
