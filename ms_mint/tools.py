@@ -72,60 +72,25 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     Takes the output of mzxml_to_pandas_df() and
     batch-calculates peak properties.
     '''
-    results = []
+    peak_areas = []
     for peak in to_peaks(peaklist):
-        result = integrate_peak(df, **peak)
-        results.append(result)
-    results = pd.concat(results)
-    results.index = range(len(results))
-    return pd.merge(peaklist, results, right_index=True, left_index=True)
+        peak_area = integrate_peak(df, **peak)
+        peak_areas.append(peak_area)
+    result = peaklist.copy()
+    result['peakArea'] = peak_areas
+    return result
 
 
-def integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel, fit_gauss=False):
+def integrate_peak(mzxml_df, mz, dmz, rt_min, rt_max, peak_label):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calculates peak properties of a single peak specified by
     the input arguements.
     '''
-    slizE = slice_ms1_mzxml(mzxml_df, 
-                rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz
-                )
-    
-    rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
-                    .groupby(['retentionTime', 'm/z array']).sum()\
-                    .unstack()\
-                    .sum(axis=1)
-                    
-    intensity_median = np.float64(rt_projection.median())
-    intensity_max = np.float64(rt_projection.max())
-    intensity_min = np.float64(rt_projection.min())
-    try:
-        max_intensity_rt = max(rt_projection.index)
-    except:
-        max_intensity_rt = None
-        
-    peakArea = slizE['intensity array'].sum()
-    result = pd.DataFrame({'peakArea': peakArea,
-                           'rt_max_intensity': max_intensity_rt,
-                           'intensity_median': intensity_median,
-                           'intensity_max': intensity_max,
-                           'intensity_min': intensity_min,
-                          }, index=[0]
-                         )
-    if fit_gauss:
-        try:
-            popt, pcov = curve_fit(gaus, rt_projection.index, 
-                                   rt_projection.values, 
-                                   p0=[intensity_max, max_intensity_rt,1], 
-                                   maxfev=1000)
-        except:
-            popt = [None, None, None]
-        gauss_fit_intensity = popt[0]
-        gauss_fit_rt = popt[1]
-        result['gauss_fit_intensity'] =gauss_fit_intensity
-        result['gauss_fit_rt'] = gauss_fit_rt
-        
-    return result
+    peak_area = slice_ms1_mzxml(mzxml_df, 
+                rtmin=rt_min, rtmax=rt_max, mz=mz, dmz=dmz
+                )['intensity array'].sum()       
+    return peak_area
 
 
 def peak_rt_projections(df, peaklist):
@@ -142,19 +107,19 @@ def peak_rt_projections(df, peaklist):
     return results
 
 
-def peak_rt_projection(df, mz, dmz, rtmin, rtmax, peaklabel):
+def peak_rt_projection(df, mz, dmz, rt_min, rt_max, peak_label):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calcualtes the projections of one peak, 
     specicied by the input parameters, onto
     the RT dimension to visualize peak shapes.
     '''
-    slizE = slice_ms1_mzxml(df, rtmin=rtmin, rtmax=rtmax, mz=mz, dmz=dmz)
+    slizE = slice_ms1_mzxml(df, rtmin=rt_min, rtmax=rt_max, mz=mz, dmz=dmz)
     rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
                     .groupby(['retentionTime', 'm/z array']).sum()\
                     .unstack()\
                     .sum(axis=1)
-    return [mz, dmz, rtmin, rtmax, peaklabel, rt_projection]
+    return [mz, dmz, rt_min, rt_max, peak_label, rt_projection]
 
 
 def to_peaks(peaklist):
@@ -171,9 +136,9 @@ def to_peaks(peaklist):
     tmp = [list(i) for i in list(peaklist[cols_to_import].values)]
     output = [{'mz': el[0],
                'dmz': el[1], 
-               'rtmin': el[2],
-               'rtmax': el[3], 
-               'peaklabel': el[4]} for el in tmp]
+               'rt_min': el[2],
+               'rt_max': el[3], 
+               'peak_label': el[4]} for el in tmp]
     return output
 
 
@@ -235,8 +200,8 @@ def check_peaklist(filename):
     except:
         return f"Not all columns found.\n\
  Please make sure the peaklist file has at least:\
- 'peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax'"
-    return f'Peaklist file ok ({filename})'
+ 'peak_label', 'mz', 'mz_width_ppm','rt_min', 'rt_max'"
+    return True
 
 
 def restructure_rt_projections(data):
@@ -257,9 +222,11 @@ def process(args):
     Expects a dictionary with keys:
         Mandatory:
         - 'filename': 'path to file to be processed',
-        - 'peaklist': 'dataframe containing the peaklist'
+        - 'peaklist': 'dataframe containing the peaklist' 
+        - 'mode': 'express' or 'standard'
+            * 'express' omits calculcation of rt projections
         Optional:
-        -  'queue': instance of multiprocessing.Manager().Queue()
+        - 'queue': instance of multiprocessing.Manager().Queue()
 
     Returns tuple with two elements:
         1) results, dataframe with integration results
@@ -267,15 +234,34 @@ def process(args):
     '''
     filename = args['filename']
     peaklist = args['peaklist']
+    mode = args['mode']
+    intensity_threshold = args['intensity_threshold']
+    
     if 'queue' in args.keys():
         q = args['queue']
         q.put('filename')
-    df = mzxml_to_pandas_df(filename)[['retentionTime', 'm/z array', 'intensity array']]
-    df['msFile'] = filename
+    cols = ['retentionTime', 'm/z array', 'intensity array']
+    df = mzxml_to_pandas_df(filename=filename)[cols]
+    if intensity_threshold > 0:
+        df = df[df['intensity array'] >= intensity_threshold]
     result = integrate_peaks(df, peaklist)
-    result['msFile'] = filename
-    result['msPath'] = os.path.dirname(filename)
-    result['fileSize[MB]'] = os.path.getsize(filename) / 1024 / 1024
-    result['intensity sum'] = df['intensity array'].sum()
-    rt_projection = {filename: peak_rt_projections(df, peaklist)}
-    return result, rt_projection
+    result['ms_file'] = filename
+    result['ms_path'] = os.path.dirname(filename)
+    result['file_size'] = os.path.getsize(filename) / 1024 / 1024
+    result['intensity_sum'] = df['intensity array'].sum()
+    if mode == 'standard':
+        rt_projection = {filename: peak_rt_projections(df, peaklist)}
+        return result, rt_projection
+    elif mode == 'express':
+        return result, None
+
+
+def peaklist_from_masses_and_rt_grid(masses, dt, rt_max=10, mz_ppm=10):
+    rt_cuts = np.arange(0, rt_max+dt, dt)
+    peaklist = pd.DataFrame(index=rt_cuts, columns=masses).unstack().reset_index()
+    del peaklist[0]
+    peaklist.columns = ['peakMz', 'rtmin']
+    peaklist['rtmax'] = peaklist.rtmin+(1*dt)
+    peaklist['peakLabel'] =  peaklist.peakMz.apply(lambda x: '{:.3f}'.format(x)) + '__' + peaklist.rtmin.apply(lambda x: '{:2.2f}'.format(x))
+    peaklist['peakMzWidth[ppm]'] = mz_ppm
+    return peaklist

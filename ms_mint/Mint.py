@@ -27,7 +27,7 @@ class Mint(object):
         self.progress = 0
         self.runtime = None
 
-    def run(self, nthreads=None):
+    def run(self, nthreads=None, mode='standard', intensity_threshold=0):
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
         if nthreads is None:
@@ -36,16 +36,18 @@ class Mint(object):
         start = time.time()
         
         if nthreads > 1:
-            self.run_parallel(nthreads)
+            self.run_parallel(nthreads, mode, intensity_threshold=intensity_threshold)
         else:
             results = []
             for i, filename in enumerate(self.files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
-                        'q':None}
+                        'q':None, 
+                        'mode': mode,
+                        'intensity_threshold': intensity_threshold}
                 results.append(process(args))
                 self.progress = int(100 * (i - (nthreads/2)) // self.n_files)
-            self._process_results_data_(results)
+            self._process_results_data_(results, mode=mode)
             self.progress = 100
             
         end = time.time()
@@ -58,7 +60,7 @@ class Mint(object):
         print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s')
 
 
-    def run_parallel(self, nthreads=1):
+    def run_parallel(self, nthreads=1, mode='standard', intensity_threshold=0):
         pool = Pool(processes=nthreads)
         m = Manager()
         q = m.Queue()
@@ -66,9 +68,11 @@ class Mint(object):
         for i, filename in enumerate(self.files):
             args.append({'filename': filename,
                          'peaklist': self.peaklist,
-                         'q':q})
-        
+                         'q':q,
+                         'mode': mode,
+                         'intensity_threshold': intensity_threshold})
         results = pool.map_async(process, args)
+        
         # monitor progress
         while True:
             if results.ready():
@@ -79,16 +83,16 @@ class Mint(object):
                 time.sleep(1)
 
         self.progress = 100
-
         pool.close()
         pool.join()
-        self._process_results_data_(results.get())
+        self._process_results_data_(results.get(), mode=mode)
 
-    def _process_results_data_(self, results):
+    def _process_results_data_(self, results, mode):
         self.results = pd.concat([i[0] for i in results])
-        rt_projections = {}
-        [rt_projections.update(i[1]) for i in results]
-        self.rt_projections = restructure_rt_projections(rt_projections)  
+        if mode == 'standard':
+            rt_projections = {}
+            [rt_projections.update(i[1]) for i in results]
+            self.rt_projections = restructure_rt_projections(rt_projections)  
 
     @property
     def files(self):
