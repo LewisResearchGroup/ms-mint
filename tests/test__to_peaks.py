@@ -9,5 +9,6 @@ def test__to_peaks():
                       'rtmax': [0.2], 
                       'peakLabel': ['test']})
     output = to_peaks(peaklist)
-    expected = [{'mz': 100, 'dmz': 10, 'rtmin': 0.1, 'rtmax': 0.2, 'peaklabel': 'test'}]
+    print(output)
+    expected = [{'mz': 100, 'dmz': 10, 'rt_min': 0.1, 'rt_max': 0.2, 'peak_label': 'test'}]
     assert output == expected, f'Output is \n {output}\n expected is \n {expected}'
