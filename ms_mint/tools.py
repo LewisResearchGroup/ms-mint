@@ -10,7 +10,9 @@ from scipy.optimize import curve_fit
 
 MINT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
-
+PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
+                    'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
+              
 def gaus(x,a,x0,sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
@@ -29,20 +31,26 @@ def read_peaklists(filenames):
     Returns:
         pandas.DataFrame in peaklist format
     '''
+    
+    NEW_LABELS = {'peakLabel': 'peak_label',
+                  'peakMz': 'mz_mean',
+                  'peakMzWidth[ppm]': 'mz_width',
+                  'rtmin': 'rt_min',
+                  'rtmax': 'rt_max'}
+    
     if isinstance(filenames, str):
         filenames = [filenames]
+
     peaklist = []
-    cols_to_import = ['peakLabel',
-                      'peakMz',
-                      'peakMzWidth[ppm]',
-                      'rtmin',
-                      'rtmax']
     for file in filenames:
         if str(file).endswith('.csv'):
-            df = pd.read_csv(file, usecols=cols_to_import,
-                             dtype={'peakLabel': str})
-            df['peakListFile'] = file
-            peaklist.append(df)
+            df = pd.read_csv(file, dtype={'peakLabel': str})\
+                   .rename(columns=NEW_LABELS)
+            df['peaklist'] = file
+            if 'intensity_threshold' not in df.columns:
+                df['intensity_threshold'] = 0
+            df['peak_label'] = df['peak_label'].astype(str)
+            peaklist.append(df[PEAKLIST_COLUMNS])
     peaklist = pd.concat(peaklist)
     peaklist.index = range(len(peaklist))
     return peaklist
@@ -63,7 +71,7 @@ def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
     '''
     df = mzxml_to_pandas_df(mzxml)
     peaks = integrate_peaks(df, peaklist)
-    peaks['msFile'] = mzxml
+    peaks['ms_file'] = mzxml
     return peaks 
 
 
@@ -77,7 +85,7 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
         peak_area = integrate_peak(df, **peak)
         peak_areas.append(peak_area)
     result = peaklist.copy()
-    result['peakArea'] = peak_areas
+    result['peak_area'] = peak_areas
     return result
 
 
@@ -125,14 +133,14 @@ def peak_rt_projection(df, mz, dmz, rt_min, rt_max, peak_label):
 def to_peaks(peaklist):
     '''
     Takes a dataframe with at least the columns:
-    ['peakMz', 'peakMzWidth[ppm]', 'rtmin', 'rtmax', 'peakLabel'].
+    ['mz_mean', 'mz_width', 'rt_min', 'rt_max', 'peak_label'].
     Returns a list of dictionaries that define peaks.
     '''
-    cols_to_import = ['peakMz', 
-                      'peakMzWidth[ppm]',
-                      'rtmin', 
-                      'rtmax', 
-                      'peakLabel']
+    cols_to_import = ['mz_mean', 
+                      'mz_width',
+                      'rt_min', 
+                      'rt_max', 
+                      'peak_label']
     tmp = [list(i) for i in list(peaklist[cols_to_import].values)]
     output = [{'mz': el[0],
                'dmz': el[1], 

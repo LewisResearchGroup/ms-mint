@@ -3,11 +3,12 @@ import pandas as pd
 
 def test__to_peaks():
     peaklist = pd.DataFrame({
-                      'peakMz': [100], 
-                      'peakMzWidth[ppm]': [10],
-                      'rtmin': [0.1], 
-                      'rtmax': [0.2], 
-                      'peakLabel': ['test']})
+                      'mz_mean': [100], 
+                      'mz_width': [10],
+                      'rt_min': [0.1], 
+                      'rt_max': [0.2],
+                      'intensity_threshold': [0],
+                      'peak_label': ['test']})
     output = to_peaks(peaklist)
     print(output)
     expected = [{'mz': 100, 'dmz': 10, 'rt_min': 0.1, 'rt_max': 0.2, 'peak_label': 'test'}]
