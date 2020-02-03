@@ -12,7 +12,7 @@ MINT_ROOT = os.path.dirname(__file__)
 STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
-              
+
 def gaus(x,a,x0,sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
@@ -20,7 +20,7 @@ def read_peaklists(filenames):
     '''
     Extracts peak data from csv files that contain peak definitions.
     CSV files must contain columns: 
-        - 'peakLabel': str, unique identifier
+        - 'peak_label': str, unique identifier
         - 'peakMz': float, center of mass to be extracted in [Da]
         - 'peakMzWidth[ppm]': float, with of mass window in [ppm]
         - 'rtmin': float, minimum retention time in [min]
@@ -196,20 +196,17 @@ def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
     return df_slice
 
 
-def check_peaklist(filename):
-    if not os.path.isfile(filename):
-        raise FileNotFoundError(f'Cannot find peaklist file ({filename}).')
-    try:
-        df = pd.read_csv(P(filename))
-    except:
-        return f'Cannot open peaklist {filename}'
-    try:
-        df[['peakLabel', 'peakMz', 'peakMzWidth[ppm]','rtmin', 'rtmax']]
-    except:
-        return f"Not all columns found.\n\
- Please make sure the peaklist file has at least:\
- 'peak_label', 'mz', 'mz_width_ppm','rt_min', 'rt_max'"
-    return True
+def check_peaklist(peaklist):
+    '''
+    Test if 
+    1) peaklist has right type, 
+    2) all columns are present and 
+    3) dtype of column peak_label is string
+    '''
+    assert isinstance(peaklist, pd.DataFrame)
+    peaklist[PEAKLIST_COLUMNS]
+    assert peaklist.dtypes['peak_label'] == np.dtype('O')
+
 
 
 def restructure_rt_projections(data):
