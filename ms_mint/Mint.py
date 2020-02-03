@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import time
+import io
 
 from .tools import read_peaklists, process,\
     restructure_rt_projections, PEAKLIST_COLUMNS,\
@@ -19,11 +20,11 @@ class Mint(object):
     def reset(self):
         self._files = []
         self._peaklist_files = []
-        self._peaklist = pd.DataFrame([])
+        self._peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
         self._rt_projections = None
         columns = PEAKLIST_COLUMNS + ['peak_area', 'ms_file', 'ms_path', 'peaklist']
         self._results = pd.DataFrame({i: [] for i in columns})
-        self._callback_progress = None
+        #self._callback_progress = None
         self._all_df = None
         self.version = ms_mint.__version__
         self.progress = 0
@@ -75,7 +76,7 @@ class Mint(object):
         print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s')
         self._status = 'waiting'
 
-    def run_parallel(self, nthreads=1, mode='standard', intensity_threshold=0):
+    def run_parallel(self, nthreads=1, mode='standard'):
         pool = Pool(processes=nthreads)
         m = Manager()
         q = m.Queue()
@@ -84,8 +85,7 @@ class Mint(object):
             args.append({'filename': filename,
                          'peaklist': self.peaklist,
                          'q':q,
-                         'mode': mode,
-                         'intensity_threshold': intensity_threshold})
+                         'mode': mode})
         results = pool.map_async(process, args)
         
         # monitor progress
@@ -180,13 +180,13 @@ class Mint(object):
                            self.results.ms_file, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
-    @property
-    def callback_progress(self):
-        return self._callback_progress
+    #@property
+    #def callback_progress(self):
+    #    return self._callback_progress
     
-    @callback_progress.setter
-    def callback_progress(self, func=None):
-        self._callback_progress = func
+    #@callback_progress.setter
+    #def callback_progress(self, func=None):
+    #    self._callback_progress = func
         
     def export(self, outfile=None):
         if outfile is None:

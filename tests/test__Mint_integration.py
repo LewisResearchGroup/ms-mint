@@ -1,22 +1,36 @@
+import os
 import pandas as pd
-
 from sklearn.metrics import r2_score
 
 from ms_mint.Mint import Mint
 from ms_mint.tools import STANDARD_PEAKFILE, check_peaklist
 
 app = Mint()
-app.peaklist_files = STANDARD_PEAKFILE
 
 class TestClass():
+    
+    def run_without_files(self):
+        app.run()
+    
     def test__add_experimental_data(self):
-        app.files = ['tests/data/test.mzXML']
+        assert app.n_files == 0, app.n_files
+        app.files = 'tests/data/test.mzXML'
+        assert app.n_files == 1, app.n_files
+        assert app.files == ['tests/data/test.mzXML']
 
     def test__add_peaklist(self):
-        app.peaklist_files = ['tests/data/test_peaklist.csv']
+        assert app.n_peaklist_files == 0, app.n_peaklist_files
+        app.peaklist_files = 'tests/data/test_peaklist.csv'
+        assert app.peaklist_files == ['tests/data/test_peaklist.csv']
+        assert app.n_peaklist_files == 1, app.n_peaklist_files
 
-    def test__app_run(self):
-        app.run()
+    def test__app_run_standard(self):
+        app.run(mode='express')
+        assert app.rt_projections is None, app.rt_projections
+
+    def test__app_run_express(self):
+        app.run(mode='standard')
+        assert app.rt_projections is not None, app.rt_projections
 
     def test__correct_peakAreas(self):
         df_test = pd.read_csv('tests/data/test_peaklist.csv', dtype={'peak_label': str})
@@ -59,3 +73,9 @@ class TestClass():
         check_peaklist(peaklist)
         app.peaklist = peaklist
         app.run(nthreads=2)
+    
+    def test__export(self, tmp_path):
+        print(app.export())
+        filename = os.path.join(tmp_path, 'output.xlsx')
+        app.export(filename)
+        assert os.path.isfile(filename)
