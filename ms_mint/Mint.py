@@ -4,7 +4,8 @@ import numpy as np
 import time
 
 from .tools import read_peaklists, process,\
-    restructure_rt_projections, PEAKLIST_COLUMNS
+    restructure_rt_projections, PEAKLIST_COLUMNS,\
+    check_peaklist
 
 from multiprocessing import Pool, Manager, cpu_count
 from datetime import date
@@ -27,8 +28,10 @@ class Mint(object):
         self.version = ms_mint.__version__
         self.progress = 0
         self.runtime = None
+        self._status = 'waiting'
 
     def run(self, nthreads=None, mode='standard', intensity_threshold=0):
+        self._status = 'running'
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
         if nthreads is None:
@@ -43,7 +46,7 @@ class Mint(object):
             for i, filename in enumerate(self.files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
-                        'q':None, 
+                        'q': None, 
                         'mode': mode,
                         'intensity_threshold': intensity_threshold}
                 results.append(process(args))
@@ -59,7 +62,7 @@ class Mint(object):
         print(f'Total runtime: {self.runtime:.2f}s')
         print(f'Runtime per file: {self.runtime_per_file:.2f}s')
         print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s')
-
+        self._status = 'waiting'
 
     def run_parallel(self, nthreads=1, mode='standard', intensity_threshold=0):
         pool = Pool(processes=nthreads)
@@ -93,7 +96,11 @@ class Mint(object):
         if mode == 'standard':
             rt_projections = {}
             [rt_projections.update(i[1]) for i in results]
-            self.rt_projections = restructure_rt_projections(rt_projections)  
+            self.rt_projections = restructure_rt_projections(rt_projections)
+             
+    @property
+    def status(self):
+        return self._status
 
     @property
     def files(self):
@@ -137,6 +144,7 @@ class Mint(object):
 
     @peaklist.setter
     def peaklist(self, peaklist):
+        check_peaklist(peaklist)
         self._peaklist = peaklist
 
     @property
