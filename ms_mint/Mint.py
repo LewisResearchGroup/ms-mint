@@ -30,25 +30,36 @@ class Mint(object):
         self.runtime = None
         self._status = 'waiting'
 
-    def run(self, nthreads=None, mode='standard', intensity_threshold=0):
+    def run(self, nthreads=None, mode='standard'):
+        '''
+        Run MINT with set up peaklist and ms-files.
+        ----
+        Args
+            - nthreads: int or None, default = None
+                * None: Run with min(n_cpus, c_files) CPUs
+                * 1: Run without multiprocessing on one CPU
+                * >1: Run with multiprocessing enabled using nthreads threads.
+            - mode: str, default = 'standard'
+                * 'standard': calculates peak shaped projected to RT dimension
+                * 'express': omits calculation of other features, only peak_areas
+        '''
         self._status = 'running'
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
+            
         print('Run MINT')
         start = time.time()
-        
         if nthreads > 1:
-            self.run_parallel(nthreads, mode, intensity_threshold=intensity_threshold)
+            self.run_parallel(nthreads, mode)
         else:
             results = []
             for i, filename in enumerate(self.files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q': None, 
-                        'mode': mode,
-                        'intensity_threshold': intensity_threshold}
+                        'mode': mode}
                 results.append(process(args))
                 self.progress = int(100 * (i - (nthreads/2)) // self.n_files)
             self._process_results_data_(results, mode=mode)

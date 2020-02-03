@@ -89,14 +89,16 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     return result
 
 
-def integrate_peak(mzxml_df, mz, dmz, rt_min, rt_max, peak_label):
+def integrate_peak(mzxml_df, mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calculates peak properties of a single peak specified by
     the input arguements.
     '''
     peak_area = slice_ms1_mzxml(mzxml_df, 
-                rtmin=rt_min, rtmax=rt_max, mz=mz, dmz=dmz
+                rt_min=rt_min, rt_max=rt_max, 
+                mz_mean=mz_mean, mz_width=mz_width, 
+                intensity_threshold=intensity_threshold
                 )['intensity array'].sum()       
     return peak_area
 
@@ -115,19 +117,21 @@ def peak_rt_projections(df, peaklist):
     return results
 
 
-def peak_rt_projection(df, mz, dmz, rt_min, rt_max, peak_label):
+def peak_rt_projection(df, mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calcualtes the projections of one peak, 
     specicied by the input parameters, onto
     the RT dimension to visualize peak shapes.
     '''
-    slizE = slice_ms1_mzxml(df, rtmin=rt_min, rtmax=rt_max, mz=mz, dmz=dmz)
+    slizE = slice_ms1_mzxml(df, rt_min=rt_min, rt_max=rt_max, 
+                            mz_mean=mz_mean, mz_width=mz_width, 
+                            intensity_threshold=intensity_threshold)
     rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
                     .groupby(['retentionTime', 'm/z array']).sum()\
                     .unstack()\
                     .sum(axis=1)
-    return [mz, dmz, rt_min, rt_max, peak_label, rt_projection]
+    return [mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label, rt_projection]
 
 
 def to_peaks(peaklist):
@@ -140,13 +144,17 @@ def to_peaks(peaklist):
                       'mz_width',
                       'rt_min', 
                       'rt_max', 
+                      'intensity_threshold',
                       'peak_label']
+                      
     tmp = [list(i) for i in list(peaklist[cols_to_import].values)]
-    output = [{'mz': el[0],
-               'dmz': el[1], 
+    output = [{'mz_mean': el[0],
+               'mz_width': el[1], 
                'rt_min': el[2],
                'rt_max': el[3], 
-               'peak_label': el[4]} for el in tmp]
+               'intensity_threshold': el[4],
+               'peak_label': el[5],
+               } for el in tmp]
     return output
 
 
@@ -175,24 +183,25 @@ def df_to_numeric(df):
         df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
 
 
-def slice_ms1_mzxml(df, rtmin, rtmax, mz, dmz):
+def slice_ms1_mzxml(df, rt_min, rt_max, mz_mean, mz_width, intensity_threshold):
     '''
     Returns a slize of a metabolomics mzXML file.
-    df - pandas.DataFrame that has columns 
+    - df: pandas.DataFrame that has columns 
             * 'retentionTime'
             * 'm/z array'
-            * 'rtmin'
-            * 'rtmax'
-    rtmin - minimal retention time
-    rtmax - maximal retention time
-    mz - center of mass (m/z)
-    dmz - width of the mass window in ppm
+            * 'intensity array'
+    - rt_min: minimal retention time
+    - rt_max: maximal retention time
+    - mz_mean: center of mass (m/z)
+    - mz_width: width of the mass window in ppm
+    - intensity_threshold: threshold for minimum intensity values
     '''
-    delta_mass = dmz*mz*1e-6
-    df_slice = df.loc[(rtmin <= df.retentionTime) &
-                      (df.retentionTime <= rtmax) &
-                      (mz-delta_mass <= df['m/z array']) & 
-                      (df['m/z array'] <= mz+delta_mass)]
+    delta_mass = mz_width*mz_mean*1e-6
+    df_slice = df.loc[(rt_min <= df.retentionTime) &
+                      (df.retentionTime <= rt_max) &
+                      (mz_mean-delta_mass <= df['m/z array']) & 
+                      (df['m/z array'] <= mz_mean+delta_mass) &
+                      (df['intensity array'] >= intensity_threshold)]
     return df_slice
 
 
@@ -240,15 +249,13 @@ def process(args):
     filename = args['filename']
     peaklist = args['peaklist']
     mode = args['mode']
-    intensity_threshold = args['intensity_threshold']
     
     if 'queue' in args.keys():
         q = args['queue']
         q.put('filename')
     cols = ['retentionTime', 'm/z array', 'intensity array']
     df = mzxml_to_pandas_df(filename=filename)[cols]
-    if intensity_threshold > 0:
-        df = df[df['intensity array'] >= intensity_threshold]
+
     result = integrate_peaks(df, peaklist)
     result['ms_file'] = filename
     result['ms_path'] = os.path.dirname(filename)
@@ -270,3 +277,4 @@ def peaklist_from_masses_and_rt_grid(masses, dt, rt_max=10, mz_ppm=10):
     peaklist['peakLabel'] =  peaklist.peakMz.apply(lambda x: '{:.3f}'.format(x)) + '__' + peaklist.rtmin.apply(lambda x: '{:2.2f}'.format(x))
     peaklist['peakMzWidth[ppm]'] = mz_ppm
     return peaklist
+

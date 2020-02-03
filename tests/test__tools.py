@@ -36,11 +36,31 @@ def test__integrate_peak():
         'id': [None]*3, 
         'm/z array': [100, 100.0001, 100.0002], 
         'intensity array': [1, 10, 100]})
-    mz = 100
-    dmz = 1
-    rtmin = 0
-    rtmax = 10
-    peaklabel = 'Label'
-    result = integrate_peak(mzxml_df, mz, dmz, rtmin, rtmax, peaklabel)
+    mz_mean = 100
+    mz_width = 1
+    rt_min = 0
+    rt_max = 10
+    peak_label = 'Label'
+    intensity_threshold = 0
+    result = integrate_peak(mzxml_df, mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label)
     expected = 11
     assert result == expected, f'{result} != {expected}'
+
+def fake_ms_data(N=100)
+    df = pd.DataFrame({
+        'num': [None]*N, 
+        'scanType': [None]*N, 
+        'centroided': [None]*N, 
+        'msLevel': [None]*N, 
+        'peaksCount': [None]*N,
+        'polarity': [None]*N,
+        'retentionTime': [1]*N, 
+        'lowMz': [None]*N, 
+        'highMz': [None]*N, 
+        'basePeakMz': [None]*N, 
+        'basePeakIntensity': [None]*N,
+        'totIonCurrent': [None]*N, 
+        'id': [None]*N, 
+        'm/z array': [100]*N, 
+        'intensity array': [100]*N})
+    return df
