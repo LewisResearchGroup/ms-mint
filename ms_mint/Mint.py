@@ -4,7 +4,7 @@ import numpy as np
 import time
 
 from .tools import read_peaklists, process,\
-    restructure_rt_projections
+    restructure_rt_projections, PEAKLIST_COLUMNS
 
 from multiprocessing import Pool, Manager, cpu_count
 from datetime import date
@@ -20,9 +20,7 @@ class Mint(object):
         self._peaklist_files = []
         self._peaklist = pd.DataFrame([])
         self._rt_projections = None
-        columns = ['peakLabel', 'peakMz', 'peakMzWidth[ppm]', 
-                  'rtmin', 'rtmax', 'peakArea', 'mzxmlFile', 'mzxmlPath', 
-                  'peakListFile']
+        columns = PEAKLIST_COLUMNS + ['peak_area', 'ms_file', 'ms_path', 'peaklist']
         self._results = pd.DataFrame({i: [] for i in columns})
         self._callback_progress = None
         self._all_df = None
@@ -158,9 +156,9 @@ class Mint(object):
         self._rt_projections = data 
 
     @property
-    def crosstab(self, col_name='peakArea'):
-        return pd.crosstab(self.results.peakLabel, 
-                           self.results.msFile, 
+    def crosstab(self, col_name='peak_area'):
+        return pd.crosstab(self.results.peak_label, 
+                           self.results.ms_file, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
     @property

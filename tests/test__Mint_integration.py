@@ -6,7 +6,7 @@ from ms_mint.Mint import Mint
 from ms_mint.tools import STANDARD_PEAKFILE
 
 app = Mint()
-app.peaklist = STANDARD_PEAKFILE
+app.peaklist_files = STANDARD_PEAKFILE
 
 class TestClass():
     def test__add_experimental_data(self):
@@ -19,7 +19,31 @@ class TestClass():
         app.run()
 
     def test__correct_peakAreas(self):
-        df_test = pd.read_csv('tests/data/test_peaklist.csv', dtype={'peakLabel': str})
-        df = pd.merge(df_test, app.results, on='peakLabel', suffixes=('_real', '_calc'))
-        R2 = r2_score(df.peakArea_real, df.peakArea_calc)
+        df_test = pd.read_csv('tests/data/test_peaklist.csv', dtype={'peak_label': str})
+        print(app.results.dtypes)
+        df = pd.merge(df_test, app.results, on='peak_label', suffixes=('_real', '_calc'))
+        R2 = r2_score(df.peak_area_real, df.peak_area_calc)
         assert R2 > 0.999, R2
+    
+    def test__results_is_dataframe(self):
+        results = app.results
+        assert isinstance(results, pd.DataFrame), 'Results is not a DataFrame'
+    
+    def test__results_lenght(self):
+        actual = len(app.results)
+        expected = len(app.peaklist) * len(app.files)
+        assert  expected == actual, f'Length of results ({actual}) does not equal expected length ({expected})'
+    
+    def test__restults_columns(self):
+        expected = ['peak_label', 'mz_mean', 'mz_width', 'rt_min', 'rt_max',
+            'intensity_threshold', 'peaklist', 'peak_area', 'ms_file', 'ms_path',
+            'file_size', 'intensity_sum']
+        actual = app.results.columns
+        assert (actual == expected).all()
+        
+        
+    
+    def test__crosstab_is_dataframe(self):
+        ct = app.crosstab
+        assert isinstance(ct, pd.DataFrame), f'Crosstab is not a DataFrame ({type(ct)}).'
+

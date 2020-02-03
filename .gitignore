@@ -13,3 +13,5 @@ dist
 dist
 *.spec
 site
+htmlcov
+Untitled.ipynb
