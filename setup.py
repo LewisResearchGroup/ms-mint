@@ -8,7 +8,7 @@ config = {
     'author': 'Soren Wacker',
     'url': 'https://github.com/soerendip/ms-mint',
     'author_email': 'swacker@ucalgary.ca',
-    'version': 0.0.25,
+    'version': '0.0.25',
     'scripts': ['scripts/Mint.py', 'scripts/Mint.bat'],
     'packages': ['ms_mint'],
     'name': 'ms_mint',
