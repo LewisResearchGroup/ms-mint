@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 from ms_mint.Mint import Mint
-from ms_mint.tools import STANDARD_PEAKFILE, check_peaklist
+from ms_mint.tools import check_peaklist
 
 app = Mint()
 

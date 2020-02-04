@@ -31,12 +31,10 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
 from ms_mint.Mint import Mint
-from ms_mint.tools import STANDARD_PEAKFILE
 from ms_mint.dash_layout import Layout
 from ms_mint.button_style import button_style
 
 mint = Mint()
-mint.peaklist_files = [STANDARD_PEAKFILE]
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"])
 app.title = 'MINT'
