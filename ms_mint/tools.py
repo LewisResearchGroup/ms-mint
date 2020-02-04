@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 
 
 MINT_ROOT = os.path.dirname(__file__)
-STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
+#STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
 
@@ -55,11 +55,11 @@ def read_peaklists(filenames):
     peaklist.index = range(len(peaklist))
     return peaklist
 
-STANDARD_PEAKLIST = read_peaklists(STANDARD_PEAKFILE)
-DEVEL = True
+#STANDARD_PEAKLIST = read_peaklists(STANDARD_PEAKFILE)
+#DEVEL = True
 
 
-def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
+def integrate_peaks_from_filename(mzxml, peaklist):
     '''
     Peak integration using a filename as input.
     -----
@@ -75,7 +75,7 @@ def integrate_peaks_from_filename(mzxml, peaklist=STANDARD_PEAKLIST):
     return peaks 
 
 
-def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
+def integrate_peaks(df, peaklist):
     '''
     Takes the output of mzxml_to_pandas_df() and
     batch-calculates peak properties.
@@ -89,7 +89,8 @@ def integrate_peaks(df, peaklist=STANDARD_PEAKLIST):
     return result
 
 
-def integrate_peak(mzxml_df, mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label):
+def integrate_peak(mzxml_df, mz_mean, mz_width, rt_min, 
+                   rt_max, intensity_threshold, peak_label):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calculates peak properties of a single peak specified by
@@ -117,7 +118,8 @@ def peak_rt_projections(df, peaklist):
     return results
 
 
-def peak_rt_projection(df, mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label):
+def peak_rt_projection(df, mz_mean, mz_width, rt_min, 
+                       rt_max, intensity_threshold, peak_label):
     '''
     Takes the output of mzxml_to_pandas_df() and 
     calcualtes the projections of one peak, 
