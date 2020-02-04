@@ -15,6 +15,8 @@ import ms_mint
 
 class Mint(object):
     def __init__(self):
+        self.version = ms_mint.__version__
+        self._progress_callback = None
         self.reset()
     
     def reset(self):
@@ -24,10 +26,8 @@ class Mint(object):
         self._rt_projections = None
         columns = PEAKLIST_COLUMNS + ['peak_area', 'ms_file', 'ms_path', 'peaklist']
         self._results = pd.DataFrame({i: [] for i in columns})
-        #self._callback_progress = None
         self._all_df = None
-        self.version = ms_mint.__version__
-        self.progress = 0
+        self._progress = 0
         self.runtime = None
         self._status = 'waiting'
 
@@ -45,6 +45,7 @@ class Mint(object):
                 * 'express': omits calculation of other features, only peak_areas
         '''
         self._status = 'running'
+            
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
         if nthreads is None:
@@ -53,7 +54,7 @@ class Mint(object):
         print('Run MINT')
         start = time.time()
         if nthreads > 1:
-            self.run_parallel(nthreads, mode)
+            self.run_parallel(nthreads=nthreads, mode=mode)
         else:
             results = []
             for i, filename in enumerate(self.files):
@@ -62,7 +63,7 @@ class Mint(object):
                         'q': None, 
                         'mode': mode}
                 results.append(process(args))
-                self.progress = int(100 * (i - (nthreads/2)) // self.n_files)
+                self.progress = int(100 * (i / self.n_files))
             self._process_results_data_(results, mode=mode)
             self.progress = 100
             
@@ -86,6 +87,7 @@ class Mint(object):
                          'peaklist': self.peaklist,
                          'q':q,
                          'mode': mode})
+                   
         results = pool.map_async(process, args)
         
         # monitor progress
@@ -93,11 +95,11 @@ class Mint(object):
             if results.ready():
                 break
             else:
-                size = q.qsize()
-                self.progress = 100 * (size - (nthreads//2)) // self.n_files
+                size = self.n_files - results._number_left
+                self.progress = int(100 * (size / self.n_files))
                 time.sleep(1)
-
         self.progress = 100
+
         pool.close()
         pool.join()
         self._process_results_data_(results.get(), mode=mode)
@@ -180,20 +182,32 @@ class Mint(object):
                            self.results.ms_file, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
-    #@property
-    #def callback_progress(self):
-    #    return self._callback_progress
+    @property
+    def progress_callback(self):
+        return self._progress_callback
     
-    #@callback_progress.setter
-    #def callback_progress(self, func=None):
-    #    self._callback_progress = func
+    @progress_callback.setter
+    def progress_callback(self, func=None):
+        self._progress_callback = func
+    
+    @property
+    def progress(self):
+        return self._progress
+    
+    @progress.setter
+    def progress(self, value):
+        assert value >= 0, value
+        assert value <= 100, value
+        self._progress = value
+        if self.progress_callback is not None:
+            self.progress_callback(value)
         
     def export(self, outfile=None):
         if outfile is None:
             file_buffer = io.BytesIO()
             writer = pd.ExcelWriter(file_buffer)
         else:
-            writer = pd.ExcelWriter(outfile)#, engine='xlsxwriter')
+            writer = pd.ExcelWriter(outfile)
         self.results.to_excel(writer, 'Results Complete', index=False)
         self.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
         meta = pd.DataFrame({'Version': [self.version], 
@@ -203,5 +217,4 @@ class Mint(object):
         if outfile is None:
             return file_buffer.seek(0)
 
-    
 

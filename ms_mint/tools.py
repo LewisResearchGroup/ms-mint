@@ -1,10 +1,14 @@
+import io
 import os
 import pandas as pd
 import numpy as np
+import uuid
 
 from pyteomics import mzxml, mzml
 from pathlib import Path as P
+from flask import send_file
 
+from datetime import date, datetime
 from scipy.optimize import curve_fit
 
 
@@ -133,7 +137,8 @@ def peak_rt_projection(df, mz_mean, mz_width, rt_min,
                     .groupby(['retentionTime', 'm/z array']).sum()\
                     .unstack()\
                     .sum(axis=1)
-    return [mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label, rt_projection]
+    # return [mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label, rt_projection]
+    return [peak_label, rt_projection]
 
 
 def to_peaks(peaklist):
@@ -223,11 +228,11 @@ def check_peaklist(peaklist):
 def restructure_rt_projections(data):
     output = {}
     for el in list(data.values())[0]:
-        output[el[4]] = {}
+        output[el[0]] = {}
     for filename in data.keys():
         for item in data[filename]:
-            peaklabel = item[4]
-            rt_proj = item[5]
+            peaklabel = item[0]
+            rt_proj = item[1]
             output[peaklabel][filename] = rt_proj
     return output
 
@@ -280,3 +285,19 @@ def peaklist_from_masses_and_rt_grid(masses, dt, rt_max=10, mz_ppm=10):
     peaklist['peakMzWidth[ppm]'] = mz_ppm
     return peaklist
 
+def browser_export(mint):
+    file_buffer = io.BytesIO()
+    writer = pd.ExcelWriter(file_buffer)
+    mint.results.to_excel(writer, 'Results Complete', index=False)
+    mint.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
+    meta = pd.DataFrame({'Version': [mint.version], 
+                            'Date': [str(date.today())]}).T[0]
+    meta.to_excel(writer, 'MetaData', index=True, header=False)
+    writer.close()
+    file_buffer.seek(0)
+    now = datetime.now().strftime("%Y-%m-%d")
+    uid = str(uuid.uuid4()).split('-')[-1]
+    return send_file(file_buffer,
+                    attachment_filename=f'MINT_{now}_{uid}.xlsx',
+                    as_attachment=True,
+                    cache_timeout=0)
