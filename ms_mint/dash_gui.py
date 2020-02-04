@@ -444,7 +444,6 @@ def plot_3d(n_clicks, peak_label, options):
 @app.server.route('/export/')
 def download_csv():
     file_buffer = io.BytesIO()
-    
     writer = pd.ExcelWriter(file_buffer) #, engine='xlsxwriter')
     mint.results.to_excel(writer, 'Results Complete', index=False)
     mint.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
@@ -452,9 +451,7 @@ def download_csv():
                             'Date': [str(date.today())]}).T[0]
     meta.to_excel(writer, 'MetaData', index=True, header=False)
     writer.close()
-    
     file_buffer.seek(0)
-    
     now = datetime.now().strftime("%Y-%m-%d")
     uid = str(uuid.uuid4()).split('-')[-1]
     return send_file(file_buffer,

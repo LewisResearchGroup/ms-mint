@@ -1,5 +1,5 @@
+import os
 import traitlets
-
 import ipywidgets as widgets
 
 from ipywidgets import Button, HBox, VBox, Textarea, HTML,\
@@ -12,8 +12,7 @@ from tkinter import Tk, filedialog
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint
-
-
+from .tools import browser_export
 
 class GUI():
     def __init__(self, mint=None):
@@ -35,28 +34,14 @@ class GUI():
                     'height': '500px', 
                     'font_family': 'monospace'})
         
-        self.list_button = Button(description="List Files")
-        self.list_button.on_click(self.list_files)
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run_mint)
         self.download_button = Button(description="Download")
-        self.download_button.on_click(self.export_mint_results  )
+        self.download_button.on_click(self.export)
         self._results = None
         self.progress = Progress(min=0, max=100, layout=Layout(width='90%'))
-        self.peaks = []
-        self._rt_projections = None
-        self.plot_button = Button(description="Plot Peaks")
-        self.plot_button.on_click(self.plot_button_on_click)
-        self.plot_peak_selector = SelectMultiple(
-            options=[], layout=Layout(width='30%', height='90px', Label='test'))
-        self.plot_file_selector = SelectMultiple(
-            options=[], layout=Layout(width='30%', height='90px'))
-        self.plot_highlight_selector = SelectMultiple(
-            options=[], layout=Layout(width='30%', height='90px'))
-        self.download_html = HTML("""Nothing to download""")
         self.output = widgets.Output()
-        self.peakLabels = []
-        self.plot_ncol_slider = IntSlider(min=1, max=5, step=1, value=1)
+        self.mint.progress_callback = self.set_progress
 
     def show(self):
         return VBox([
@@ -70,11 +55,7 @@ class GUI():
                     HBox([Label('Peak', layout=Layout(width='30%')),
                           Label('File', layout=Layout(width='30%')), 
                           Label('Highlight', layout=Layout(width='30%'))]),
-                    HBox([self.plot_peak_selector,
-                          self.plot_file_selector,
-                          self.plot_highlight_selector]),
-                    self.plot_button,
-                    HBox([Label('N columns'), self.plot_ncol_slider])
+                    
                 ])
             
     def list_files(self, b=None):
@@ -84,22 +65,41 @@ class GUI():
             self.mint.peaklist_files = [i for i in self.peaklist_files_button.files]
         except:
             pass
-        for line in self.mint.files:
+        for i, line in enumerate(elf.mint.files):
             text += line+'\n'
-        text += '\n\nUsing peak list:\n'
+            if i > 10:
+                line+'...\n'
+                break
+        text += '\nUsing peak list:\n'
         if len(self.mint.peaklist_files) != 0:
             text += '\n'.join([str(i) for i in self.mint.peaklist_files])
         else:
             text += '\nNo peaklist defined.'
         self.message_box.value = text
-    
-    def plot_button_on_click(self, button):
-        pass
-    
+       
     def run_mint(self, b, **kwargs):
+        self.mint.progress = 0
         with self.output:
             self.mint.run(**kwargs)
+        self.message_box.value += f'\n\nDone processing.'
+
+    def set_progress(self, value):
+        self.progress.value = value
     
-    def export_mint_results(self, b, **kwargs):
-        self.mint.export(**kwargs)
-        
+    def export(self, b):
+        home = os.getenv("HOME")
+        filename = os.path.join(home, 'MINT_output.xlsx')
+        self.mint.export(filename)
+        self.message_box.value += f'\n\nExported results to: {filename}'
+    
+    @property
+    def results(self):
+        return self.mint.results
+    
+    @property
+    def crosstab(self):
+        return self.mint.crosstab    
+    
+    @property
+    def rt_projections(self):
+        return self.mint.rt_projections
