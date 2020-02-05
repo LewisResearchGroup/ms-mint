@@ -6,7 +6,7 @@ import io
 
 from .tools import read_peaklists, process,\
     restructure_rt_projections, PEAKLIST_COLUMNS,\
-    check_peaklist
+    check_peaklist, export_to_excel
 
 from multiprocessing import Pool, Manager, cpu_count
 from datetime import date
@@ -14,10 +14,21 @@ from datetime import date
 import ms_mint
 
 class Mint(object):
-    def __init__(self):
-        self.version = ms_mint.__version__
+    def __init__(self, verbose:bool=False):
+        self._verbose = verbose
+        self._version = ms_mint.__version__
         self._progress_callback = None
         self.reset()
+        if self.verbose:
+            print('Mint Version:', self.version , '\n')
+
+    @property
+    def verbose(self):
+        return self._verbose
+    
+    @property
+    def version(self):
+        return self._version
     
     def reset(self):
         self._files = []
@@ -30,6 +41,8 @@ class Mint(object):
         self._progress = 0
         self.runtime = None
         self._status = 'waiting'
+
+
 
     def run(self, nthreads=None, mode='standard'):
         '''
@@ -51,7 +64,7 @@ class Mint(object):
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
             
-        print('Run MINT')
+        if self.verbose: print(f'Run MINT with {nthreads} processes:')
         start = time.time()
         if nthreads > 1:
             self.run_parallel(nthreads=nthreads, mode=mode)
@@ -72,9 +85,10 @@ class Mint(object):
         self.runtime_per_file = (self.runtime / self.n_files)
         self.runtime_per_peak = (self.runtime / self.n_files / len(self.peaklist))
         
-        print(f'Total runtime: {self.runtime:.2f}s')
-        print(f'Runtime per file: {self.runtime_per_file:.2f}s')
-        print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s')
+        if self.verbose: 
+            print(f'Total runtime: {self.runtime:.2f}s')
+            print(f'Runtime per file: {self.runtime_per_file:.2f}s')
+            print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
         self._status = 'waiting'
 
     def run_parallel(self, nthreads=1, mode='standard'):
@@ -131,7 +145,9 @@ class Mint(object):
         for f in list_of_files:
             assert os.path.isfile(f), f'File not found ({f})'
         self._files = list_of_files
-
+        if self.verbose:
+            print( 'Set files to:\n' + '\n'.join(self.files) + '\n' )
+            
     @property
     def peaklist_files(self):
         return self._peaklist_files
@@ -143,9 +159,11 @@ class Mint(object):
         if not isinstance(list_of_files, list):
             raise ValueError('Input should be a list of files.')
         for f in list_of_files:
-            assert os.path.isfile(f), f'File not found ({f})'    
+            assert os.path.isfile(f), f'File not found ({f})' 
         self._peaklist_files = list_of_files
+        if self.verbose: print( 'Set peaklist files to:\n' + 'hallo\n'.join(self.peaklist_files) + '\n')
         self.peaklist = read_peaklists(list_of_files)
+
         
     @property
     def n_peaklist_files(self):
@@ -159,6 +177,8 @@ class Mint(object):
     def peaklist(self, peaklist):
         check_peaklist(peaklist)
         self._peaklist = peaklist
+        if self.verbose:
+            print('Set peaklists to:\n', self.peaklist.to_string(), '\n')
 
     @property
     def results(self):
@@ -201,20 +221,8 @@ class Mint(object):
         self._progress = value
         if self.progress_callback is not None:
             self.progress_callback(value)
-        
-    def export(self, outfile=None):
-        if outfile is None:
-            file_buffer = io.BytesIO()
-            writer = pd.ExcelWriter(file_buffer)
-        else:
-            writer = pd.ExcelWriter(outfile)
-        self.results.to_excel(writer, 'Results Complete', index=False)
-        self.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
-        meta = pd.DataFrame({'Version': [self.version], 
-                                'Date': [str(date.today())]}).T[0]
-        meta.to_excel(writer, 'MetaData', index=True, header=False)
-        writer.close()
-        if outfile is None:
-            return file_buffer.seek(0)
 
-
+    def export(self, filename=None):
+        buffer = export_to_excel(self, filename=filename)
+        if filename is None:
+            return buffer
