@@ -13,12 +13,8 @@ from scipy.optimize import curve_fit
 from .io import ms_file_to_df
 
 MINT_ROOT = os.path.dirname(__file__)
-#STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
-
-def gaus(x,a,x0,sigma):
-    return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
 def read_peaklists(filenames):
     '''
@@ -194,7 +190,7 @@ def check_peaklist(peaklist):
     assert isinstance(peaklist, pd.DataFrame)
     peaklist[PEAKLIST_COLUMNS]
     assert peaklist.dtypes['peak_label'] == np.dtype('O')
-
+    assert peaklist.peak_label.value_counts().max() == 1, peaklist.peak_label.value_counts()
 
 
 def restructure_rt_projections(data):
@@ -247,29 +243,45 @@ def process(args):
         return result, None
 
 
-def peaklist_from_masses_and_rt_grid(masses, dt, rt_max=10, mz_ppm=10):
+def generate_grid_peaklist(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
+    '''
+    Creates a peaklist from a list of masses.
+    -----
+    Args:
+        - masses: iterable of float values
+        - dt: float or int, size of peak windows in time dimension [min]
+        - rt_max: float, maximum time [min]
+        - mz_ppm: width of peak window in m/z dimension
+            mass +/- (mz_ppm * mass * 1e-6)
+    '''
     rt_cuts = np.arange(0, rt_max+dt, dt)
     peaklist = pd.DataFrame(index=rt_cuts, columns=masses).unstack().reset_index()
     del peaklist[0]
-    peaklist.columns = ['peakMz', 'rtmin']
-    peaklist['rtmax'] = peaklist.rtmin+(1*dt)
-    peaklist['peakLabel'] =  peaklist.peakMz.apply(lambda x: '{:.3f}'.format(x)) + '__' + peaklist.rtmin.apply(lambda x: '{:2.2f}'.format(x))
-    peaklist['peakMzWidth[ppm]'] = mz_ppm
+    peaklist.columns = ['mz_mean', 'rt_min']
+    peaklist['rt_max'] = peaklist.rt_min+(1*dt)
+    peaklist['peak_label'] =  peaklist.mz_mean.apply(lambda x: '{:.3f}'.format(x)) + '__' + peaklist.rt_min.apply(lambda x: '{:2.2f}'.format(x))
+    peaklist['mz_width'] = mz_ppm
+    peaklist['intensity_threshold'] = intensity_threshold
+    peaklist['peaklist'] = 'Generated'
+    check_peaklist(peaklist)
     return peaklist
 
-def browser_export(mint):
-    file_buffer = io.BytesIO()
-    writer = pd.ExcelWriter(file_buffer)
-    mint.results.to_excel(writer, 'Results Complete', index=False)
-    mint.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
-    meta = pd.DataFrame({'Version': [mint.version], 
-                            'Date': [str(date.today())]}).T[0]
-    meta.to_excel(writer, 'MetaData', index=True, header=False)
+
+def export_to_excel(mint, filename=None):
+    date_string = str(date.today())
+    if filename is None:
+        file_buffer = io.BytesIO()
+        writer = pd.ExcelWriter(file_buffer)
+    else:
+        writer = pd.ExcelWriter(filename)
+    # Write into file
+    mint.results.to_excel(writer, 'MINT', index=False)
+    mint.peaklist.to_excel(writer, 'Peaklist', index=False)
+    mint.crosstab.T.to_excel(writer, 'PeakArea', index=True)
+    meta = pd.DataFrame({'MINT_version': [mint.version], 
+                         'Date': [date_string]}).T[0]
+    meta.to_excel(writer, 'Metadata', index=True, header=False)
+    # Close writer and maybe return file buffer
     writer.close()
-    file_buffer.seek(0)
-    now = datetime.now().strftime("%Y-%m-%d")
-    uid = str(uuid.uuid4()).split('-')[-1]
-    return send_file(file_buffer,
-                    attachment_filename=f'MINT_{now}_{uid}.xlsx',
-                    as_attachment=True,
-                    cache_timeout=0)
+    if filename is None:
+        return file_buffer.seek(0)
