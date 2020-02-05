@@ -33,6 +33,7 @@ from scipy.spatial.distance import pdist, squareform
 from ms_mint.Mint import Mint
 from ms_mint.dash_layout import Layout
 from ms_mint.button_style import button_style
+from ms_mint.plotly_tools import plot_rt_projections
 
 mint = Mint()
 
@@ -361,52 +362,9 @@ def plot_0(n_clicks, options, ndxs, data, column):
     [State('n_cols', 'value'),
      State('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
-    if (n_clicks is None) or (mint.rt_projections is None):
+    if mint.rt_projections is None:
         raise PreventUpdate
-    files = mint.crosstab.columns
-    labels = mint.crosstab.index
-    fig = make_subplots(rows=len(labels)//n_cols+1, 
-                        cols=n_cols, 
-                            subplot_titles=labels)
-    
-    if len(files) < 13:
-        # largest color set in colorlover is 12
-        colors = cl.scales['12']['qual']['Paired']
-    else:
-        colors = cl.interp( cl.scales['12']['qual']['Paired'], len(files))
-            
-    for label_i, label in enumerate(labels):
-        for file_i, file in enumerate(files):
-
-            data = mint.rt_projections[label][file]
-            ndx_r = (label_i // n_cols)+1
-            ndx_c = label_i % n_cols + 1
-            
-            fig.add_trace(
-                go.Scatter(x=data.index, 
-                        y=data.values,
-                        name=basename(file),
-                        mode='lines',
-                        legendgroup=file_i,
-                        showlegend=(label_i == 0),  
-                        marker_color=colors[file_i],
-                        text=file),
-                row=ndx_r,
-                col=ndx_c,
-            )
-            
-            fig.update_xaxes(title_text="Retention Time", row=ndx_r, col=ndx_c)
-            fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
-
-    fig.update_layout(height=200*len(labels), title_text="Peak Shapes")
-    fig.update_layout(xaxis={'title': 'test'})
-    
-    if 'legend_horizontal' in options:
-        fig.update_layout(legend_orientation="h")
-
-    if 'legend' in options:
-        fig.update_layout(showlegend=True)
-    return fig
+    return plot_rt_projections(mint, n_cols, options)
 
 
 @lru_cache(maxsize=32)
