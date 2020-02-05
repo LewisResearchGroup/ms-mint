@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 from sklearn.metrics import r2_score
 
 from ms_mint.Mint import Mint
@@ -24,14 +25,37 @@ class TestClass():
         assert app.peaklist_files == ['tests/data/test_peaklist.csv']
         assert app.n_peaklist_files == 1, app.n_peaklist_files
 
-    def test__app_run_standard(self):
+    def test__app_run_express(self):
         app.run(mode='express')
         assert app.rt_projections is None, app.rt_projections
 
-    def test__app_run_express(self):
+    def test__app_run_standard(self):
         app.run(mode='standard')
         assert app.rt_projections is not None, app.rt_projections
-
+    
+    def test__rt_proj_is_dict(self):
+        rt = app.rt_projections
+        assert isinstance(rt, dict), type(rt)
+    
+    def test__rt_proj_keys(self):
+        rt = app.rt_projections
+        expected = app.peaklist.peak_label.values
+        actual = np.array(list(rt.keys()))
+        print(f'Expected: {expected}')
+        print(f'Actual: {actual}')
+        assert len(expected) == len(actual), actual
+        assert all([(i in expected) for i in actual])
+    
+    def test__rt_proj_files(self):
+        rt = app.rt_projections
+        key = list(rt.keys())[0]
+        actual = list(rt[key].keys())
+        expected = ['tests/data/test.mzXML']
+        print(f'Expected: {expected}')
+        print(f'Actual: {actual}')
+        assert len(expected) == len(actual), actual
+        assert all([(i in expected) for i in actual])
+       
     def test__correct_peakAreas(self):
         df_test = pd.read_csv('tests/data/test_peaklist.csv', dtype={'peak_label': str})
         print(app.results.dtypes)
