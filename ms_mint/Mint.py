@@ -26,6 +26,10 @@ class Mint(object):
     def verbose(self):
         return self._verbose
     
+    @verbose.setter
+    def verbose(self, value:bool):
+        self._verbose = value
+    
     @property
     def version(self):
         return self._version
@@ -99,7 +103,7 @@ class Mint(object):
         for i, filename in enumerate(self.files):
             args.append({'filename': filename,
                          'peaklist': self.peaklist,
-                         'q':q,
+                         'queue': q,
                          'mode': mode})
                    
         results = pool.map_async(process, args)
@@ -109,7 +113,7 @@ class Mint(object):
             if results.ready():
                 break
             else:
-                size = self.n_files - results._number_left
+                size = q.qsize()
                 self.progress = int(100 * (size / self.n_files))
                 time.sleep(1)
         self.progress = 100

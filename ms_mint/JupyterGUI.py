@@ -12,9 +12,9 @@ from tkinter import Tk, filedialog
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint
-from .tools import browser_export
+from .plotly_tools import plot_rt_projections
 
-class GUI():
+class JupyterGUI():
     def __init__(self, mint=None):
         
         if mint is None:
@@ -22,7 +22,7 @@ class GUI():
         else:
             self.mint = mint
         
-        self.ms_files_button = SelectFilesButton(text='Select mzXML', callback=self.list_files)
+        self.ms_files_button = SelectFilesButton(text='Select MS-files', callback=self.list_files)
         self.peaklist_files_button = SelectFilesButton(text='Peaklist', callback=self.list_files)
         
         self.message_box = Textarea(
@@ -36,8 +36,12 @@ class GUI():
         
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run_mint)
+        self.run_button.style.button_color = 'lightgray'
+
         self.download_button = Button(description="Download")
         self.download_button.on_click(self.export)
+        self.download_button.style.button_color = 'lightgray'
+
         self._results = None
         self.progress = Progress(min=0, max=100, layout=Layout(width='90%'))
         self.output = widgets.Output()
@@ -51,11 +55,7 @@ class GUI():
                     self.message_box,
                     HBox([self.run_button, 
                            self.download_button]),
-                    self.progress,
-                    HBox([Label('Peak', layout=Layout(width='30%')),
-                          Label('File', layout=Layout(width='30%')), 
-                          Label('Highlight', layout=Layout(width='30%'))]),
-                    
+                    self.progress                    
                 ])
             
     def list_files(self, b=None):
@@ -76,12 +76,18 @@ class GUI():
         else:
             text += '\nNo peaklist defined.'
         self.message_box.value = text
+        if (self.mint.n_files != 0) and (self.mint.n_peaklist_files != 0):
+            self.run_button.style.button_color = 'lightgreen'
+        else:
+            self.run_button.style.button_color = 'lightgray'
        
     def run_mint(self, b, **kwargs):
         self.mint.progress = 0
         with self.output:
             self.mint.run(**kwargs)
         self.message_box.value += f'\n\nDone processing.'
+        if self.mint.results is not None:
+            self.download_button.style.button_color = 'lightgreen'
 
     def set_progress(self, value):
         self.progress.value = value
@@ -103,3 +109,6 @@ class GUI():
     @property
     def rt_projections(self):
         return self.mint.rt_projections
+    
+    def plot_rt_projections(self, **kwargs):
+        return plot_rt_projections(self.mint, **kwargs)

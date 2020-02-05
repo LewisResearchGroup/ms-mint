@@ -13,8 +13,8 @@ if __name__ == '__main__':
     
     if '--debug' in args:
         DEBUG = True
-        mint.peaklist_files = ['tests/data/peaklist_v0.csv']
-        mint.files = glob('**/*.mzXML', recursive=True)
+        mint.peaklist_files = ['tests/data/peaklist_v1.csv']
+        mint.files = glob('/data/metabolomics_storage/MINT_demo_files/**/*.mzXML', recursive=True)
         print('MINT files:', mint.files)
         print('MINTegration list:')
         print(mint.peaklist.to_string())
