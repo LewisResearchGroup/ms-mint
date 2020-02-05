@@ -65,7 +65,7 @@ class GUI():
             self.mint.peaklist_files = [i for i in self.peaklist_files_button.files]
         except:
             pass
-        for i, line in enumerate(elf.mint.files):
+        for i, line in enumerate(self.mint.files):
             text += line+'\n'
             if i > 10:
                 line+'...\n'

@@ -10,7 +10,7 @@ from flask import send_file
 
 from datetime import date, datetime
 from scipy.optimize import curve_fit
-
+from .io import ms_file_to_df
 
 MINT_ROOT = os.path.dirname(__file__)
 #STANDARD_PEAKFILE = os.path.abspath(str(P(MINT_ROOT)/P('../static/Standard_Peaklist.csv')))
@@ -59,23 +59,20 @@ def read_peaklists(filenames):
     peaklist.index = range(len(peaklist))
     return peaklist
 
-#STANDARD_PEAKLIST = read_peaklists(STANDARD_PEAKFILE)
-#DEVEL = True
 
-
-def integrate_peaks_from_filename(mzxml, peaklist):
+def integrate_peaks_from_filename(filename, peaklist):
     '''
     Peak integration using a filename as input.
     -----
     Args:
-        - mzxml: str or PosixPath, path to mzxml filename
+        - filename: str or PosixPath, path to mzxml or mzml filename
         - peaklist: pandas.DataFrame(), DataFrame in peaklist format
     Returns:
         pandas.DataFrame(), DataFrame with integrated peak intensities
     '''
-    df = mzxml_to_pandas_df(mzxml)
+    df = ms_file_to_df(filename)
     peaks = integrate_peaks(df, peaklist)
-    peaks['ms_file'] = mzxml
+    peaks['ms_file'] = filename
     return peaks 
 
 
@@ -93,14 +90,14 @@ def integrate_peaks(df, peaklist):
     return result
 
 
-def integrate_peak(mzxml_df, mz_mean, mz_width, rt_min, 
+def integrate_peak(ms_df, mz_mean, mz_width, rt_min, 
                    rt_max, intensity_threshold, peak_label):
     '''
-    Takes the output of mzxml_to_pandas_df() and 
+    Takes the output of ms_file_to_df() and 
     calculates peak properties of a single peak specified by
     the input arguements.
     '''
-    peak_area = slice_ms1_mzxml(mzxml_df, 
+    peak_area = slice_ms1_mzxml(ms_df, 
                 rt_min=rt_min, rt_max=rt_max, 
                 mz_mean=mz_mean, mz_width=mz_width, 
                 intensity_threshold=intensity_threshold
@@ -163,31 +160,6 @@ def to_peaks(peaklist):
                'peak_label': el[5],
                } for el in tmp]
     return output
-
-
-def mzxml_to_pandas_df(filename):
-    '''
-    Reads mzXML file and returns a pandas.DataFrame.
-    '''
-    cols = ['retentionTime', 'm/z array', 'intensity array']
-    slices = []
-    file = mzxml.MzXML(filename)
-    while True:
-        try:
-            slices.append( pd.DataFrame(file.next()) ) 
-        except:
-            break
-    df = pd.concat(slices)[cols]
-    df_to_numeric(df)
-    return df
-
-
-def df_to_numeric(df):
-    '''
-    Converts dataframe to numeric types if possible.
-    '''
-    for col in df.columns:
-        df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
 
 
 def slice_ms1_mzxml(df, rt_min, rt_max, mz_mean, mz_width, intensity_threshold):
@@ -261,7 +233,7 @@ def process(args):
         q = args['queue']
         q.put('filename')
     cols = ['retentionTime', 'm/z array', 'intensity array']
-    df = mzxml_to_pandas_df(filename=filename)[cols]
+    df = ms_file_to_df(filename=filename)[cols]
 
     result = integrate_peaks(df, peaklist)
     result['ms_file'] = filename
