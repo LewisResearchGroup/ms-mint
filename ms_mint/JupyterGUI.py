@@ -43,7 +43,8 @@ class JupyterGUI():
         self.download_button.style.button_color = 'lightgray'
 
         self._results = None
-        self.progress = Progress(min=0, max=100, layout=Layout(width='90%'))
+        self.progress = Progress(min=0, max=100, layout=Layout(width='90%'), 
+                                 description='Progress:', bar_style='info')
         self.output = widgets.Output()
         self.mint.progress_callback = self.set_progress
 
@@ -54,7 +55,7 @@ class JupyterGUI():
                            ]),
                     self.message_box,
                     HBox([self.run_button, 
-                           self.download_button]),
+                          self.download_button]),
                     self.progress                    
                 ])
             
@@ -83,8 +84,7 @@ class JupyterGUI():
        
     def run_mint(self, b, **kwargs):
         self.mint.progress = 0
-        with self.output:
-            self.mint.run(**kwargs)
+        self.mint.run(**kwargs)
         self.message_box.value += f'\n\nDone processing.'
         if self.mint.results is not None:
             self.download_button.style.button_color = 'lightgreen'

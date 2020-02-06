@@ -71,7 +71,7 @@ def select_files(n_clicks, options):
             if isinstance(dir_ , tuple):
                 dir_ = []
             if len(dir_) != 0:
-                files = glob(join(dir_, join('**', '*.mzXML')), recursive=True)
+                files = glob(join(dir_, join('**', '*.mz*ML')), recursive=True)
             else:
                 files = []
         if len(files) != 0:

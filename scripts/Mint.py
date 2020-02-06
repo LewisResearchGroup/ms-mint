@@ -13,8 +13,9 @@ if __name__ == '__main__':
     
     if '--debug' in args:
         DEBUG = True
-        mint.peaklist_files = ['tests/data/peaklist_v1.csv']
-        mint.files = glob('/data/metabolomics_storage/MINT_demo_files/**/*.mzXML', recursive=True)
+        mint.verbose = True
+        mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/MINT-peaklist__TR-13-biomarkers.csv']
+        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)
         print('MINT files:', mint.files)
         print('MINTegration list:')
         print(mint.peaklist.to_string())
