@@ -1,7 +1,7 @@
 import os
 import ipywidgets as widgets
 
-from ipywidgets import Button, HBox, VBox, Textarea\
+from ipywidgets import Button, HBox, VBox, Textarea,\
     Layout
 
 from ipywidgets import IntProgress as Progress
