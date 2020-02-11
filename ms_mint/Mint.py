@@ -2,14 +2,12 @@ import os
 import pandas as pd
 import numpy as np
 import time
-import io
+
+from multiprocessing import Pool, Manager, cpu_count
 
 from .tools import read_peaklists, process,\
     restructure_rt_projections, PEAKLIST_COLUMNS,\
     check_peaklist, export_to_excel
-
-from multiprocessing import Pool, Manager, cpu_count
-from datetime import date
 
 import ms_mint
 
