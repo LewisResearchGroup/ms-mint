@@ -1,7 +1,7 @@
 import colorlover as cl
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-from os.path import basename, isfile, abspath, join
+from os.path import basename
 
 def plot_rt_projections(mint, n_cols=3, options=None):
     if mint.rt_projections is None:

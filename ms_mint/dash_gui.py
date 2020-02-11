@@ -1,8 +1,6 @@
 
 import io
-import sys
 
-import colorlover as cl
 import numpy as np
 import pandas as pd
 import uuid
@@ -11,7 +9,6 @@ from datetime import date, datetime
 from flask import send_file
 from functools import lru_cache
 from glob import glob
-from plotly.subplots import make_subplots
 from tkinter import Tk, filedialog
 
 from os.path import basename, isfile, abspath, join
@@ -206,7 +203,7 @@ def get_table(json, label_regex, col_value):
     if col_value in ['peak_area', 'rt_max_intensity']:
         df = pd.crosstab(df.peak_label, df.Label, df[col_value], aggfunc=np.mean).astype(np.float64).T
         if col_value in ['peakArea']:
-               df = df.round(0)
+            df = df.round(0)
         df.reset_index(inplace=True)
         df.fillna(0, inplace=True)
     

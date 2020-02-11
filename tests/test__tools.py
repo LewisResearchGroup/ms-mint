@@ -1,11 +1,8 @@
-import pandas as pd
-import numpy as np
 import os
 
 from pathlib import Path as P
 
-from ms_mint.tools import MINT_ROOT, integrate_peaks_from_filename,\
-    integrate_peak
+from ms_mint.tools import MINT_ROOT
 
 TEST_MZXML = os.path.abspath(str(P(MINT_ROOT)/P('../tests/data/test.mzXML')))
 

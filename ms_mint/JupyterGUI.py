@@ -1,13 +1,11 @@
 import os
-import traitlets
 import ipywidgets as widgets
 
-from ipywidgets import Button, HBox, VBox, Textarea, HTML,\
-    SelectMultiple, Select, Layout, Label, IntSlider
+from ipywidgets import Button, HBox, VBox, Textarea\
+    Layout
 
 from ipywidgets import IntProgress as Progress
 
-from IPython.display import display
 from tkinter import Tk, filedialog
 
 from .SelectFilesButton import SelectFilesButton
