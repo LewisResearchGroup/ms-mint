@@ -17,7 +17,6 @@ install_requires = [
     'dash',
     'scipy',
     'setuptools',
-    'sqlite',
     'statsmodels',
     'flask',
     'pyteomics',
