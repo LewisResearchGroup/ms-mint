@@ -22,7 +22,8 @@ install_requires = [
     'pyteomics',
     'openpyxl',
     'colorlover',
-    'dash-bootstrap-components'
+    'dash-bootstrap-components',
+    'scikit-learn'
 ]
 
 config = {
