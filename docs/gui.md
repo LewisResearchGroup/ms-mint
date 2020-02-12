@@ -7,7 +7,7 @@ Individual files can be added to an in worklist using the `ADD FILE(S)` button. 
 
 
 ## Select Peaklist
-A standard peaklist is provided. A user defined peaklist can be selected and used with the `SELECT PEAKLIST FILE(S)` button. Peaklists are explained in more detail [here](peaklists.md).
+A standard peaklist is provided. A user defined peaklist can be selected and used with the `SELECT PEAKLIST FILE(S)` button. Peaklists are explained in more detail [here](index.md#peaklists).
 
 ![Demo Image](./image/mint1.png "Demo image")
 
