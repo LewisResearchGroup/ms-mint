@@ -2,8 +2,7 @@
 A peaklist is the protocol that captures how data is going to be extracted from the individual MS-files. It is provided as `csv` file and essentially contains the definitions of peaks to be extracted. A single peak is defined by five properties that need to be present as headers in the `csv` file which will be explained in the following:
 
 
-#### peak_label
-A **unique** identifier such as the biomarker name or ID. Even if multiple peaklist files are used, the label have to be unique across all the files.
+    - **peak_label**:  A __unique__ identifier such as the biomarker name or ID. Even if multiple peaklist files are used, the label have to be unique across all the files.
 
 
 #### mz_mean
