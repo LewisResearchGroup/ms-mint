@@ -17,3 +17,5 @@ The server to run the GUI can be started with
     Mint.py
 
 Then navigate to http://localhost:9999.
+
+![GUI](./docs/image/mint1.png "The GUI")
