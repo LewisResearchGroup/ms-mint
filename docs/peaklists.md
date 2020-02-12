@@ -1,5 +1,5 @@
 # Peaklists
-A peaklist is the protocol that captures how data is going to be extracted from the individual MS-files. It is provided as `csv` file and essentially contains the definitions of peaks to be extracted. A single peak is defined by five properties that need to be present as headers in the `csv` file.
+A peaklist is the protocol that captures how data is going to be extracted from the individual MS-files. It is provided as `csv` file and essentially contains the definitions of peaks to be extracted. A single peak is defined by five properties that need to be present as headers in the `csv` file which will be explained in the following:
 
 
 #### peak_label
@@ -11,15 +11,15 @@ The target mass (m/z-value) in [Da].
 
 
 #### mz_width
-The width of the peak in the m/z-dimension in units of ppm (peakMz/1e6). The window will be *mz_mean* +/- (*mz_width*mz_mean*1e-6*).
+The width of the peak in the m/z-dimension in units of ppm. The window will be *mz_mean* +/- (*mz_width*mz_mean*1e-6*). Usually, a values between 5 and 10 are used.
 
 
 #### rt_min
-The start of the retention time for each peak in minutes.
+The start of the retention time for each peak in [min].
 
 
 #### rt_max
-The end of the retention time for each peak in minutes.
+The end of the retention time for each peak in [min].
 
 
 #### intensity_threshold
