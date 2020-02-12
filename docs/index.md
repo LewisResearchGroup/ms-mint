@@ -10,9 +10,9 @@ The tool can be used with a browser based graphical user interface (GUI) impleme
 
 ### With Anaconda (Miniconda)
 
-   conda create -n ms-mint python=3.8
-   conda activate ms-mint
-   pip install ms-mint
+    conda create -n ms-mint python=3.8
+    conda activate ms-mint
+    pip install ms-mint
 
 The server to run the GUI can be started with 
 
@@ -50,7 +50,7 @@ Start the app with
 
     conda activate ms-mint  # if you run MINT in an Anaconda environment
     Mint.py
-    
+
 Then navigate to the following ULR with your browser: `http://localhost:9999/`
 
 ## The GUI
