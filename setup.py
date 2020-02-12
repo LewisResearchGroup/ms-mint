@@ -24,7 +24,7 @@ install_requires = [
     'pyteomics',
     'openpyxl',
     'colorlover',
-    'dash-bootstrap-component'
+    'dash-bootstrap-components'
 ]
 
 config = {
