@@ -15,7 +15,6 @@ install_requires = [
     'plotly',
     'plotly_express',
     'dash',
-    'pyqt',
     'scipy',
     'setuptools',
     'sqlite',
