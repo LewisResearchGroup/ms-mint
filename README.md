@@ -11,3 +11,9 @@ More information on how to install and run the program can be found in the [Docu
 The program can be installed in a Python 3 (>= 3.7) environment using `pip`:
 
     pip install ms-mint
+
+The server to run the GUI can be started with 
+
+    Mint.py
+
+Then navigate to http://localhost:9999.
