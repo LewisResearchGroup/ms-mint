@@ -104,5 +104,5 @@ Mint results can be exported using the `export()` method. A filename has to be p
 
     mint.export('MINT-results.xlsx')
 
-An Excel file with the results is exported including the peaklist and some metadata such as date and the current verion of `Mint`.
+An Excel file with the results is exported. The file includes the data of all windows that were used as well as some metadata such as date and the current verion of `Mint`.
 
