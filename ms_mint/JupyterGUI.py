@@ -48,8 +48,8 @@ class JupyterGUI():
 
     def show(self):
         return VBox([
-                    HBox([self.ms_files_button, 
-                           self.peaklist_files_button, 
+                    HBox([self.peaklist_files_button,
+                          self.ms_files_button, 
                            ]),
                     self.message_box,
                     HBox([self.run_button, 
