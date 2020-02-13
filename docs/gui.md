@@ -23,7 +23,7 @@ The number of cores used for MINT can be selected with the `Select number of cor
 
 
 ### Export
-Mint results can be exported [here](python.md#export).
+Once generated Mint results can be exported by clicking on the `Export` button. An Excel file is generated which is described in more detail [here](python.md#export).
 
 ![Ready to export results](./image/run-done-export-ready.png "Ready to export results")
 
@@ -32,7 +32,6 @@ Mint results can be exported [here](python.md#export).
 
 ## Interative Results Table
 ![Interactive Results Table](./image/interactive-table.png "Interactive Results Table")
-
 
 ## Heatmap Tool
 ![Interactive Heatmap"](./image/heatmap.png "Interactive Heatmap")
