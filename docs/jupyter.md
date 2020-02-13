@@ -14,4 +14,6 @@ The design follows the same principles as the [browser based GUI](gui.md)
 
 That way the results will be readily available for further analysis and processing that is out of the scope of `MINT`.
 
+    gui.results
+
 ![Mint Jupyter Results](./image/jupyter_results.png "Mint Jupyter Results")
