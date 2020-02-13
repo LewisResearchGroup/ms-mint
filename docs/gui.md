@@ -1,4 +1,4 @@
-# The GUI
+# The browser based GUI
 The app's frontend is build using [Plotly-Dash](https://plot.ly/dash/) and runs locally in a browser. Thought, the Python functions provided can be imported and used in any Python project independently.
 
 

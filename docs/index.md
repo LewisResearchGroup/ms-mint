@@ -31,17 +31,14 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
     pip setup.py install  # for regular install
     pip install -e .  # for development
 
-## The browser based GUI
+### Starting the browser based GUI
 
-Start the app with
+The browser based GUI can then be started with
 
     conda activate ms-mint  # if you run MINT in an Anaconda environment
     Mint.py
 
-Then navigate to the following ULR with your browser: [http://localhost:9999/](http://localhost:9999/)
-
-The graphical user interface is explained in more detail [here](gui.md)
-
+Then navigate to the following ULR with your browser: [http://localhost:9999/](http://localhost:9999/). The graphical user interface is explained in more detail [here](gui.md)
 
 # Peaklists
 A peaklist is the protocol that captures how data is going to be extracted from the individual MS-files. It is provided as `csv-file` and essentially contains the definitions of peaks to be extracted. A single peak is defined by five properties that need to be present as headers in the `csv-file` which will be explained in the following:
@@ -53,7 +50,7 @@ A peaklist is the protocol that captures how data is going to be extracted from 
 - **rt_max** : The end of the retention time for each peak in [min].
 - **intensity_threshold** : A threshold that is applied to filter noise for each window individually. Can be set to 0 or any positive value.
 
-# Example File
+## Example file
 **peaklist.csv:**
 ```text
 peak_label,mz_mean,mz_width,rt_min,rt_max,intensity_threshold
