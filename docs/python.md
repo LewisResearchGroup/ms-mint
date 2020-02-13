@@ -43,15 +43,15 @@ The result will be stored in the `results` and the `crosstab` attributes as `pan
     print(mint.results)
 
 <pre>
-  peak_label    mz_mean  mz_width  rt_min  rt_max  intensity_threshold                peaklist     peak_area            ms_file ms_path  file_size  intensity_sum
-0          1  151.06050         5    5.07    5.09                    0  ./data/peaklist_v0.csv  2.879748e+03  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-1          2  216.05040         5    3.98    4.39                    0  ./data/peaklist_v0.csv  4.892307e+05  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-2          3  115.00320         5    3.45    4.39                    0  ./data/peaklist_v0.csv  3.916772e+07  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-3          4  273.00061         5    1.10    2.22                    0  ./data/peaklist_v0.csv  6.862484e+06  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-0          1  151.06050         5    5.07    5.09                    0  ./data/peaklist_v0.csv  2.879748e+03  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-1          2  216.05040         5    3.98    4.39                    0  ./data/peaklist_v0.csv  4.892307e+05  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-2          3  115.00320         5    3.45    4.39                    0  ./data/peaklist_v0.csv  3.916772e+07  ./data/test.mzXML  ./data  14.201964   5.607296e+10
-3          4  273.00061         5    1.10    2.22                    0  ./data/peaklist_v0.csv  6.862484e+06  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+peak_label    mz_mean  mz_width  rt_min  rt_max  intensity_threshold  peaklist  peak_area  ms_file ms_path  file_size  intensity_sum
+1  151.06050  5    5.07    5.09  0  ./data/peaklist_v0.csv  2.879748e+03  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+2  216.05040  5    3.98    4.39  0 ./data/peaklist_v0.csv  4.892307e+05  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+3  115.00320  5    3.45    4.39  0  ./data/peaklist_v0.csv  3.916772e+07  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+4  273.00061  5    1.10    2.22  0  ./data/peaklist_v0.csv  6.862484e+06  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+1  151.06050  5    5.07    5.09  0  ./data/peaklist_v0.csv  2.879748e+03  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+2  216.05040  5    3.98    4.39  0  ./data/peaklist_v0.csv  4.892307e+05  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+3  115.00320  5    3.45    4.39  0  ./data/peaklist_v0.csv  3.916772e+07  ./data/test.mzXML  ./data  14.201964   5.607296e+10
+4  273.00061  5    1.10    2.22  0  ./data/peaklist_v0.csv  6.862484e+06  ./data/test.mzXML  ./data  14.201964   5.607296e+10
 </pre>
 
 and `crosstab()` can shows a compressed form of the data only containing one property e.g. the extracted `peak_area`:
