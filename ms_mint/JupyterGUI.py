@@ -36,7 +36,7 @@ class JupyterGUI():
         self.run_button.on_click(self.run_mint)
         self.run_button.style.button_color = 'lightgray'
 
-        self.download_button = Button(description="Download")
+        self.download_button = Button(description="Export")
         self.download_button.on_click(self.export)
         self.download_button.style.button_color = 'lightgray'
 
