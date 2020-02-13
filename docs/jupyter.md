@@ -1,6 +1,6 @@
 # Jupyter Integration
 
-Mint can be integrated in an interactive `Jupyter Notebook` environment with a GUI that is based on Jupyter-Widgets.
+Mint can be integrated in an interactive `Jupyter Notebook` environment with a GUI that is based on IPython-Widgets.
 The design follows the same principles as the [browser based GUI](gui.md)
 
     from ms_mint import Mint
