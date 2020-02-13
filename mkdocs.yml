@@ -4,4 +4,4 @@ site_author: Soren Wacker
 nav:
   - Home: 'index.md'
   - The GUI: 'gui.md'
-  - Peaklists: 'python.md'
+  - Python API: 'python.md'
