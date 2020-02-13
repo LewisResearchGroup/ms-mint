@@ -114,7 +114,10 @@ def select_peaklist(n_clicks, n_clicks_clear):
         if len(files) != 0:
             mint.peaklist_files = files
         root.destroy()
-    return '{} peaklist-files selected.'.format(mint.n_peaklist_files), mint.n_peaklist_files
+    if len(mint.messages) == 0:
+        return '{} peaklist-files selected.'.format(mint.n_peaklist_files), mint.n_peaklist_files
+    else:
+        return '\n'.join(mint.messages).upper(), -1
 
 ### Button styles
 @app.callback(
@@ -130,9 +133,11 @@ def run_button_style(n_peaklists, n_files, progress):
     style_files     = button_style('wait')    
     style_run       = button_style('wait')
     style_export    = button_style('wait')
-    if n_peaklists != 0:
+    if n_peaklists == -1: 
+         style_peaklists = button_style('error')
+    elif n_peaklists != 0:
         style_peaklists = button_style('ready')
-        style_files     = button_style('next')    
+        style_files     = button_style('next') 
     if n_files != 0:
         style_files= button_style('ready')
         style_run = button_style('next')

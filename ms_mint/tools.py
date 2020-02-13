@@ -50,6 +50,11 @@ def read_peaklists(filenames):
     return peaklist
 
 
+def make_peaklabel_unambiguous(peaklist):
+    cumcounts = peaklist.groupby('peak_label').cumcount()
+    peaklist.loc[cumcounts != 0, 'peak_label'] = peaklist.loc[cumcounts != 0, 'peak_label'] + '_'+ cumcounts[cumcounts!=0].astype(str)
+    
+
 def integrate_peaks_from_filename(filename, peaklist):
     '''
     Peak integration using a filename as input.
@@ -180,11 +185,18 @@ def check_peaklist(peaklist):
     1) peaklist has right type, 
     2) all columns are present and 
     3) dtype of column peak_label is string
+    Returns a list of strings indicating identified errors.
+    If list is empty peaklist is OK.
     '''
-    assert isinstance(peaklist, pd.DataFrame)
+    errors = []
+    if not isinstance(peaklist, pd.DataFrame):
+        errors.append('Peaklist is not a dataframe.')
     peaklist[PEAKLIST_COLUMNS]
-    assert peaklist.dtypes['peak_label'] == np.dtype('O')
-    assert peaklist.peak_label.value_counts().max() == 1, peaklist.peak_label.value_counts()
+    if not peaklist.dtypes['peak_label'] == np.dtype('O'):
+        errors.append('Provided peak labels are not strings.')
+    if not peaklist.peak_label.value_counts().max() == 1:
+        errors.append('Provided peak labels are not unique.')
+    return errors
 
 
 def restructure_rt_projections(data):
@@ -257,8 +269,8 @@ def generate_grid_peaklist(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold
     peaklist['mz_width'] = mz_ppm
     peaklist['intensity_threshold'] = intensity_threshold
     peaklist['peaklist'] = 'Generated'
-    check_peaklist(peaklist)
     return peaklist
+
 
 
 def export_to_excel(mint, filename=None):

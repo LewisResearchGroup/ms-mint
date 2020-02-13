@@ -43,8 +43,7 @@ class Mint(object):
         self._progress = 0
         self.runtime = None
         self._status = 'waiting'
-
-
+        self._messages = []
 
     def run(self, nthreads=None, mode='standard'):
         '''
@@ -126,6 +125,9 @@ class Mint(object):
             rt_projections = {}
             [rt_projections.update(i[1]) for i in results]
             self.rt_projections = restructure_rt_projections(rt_projections)
+    @property
+    def messages(self):
+        return self._messages
              
     @property
     def status(self):
@@ -177,7 +179,12 @@ class Mint(object):
 
     @peaklist.setter
     def peaklist(self, peaklist):
-        check_peaklist(peaklist)
+        errors = check_peaklist(peaklist)
+        if len(errors) != 0:
+            error_string = '\n'.join(errors)
+            if self.verbose:
+                print('Errors in peaklist:\n{error_string}')
+            self._messages = errors
         self._peaklist = peaklist
         if self.verbose:
             print('Set peaklists to:\n', self.peaklist.to_string(), '\n')

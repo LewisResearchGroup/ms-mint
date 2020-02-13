@@ -5,6 +5,7 @@ def button_style(style_name=None, **kwargs):
                  'background-color': 'lightgrey'}
         
         styles = {'warn': {'font-weight': 'bold', 'color': 'red'},
+                  'error': {'background-color': 'orange'},
                   'wait': {'color': 'grey'},
                   'ready': {'background-color': 'lightgreen',
                             'color': 'black'},
