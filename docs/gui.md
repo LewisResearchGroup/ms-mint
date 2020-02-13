@@ -19,6 +19,8 @@ Clicking the reset button will delete current results and remove all selected fi
 ### Run
 The number of cores used for MINT can be selected with the `Select number of cores` slider. The maximum number shown here depends on the computer on which MINT is running. The `RUN` button starts mint and a progress bar monitors the progress and can be used to estimate the remaining time.
 
+![Select number of CPUs](./image/cpu-select.png "Select number of CPUs")
+
 
 ### Export
 Mint results can be exported [here](python.md#export).
@@ -33,13 +35,6 @@ Mint results can be exported [here](python.md#export).
 
 
 ## Heatmap Tool
-![Demo Image](./image/mint2.png "Demo image")
+![Interactive Heatmap"](./image/heatmap.png "Interactive Heatmap")
 
-
-## Peak-Viewer
-![Demo Image](./image/mint3.png "Demo image")
-
-
-## 3D-Peak-Viewer
-![Demo Image](./image/mint4.png "Demo image")
 
