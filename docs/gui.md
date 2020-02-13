@@ -21,7 +21,7 @@ The number of cores used for MINT can be selected with the `Select number of cor
 
 
 ### Export
-Mint results can be exported [here]('python.md#export').
+Mint results can be exported [here](python.md#export).
 
 ![Ready to export results](./image/run-done-export-ready.png "Ready to export results")
 
