@@ -4,7 +4,7 @@ MINT (Metabolomics Integrator) is an app for processing mzML and mzXML mass-spec
 
 The tool can be used with a browser based graphical user interface (GUI) implemented as interactive dashboard with [Plotly-Dash](https://plot.ly/dash/). A second (experimental) GUI is available that runs integrated in a `Jupyter Notebook`. Alternatively, the `ms_mint` package can be imported as python library to be integrated in any Python script and processing pipeline to automate MS-file processing.
 
-
+    
 ## Installation
 
 ### With Anaconda (Miniconda) and PIP
