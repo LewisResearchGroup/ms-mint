@@ -63,7 +63,7 @@ and `crosstab()` can shows a compressed form of the data only containing one pro
 </pre>
 
 
-### Peak-shapes
+#### Peak shapes
 The last property is `mint.rt_projections` which stores a dictionary of dictionaries with peak shapes:
 
 <pre>
@@ -99,7 +99,10 @@ The peak shapes can be plotted with the same function that is used by the GUI's:
     from ms_mint.plotly_tools import plot_rt_projections
     plot_rt_projections(mint)
 
-### Export results
+### Export
 Mint results can be exported using the `export()` method. A filename has to be provided:
 
     mint.export('MINT-results.xlsx')
+
+An Excel file with the results is exported including the peaklist and some metadata such as date and the current verion of `Mint`.
+
