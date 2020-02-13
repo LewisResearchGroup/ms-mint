@@ -249,7 +249,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
     
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
-    df = df[non_zero_labels]
+    df = df.loc[non_zero_labels]
 
     plot_type = 'Heatmap'
     colorscale = 'Blues'

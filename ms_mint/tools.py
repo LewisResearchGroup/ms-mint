@@ -40,7 +40,7 @@ def read_peaklists(filenames):
         if str(file).endswith('.csv'):
             df = pd.read_csv(file, dtype={'peakLabel': str})\
                    .rename(columns=NEW_LABELS)
-            df['peaklist'] = file
+            df['peaklist'] = os.path.basename(file)
             if 'intensity_threshold' not in df.columns:
                 df['intensity_threshold'] = 0
             df['peak_label'] = df['peak_label'].astype(str)
