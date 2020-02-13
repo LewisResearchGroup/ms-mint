@@ -246,7 +246,11 @@ def plot_0(n_clicks, options, ndxs, data, column):
     
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     df = pd.DataFrame(data).set_index('Label').select_dtypes(include=numerics)
-       
+    
+    max_is_not_zero = df.max(axis=1) != 0
+    non_zero_labels = max_is_not_zero[max_is_not_zero].index
+    df = df[non_zero_labels]
+
     plot_type = 'Heatmap'
     colorscale = 'Blues'
     plot_attributes = []
