@@ -1,12 +1,12 @@
 # Python Integration
 
-`ms-mint` backend can be imported as a python object and used in a python script or interactively in a Jupyter notebook environment.
+`ms-mint` backend can be imported as a python object and used in a python script or interactively in a Jupyter notebook environment. A typical workflow using the python API is described in the following:
 
     from ms_mint import Mint
     from glob import glob
 
 
-Fist, a mint object has to be initiated:
+Fist, the Mint class has to be instantiated:
 
     mint = Mint(verbose=False)
 
