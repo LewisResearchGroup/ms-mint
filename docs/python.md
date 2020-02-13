@@ -38,7 +38,7 @@ Then mint can be executed calling the `run()` method:
 
 
 
-The result will be stored in the `results` and the `crosstab` attributes:
+The result will be stored in the `results` and the `crosstab` attributes as `pandas.DataFrames()`. Where `mint.results` contains all results:
 
     print(mint.results)
 
@@ -54,3 +54,37 @@ The result will be stored in the `results` and the `crosstab` attributes:
 3          4  273.00061         5    1.10    2.22                    0  ./data/peaklist_v0.csv  6.862484e+06  ./data/test.mzXML  ./data  14.201964   5.607296e+10
 </pre>
 
+and `crosstab()` can shows a compressed form of the data only containing one property e.g. the extracted `peak_area`:
+
+<pre>
+...
+</pre>
+
+The last property is `mint.rt_projections` which stores a dictionary of dictionaries with peakshapes:
+
+<pre>
+{'1': {'./data/test.mzXML': retentionTime
+  5.079267    2879.747559
+  dtype: float32},
+ '2': {'./data/test.mzXML': retentionTime
+  3.986050    15166.202148
+  3.996917    14039.182617
+  4.007817    15455.113281
+  4.018700    16612.851562
+  4.029633    22065.619141
+  4.040633    26693.970703
+  4.051533    22569.896484
+  4.062450    32379.552734
+  4.073567    27225.439453
+  4.084683    22142.037109
+  4.095867    22974.357422
+  4.106900    23733.207031
+  4.117917    25081.419922
+  4.128983    17945.343750
+  4.140200    14623.268555
+  4.151250    16119.997070
+  4.162317    15771.708008
+  4.173467    11171.838867
+  4.184517    12554.623047
+  ...
+</pre>
