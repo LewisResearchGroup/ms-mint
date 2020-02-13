@@ -1,5 +1,6 @@
 # Python API
 
+### Start
 `ms-mint` backend can be imported as a python object and used in a python script or interactively in a Jupyter notebook environment. A typical workflow using the python API is described in the following:
 
     from ms_mint import Mint
@@ -93,7 +94,7 @@ The last property is `mint.rt_projections` which stores a dictionary of dictiona
   ...
 </pre>
 
-#### Plotting shapes
+#### Plotting peak shapes
 The peak shapes can be plotted with the same function that is used by the GUI's:
 
     from ms_mint.plotly_tools import plot_rt_projections
