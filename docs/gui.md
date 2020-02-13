@@ -25,7 +25,8 @@ An Excel file with the results is exported. The file includes the data of all wi
 # Interactive elements
 
 ## Interative Results Table
-The results
+![Demo Image](./image/mint1.png "Demo image")
+
 
 ## Heatmap Tool
 ![Demo Image](./image/mint2.png "Demo image")
