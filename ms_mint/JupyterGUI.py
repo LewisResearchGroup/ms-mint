@@ -16,9 +16,9 @@ class JupyterGUI():
     def __init__(self, mint=None):
         
         if mint is None:
-            self.mint = Mint()
+            self._mint = Mint()
         else:
-            self.mint = mint
+            self._mint = mint
         
         self.ms_files_button = SelectFilesButton(text='Select MS-files', callback=self.list_files)
         self.peaklist_files_button = SelectFilesButton(text='Peaklist', callback=self.list_files)
@@ -33,7 +33,7 @@ class JupyterGUI():
                     'font_family': 'monospace'})
         
         self.run_button = Button(description="Run")
-        self.run_button.on_click(self.run_mint)
+        self.run_button.on_click(self.run)
         self.run_button.style.button_color = 'lightgray'
 
         self.download_button = Button(description="Export")
@@ -80,7 +80,7 @@ class JupyterGUI():
         else:
             self.run_button.style.button_color = 'lightgray'
        
-    def run_mint(self, b, **kwargs):
+    def run(self, b=None, **kwargs):
         self.mint.progress = 0
         self.mint.run(**kwargs)
         self.message_box.value += f'\n\nDone processing.'
@@ -97,6 +97,22 @@ class JupyterGUI():
         self.message_box.value += f'\n\nExported results to: {filename}'
     
     @property
+    def peaklist_files(self):
+        self.mint.peaklist_files
+        
+    @peaklist_files.setter
+    def peaklist_files(self, value):
+        self.mint.peaklist_files = value
+
+    @property
+    def files(self):
+        self.mint.files
+        
+    @files.setter
+    def files(self, value):
+        self.mint.files = value
+                    
+    @property
     def results(self):
         return self.mint.results
     
@@ -110,3 +126,7 @@ class JupyterGUI():
     
     def plot_rt_projections(self, **kwargs):
         return plot_rt_projections(self.mint, **kwargs)
+    
+    @property
+    def mint(self):
+        return self._mint
