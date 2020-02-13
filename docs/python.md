@@ -1,6 +1,5 @@
 # Python API
 
-### Start
 The `MINT` API for Python can be imported as a python object and used in a python script or interactively in a Jupyter notebook environment. A typical workflow using the Python API is described in the following:
 
     from ms_mint import Mint
