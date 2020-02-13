@@ -3,5 +3,6 @@ site_url: https://github.com/soerendip/ms-mint
 site_author: Soren Wacker
 nav:
   - Home: 'index.md'
-  - The GUI: 'gui.md'
+  - Mint-GUI: 'gui.md'
   - Python API: 'python.md'
+  - Jupyter Integration: 'jupyter.md'

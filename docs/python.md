@@ -60,7 +60,7 @@ and `crosstab()` can shows a compressed form of the data only containing one pro
 ...
 </pre>
 
-The last property is `mint.rt_projections` which stores a dictionary of dictionaries with peakshapes:
+The last property is `mint.rt_projections` which stores a dictionary of dictionaries with peak shapes:
 
 <pre>
 {'1': {'./data/test.mzXML': retentionTime
@@ -88,3 +88,11 @@ The last property is `mint.rt_projections` which stores a dictionary of dictiona
   4.184517    12554.623047
   ...
 </pre>
+
+The peak shapes can be plotted with the same function that is used by the GUI's:
+
+    from ms_mint.plotly_tools import plot_rt_projections
+    plot_rt_projections(mint)
+
+# The Jupyter GUI
+
