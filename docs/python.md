@@ -1,4 +1,4 @@
-# Python Integration
+# Python API
 
 `ms-mint` backend can be imported as a python object and used in a python script or interactively in a Jupyter notebook environment. A typical workflow using the python API is described in the following:
 
@@ -10,6 +10,7 @@ Fist, the Mint class has to be instantiated:
 
     mint = Mint(verbose=False)
 
+### Load files
 One ore more peaklist files as well as mass-spec files have to be assigned to `mint.peaklist_files` and `mint.files` accordingly:
 
     mint.peaklist_files = ['path_to/peaklist-file.csv']
@@ -27,6 +28,7 @@ Calling the `peaklist()` method displays the imported and concatenated peaklists
 3          4  273.00061         5    1.10    2.22                    0  ./data/peaklist_v0.csv
 </pre>
 
+### Running Mint
 Then mint can be executed calling the `run()` method:
 
     mint.run()
@@ -37,7 +39,7 @@ Then mint can be executed calling the `run()` method:
     > Runtime per peak (79): 0.04s
 
 
-
+### Results
 The result will be stored in the `results` and the `crosstab` attributes as `pandas.DataFrames()`. Where `mint.results` contains all results:
 
     print(mint.results)
@@ -60,6 +62,8 @@ and `crosstab()` can shows a compressed form of the data only containing one pro
 ...
 </pre>
 
+
+### Peak-shapes
 The last property is `mint.rt_projections` which stores a dictionary of dictionaries with peak shapes:
 
 <pre>
@@ -89,10 +93,13 @@ The last property is `mint.rt_projections` which stores a dictionary of dictiona
   ...
 </pre>
 
+#### Plotting shapes
 The peak shapes can be plotted with the same function that is used by the GUI's:
 
     from ms_mint.plotly_tools import plot_rt_projections
     plot_rt_projections(mint)
 
-# The Jupyter GUI
+### Export results
+Mint results can be exported using the `export()` method. A filename has to be provided:
 
+    mint.export('MINT-results.xlsx')
