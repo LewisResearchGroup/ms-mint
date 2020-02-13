@@ -10,7 +10,7 @@ A standard peaklist is provided. A user defined peaklist can be selected and use
 ## Add MS-Files
 Individual files can be added to an in worklist using the `ADD FILE(S)` button. If the checkbox `Add files from directory` is checked, all files from a directory and its subdirectories are imported that end on `mzXML` or `mzML` (not yet supported). The box is checked by default. Note that files are always added to the worklist. The worklist can be cleared with the `CLEAR FILES` button, which has no effect on the selected peaklists.
 
-![Peakfiles selected](./image/peakfile-selected.png "Peakfiles Selected")
+![Peakfiles selected](./image/peakfiles-selected.png "Peakfiles Selected")
 
 
 ## Reset
