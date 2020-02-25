@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import time
 
+from pathlib import Path as P
+
 from multiprocessing import Pool, Manager, cpu_count
 
 from .tools import read_peaklists, process,\
@@ -62,10 +64,12 @@ class Mint(object):
             
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
+
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
             
         if self.verbose: print(f'Run MINT with {nthreads} processes:')
+        
         start = time.time()
         if nthreads > 1:
             self.run_parallel(nthreads=nthreads, mode=mode)
@@ -145,9 +149,10 @@ class Mint(object):
     def files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
-        
+        list_of_files = [str(P(i)) for i in list_of_files]
         for f in list_of_files:
-            assert os.path.isfile(f), f'File not found ({f})'
+            if not os.path.isfile(f): 
+                print(f'File not found ({f})')
         self._files = list_of_files
         if self.verbose:
             print( 'Set files to:\n' + '\n'.join(self.files) + '\n' )

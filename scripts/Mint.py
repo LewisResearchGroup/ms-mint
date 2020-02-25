@@ -8,20 +8,29 @@ from glob import glob
 from ms_mint.dash_gui import app, mint
 
 if __name__ == '__main__':
+
+    # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
+    multiprocessing.freeze_support()
     
     args = sys.argv
     
     if '--debug' in args:
         DEBUG = True
         mint.verbose = True
-        mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/19-11-12_sw__MINT-Peaklist__MSMLSList-Col001-Neg.csv']
-        mint.peaklist = mint.peaklist.head(30)
-        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)
-        print('MINT files:', mint.files)
-        print('MINTegration list:')
-        print(mint.peaklist.to_string())
+        try:
+            mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/19-11-12_sw__MINT-Peaklist__MSMLSList-Col001-Neg.csv']
+            mint.peaklist = mint.peaklist.head(30)
+            mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)
+            print('MINT files:', mint.files)
+            print('MINTegration list:')
+            print(mint.peaklist.to_string())
+        except:
+            pass
     else:
         DEBUG = False
+
+    if '--verbose' in args:
+        mint.verbose = True
 
     if '--data' in args:
         if isfile('/tmp/mint_results.csv'):

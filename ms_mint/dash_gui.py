@@ -34,7 +34,7 @@ from ms_mint.plotly_tools import plot_rt_projections
 
 mint = Mint()
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"], eager_loading=True)
 app.title = 'MINT'
 app.layout = Layout
 
