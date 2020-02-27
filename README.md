@@ -18,4 +18,4 @@ The server to run the GUI can be started with
 
 Then navigate to http://localhost:9999.
 
-![GUI](./docs/image/mint1.png "The GUI")
+![GUI](./docs/image/mint-overview.png "The GUI")
