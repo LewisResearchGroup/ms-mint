@@ -4,22 +4,24 @@ MINT (Metabolomics Integrator) is an app for processing mzML and mzXML mass-spec
 
 The tool can be used with a browser based graphical user interface (GUI) implemented as interactive dashboard with [Plotly-Dash](https://plot.ly/dash/). A second (experimental) GUI is available that runs integrated in a `Jupyter Notebook`. Alternatively, the `ms_mint` package can be imported as python library to be integrated in any Python script and processing pipeline to automate MS-file processing.
 
+![MINT](image/mint-overview.png)
+
     
 ## Installation
 
-### With Anaconda (Miniconda) and PIP
+#### With Anaconda (Miniconda) and PIP
 
     conda create -n ms-mint python=3.8
     conda activate ms-mint
     pip install ms-mint
 
-### Just PIP
+#### Just PIP
 
 The program can be installed in a Python 3 (>= 3.7) environment using `pip`:
 
     pip install ms-mint
 
-### From source in Anaconda environment (recommended for Windows)
+#### From source in Anaconda environment (recommended for Windows)
 
 Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.html) (or alternatively `anaconda`) package to install dependencies in a virtual environment.
 
@@ -31,7 +33,7 @@ Here we use `conda` from the [miniconda](https://conda.io/en/latest/miniconda.ht
     pip setup.py install  # for regular install
     pip install -e .  # for development
 
-### Starting the browser based GUI
+#### Starting the browser based GUI
 
 The browser based GUI can then be started with
 
@@ -40,7 +42,8 @@ The browser based GUI can then be started with
 
 Then navigate to the following ULR with your browser: [http://localhost:9999/](http://localhost:9999/). The graphical user interface is explained in more detail [here](gui.md)
 
-# Peaklists
+## Input files
+### Peaklist file
 A peaklist is the protocol that captures how data is going to be extracted from the individual MS-files. It is provided as `csv-file` and essentially contains the definitions of peaks to be extracted. A single peak is defined by five properties that need to be present as headers in the `csv-file` which will be explained in the following:
 
 - **peak_label** : A __unique__ identifier such as the biomarker name or ID. Even if multiple peaklist files are used, the label have to be unique across all the files.
@@ -50,10 +53,13 @@ A peaklist is the protocol that captures how data is going to be extracted from 
 - **rt_max** : The end of the retention time for each peak in [min].
 - **intensity_threshold** : A threshold that is applied to filter noise for each window individually. Can be set to 0 or any positive value.
 
-## Example file
+#### Example file
 **peaklist.csv:**
 ```text
 peak_label,mz_mean,mz_width,rt_min,rt_max,intensity_threshold
 Biomarker-A,151.0605,10,4.65,5.2,0
 Biomarker-B,151.02585,10,4.18,4.53,0
 ```
+
+### Mass spectrometry files (mzML or mzXML)
+...
