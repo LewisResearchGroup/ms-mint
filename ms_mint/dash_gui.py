@@ -30,7 +30,7 @@ from scipy.spatial.distance import pdist, squareform
 from ms_mint.Mint import Mint
 from ms_mint.dash_layout import Layout
 from ms_mint.button_style import button_style
-from ms_mint.plotly_tools import plot_rt_projections
+from ms_mint.plotly_tools import plot_peak_shapes
 
 mint = Mint()
 
@@ -368,7 +368,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
 def plot_1(n_clicks, n_cols, options):
     if mint.results is None:
         raise PreventUpdate
-    return plot_rt_projections(mint, n_cols, options)
+    return plot_peak_shapes(mint, n_cols, options)
 
 
 @lru_cache(maxsize=32)

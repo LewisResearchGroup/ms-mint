@@ -8,8 +8,8 @@ from pathlib import Path as P
 from multiprocessing import Pool, Manager, cpu_count
 
 from .tools import read_peaklists, process,\
-    restructure_rt_projections, PEAKLIST_COLUMNS,\
-    check_peaklist, export_to_excel
+    check_peaklist, export_to_excel,\
+    MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
 
 import ms_mint
 
@@ -38,9 +38,7 @@ class Mint(object):
         self._files = []
         self._peaklist_files = []
         self._peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
-        self._rt_projections = None
-        columns = PEAKLIST_COLUMNS + ['peak_area', 'ms_file', 'ms_path', 'peaklist']
-        self._results = pd.DataFrame({i: [] for i in columns})
+        self._results = pd.DataFrame({i: [] for i in MINT_RESULTS_COLUMNS})
         self._all_df = None
         self._progress = 0
         self.runtime = None
@@ -199,12 +197,9 @@ class Mint(object):
 
     @property
     def rt_projections(self):
-        return self._rt_projections
-
-    @rt_projections.setter
-    def rt_projections(self, data):
-        self._rt_projections = data 
-
+        return DeprecationWarning('rt_projections is deprecated. Peak shapes are now '
+                                 'directly stored in the results table (mint.results).')
+        
     def crosstab(self, col_name='peak_area'):
         return pd.crosstab(self.results.peak_label, 
                            self.results.ms_file, 

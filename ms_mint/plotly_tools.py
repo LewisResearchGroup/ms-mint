@@ -6,8 +6,7 @@ import numpy as np
 from collections.abc import Iterable
 
 
-
-def plot_rt_projections(mint, n_cols=3, options=None):
+def plot_peak_shapes(mint, n_cols=3, options=None):
     res = mint.results.set_index(['peak_label', 'ms_file'])
      
     if options is None:
