@@ -24,43 +24,10 @@ class TestClass():
         mint.peaklist_files = 'tests/data/test_peaklist.csv'
         assert mint.peaklist_files == ['tests/data/test_peaklist.csv']
         assert mint.n_peaklist_files == 1, mint.n_peaklist_files
-                  
-    def test__mint_run_express(self):
-        mint.run(mode='express')
-        assert mint.rt_projections is None, mint.rt_projections
-
-    def test__export_to_excel(self, tmp_path):
-        filename = os.path.join(tmp_path, 'output.xlsx')
-        mint.export(filename)
-        assert os.path.isfile(filename)
-
+                
     def test__mint_run_standard(self):
-        mint.run(mode='standard')
-        assert mint.rt_projections is not None, mint.rt_projections
-    
-    def test__rt_proj_is_dict(self):
-        rt = mint.rt_projections
-        assert isinstance(rt, dict), type(rt)
-    
-    def test__rt_proj_keys(self):
-        rt = mint.rt_projections
-        expected = mint.peaklist.peak_label.values
-        actual = np.array(list(rt.keys()))
-        print(f'Expected: {expected}')
-        print(f'Actual: {actual}')
-        assert len(expected) == len(actual), actual
-        assert all([(i in expected) for i in actual])
-    
-    def test__rt_proj_files(self):
-        rt = mint.rt_projections
-        key = list(rt.keys())[0]
-        actual = list(rt[key].keys())
-        expected = ['tests/data/test.mzXML']
-        print(f'Expected: {expected}')
-        print(f'Actual: {actual}')
-        assert len(expected) == len(actual), actual
-        assert all([(i in expected) for i in actual])
-       
+        mint.run()
+           
     def test__correct_peakAreas(self):
         df_test = pd.read_csv('tests/data/test_peaklist.csv', dtype={'peak_label': str})
         print(mint.results.dtypes)
@@ -77,15 +44,17 @@ class TestClass():
         expected = len(mint.peaklist) * len(mint.files)
         assert  expected == actual, f'Length of results ({actual}) does not equal expected length ({expected})'
     
-    def test__restults_columns(self):
-        expected = ['peak_label', 'mz_mean', 'mz_width', 'rt_min', 'rt_max',
-            'intensity_threshold', 'peaklist', 'peak_area', 'ms_file', 'ms_path',
-            'file_size', 'intensity_sum']
+    def test__results_columns(self):
+        expected = ['peak_shape', 'peak_area', 'peak_max', 'peak_min', 'peak_median',
+            'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
+            'peak_rt_of_max', 'mz_mean', 'mz_width', 'rt_min', 'rt_max',
+            'intensity_threshold', 'peak_label', 'peaklist', 'ms_file', 'ms_path', 'file_size',
+            'intensity_sum']
         actual = mint.results.columns
-        assert (actual == expected).all(), actual
+        assert (expected == actual).all(), actual
     
     def test__crosstab_is_dataframe(self):
-        ct = mint.crosstab
+        ct = mint.crosstab()
         assert isinstance(ct, pd.DataFrame), f'Crosstab is not a DataFrame ({type(ct)}).'
 
     def test__mint_run_parallel(self):
@@ -106,8 +75,9 @@ class TestClass():
     def test__export(self, tmp_path):
         print(mint.export())
         filename = os.path.join(tmp_path, 'output.xlsx')
+        print(mint.crosstab())
         mint.export(filename)
-        assert os.path.isfile(filename)
+        assert os.path.isfile(filename), mint.crosstab()
         
     def test__mzxml_equals_mzml(self):
         mint.reset()

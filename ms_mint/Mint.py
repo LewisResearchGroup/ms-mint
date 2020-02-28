@@ -82,7 +82,7 @@ class Mint(object):
                         'mode': mode}
                 results.append(process(args))
                 self.progress = int(100 * (i / self.n_files))
-            self._process_results_data_(results, mode=mode)
+            self.results = pd.concat(results)
             self.progress = 100
             
         end = time.time()
@@ -121,14 +121,9 @@ class Mint(object):
 
         pool.close()
         pool.join()
-        self._process_results_data_(results.get(), mode=mode)
+        results = results.get()
+        self.results = pd.concat(results)
 
-    def _process_results_data_(self, results, mode):
-        self.results = pd.concat([i[0] for i in results])
-        if mode == 'standard':
-            rt_projections = {}
-            [rt_projections.update(i[1]) for i in results]
-            self.rt_projections = restructure_rt_projections(rt_projections)
     @property
     def messages(self):
         return self._messages
@@ -210,7 +205,6 @@ class Mint(object):
     def rt_projections(self, data):
         self._rt_projections = data 
 
-    @property
     def crosstab(self, col_name='peak_area'):
         return pd.crosstab(self.results.peak_label, 
                            self.results.ms_file, 
