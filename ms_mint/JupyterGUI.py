@@ -10,7 +10,7 @@ from tkinter import Tk, filedialog
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint
-from .plotly_tools import plot_rt_projections
+from .plotly_tools import plot_peak_shapes
 
 class JupyterGUI():
     def __init__(self, mint=None):

@@ -30,7 +30,7 @@ from scipy.spatial.distance import pdist, squareform
 from ms_mint.Mint import Mint
 from ms_mint.dash_layout import Layout
 from ms_mint.button_style import button_style
-from ms_mint.plotly_tools import plot_rt_projections
+from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d
 
 mint = Mint()
 
@@ -123,8 +123,8 @@ def select_peaklist(n_clicks, n_clicks_clear):
 @app.callback(
     [Output('B_select-peaklists', 'style'),
      Output('B_add-files', 'style'),
-     Output('run', 'style'),
-     Output('export', 'style')],
+     Output('B_run', 'style'),
+     Output('B_export', 'style')],
     [Input('n_peaklist_selected', 'children'),
      Input('n_files_selected', 'children'),
      Input('progress-bar', 'value')])
@@ -157,7 +157,7 @@ def mint_cpu_info(value):
 ### Storage
 @app.callback(
     Output('storage', 'children'),
-    [Input('run', 'n_clicks'),
+    [Input('B_run', 'n_clicks'),
      Input('B_clear', 'value')],
     [State('n_cpus', 'value')])
 def run_mint(n_clicks, n_clicks_clear, n_cpus):
@@ -366,9 +366,12 @@ def plot_0(n_clicks, options, ndxs, data, column):
     [State('n_cols', 'value'),
      State('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
-    if mint.results is None:
+    if (len(mint.results) == 0) or (n_clicks == 0):
         raise PreventUpdate
-    return plot_rt_projections(mint, n_cols, options)
+    new_fig = plot_peak_shapes(mint, n_cols, options)
+    if new_fig is None:
+        raise PreventUpdate
+    return new_fig
 
 
 @lru_cache(maxsize=32)
@@ -378,28 +381,12 @@ def plot_1(n_clicks, n_cols, options):
     Input('peak-select', 'value'),
     Input('check_peakShapes3d', 'value')])
 def plot_3d(n_clicks, peak_label, options):
-    if (n_clicks is None) or (mint.rt_projections is None) or (peak_label is None):
+    if (n_clicks is None) or (len(mint.results) == 0) or (peak_label is None):
         raise PreventUpdate
-    # Peak labels are supposed to be strings
-    # Sometimes they are converted to int though
-    data = mint.rt_projections[str(peak_label)]
-    samples = []
-    for i, key in enumerate(list(data.keys())):
-        sample = data[key].to_frame().reset_index()
-        sample.columns = ['retentionTime', 'intensity']
-        sample['peak_area'] = sample.intensity.sum()
-        sample['ms_file'] = basename(key)
-        samples.append(sample)
-    samples = pd.concat(samples)
-    fig = px.line_3d(samples, x='retentionTime', y='peak_area' , z='intensity', color='ms_file')
-    fig.update_layout({'height': 800})
-    if 'legend_horizontal' in options:
-        fig.update_layout(legend_orientation="h")
-
-    if not 'legend' in options:
-        fig.update_layout(showlegend=False)
-    fig.update_layout({'title': peak_label})
-    return fig
+    new_fig = plot_peak_shapes_3d(mint, peak_label, options)
+    if new_fig is None:
+        raise PreventUpdate
+    return new_fig
 
 
 ## Results Export (Download)
