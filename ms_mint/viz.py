@@ -1,5 +1,11 @@
+from matplotlib.pyplot import vlines, hlines, plot, tight_layout, title, xlabel, ylabel, legend
+from scipy.signal import find_peaks, find_peaks_cwt
+
 def plot_peak_prop(peak_data, show_legend=False):
     shape = peak_data.peak_shape
+    if shape is None:
+        print('Nothing to plot.')
+        return None
     shape.plot(color='k', label='Signal')
     vlines(peak_data.peak_rt_of_max, 0, peak_data.peak_max, lw=1, colors='k', linestyle='--', label='RT of max', color='grey')
     hlines([peak_data.peak_max, peak_data.peak_min], peak_data.rt_min, peak_data.rt_max, color='C0', linewidth=2, label='Min/Max')
