@@ -9,7 +9,7 @@ from ms_mint.dash_gui import app, mint
 import multiprocessing
 import os
 
-    
+
 if __name__ == '__main__':
     if os.name == 'nt':
         print('On windows')
@@ -21,15 +21,13 @@ if __name__ == '__main__':
     if '--debug' in args:
         DEBUG = True
         mint.verbose = True
-        try:
-            mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/MINT_Peaklist__Thomas_Ryzdak_13_compounds.csv']
-            mint.peaklist = mint.peaklist.head(10)
-            mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)[:2]
-            print('MINT files:', mint.files)
-            print('MINTegration list:')
-            print(mint.peaklist.to_string())
-        except:
-            pass
+        mint.peaklist_files = ['tests/data/peaklist_v1.csv']
+        mint.peaklist = mint.peaklist.head(10)
+        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)[:2]
+        print('MINT files:', mint.files)
+        print('MINTegration list:')
+        print(mint.peaklist.to_string())
+
     else:
         DEBUG = False
 

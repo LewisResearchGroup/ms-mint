@@ -30,18 +30,14 @@ from scipy.spatial.distance import pdist, squareform
 from ms_mint.Mint import Mint
 from ms_mint.dash_layout import Layout
 from ms_mint.button_style import button_style
-<<<<<<< HEAD
-from ms_mint.plotly_tools import plot_peak_shapes
-=======
 from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d
->>>>>>> 6c551e76cdc46af976759b17928a6b1d6793a064
 
 mint = Mint()
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, "https://codepen.io/chriddyp/pen/bWLwgP.css"], eager_loading=True)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, 
+                                                "https://codepen.io/chriddyp/pen/bWLwgP.css"])
 app.title = 'MINT'
 app.layout = Layout
-
 
 @app.callback(
     [Output("progress-bar", "value"), 
@@ -54,8 +50,8 @@ def update_progress(n):
 
 ### Load MS-files
 @app.callback(
-    Output('B_add-files', 'value'),
-    [Input('B_add-files', 'n_clicks')],
+    Output('B_add_files', 'value'),
+    [Input('B_add_files', 'n_clicks')],
     [State('files-check', 'value')] )
 def select_files(n_clicks, options):
     if n_clicks is not None:
@@ -83,8 +79,8 @@ def select_files(n_clicks, options):
 
 ### Clear files
 @app.callback(
-    Output('B_clear', 'value'),
-    [Input('B_clear', 'n_clicks')])
+    Output('B_reset', 'value'),
+    [Input('B_reset', 'n_clicks')])
 def clear_files(n_clicks):
     if n_clicks is None:
         raise PreventUpdate
@@ -95,21 +91,24 @@ def clear_files(n_clicks):
 @app.callback(
     [Output('files-text', 'children'),
      Output('n_files_selected', 'children')],
-    [Input('B_add-files', 'value'),
-     Input('B_clear', 'value')])    
-def update_files_text(n,k):
-        return '{} data files selected.'.format(mint.n_files), mint.n_files
+    [Input('B_add_files', 'value'),
+     Input('B_reset', 'value')])    
+def update_files_text(n_clicks, n_clicks_clear):
+    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
+    print(mint.n_files, mint.files)
+    return '{} data files selected.'.format(mint.n_files), mint.n_files
 
 
 ### Load peaklist files
 @app.callback(
     [Output('peaklist-text', 'children'),
      Output('n_peaklist_selected', 'children')],
-    [Input('B_select-peaklists', 'n_clicks'),
-     Input('B_clear', 'value')] )
-def select_peaklist(n_clicks, n_clicks_clear):
-    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_clear')
-    if (n_clicks is not None) and (not clear):
+    [Input('B_peaklists', 'n_clicks'),
+     Input('B_reset', 'value')] )
+def select_peaklist(nc_peaklists, nc_reset):
+    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
+    print('B_peaklists:', nc_peaklists, nc_reset)
+    if (nc_peaklists is not None) and (not clear):
         root = Tk()
         root.withdraw()
         root.call('wm', 'attributes', '.', '-topmost', True)
@@ -123,32 +122,40 @@ def select_peaklist(n_clicks, n_clicks_clear):
     else:
         return '\n'.join(mint.messages).upper(), -1
 
+
 ### Button styles
 @app.callback(
-    [Output('B_select-peaklists', 'style'),
-     Output('B_add-files', 'style'),
+    [Output('B_peaklists', 'style'),
+     Output('B_add_files', 'style'),
      Output('B_run', 'style'),
-     Output('B_export', 'style')],
-    [Input('n_peaklist_selected', 'children'),
-     Input('n_files_selected', 'children'),
+     Output('B_export', 'style'),
+     Output('B_heatmap', 'style'),
+     Output('B_shapes', 'style'),
+     Output('B_shapes3d', 'style')],
+    [Input('B_peaklists', 'n_clicks'),
+     Input('B_add_files', 'n_clicks'),
+     Input('B_reset', 'n_clicks'),
      Input('progress-bar', 'value')])
-def run_button_style(n_peaklists, n_files, progress):
+def run_button_style(nc_peaklists, nc_files, nc_reset, progress):
     style_peaklists = button_style('next')
     style_files     = button_style('wait')    
     style_run       = button_style('wait')
     style_export    = button_style('wait')
-    if n_peaklists == -1: 
+    style_heatmap   = button_style('wait')
+    if mint.n_peaklist_files == -1: 
          style_peaklists = button_style('error')
-    elif n_peaklists != 0:
+    elif mint.n_peaklist_files != 0:
         style_peaklists = button_style('ready')
         style_files     = button_style('next') 
-    if n_files != 0:
+    if mint.n_files != 0:
         style_files= button_style('ready')
         style_run = button_style('next')
-    if (n_files != 0) and (n_files != 0) and (progress == 100):
+    if (mint.n_files != 0) and (mint.n_files != 0) and (progress == 100):
         style_run = button_style('ready')
         style_export = button_style('next')
-    return style_peaklists, style_files, style_run, style_export
+    if len(mint.results) > 0:
+        style_heatmap = button_style('ready')   
+    return style_peaklists, style_files, style_run, style_export, style_heatmap, style_heatmap, style_heatmap
 
 ### CPU text
 @app.callback(
@@ -162,10 +169,10 @@ def mint_cpu_info(value):
 @app.callback(
     Output('storage', 'children'),
     [Input('B_run', 'n_clicks'),
-     Input('B_clear', 'value')],
+     Input('B_reset', 'value')],
     [State('n_cpus', 'value')])
 def run_mint(n_clicks, n_clicks_clear, n_cpus):
-    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_clear')
+    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
     if mint.status == 'running':
         raise PreventUpdate
     if (n_clicks is not None) and (not clear):
@@ -183,14 +190,11 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus):
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split')
         
-    cols = ['Label', 'peak_label',
-            'peak_area', 'ms_path', 'ms_file', 'file_size',
-            'intensity_sum', 'peaklist', 'mz_mean', 'mz_width',
-            'rt_min', 'rt_max']     
+    cols = ['Label', 'peak_label', 'peak_area', 'peak_max', 'peak_min',
+            'peak_median', 'peak_mean', 'file_size', 'peak_delta_int', 'peak_rt_of_max']     
     
     if len(df) == 0:
         return None, []
-        #df = pd.DataFrame(columns=cols)
     
     if df['ms_file'].apply(basename).value_counts().max() > 1:
         df['ms_file'] = df['ms_file'].apply(basename)
@@ -201,13 +205,11 @@ def get_table(json, label_regex, col_value):
         df['Label'] = labels
     except:
         df['Label'] = df.ms_file
-    
-
-               
+                   
     df = df[cols]
     biomarker_names = df.peak_label.drop_duplicates().sort_values().values
 
-    if col_value in ['peak_area', 'rt_max_intensity']:
+    if col_value != 'full':
         df = pd.crosstab(df.peak_label, df.Label, df[col_value], aggfunc=np.mean).astype(np.float64).T
         if col_value in ['peakArea']:
             df = df.round(0)
@@ -237,7 +239,7 @@ def get_table(json, label_regex, col_value):
 
 @app.callback(
     Output('heatmap', 'figure'),
-    [Input('B_peakAreas', 'n_clicks'),
+    [Input('B_heatmap', 'n_clicks'),
      Input('checklist', 'value')],
     [State('table', 'derived_virtual_indices'),
      State('table', 'data'),
@@ -366,26 +368,22 @@ def plot_0(n_clicks, options, ndxs, data, column):
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape', 'figure'),
-    [Input('B_peakShapes', 'n_clicks')],
+    [Input('B_shapes', 'n_clicks')],
     [State('n_cols', 'value'),
      State('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
     if (len(mint.results) == 0) or (n_clicks == 0):
         raise PreventUpdate
-<<<<<<< HEAD
-    return plot_peak_shapes(mint, n_cols, options)
-=======
     new_fig = plot_peak_shapes(mint, n_cols, options)
     if new_fig is None:
         raise PreventUpdate
     return new_fig
->>>>>>> 6c551e76cdc46af976759b17928a6b1d6793a064
 
 
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape3d', 'figure'),
-    [Input('B_peakShapes3d', 'n_clicks'),
+    [Input('B_shapes3d', 'n_clicks'),
     Input('peak-select', 'value'),
     Input('check_peakShapes3d', 'value')])
 def plot_3d(n_clicks, peak_label, options):

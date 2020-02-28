@@ -37,9 +37,9 @@ Layout = html.Div(
         html.Div(id='n_files_selected', children=0, style={'display': 'none'}),
 
         # Buttons
-        html.Button('Select peaklist file(s)', id='B_select-peaklists', style=button_style()),
-        html.Button('Add MS-file(s)', id='B_add-files', style=button_style()),
-        html.Button('Reset', id='B_clear', style=button_style('warn')),
+        html.Button('Select peaklist file(s)', id='B_peaklists', style=button_style()),
+        html.Button('Add MS-file(s)', id='B_add_files', style=button_style()),
+        html.Button('Reset', id='B_reset', style=button_style('warn')),
         
         html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
                children=[html.Button('Help / Issues', id='B_help', style=button_style('help', float="right"))],
@@ -48,7 +48,7 @@ Layout = html.Div(
         html.Br(),
         
         dcc.Checklist(id='files-check', 
-                      options=[{ 'label': 'Add files from directory', 'value': 'by-dir'}], 
+                      options=[{ 'label': 'Add files from directory', 'value': 'by-dir' }], 
                       value=['by-dir'], style={'display': 'inline-block'}),
         html.Br(),
         
@@ -85,11 +85,13 @@ Layout = html.Div(
                      options=[ 
                               {'label': 'Full Table', 'value': 'full'},
                               {'label': 'Peak Area', 'value': 'peak_area'},
-                              {'label': 'Retention time of peak maximum', 'value': 'rt_max_intensity'}
+                              {'label': 'Retention time of maximum', 'value': 'peak_rt_of_max'},
+                              {'label': 'Peak Max', 'value': 'peak_max'},
+                              {'label': 'Peak Min', 'value': 'peak_min'},
+                              {'label': 'Peak Median', 'value': 'peak_median'},
+                              {'label': 'Peak Mean', 'value': 'peak_mean'},
+                              {'label': 'First minus last intensity', 'value': 'peak_delta_int'}
                      ]),
-                      
-                            # 'peakArea', 'rt_max_intensity',
-                            # 'intensity_median', 'intensity_max', 'intensity_min'
         
         html.Div(id='run-out', 
                 style={'min-height':  0, 'margin-top': 10},
@@ -100,7 +102,7 @@ Layout = html.Div(
         
         html.H2("Heatmap"),
         
-        html.Button('Heatmap', id='B_peakAreas', style=button_style()),
+        html.Button('Heatmap', id='B_heatmap', style=button_style()),
         
         dcc.Checklist(id='checklist', 
                       options=[{ 'label': 'Normalized by peak', 'value': 'normed'},
@@ -115,7 +117,7 @@ Layout = html.Div(
         
         html.H2("Peak Shapes"),
         
-        html.Button('Peak Shapes', id='B_peakShapes', style=button_style()),
+        html.Button('Peak Shapes', id='B_shapes', style=button_style()),
         
         dcc.Checklist(id='check_peakShapes', 
                       options=[{'label': 'Show Legend', 'value': 'legend'},
@@ -130,7 +132,7 @@ Layout = html.Div(
         
         html.H2("Peak Shapes 3D"),
         
-        html.Button('Peak Shapes 3D', id='B_peakShapes3d', style=button_style()),
+        html.Button('Peak Shapes 3D', id='B_shapes3d', style=button_style()),
         
         dcc.Checklist(id='check_peakShapes3d', 
                     options=[{'label': 'Show Legend', 'value': 'legend'},
