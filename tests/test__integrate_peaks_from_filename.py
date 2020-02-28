@@ -1,9 +1,8 @@
-from ms_mint.tools import integrate_peaks_from_filename, read_peaklists
+from ms_mint.tools import integrate_peaks_from_filename, read_peaklists, MINT_RESULTS_COLUMNS
 
 def check_result(result, peaklist):
-    assert list(result.columns) == ['peak_label', 'mz_mean', 'mz_width', 'rt_min', 'rt_max',
-       'intensity_threshold', 'peaklist', 'peak_area', 'ms_file']
-    assert (result.peak_label == peaklist.peak_label).all()
+    assert list(result.columns) == MINT_RESULTS_COLUMNS, list(result.columns)
+    assert (result.peak_label == peaklist.peak_label).all(), result.peak_label
     return True
 
 def test__integrate_peaks_from_filename_mzxml():

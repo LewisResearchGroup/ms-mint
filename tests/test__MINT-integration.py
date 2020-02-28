@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.metrics import r2_score
 
 from ms_mint.Mint import Mint
-from ms_mint.tools import check_peaklist
+from ms_mint.tools import check_peaklist, MINT_RESULTS_COLUMNS
 
 mint = Mint(verbose=True)
 
@@ -45,11 +45,7 @@ class TestClass():
         assert  expected == actual, f'Length of results ({actual}) does not equal expected length ({expected})'
     
     def test__results_columns(self):
-        expected = ['peak_shape', 'peak_area', 'peak_max', 'peak_min', 'peak_median',
-            'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
-            'peak_rt_of_max', 'mz_mean', 'mz_width', 'rt_min', 'rt_max',
-            'intensity_threshold', 'peak_label', 'peaklist', 'ms_file', 'ms_path', 'file_size',
-            'intensity_sum']
+        expected = MINT_RESULTS_COLUMNS
         actual = mint.results.columns
         assert (expected == actual).all(), actual
     

@@ -10,6 +10,17 @@ MINT_ROOT = os.path.dirname(__file__)
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
 
+RESULTS_COLUMNS = ['peak_label', 'peak_area', 'peak_max', 'peak_min', 'peak_median',
+    'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
+    'peak_rt_of_max', 'peaklist', 'mz_mean', 'mz_width', 'rt_min', 'rt_max', 
+    'intensity_threshold', 'peak_shape']
+
+MINT_RESULTS_COLUMNS = ['peak_label', 'ms_file', 
+    'peak_area', 'peak_max', 'peak_min', 'peak_median',
+    'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
+    'peak_rt_of_max', 'file_size', 'intensity_sum', 'ms_path', 'peaklist', 
+    'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold', 'peak_shape']
+
 
 def integrate_peaks(ms_data, peaklist):
     
@@ -51,11 +62,32 @@ def integrate_peaks(ms_data, peaklist):
             results['peak_rt_of_max'] = np.nan
                     
         results.update(peak)
+
         return results
     
     base = np.vectorize(base)
     results = base(to_peaks(peaklist))
-    return pd.merge(pd.DataFrame(list(results)), peaklist[['peaklist', 'peak_label']], on=['peak_label'])
+    results = pd.merge(pd.DataFrame(list(results)), peaklist[['peaklist', 'peak_label']], on=['peak_label'])
+    
+    # Make sure all columns are present
+    for col in RESULTS_COLUMNS:
+            if not col in results.keys():
+                results[col] = np.NaN
+                
+    return results[RESULTS_COLUMNS]
+
+def integrate_peak(ms_data, mz_mean, mz_width, rt_min, rt_max, 
+                   intensity_threshold, peak_label):
+    peaklist = pd.DataFrame([dict(mz_mean=mz_mean, 
+                                  mz_width=mz_width,
+                                  rt_min=rt_min,
+                                  rt_max=rt_max, 
+                                  intensity_threshold=intensity_threshold, 
+                                  peak_label=peak_label,
+                                  peaklist='single_peak')], index=[0])
+    result = integrate_peaks(ms_data, peaklist)
+    return result
+    
 
 
 def read_peaklists(filenames):
@@ -114,9 +146,12 @@ def integrate_peaks_from_filename(filename, peaklist):
         pandas.DataFrame(), DataFrame with integrated peak intensities
     '''
     df = ms_file_to_df(filename)
-    peaks = integrate_peaks(df, peaklist)
-    peaks['ms_file'] = filename
-    return peaks 
+    results = integrate_peaks(df, peaklist)
+    results['ms_file'] = os.path.basename(filename)
+    results['ms_path'] = os.path.dirname(filename)
+    results['file_size'] = os.path.getsize(filename) / 1024 / 1024
+    results['intensity_sum'] = df['intensity array'].sum()    
+    return results[MINT_RESULTS_COLUMNS]
 
 
 def to_peaks(peaklist):
@@ -217,7 +252,6 @@ def process(args):
     '''
     filename = args['filename']
     peaklist = args['peaklist']
-    mode = args['mode']
     
     if 'queue' in args.keys():
         q = args['queue']
@@ -226,11 +260,11 @@ def process(args):
     df = ms_file_to_df(filename=filename)[cols]
 
     results = integrate_peaks(df, peaklist)
-    results['ms_file'] = filename
+    results['ms_file'] = os.path.basename(filename)
     results['ms_path'] = os.path.dirname(filename)
     results['file_size'] = os.path.getsize(filename) / 1024 / 1024
     results['intensity_sum'] = df['intensity array'].sum()
-    return results
+    return results[MINT_RESULTS_COLUMNS]
 
 
 def generate_grid_peaklist(masses, dt, rt_max=10, 

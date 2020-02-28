@@ -12,6 +12,8 @@ from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint
 from .plotly_tools import plot_rt_projections
 
+import warning
+
 class JupyterGUI():
     def __init__(self, mint=None):
         
@@ -119,13 +121,9 @@ class JupyterGUI():
     @property
     def crosstab(self):
         return self.mint.crosstab    
-    
-    @property
-    def rt_projections(self):
-        return self.mint.rt_projections
-    
-    def plot_rt_projections(self, **kwargs):
-        return plot_rt_projections(self.mint, **kwargs)
+       
+    def plot_peak_shapes(self, **kwargs):
+        return plot_peak_shapes(self.mint, **kwargs)
     
     @property
     def mint(self):
