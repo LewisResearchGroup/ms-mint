@@ -1,21 +1,27 @@
 import colorlover as cl
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
-from os.path import basename
 import numpy as np
+import pandas as pd
+import plotly_express as px
+
+import plotly.graph_objects as go
+
 from collections.abc import Iterable
+from os.path import basename
+from plotly.subplots import make_subplots
 
 
 def plot_peak_shapes(mint, n_cols=3, options=None):
+    '''
+    Returns a plotly multiplost of all peak_shapes in mint.results
+    grouped by peak_label.
+    '''
     res = mint.results.set_index(['peak_label', 'ms_file'])
      
     if options is None:
         options = []
-        
+
     files = mint.files
     labels = mint.peaklist.peak_label.values
-    print('Files:', files)
-    print('Labels:', labels)
     
     # Calculate neccessary number of rows
     n_rows = len(labels)//n_cols
@@ -52,7 +58,7 @@ def plot_peak_shapes(mint, n_cols=3, options=None):
                 col=ndx_c,
             )
 
-            fig.update_xaxes(title_text="Scan Time", row=ndx_r, col=ndx_c)
+            fig.update_xaxes(title_text="Retention Time", row=ndx_r, col=ndx_c)
             fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
 
     # Layout
@@ -61,6 +67,41 @@ def plot_peak_shapes(mint, n_cols=3, options=None):
     if 'legend' in options:
         fig.update_layout(showlegend=True)
     fig.update_layout(height=400*n_rows, title_text="Peak Shapes")
-
     return fig
 
+
+def plot_peak_shapes_3d(mint, peak_label, options=None):
+    '''
+    Returns a plotly 3D plot of all peak_shapes in mint.results
+    where mint.results.peak_label == peak_label.
+    '''
+    if options is None:
+        options = []
+    data = mint.results[mint.results.peak_label == peak_label].groupby('ms_file')
+    filenames = mint.files
+    # Peak labels are supposed to be strings
+    # Sometimes they are converted to int though
+
+    samples = []
+    for i, fn in enumerate(filenames):
+        sample = data.get_group(fn)['peak_shape'].values[0]
+        if not isinstance(sample, Iterable):
+            continue
+        else:
+            sample = sample.to_frame().reset_index()
+        sample.columns = ['retentionTime', 'intensity']
+        sample['peak_area'] = sample.intensity.sum()
+        sample['ms_file'] = basename(fn)
+        samples.append(sample)
+    if len(samples) == 0:
+        return None
+    
+    samples = pd.concat(samples)
+    fig = px.line_3d(samples, x='retentionTime', y='peak_area' , z='intensity', color='ms_file')
+    fig.update_layout({'height': 800})
+    if 'legend_horizontal' in options:
+        fig.update_layout(legend_orientation="h")
+    if not 'legend' in options:
+        fig.update_layout(showlegend=False)
+    fig.update_layout({'title': peak_label})
+    return fig

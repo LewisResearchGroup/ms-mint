@@ -68,10 +68,9 @@ Layout = html.Div(
                             marks={i: f'{i} cpus' for i in [1, n_cpus]}),
                 style=slider_style),
         
-        html.Button('Run', id='run'),
+        html.Button('Run', id='B_run'),
         
-        html.A(html.Button('Export', id='export'),
-        href="export"),
+        html.A(html.Button('Export', id='B_export'), href="export"),
         
         # Progress bar
         dcc.Interval(id="progress-interval", n_intervals=0, interval=5000, disabled=False),
@@ -86,7 +85,7 @@ Layout = html.Div(
                      options=[ 
                               {'label': 'Full Table', 'value': 'full'},
                               {'label': 'Peak Area', 'value': 'peak_area'},
-                              # {'label': 'Retention time of peak maximum', 'value': 'rt_max_intensity'}
+                              {'label': 'Retention time of peak maximum', 'value': 'rt_max_intensity'}
                      ]),
                       
                             # 'peakArea', 'rt_max_intensity',
