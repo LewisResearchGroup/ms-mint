@@ -92,7 +92,7 @@ class Mint(object):
             print(f'Total runtime: {self.runtime:.2f}s')
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
-        self._status = 'waiting'
+        self._status = 'done'
 
     def run_parallel(self, nthreads=1, mode='standard'):
         pool = Pool(processes=nthreads)
