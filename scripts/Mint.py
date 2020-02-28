@@ -22,7 +22,7 @@ if __name__ == '__main__':
         DEBUG = True
         mint.verbose = True
         try:
-            mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/19-11-12_sw__MINT-Peaklist__MSMLSList-Col001-Neg.csv']
+            mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/MINT_Peaklist__Thomas_Ryzdak_13_compounds.csv']
             mint.peaklist = mint.peaklist.head(10)
             mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)[:2]
             print('MINT files:', mint.files)
