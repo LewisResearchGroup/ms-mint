@@ -10,6 +10,54 @@ MINT_ROOT = os.path.dirname(__file__)
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
 
+
+def integrate_peaks(ms_data, peaklist):
+    
+    def base(peak):        
+        slizE = slice_ms1_mzxml(ms_data, **peak)
+
+        shape = slizE[['retentionTime', 'm/z array', 'intensity array']]\
+                        .groupby(['retentionTime', 'm/z array']).sum()\
+                        .unstack()\
+                        .sum(axis=1)
+        
+        if len(shape) == 0:
+            results = peak.copy()
+            results.update({'peak_area': 0})
+            return results
+    
+        peak_area = np.int64(shape.sum())
+        peak_med = np.float64(shape[shape != 0].median())
+        peak_avg = np.float64(shape[shape != 0].mean())
+        peak_max = np.float64(shape.max())
+        peak_min = np.float64(shape.min())
+
+        results = {}
+
+        results['peak_shape']  = shape
+        results['peak_area']   = peak_area
+        results['peak_max']    = peak_max
+        results['peak_min']    = peak_min
+        results['peak_median'] = peak_med
+        results['peak_mean']   = peak_avg
+        results['peak_int_first'] = shape.values[0]
+        results['peak_int_last'] = shape.values[-1]
+        results['peak_delta_int'] = results['peak_int_last'] - results['peak_int_first']
+        results['peak_rt_of_max'] = shape[shape == peak_max].index
+        
+        if len(results['peak_rt_of_max']) > 0:
+            results['peak_rt_of_max'] = np.mean(results['peak_rt_of_max'])
+        else:
+            results['peak_rt_of_max'] = np.nan
+                    
+        results.update(peak)
+        return results
+    
+    base = np.vectorize(base)
+    results = base(to_peaks(peaklist))
+    return pd.merge(pd.DataFrame(list(results)), peaklist[['peaklist', 'peak_label']], on=['peak_label'])
+
+
 def read_peaklists(filenames):
     '''
     Extracts peak data from csv files that contain peak definitions.
@@ -71,72 +119,12 @@ def integrate_peaks_from_filename(filename, peaklist):
     return peaks 
 
 
-def integrate_peaks(df, peaklist):
-    '''
-    Takes the output of mzxml_to_pandas_df() and
-    batch-calculates peak properties.
-    '''
-    peak_areas = []
-    for peak in to_peaks(peaklist):
-        peak_area = integrate_peak(df, **peak)
-        peak_areas.append(peak_area)
-    result = peaklist.copy()
-    result['peak_area'] = peak_areas
-    return result
-
-
-def integrate_peak(ms_df, mz_mean, mz_width, rt_min, 
-                   rt_max, intensity_threshold, peak_label):
-    '''
-    Takes the output of ms_file_to_df() and 
-    calculates peak properties of a single peak specified by
-    the input arguements.
-    '''
-    peak_area = slice_ms1_mzxml(ms_df, 
-                rt_min=rt_min, rt_max=rt_max, 
-                mz_mean=mz_mean, mz_width=mz_width, 
-                intensity_threshold=intensity_threshold
-                )['intensity array'].sum()       
-    return peak_area
-
-
-def peak_rt_projections(df, peaklist):
-    '''
-    Takes the output of mzxml_to_pandas_df() and 
-    batch-calcualtes the projections of peaks onto
-    the RT dimension to visualize peak shapes.
-    '''
-    peaklist.index = range(len(peaklist))
-    results = []
-    for peak in to_peaks(peaklist):
-        result = peak_rt_projection(df, **peak)
-        results.append(result)
-    return results
-
-
-def peak_rt_projection(df, mz_mean, mz_width, rt_min, 
-                       rt_max, intensity_threshold, peak_label):
-    '''
-    Takes the output of mzxml_to_pandas_df() and 
-    calcualtes the projections of one peak, 
-    specicied by the input parameters, onto
-    the RT dimension to visualize peak shapes.
-    '''
-    slizE = slice_ms1_mzxml(df, rt_min=rt_min, rt_max=rt_max, 
-                            mz_mean=mz_mean, mz_width=mz_width, 
-                            intensity_threshold=intensity_threshold)
-    rt_projection = slizE[['retentionTime', 'm/z array', 'intensity array']]\
-                    .groupby(['retentionTime', 'm/z array']).sum()\
-                    .unstack()\
-                    .sum(axis=1)
-    # return [mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label, rt_projection]
-    return [peak_label, rt_projection]
-
-
 def to_peaks(peaklist):
     '''
     Takes a dataframe with at least the columns:
-    ['mz_mean', 'mz_width', 'rt_min', 'rt_max', 'peak_label'].
+        ['mz_mean', 'mz_width', 
+         'rt_min',  'rt_max', 
+         'peak_label', 'intensity_threshold'].
     Returns a list of dictionaries that define peaks.
     '''
     cols_to_import = ['mz_mean', 
@@ -157,7 +145,7 @@ def to_peaks(peaklist):
     return output
 
 
-def slice_ms1_mzxml(df, rt_min, rt_max, mz_mean, mz_width, intensity_threshold):
+def slice_ms1_mzxml(df, rt_min, rt_max, mz_mean, mz_width, intensity_threshold, peak_label=None):
     '''
     Returns a slize of a metabolomics mzXML file.
     - df: pandas.DataFrame that has columns 
@@ -237,19 +225,16 @@ def process(args):
     cols = ['retentionTime', 'm/z array', 'intensity array']
     df = ms_file_to_df(filename=filename)[cols]
 
-    result = integrate_peaks(df, peaklist)
-    result['ms_file'] = filename
-    result['ms_path'] = os.path.dirname(filename)
-    result['file_size'] = os.path.getsize(filename) / 1024 / 1024
-    result['intensity_sum'] = df['intensity array'].sum()
-    if mode == 'standard':
-        rt_projection = {filename: peak_rt_projections(df, peaklist)}
-        return result, rt_projection
-    elif mode == 'express':
-        return result, None
+    results = integrate_peaks(df, peaklist)
+    results['ms_file'] = filename
+    results['ms_path'] = os.path.dirname(filename)
+    results['file_size'] = os.path.getsize(filename) / 1024 / 1024
+    results['intensity_sum'] = df['intensity array'].sum()
+    return results
 
 
-def generate_grid_peaklist(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
+def generate_grid_peaklist(masses, dt, rt_max=10, 
+                           mz_ppm=10, intensity_threshold=0):
     '''
     Creates a peaklist from a list of masses.
     -----
@@ -283,7 +268,7 @@ def export_to_excel(mint, filename=None):
     # Write into file
     mint.results.to_excel(writer, 'MINT', index=False)
     mint.peaklist.to_excel(writer, 'Peaklist', index=False)
-    mint.crosstab.T.to_excel(writer, 'PeakArea', index=True)
+    mint.crosstab().T.to_excel(writer, 'PeakArea', index=True)
     meta = pd.DataFrame({'MINT_version': [mint.version], 
                          'Date': [date_string]}).T[0]
     meta.to_excel(writer, 'Metadata', index=True, header=False)
@@ -291,3 +276,7 @@ def export_to_excel(mint, filename=None):
     writer.close()
     if filename is None:
         return file_buffer.seek(0)
+    
+
+def gaus(x,a,x0,sigma):
+    return a*np.exp(-(x-x0)**2/(2*sigma**2))
