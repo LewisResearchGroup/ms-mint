@@ -6,11 +6,15 @@ from os.path import isfile
 from glob import glob
 
 from ms_mint.dash_gui import app, mint
+import multiprocessing
+import os
 
+    
 if __name__ == '__main__':
-
-    # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
-    multiprocessing.freeze_support()
+    if os.name == 'nt':
+        print('On windows')
+        # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
+        multiprocessing.freeze_support()
     
     args = sys.argv
     
@@ -19,8 +23,8 @@ if __name__ == '__main__':
         mint.verbose = True
         try:
             mint.peaklist_files = ['/home/swacker/data/metabolomics_storage/MINT/MINT_peaklists/19-11-12_sw__MINT-Peaklist__MSMLSList-Col001-Neg.csv']
-            mint.peaklist = mint.peaklist.head(30)
-            mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)
+            mint.peaklist = mint.peaklist.head(10)
+            mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)[:2]
             print('MINT files:', mint.files)
             print('MINTegration list:')
             print(mint.peaklist.to_string())

@@ -2,14 +2,21 @@ import colorlover as cl
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from os.path import basename
+import numpy as np
+from collections.abc import Iterable
+
+
 
 def plot_rt_projections(mint, n_cols=3, options=None):
-    if mint.rt_projections is None:
-        return None    
+    res = mint.results.set_index(['peak_label', 'ms_file'])
+     
     if options is None:
         options = []
-    files = mint.crosstab.columns
-    labels = mint.crosstab.index
+        
+    files = mint.files
+    labels = mint.peaklist.peak_label.values
+    print('Files:', files)
+    print('Labels:', labels)
     
     # Calculate neccessary number of rows
     n_rows = len(labels)//n_cols
@@ -27,8 +34,9 @@ def plot_rt_projections(mint, n_cols=3, options=None):
     # Create sub-plots
     for label_i, label in enumerate(labels):
         for file_i, file in enumerate(files):
-
-            data = mint.rt_projections[label][file]
+            data = res.loc[(label, file), 'peak_shape']
+            if not isinstance(data,  Iterable):
+                continue
             ndx_r = (label_i // n_cols)+1
             ndx_c = label_i % n_cols + 1
 

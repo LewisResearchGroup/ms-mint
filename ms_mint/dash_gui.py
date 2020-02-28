@@ -178,9 +178,7 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus):
      Input('table-value-select', 'value')])
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split')
-    
-    print(df.columns)
-    
+        
     cols = ['Label', 'peak_label',
             'peak_area', 'ms_path', 'ms_file', 'file_size',
             'intensity_sum', 'peaklist', 'mz_mean', 'mz_width',
@@ -368,7 +366,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
     [State('n_cols', 'value'),
      State('check_peakShapes', 'value')])
 def plot_1(n_clicks, n_cols, options):
-    if mint.rt_projections is None:
+    if mint.results is None:
         raise PreventUpdate
     return plot_rt_projections(mint, n_cols, options)
 
@@ -410,7 +408,7 @@ def download_csv():
     file_buffer = io.BytesIO()
     writer = pd.ExcelWriter(file_buffer) #, engine='xlsxwriter')
     mint.results.to_excel(writer, 'Results Complete', index=False)
-    mint.crosstab.T.to_excel(writer, 'PeakArea Summary', index=True)
+    mint.crosstab().T.to_excel(writer, 'PeakArea Summary', index=True)
     meta = pd.DataFrame({'Version': [mint.version], 
                             'Date': [str(date.today())]}).T[0]
     meta.to_excel(writer, 'MetaData', index=True, header=False)
