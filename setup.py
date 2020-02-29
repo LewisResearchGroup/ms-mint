@@ -28,7 +28,7 @@ install_requires = [
 
 config = {
     'name': 'ms-mint',
-    'version': '0.0.27',
+    'version': '0.0.28',
     'description': 'Metabolomics Integrator (Mint)',
     'long_description': long_description,
     'author': 'Soren Wacker',
