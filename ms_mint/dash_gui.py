@@ -22,7 +22,6 @@ from dash_table import DataTable
 
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
-import plotly.express as px
 
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
@@ -94,7 +93,6 @@ def clear_files(n_clicks):
     [Input('B_add_files', 'value'),
      Input('B_reset', 'value')])    
 def update_files_text(n_clicks, n_clicks_clear):
-    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
     return '{} data files selected.'.format(mint.n_files), mint.n_files
 
 
@@ -141,7 +139,7 @@ def run_button_style(nc_peaklists, nc_files, nc_reset, progress):
     style_export    = button_style('wait')
     style_heatmap   = button_style('wait')
     if mint.n_peaklist_files == -1: 
-         style_peaklists = button_style('error')
+        style_peaklists = button_style('error')
     elif mint.n_peaklist_files != 0:
         style_peaklists = button_style('ready')
         style_files     = button_style('next') 

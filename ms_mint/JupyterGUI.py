@@ -6,13 +6,10 @@ from ipywidgets import Button, HBox, VBox, Textarea,\
 
 from ipywidgets import IntProgress as Progress
 
-from tkinter import Tk, filedialog
-
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint
 from .plotly_tools import plot_peak_shapes
 
-import warning
 
 class JupyterGUI():
     def __init__(self, mint=None):

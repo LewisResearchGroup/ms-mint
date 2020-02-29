@@ -181,7 +181,7 @@ class Mint(object):
         if len(errors) != 0:
             error_string = '\n'.join(errors)
             if self.verbose:
-                print('Errors in peaklist:\n{error_string}')
+                print(f'Errors in peaklist:\n{error_string}')
             self._messages = errors
         self._peaklist = peaklist
         if self.verbose:
