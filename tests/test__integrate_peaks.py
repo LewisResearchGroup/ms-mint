@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from ms_mint.tools import integrate_peak, MINT_RESULTS_COLUMNS
+from ms_mint.tools import integrate_peak
 
 def fake_ms_data(min_rt=0, max_rt=2, min_mz=0, max_mz=200, drt=.1, dmz=.1):
     retention_times = np.arange(min_rt+drt, max_rt+drt, drt)

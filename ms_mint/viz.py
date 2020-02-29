@@ -1,4 +1,4 @@
-from matplotlib.pyplot import vlines, hlines, plot, tight_layout, title, xlabel, ylabel, legend
+from matplotlib.pyplot import vlines, hlines, tight_layout, title, xlabel, ylabel, legend
 from scipy.signal import find_peaks, find_peaks_cwt
 
 def plot_peak_prop(peak_data, show_legend=False):
