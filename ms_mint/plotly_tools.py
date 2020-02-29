@@ -75,24 +75,15 @@ def plot_peak_shapes_3d(mint, peak_label, options=None):
     Returns a plotly 3D plot of all peak_shapes in mint.results
     where mint.results.peak_label == peak_label.
     '''
-    print('-plot-peaks-3d-')
-    print('Args:', mint, peak_label, options)
     if options is None:
         options = []
-    print(mint.results)
-    print('ms_file' in mint.results.columns)
     data = mint.results[mint.results.peak_label == peak_label].groupby('ms_file')
-    print(type(mint), type(data), type(mint.results), len(mint.results))
-    print('Groups:', data.groups)
     filenames = mint.files
-    print('Filenames:',filenames)
     # Peak labels are supposed to be strings
     # Sometimes they are converted to int though
-    print(mint.results.ms_file)
-    
+   
     samples = []
     for i, fn in enumerate(filenames):
-        print('Filename:', fn)
         sample = data.get_group(fn)['peak_shape'].values[0]
         if not isinstance(sample, Iterable):
             continue
@@ -104,7 +95,6 @@ def plot_peak_shapes_3d(mint, peak_label, options=None):
         samples.append(sample)
     
     if len(samples) == 0:
-        print('No data! I am out!!!')
         return None
     
     samples = pd.concat(samples)
@@ -115,5 +105,4 @@ def plot_peak_shapes_3d(mint, peak_label, options=None):
     if not 'legend' in options:
         fig.update_layout(showlegend=False)
     fig.update_layout({'title': peak_label, 'title_x': 0.5})
-    print('Done')
     return fig

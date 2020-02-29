@@ -95,7 +95,6 @@ def clear_files(n_clicks):
      Input('B_reset', 'value')])    
 def update_files_text(n_clicks, n_clicks_clear):
     clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
-    print(mint.n_files, mint.files)
     return '{} data files selected.'.format(mint.n_files), mint.n_files
 
 
@@ -107,7 +106,6 @@ def update_files_text(n_clicks, n_clicks_clear):
      Input('B_reset', 'value')] )
 def select_peaklist(nc_peaklists, nc_reset):
     clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
-    print('B_peaklists:', nc_peaklists, nc_reset)
     if (nc_peaklists is not None) and (not clear):
         root = Tk()
         root.withdraw()
@@ -233,7 +231,7 @@ def get_table(json, label_regex, col_value):
                 style_as_list_view=True,
                 style_cell={'padding': '5px'},
                 style_header={'backgroundColor': 'white',
-                            'fontWeight': 'bold'},
+                              'fontWeight': 'bold'},
             )
     return table, [ {'label': i, 'value': i} for i in biomarker_names]
 
