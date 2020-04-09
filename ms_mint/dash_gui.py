@@ -19,6 +19,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_table import DataTable
+import dash_html_components as html
 
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -409,3 +410,4 @@ def download_csv():
                      attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
                      as_attachment=True,
                      cache_timeout=0)
+
