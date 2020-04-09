@@ -1,5 +1,4 @@
 .localhistory
-#*.csv
 .ipynb_checkpoints
 .*.ipynb
 .pytest_cache
@@ -10,9 +9,7 @@ devel
 output
 build
 dist
-dist
-*.spec
 site
 htmlcov
-Untitled.ipynb
+Untitled*.ipynb
 "nohup.out" 
