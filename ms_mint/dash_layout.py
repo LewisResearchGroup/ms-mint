@@ -40,7 +40,8 @@ Layout = html.Div(
         html.Button('Select peaklist file(s)', id='B_peaklists', style=button_style()),
         html.Button('Add MS-file(s)', id='B_add_files', style=button_style()),
         html.Button('Reset', id='B_reset', style=button_style('warn')),
-        
+        html.Button('Load', id='B_load', style=button_style('neutral')),
+
         html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
                children=[html.Button('Help / Issues', id='B_help', style=button_style('help', float="right"))],
                target="_blank"),
