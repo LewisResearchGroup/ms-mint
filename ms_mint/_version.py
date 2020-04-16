@@ -43,7 +43,7 @@ def get_config():
     cfg.style = ""
     cfg.tag_prefix = ""
     cfg.parentdir_prefix = "mint-"
-    cfg.versionfile_source = "mint/_version.py"
+    cfg.versionfile_source = "ms_mint/_version.py"
     cfg.verbose = False
     return cfg
 

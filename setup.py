@@ -3,6 +3,10 @@ try:
 except ImportError:
     from distutils.core import setup
 
+from ms_mint._version import get_versions
+__version__ = get_versions()['version']
+
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -28,7 +32,7 @@ install_requires = [
 
 config = {
     'name': 'ms-mint',
-    'version': '0.0.29',
+    'version': __version__,
     'description': 'Metabolomics Integrator (Mint)',
     'long_description': long_description,
     'author': 'Soren Wacker',

@@ -1,2 +1,3 @@
 include versioneer.py
 include mint/_version.py
+include ms_mint/_version.py
