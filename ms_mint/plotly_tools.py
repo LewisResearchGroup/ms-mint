@@ -9,19 +9,23 @@ from os.path import basename
 from plotly.subplots import make_subplots
 
 
-def plot_peak_shapes(mint, n_cols=3, options=None):
+def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
     '''
     Returns a plotly multiplost of all peak_shapes in mint.results
     grouped by peak_label.
     '''
     res = mint.results.set_index(['peak_label', 'ms_file'])
-     
+    
     if options is None:
         options = []
 
     files = mint.files
-    labels = mint.peaklist.peak_label.values
-    
+        
+    if len(biomarkers) == 0:
+        labels = mint.peaklist.peak_label.values
+    else:
+        labels = [str(i) for i in biomarkers]
+        
     # Calculate neccessary number of rows
     n_rows = len(labels)//n_cols
     if n_rows*n_cols < len(labels):

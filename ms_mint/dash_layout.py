@@ -95,55 +95,61 @@ Layout = html.Div(
                      ]),
         
         html.Div(id='run-out', 
-                style={'min-height':  0, 'margin-top': 10},
-                children=[DataTable(id='table', data=np.array([]))]),
+                 style={'min-height':  0, 'margin-top': 10},
+                 children=[DataTable(id='table', data=np.array([]))]),
         
         dcc.Input(id="label-regex", type='text', placeholder="Label Selector"),
         
-        
+                                
         html.H2("Heatmap"),
         
         html.Button('Heatmap', id='B_heatmap', style=button_style()),
         
         dcc.Checklist(id='checklist', 
-                      options=[{ 'label': 'Normalized by peak', 'value': 'normed'},
-                               { 'label': 'Cluster', 'value': 'clustered'},
-                               { 'label': 'Dendrogram', 'value': 'dendrogram'},
-                               { 'label': 'Transposed', 'value': 'transposed'},
-                               { 'label': 'Correlation', 'value': 'corr'} ], 
-                      value=['normed'], style={'display': 'inline-block'}),
+                options=[{ 'label': 'Normalized by biomarker', 'value': 'normed'},
+                        { 'label': 'Cluster', 'value': 'clustered'},
+                        { 'label': 'Dendrogram', 'value': 'dendrogram'},
+                        { 'label': 'Transposed', 'value': 'transposed'},
+                        { 'label': 'Correlation', 'value': 'corr'} ], 
+                value=['normed'], style={'display': 'inline-block'}),
+        html.P(id='heatmap-message'),
         
         dcc.Graph(id='heatmap', figure={}),
         
+        html.Div(id='analysis', children=[
         
-        html.H2("Peak Shapes"),
-        
-        html.Button('Peak Shapes', id='B_shapes', style=button_style()),
-        
-        dcc.Checklist(id='check_peakShapes', 
-                      options=[{'label': 'Show Legend', 'value': 'legend'},
-                               {'label': 'Horizontal legend', 'value': 'legend_horizontal'}],
-                      value=['legend'], style={'display': 'inline-block'}),
-        
-        html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
-                            marks={i: f'{i} columns' for i in range(1, 6)}),
-                 style=slider_style),
-        
-        dcc.Graph(id='peakShape', figure={}),
-        
-        html.H2("Peak Shapes 3D"),
-        
-        html.Button('Peak Shapes 3D', id='B_shapes3d', style=button_style()),
-        
-        dcc.Checklist(id='check_peakShapes3d', 
-                    options=[{'label': 'Show Legend', 'value': 'legend'},
-                            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
-                    value=['legend'], style={'display': 'inline-block'}),
-        
-        dcc.Dropdown(id='peak-select', options=[]),
-        
-        dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}),
-
-    ], style={'max-width': '80%', 'margin': 'auto', 'margin-bottom': '10%'}
-
-)
+                html.H2("Peak Shapes"),
+                
+                dcc.Dropdown(id='peakshapes-selection',
+                        options=[],
+                        value=[],
+                        multi=True
+                        ), 
+                
+                html.Button('Peak Shapes', id='B_shapes', style=button_style()),
+                
+                dcc.Checklist(id='check_peakShapes', 
+                        options=[{'label': 'Show Legend', 'value': 'legend'},
+                                {'label': 'Horizontal legend', 'value': 'legend_horizontal'}],
+                        value=['legend'], style={'display': 'inline-block'}),
+                
+                html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
+                                marks={i: f'{i} columns' for i in range(1, 6)}),
+                        style=slider_style),
+                
+                dcc.Graph(id='peakShape', figure={}),
+                
+                html.H2("Peak Shapes 3D"),
+                
+                html.Button('Peak Shapes 3D', id='B_shapes3d', style=button_style()),
+                
+                dcc.Checklist(id='check_peakShapes3d', 
+                        options=[{'label': 'Show Legend', 'value': 'legend'},
+                                {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
+                        value=['legend'], style={'display': 'inline-block'}),
+                
+                dcc.Dropdown(id='peak-select', options=[]),
+                
+                dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}),
+        ], style={'display': 'none'})
+], style={'max-width': '80%', 'margin': 'auto', 'margin-bottom': '10%'})
