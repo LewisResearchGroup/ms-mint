@@ -151,8 +151,11 @@ def run_button_style(nc_peaklists, nc_files, nc_reset, progress):
         style_run = button_style('ready')
         style_export = button_style('next')
     if len(mint.results) > 0:
-        style_heatmap = button_style('ready')   
-    return style_peaklists, style_files, style_run, style_export, style_heatmap, style_heatmap, style_heatmap
+        style_heatmap = button_style('ready')
+         
+    return (style_peaklists, style_files, style_run, 
+            style_export, style_heatmap, style_heatmap, 
+            style_heatmap)
 
 ### CPU text
 @app.callback(
@@ -180,32 +183,42 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus):
 ### Data Table
 @app.callback(
     [Output('run-out', 'children'),
-     Output('peak-select', 'options')],
+     Output('peak-select', 'options'),
+     Output('peakshapes-selection', 'options'),
+     Output('analysis', 'style')],
     [Input('storage', 'children'),
      Input('label-regex', 'value'),
      Input('table-value-select', 'value')])
 def get_table(json, label_regex, col_value):
     df = pd.read_json(json, orient='split')
-        
+     
+    # Columns to show in frontend    
     cols = ['Label', 'peak_label', 'peak_area', 'peak_max', 'peak_min',
             'peak_median', 'peak_mean', 'file_size', 'peak_delta_int', 'peak_rt_of_max']     
     
+    # Don't update without data
     if len(df) == 0:
         return None, []
     
+    # Only show file name, not complete path
     if df['ms_file'].apply(basename).value_counts().max() > 1:
         df['ms_file'] = df['ms_file'].apply(basename)
-        
+    
+    # Generate labels 
     try:
-        # Generate label without file extention
         labels = [ '.'.join(i.split('.')[:-1]).split('_')[int(label_regex)] for i in df.ms_file ]
         df['Label'] = labels
     except:
         df['Label'] = df.ms_file
-                   
+        
+    # Extract names of biomarkers for other fontend elements
+    # before reducing it to frontend version
+    biomarkers = df.peak_label.drop_duplicates().sort_values().values        
+    biomarker_options = [ {'label': i, 'value': i} for i in biomarkers]
+    
+    # Order dataframe columns               
     df = df[cols]
-    biomarker_names = df.peak_label.drop_duplicates().sort_values().values
-
+    
     if col_value != 'full':
         df = pd.crosstab(df.peak_label, df.Label, df[col_value], aggfunc=np.mean).astype(np.float64).T
         if col_value in ['peakArea']:
@@ -221,7 +234,9 @@ def get_table(json, label_regex, col_value):
                 data=df.to_dict('records'),
                 sort_action="native",
                 sort_mode="single",
-                row_selectable="multi",
+                row_selectable=False,
+                row_deletable=False,
+                column_selectable=False,
                 selected_rows=[],
                 page_action="native",
                 page_current= 0,
@@ -232,8 +247,13 @@ def get_table(json, label_regex, col_value):
                 style_header={'backgroundColor': 'white',
                               'fontWeight': 'bold'},
             )
-    return table, [ {'label': i, 'value': i} for i in biomarker_names]
+    
+    analysis_style = {'display': 'inline'}
+    
+    return table, biomarker_options, biomarker_options, analysis_style
 
+
+# HEATMAP TOOL
 @app.callback(
     Output('heatmap', 'figure'),
     [Input('B_heatmap', 'n_clicks'),
@@ -247,6 +267,9 @@ def plot_0(n_clicks, options, ndxs, data, column):
     
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     df = pd.DataFrame(data).set_index('Label').select_dtypes(include=numerics)
+    
+    # Same order as data-table
+    df = df.iloc[ndxs]
     
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
@@ -362,16 +385,19 @@ def plot_0(n_clicks, options, ndxs, data, column):
     return fig
 
 
+
+# PEAKEXPLORER
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape', 'figure'),
     [Input('B_shapes', 'n_clicks')],
     [State('n_cols', 'value'),
-     State('check_peakShapes', 'value')])
-def plot_1(n_clicks, n_cols, options):
+     State('check_peakShapes', 'value'),
+     State('peakshapes-selection', 'value')])
+def plot_1(n_clicks, n_cols, options, biomarkers):
     if (len(mint.results) == 0) or (n_clicks == 0):
         raise PreventUpdate
-    new_fig = plot_peak_shapes(mint, n_cols, options)
+    new_fig = plot_peak_shapes(mint, n_cols, biomarkers, options)
     if new_fig is None:
         raise PreventUpdate
     return new_fig
@@ -381,8 +407,8 @@ def plot_1(n_clicks, n_cols, options):
 @app.callback(
     Output('peakShape3d', 'figure'),
     [Input('B_shapes3d', 'n_clicks'),
-    Input('peak-select', 'value'),
-    Input('check_peakShapes3d', 'value')])
+     Input('peak-select', 'value'),
+     Input('check_peakShapes3d', 'value')])
 def plot_3d(n_clicks, peak_label, options):
     if (n_clicks is None) or (len(mint.results) == 0) or (peak_label is None):
         raise PreventUpdate
@@ -390,6 +416,16 @@ def plot_3d(n_clicks, peak_label, options):
     if new_fig is None:
         raise PreventUpdate
     return new_fig
+
+@app.callback(
+    Output('heatmap-message', 'children'),
+    [Input('table-value-select', 'value')]
+)
+def return_messave(value):
+    if value == 'full':
+        return 'Heatmap does not work with "Full Table"'
+    else:
+        return None
 
 
 ## Results Export (Download)

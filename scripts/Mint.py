@@ -21,9 +21,9 @@ if __name__ == '__main__':
     if '--debug' in args:
         DEBUG = True
         mint.verbose = True
-        mint.peaklist_files = ['tests/data/peaklist_v1.csv']
+        mint.peaklist_files = ['/data/metabolomics_storage/MINT/MINT_demofiles/MINT_Peaklist__Thomas_Ryzdak_13_compounds.csv']
         mint.peaklist = mint.peaklist.head(10)
-        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)[:2]
+        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/**/*.mzXML', recursive=True)[:4]
         print('MINT files:', mint.files)
         print('MINTegration list:')
         print(mint.peaklist.to_string())
