@@ -106,4 +106,3 @@ class TestClass():
         mint.reset()
         mint.peaklist_files = 'tests/data/peaklist_v0.csv'
         assert mint.run() is None
-        
