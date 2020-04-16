@@ -74,7 +74,7 @@ Layout = html.Div(
         html.A(html.Button('Export', id='B_export'), href="export"),
         
         # Progress bar
-        dcc.Interval(id="progress-interval", n_intervals=0, interval=5000, disabled=False),
+        dcc.Interval(id="progress-interval", n_intervals=0, interval=100, disabled=False),
         dbc.Progress(id="progress-bar", value=0),
         html.Div(id='progress', children=[], style=info_style),
         

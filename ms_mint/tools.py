@@ -257,13 +257,16 @@ def process(args):
         q = args['queue']
         q.put('filename')
     cols = ['retentionTime', 'm/z array', 'intensity array']
-    df = ms_file_to_df(filename=filename)[cols]
-
+    try:
+        df = ms_file_to_df(filename=filename)[cols]
+    except:
+        return None
     results = integrate_peaks(df, peaklist)
     results['ms_file'] = filename
     results['ms_path'] = os.path.dirname(filename)
     results['file_size'] = os.path.getsize(filename) / 1024 / 1024
     results['intensity_sum'] = df['intensity array'].sum()
+    
     return results[MINT_RESULTS_COLUMNS]
 
 
