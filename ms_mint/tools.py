@@ -260,7 +260,7 @@ def process(args):
     try:
         df = ms_file_to_df(filename=filename)[cols]
     except:
-        return None
+        return pd.DataFrame()
     results = integrate_peaks(df, peaklist)
     results['ms_file'] = filename
     results['ms_path'] = os.path.dirname(filename)
