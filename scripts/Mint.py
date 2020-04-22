@@ -1,22 +1,39 @@
 #!/usr/bin/env python
 
+import os
 import sys
+import subprocess
+import multiprocessing
+
 import pandas as pd
 from os.path import isfile
 from glob import glob
 
 import ms_mint
 from ms_mint.dash_gui import app, mint
-import multiprocessing
-import os
 
 
 if __name__ == '__main__':
+    
+    url = 'http://localhost:9999'
+    
     if os.name == 'nt':
-        print('On windows')
         # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
         multiprocessing.freeze_support()
-    
+        
+    if sys.platform in ['win32', 'nt']:
+        os.startfile(url)
+        
+    elif sys.platform=='darwin':
+        subprocess.Popen(['open', url])
+        
+    else:
+        try:
+            subprocess.Popen(['xdg-open', url])
+        except OSError:
+            print('Please open a browser on: ', url)
+
+
     args = sys.argv
     
     if '--version' in args:
@@ -46,5 +63,6 @@ if __name__ == '__main__':
             assert isfile(i)
         for i in mint.peaklist_files:
             assert isfile(i)
+
 
     app.run_server(debug=DEBUG, port=9999)
