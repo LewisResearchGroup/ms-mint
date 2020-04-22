@@ -42,7 +42,10 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
     # Create sub-plots
     for label_i, label in enumerate(labels):
         for file_i, file in enumerate(files):
-            data = res.loc[(label, file), 'peak_shape']
+            try:
+                data = res.loc[(label, file), 'peak_shape']
+            except:
+                continue
             if not isinstance(data,  Iterable):
                 continue
             ndx_r = (label_i // n_cols)+1
@@ -87,7 +90,10 @@ def plot_peak_shapes_3d(mint, peak_label, options=None):
    
     samples = []
     for i, fn in enumerate(filenames):
-        sample = data.get_group(fn)['peak_shape'].values[0]
+        try:
+            sample = data.get_group(fn)['peak_shape'].values[0]
+        except:
+            continue
         if not isinstance(sample, Iterable):
             continue
         else:

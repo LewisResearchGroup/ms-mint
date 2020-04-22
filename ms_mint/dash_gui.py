@@ -198,7 +198,7 @@ def get_table(json, label_regex, col_value):
     
     # Don't update without data
     if len(df) == 0:
-        return None, []
+        raise PreventUpdate
     
     # Only show file name, not complete path
     if df['ms_file'].apply(basename).value_counts().max() > 1:
