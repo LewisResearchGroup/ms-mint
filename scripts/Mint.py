@@ -15,26 +15,28 @@ from ms_mint.dash_gui import app, mint
 
 if __name__ == '__main__':
     
+    args = sys.argv
+
     url = 'http://localhost:9999'
     
-    if os.name == 'nt':
-        # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
-        multiprocessing.freeze_support()
-        
-    if sys.platform in ['win32', 'nt']:
-        os.startfile(url)
-        
-    elif sys.platform=='darwin':
-        subprocess.Popen(['open', url])
-        
-    else:
-        try:
-            subprocess.Popen(['xdg-open', url])
-        except OSError:
-            print('Please open a browser on: ', url)
+    if not '--no-browser' in args:
+        if os.name == 'nt':
+            # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
+            multiprocessing.freeze_support()
+            
+        if sys.platform in ['win32', 'nt']:
+            os.startfile(url)
+            
+        elif sys.platform=='darwin':
+            subprocess.Popen(['open', url])
+            
+        else:
+            try:
+                subprocess.Popen(['xdg-open', url])
+            except OSError:
+                print('Please open a browser on: ', url)
 
 
-    args = sys.argv
     
     if '--version' in args:
         print('Mint version:', ms_mint.__version__)
