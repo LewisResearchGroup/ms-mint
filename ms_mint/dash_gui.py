@@ -188,8 +188,9 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus):
      Output('analysis', 'style')],
     [Input('storage', 'children'),
      Input('label-regex', 'value'),
-     Input('table-value-select', 'value')])
-def get_table(json, label_regex, col_value):
+     Input('table-value-select', 'value'),
+     Input('B_reload', 'n_clicks')])
+def get_table(json, label_regex, col_value, clicks):
     df = pd.read_json(json, orient='split')
      
     # Columns to show in frontend    

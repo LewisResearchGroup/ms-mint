@@ -100,6 +100,8 @@ Layout = html.Div(
         
         dcc.Input(id="label-regex", type='text', placeholder="Label Selector"),
         
+        html.Button('Reload', id='B_reload'),
+
                                 
         html.H2("Heatmap"),
         
