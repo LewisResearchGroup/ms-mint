@@ -10,13 +10,13 @@ MINT_ROOT = os.path.dirname(__file__)
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
 
-RESULTS_COLUMNS = ['peak_label', 'peak_area', 'peak_max', 'peak_min', 'peak_median',
+RESULTS_COLUMNS = ['peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'peaklist', 'mz_mean', 'mz_width', 'rt_min', 'rt_max', 
     'intensity_threshold', 'peak_shape']
 
 MINT_RESULTS_COLUMNS = ['peak_label', 'ms_file', 
-    'peak_area', 'peak_max', 'peak_min', 'peak_median',
+    'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'file_size', 'intensity_sum', 'ms_path', 'peaklist', 
     'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold', 'peak_shape']
@@ -55,6 +55,7 @@ def integrate_peaks(ms_data, peaklist):
         results['peak_int_last'] = shape.values[-1]
         results['peak_delta_int'] = results['peak_int_last'] - results['peak_int_first']
         results['peak_rt_of_max'] = shape[shape == peak_max].index
+        results['peak_n_datapoints'] = len(shape)
         
         if len(results['peak_rt_of_max']) > 0:
             results['peak_rt_of_max'] = np.mean(results['peak_rt_of_max'])
@@ -120,14 +121,28 @@ def read_peaklists(filenames):
         if str(file).endswith('.csv'):
             df = pd.read_csv(file, dtype={'peakLabel': str})\
                    .rename(columns=NEW_LABELS)
-            df['peaklist'] = os.path.basename(file)
-            if 'intensity_threshold' not in df.columns:
-                df['intensity_threshold'] = 0
-            df['peak_label'] = df['peak_label'].astype(str)
-            peaklist.append(df[PEAKLIST_COLUMNS])
+        elif str(file).endswith('.xlsx'):
+            df = pd.read_excel(file, dtype={'peakLabel': str})\
+                   .rename(columns=NEW_LABELS)
+        df['peaklist'] = os.path.basename(file)
+        if 'intensity_threshold' not in df.columns:
+            df['intensity_threshold'] = 0
+        df['peak_label'] = df['peak_label'].astype(str)
+        peaklist.append(df[PEAKLIST_COLUMNS])
     peaklist = pd.concat(peaklist)
     peaklist.index = range(len(peaklist))
     return peaklist
+
+
+def format_peaklist(peaklist):
+    for col in ['peak_label']:
+        peaklist[col] = peaklist[col].astype(str)
+    
+    for col in ['mz_mean', 'mz_width', 'rt_min', 
+                'rt_max', 'intensity_threshold']:
+        peaklist[col] = peaklist[col].astype(float)
+    return peaklist
+        
 
 
 def make_peaklabel_unambiguous(peaklist):
@@ -317,3 +332,31 @@ def export_to_excel(mint, filename=None):
 
 def gaus(x,a,x0,sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
+
+
+
+def dataframe_difference(df1, df2, which=None):
+    """Find rows which are different between two DataFrames."""
+    comparison_df = df1.merge(df2,
+                              indicator=True,
+                              how='outer')
+    if which is None:
+        diff_df = comparison_df[comparison_df['_merge'] != 'both']
+    else:
+        diff_df = comparison_df[comparison_df['_merge'] == which]
+    return diff_df
+
+
+def diff_peaklist(old_pklist, new_pklist):
+    df = dataframe_difference(old_pklist, new_pklist)
+    df = df[df['_merge'] == 'right_only']
+    return df.drop('_merge', axis=1)
+
+def remove_all_zero_columns(df):
+    is_zero = df.max() != 0
+    is_zero = is_zero[is_zero].index
+    return df[is_zero]
+
+def sort_columns_by_median(df):
+    cols = df.median().sort_values(ascending=False).index
+    return df[cols]

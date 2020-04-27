@@ -14,25 +14,31 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
     Returns a plotly multiplost of all peak_shapes in mint.results
     grouped by peak_label.
     '''
-    res = mint.results.set_index(['peak_label', 'ms_file'])
+    
+    res = mint.results[mint.results.peak_area > 0]
+    files = list(res.ms_file.drop_duplicates())
+    labels = list(res.peak_label.drop_duplicates())
+    
+    res = res.set_index(['peak_label', 'ms_file'])
     
     if options is None:
         options = []
 
-    files = mint.files
-        
-    if len(biomarkers) == 0:
-        labels = mint.peaklist.peak_label.values
-    else:
+    if len(biomarkers) != 0:
         labels = [str(i) for i in biomarkers]
-        
+            
     # Calculate neccessary number of rows
     n_rows = len(labels)//n_cols
     if n_rows*n_cols < len(labels):
         n_rows += 1
     
-    fig = make_subplots(rows=n_rows, 
-                        cols=n_cols, 
+    print(n_rows, n_cols)
+    print('ms_files:', files)
+    print('peak_labels:', labels)
+    print('Data:', res)
+    
+    fig = make_subplots(rows=max(1, n_rows), 
+                        cols=max(1, n_cols), 
                         subplot_titles=labels)
     if len(files) < 13:
         colors = cl.scales['12']['qual']['Paired']
@@ -48,14 +54,23 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
                 continue
             if not isinstance(data,  Iterable):
                 continue
+            
             ndx_r = (label_i // n_cols)+1
             ndx_c = label_i % n_cols + 1
-
+            
+            print(len(data))
+            
+            if len(data) == 1:
+                mode='markers'
+            else:
+                mode='lines'
+            
             fig.add_trace(
-                go.Scatter(x=data.index, 
+                go.Scatter(
+                        x=data.index, 
                         y=data.values,
                         name=basename(file),
-                        mode='lines',
+                        mode=mode,
                         legendgroup=file_i,
                         showlegend=(label_i == 0),  
                         marker_color=colors[file_i],

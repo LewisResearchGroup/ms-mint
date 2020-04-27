@@ -27,7 +27,8 @@ install_requires = [
     'openpyxl',
     'colorlover',
     'dash-bootstrap-components',
-    'scikit-learn'
+    'scikit-learn',
+    'xlrd'
 ]
 
 config = {
