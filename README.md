@@ -7,7 +7,7 @@ The tool can be used with a browser based graphical user interface (GUI) impleme
 More information on how to install and run the program can be found in the [Documentation](https://soerendip.github.io/ms-mint/).
 
 ## Download Latest release
-For Windows 10 a zip build is provided [here](https://github.com/soerendip/ms-mint/releases/download/v0.0.30/Mint-0.0.30-Windows10.zip)
+For Windows 10 a build is provided [here](https://github.com/soerendip/ms-mint/releases/download/v0.0.30/Mint-0.0.30-Windows10.zip)
 
 Simply, unpack the zip-archive and start `Mint.exe`.
 
