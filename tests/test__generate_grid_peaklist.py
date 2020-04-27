@@ -1,4 +1,4 @@
-from ms_mint import generate_grid_peaklist
+from ms_mint.tools import generate_grid_peaklist
 
 
 def test__generate_peaklist():
