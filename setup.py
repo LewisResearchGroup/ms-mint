@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 install_requires = [
     'pandas>=1',
     'plotly',
-    'lxml',git 
+    'lxml', 
     'matplotlib',
     'pandoc',
     'plotly',
