@@ -31,6 +31,8 @@ from ms_mint.Mint import Mint
 from ms_mint.dash_layout import Layout
 from ms_mint.button_style import button_style
 from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d
+from ms_mint.tools import read_peaklists, PEAKLIST_COLUMNS, format_peaklist,\
+     diff_peaklist, remove_all_zero_columns, sort_columns_by_median
 
 mint = Mint()
 
@@ -38,6 +40,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,
                                                 "https://codepen.io/chriddyp/pen/bWLwgP.css"])
 app.title = 'MINT'
 app.layout = Layout
+
 
 @app.callback(
     [Output("progress-bar", "value"), 
@@ -99,26 +102,93 @@ def update_files_text(n_clicks, n_clicks_clear):
 
 ### Load peaklist files
 @app.callback(
-    [Output('peaklist-text', 'children'),
-     Output('n_peaklist_selected', 'children')],
+    [Output('table-peaklist-container', 'children'),
+     Output('peaklist-div', 'style')],
     [Input('B_peaklists', 'n_clicks'),
-     Input('B_reset', 'value')] )
-def select_peaklist(nc_peaklists, nc_reset):
+     Input('B_reset', 'value'),
+     Input('B_peaklist-add', 'n_clicks'),
+     Input('int-threshold', 'value'),
+     Input('mz-width', 'value')],
+    [State('table-peaklist', 'data')] )
+def select_peaklist(nc_peaklists, nc_reset, add_row, int_thresh, mz_width, data):
+    
     clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
-    if (nc_peaklists is not None) and (not clear):
+    add_row = dash.callback_context.triggered[0]['prop_id'].startswith('B_peaklist-add')   
+    set_thresh = dash.callback_context.triggered[0]['prop_id'].startswith('int-threshold') 
+    set_mzwidth = dash.callback_context.triggered[0]['prop_id'].startswith('mz-width') 
+
+    columns = [{"name": i, "id": i, 
+                "selectable": True}  for i in PEAKLIST_COLUMNS] 
+    
+    if add_row: 
+        defaults = ['', 0 , 0, 0, 0, 0, 'manual']
+        append = {c['id']: d for c,d in zip(columns, defaults)}
+        data.append(append)
+
+    elif set_thresh:
+        data = pd.DataFrame(data)
+        data['intensity_threshold'] = int_thresh
+        data = data.to_dict('records')
+    
+    elif set_mzwidth:
+        data = pd.DataFrame(data)
+        data['mz_width'] = mz_width
+        data = data.to_dict('records')        
+    
+    elif (nc_peaklists is not None) and (not clear):
         root = Tk()
         root.withdraw()
         root.call('wm', 'attributes', '.', '-topmost', True)
         files = filedialog.askopenfilename(multiple=True)
-        files = [i  for i in files if i.endswith('.csv')]
+        files = [i  for i in files if (i.endswith('.csv') or (i.endswith('.xlsx')))]
         if len(files) != 0:
-            mint.peaklist_files = files
+            df = read_peaklists(files)
+            data = df.to_dict('records')
         root.destroy()
-    if len(mint.messages) == 0:
-        return '{} peaklist-files selected.'.format(mint.n_peaklist_files), mint.n_peaklist_files
-    else:
-        return '\n'.join(mint.messages).upper(), -1
+    
+    table = DataTable(
+                id='table-peaklist',
+                columns=columns,
+                data=data,
+                sort_action="native",
+                sort_mode="single",
+                row_selectable=False,
+                row_deletable=True,
+                editable=True,
+                column_selectable=False,
+                selected_rows=[],
+                page_action="native",
+                page_current= 0,
+                page_size= 30,
+                filter_action='native',                
+                style_table={'overflowX': 'scroll'},
+                style_as_list_view=True,
+                style_cell={'padding-left': '5px', 
+                            'padding-right': '5px'},
+                style_header={'backgroundColor': 'white',
+                              'fontWeight': 'bold'},
+                export_format='csv',
+                export_headers='display',
+                merge_duplicate_headers=True
+            )    
 
+    #if len(data) == 0:
+    #    style = {'display': 'none'}
+    #else:
+    style = {'display': 'inline'}   
+    return [table], style 
+
+@app.callback(
+    Output('run-mint-div', 'style'),
+    [Input('table-peaklist', 'data')]
+    )
+def show_run_control(table):
+    if len(table) == 0:
+        style = {'display': 'none'}
+    else:
+        style = {'display': 'inline'}
+    print(len(table))
+    return style
 
 ### Button styles
 @app.callback(
@@ -132,18 +202,18 @@ def select_peaklist(nc_peaklists, nc_reset):
     [Input('B_peaklists', 'n_clicks'),
      Input('B_add_files', 'n_clicks'),
      Input('B_reset', 'n_clicks'),
-     Input('progress-bar', 'value')])
-def run_button_style(nc_peaklists, nc_files, nc_reset, progress):
+     Input('progress-bar', 'value')],
+    [State('table-peaklist', 'data')])
+def run_button_style(nc_peaklists, nc_files, nc_reset, progress, peaklist):
     style_peaklists = button_style('next')
-    style_files     = button_style('wait')    
+    style_files     = button_style('next')    
     style_run       = button_style('wait')
     style_export    = button_style('wait')
     style_heatmap   = button_style('wait')
-    if mint.n_peaklist_files == -1: 
-        style_peaklists = button_style('error')
-    elif mint.n_peaklist_files != 0:
+    if len(peaklist) == 0: 
+        style_peaklists = button_style('next')
+    elif len(peaklist) != 0:
         style_peaklists = button_style('ready')
-        style_files     = button_style('next') 
     if mint.n_files != 0:
         style_files= button_style('ready')
         style_run = button_style('next')
@@ -156,6 +226,7 @@ def run_button_style(nc_peaklists, nc_files, nc_reset, progress):
     return (style_peaklists, style_files, style_run, 
             style_export, style_heatmap, style_heatmap, 
             style_heatmap)
+
 
 ### CPU text
 @app.callback(
@@ -170,14 +241,56 @@ def mint_cpu_info(value):
     Output('storage', 'children'),
     [Input('B_run', 'n_clicks'),
      Input('B_reset', 'value')],
-    [State('n_cpus', 'value')])
-def run_mint(n_clicks, n_clicks_clear, n_cpus):
-    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
-    if mint.status == 'running':
+    [State('n_cpus', 'value'),
+     State('table-peaklist', 'data'),
+     State('storage', 'children')])
+def run_mint(n_clicks, n_clicks_clear, n_cpus, peaklist, old_results):
+    
+    if mint.status == 'running' or len(peaklist) == 0 :
         raise PreventUpdate
+    
+    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
+    
+    peaklist = format_peaklist(pd.DataFrame(peaklist))
+    
+    if old_results is None:
+        mint.peaklist = peaklist
+    else:
+        #old_results = pd.read_json(old_results, orient='split')
+        old_results = mint.results
+        feat_cols = ['peak_label', 'mz_mean', 'mz_width', 
+                     'rt_min', 'rt_max', 'intensity_threshold', 
+                     'peaklist']
+        
+        old_peaklist_features = format_peaklist(old_results[feat_cols].drop_duplicates())
+        new_peak_list_features = format_peaklist(peaklist[feat_cols].drop_duplicates())
+    
+        diff = diff_peaklist(old_peaklist_features, 
+                             new_peak_list_features)
+        print('Run with:')
+        print(diff)
+        if len(diff) == 0:
+            raise PreventUpdate
+        mint.peaklist = diff
+        
     if (n_clicks is not None) and (not clear):
         mint.run(nthreads=n_cpus)
-    return mint.results.to_json(orient='split')
+    
+    
+    # Update results data with new data
+    if old_results is None:
+        new_results = mint.results
+    else:
+        old_results = old_results.set_index(['peak_label', 'ms_file'])
+        new_results = mint.results.set_index(['peak_label', 'ms_file'])
+
+        old_results = old_results.drop(new_results.index, errors='ignore')
+        
+        new_results = pd.concat([old_results, new_results]).reset_index()
+    
+        mint.results = new_results
+        
+    return new_results.to_json(orient='split')
 
 
 ### Data Table
@@ -185,7 +298,7 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus):
     [Output('run-out', 'children'),
      Output('peak-select', 'options'),
      Output('peakshapes-selection', 'options'),
-     Output('analysis', 'style')],
+     Output('results-div', 'style')],
     [Input('storage', 'children'),
      Input('label-regex', 'value'),
      Input('table-value-select', 'value'),
@@ -193,9 +306,12 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus):
 def get_table(json, label_regex, col_value, clicks):
     df = pd.read_json(json, orient='split')
      
+    print(df.peak_shape)
+    
     # Columns to show in frontend    
     cols = ['Label', 'peak_label', 'peak_area', 'peak_max', 'peak_min',
-            'peak_median', 'peak_mean', 'file_size', 'peak_delta_int', 'peak_rt_of_max']     
+            'peak_median', 'peak_mean', 'file_size', 'peak_delta_int',
+            'peak_rt_of_max', 'peak_n_datapoints']     
     
     # Don't update without data
     if len(df) == 0:
@@ -214,14 +330,17 @@ def get_table(json, label_regex, col_value, clicks):
         
     # Extract names of biomarkers for other fontend elements
     # before reducing it to frontend version
-    biomarkers = df.peak_label.drop_duplicates().sort_values().values        
+    biomarkers = df.peak_label.astype(str).drop_duplicates().sort_values().values        
     biomarker_options = [ {'label': i, 'value': i} for i in biomarkers]
     
     # Order dataframe columns               
     df = df[cols]
     
     if col_value != 'full':
-        df = pd.crosstab(df.peak_label, df.Label, df[col_value], aggfunc=np.mean).astype(np.float64).T
+        df = pd.crosstab(df.peak_label, df.Label, df[col_value].astype(np.float64), aggfunc=np.mean).T
+        df = df.loc[:, (df != 0).any(axis=0)]  # remove columns with only zeros
+        df = remove_all_zero_columns(df)
+        df = sort_columns_by_median(df)
         if col_value in ['peakArea']:
             df = df.round(0)
         df.reset_index(inplace=True)
@@ -231,7 +350,9 @@ def get_table(json, label_regex, col_value, clicks):
         
     table = DataTable(
                 id='table',
-                columns=[{"name": i, "id": i, "selectable": True} for i in df.columns],
+                columns=[{"name": i, "id": i, 
+                          "selectable": True,
+                          "deletable": True} for i in df.columns],
                 data=df.to_dict('records'),
                 sort_action="native",
                 sort_mode="single",
@@ -245,11 +366,12 @@ def get_table(json, label_regex, col_value, clicks):
                 style_table={'overflowX': 'scroll'},
                 style_as_list_view=True,
                 style_cell={'padding': '5px'},
+                filter_action='native',
                 style_header={'backgroundColor': 'white',
                               'fontWeight': 'bold'},
             )
     
-    analysis_style = {'display': 'inline'}
+    analysis_style = {}
     
     return table, biomarker_options, biomarker_options, analysis_style
 
@@ -388,7 +510,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
 
 
 # PEAKEXPLORER
-@lru_cache(maxsize=32)
+# @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape', 'figure'),
     [Input('B_shapes', 'n_clicks')],
@@ -434,6 +556,7 @@ def return_messave(value):
 def download_csv():
     file_buffer = io.BytesIO()
     writer = pd.ExcelWriter(file_buffer) #, engine='xlsxwriter')
+    mint.peaklist.to_excel(writer, 'Peaklist', index=False)    
     mint.results.to_excel(writer, 'Results Complete', index=False)
     mint.crosstab().T.to_excel(writer, 'PeakArea Summary', index=True)
     meta = pd.DataFrame({'Version': [mint.version], 
