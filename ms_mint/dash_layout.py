@@ -139,7 +139,6 @@ Layout = html.Div(
                         
                         html.Div(style={'padding': 50}),
                                 
-
                         html.H2("Peak Shapes"),
                         
                         dcc.Dropdown(id='peakshapes-selection',

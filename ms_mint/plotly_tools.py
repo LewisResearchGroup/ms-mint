@@ -57,9 +57,7 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
             
             ndx_r = (label_i // n_cols)+1
             ndx_c = label_i % n_cols + 1
-            
-            print(len(data))
-            
+                        
             if len(data) == 1:
                 mode='markers'
             else:

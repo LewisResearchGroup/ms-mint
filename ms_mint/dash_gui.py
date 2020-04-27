@@ -309,9 +309,9 @@ def get_table(json, label_regex, col_value, clicks):
     print(df.peak_shape)
     
     # Columns to show in frontend    
-    cols = ['Label', 'peak_label', 'peak_area', 'peak_max', 'peak_min',
+    cols = ['Label', 'peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min',
             'peak_median', 'peak_mean', 'file_size', 'peak_delta_int',
-            'peak_rt_of_max', 'peak_n_datapoints']     
+            'peak_rt_of_max']     
     
     # Don't update without data
     if len(df) == 0:
