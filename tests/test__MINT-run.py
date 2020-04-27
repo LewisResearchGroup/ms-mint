@@ -1,4 +1,4 @@
-from ms_mint import Mint
+from ms_mint.Mint import Mint
 
 def test__run_skips_broken_files():
     mint = Mint()
