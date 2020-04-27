@@ -1,7 +1,7 @@
-# Running Mint
+# The MINT GUI
 The app's frontend is build using [Plotly-Dash](https://plot.ly/dash/) and runs locally in a browser. Thought, the Python functions provided can be imported and used in any Python project independently. The GUI is under active development and might be changed in the future.
 
-![GUI](./docs/image/mint-overview.png "The GUI")
+![GUI](image/mint-overview.png "The GUI")
 
 ## Select Peaklist File(s)
 A user defined peaklist can be selected and used with the `SELECT PEAKLIST FILE(S)` button. Peaklists are explained in more detail [here](index.md#peaklists).

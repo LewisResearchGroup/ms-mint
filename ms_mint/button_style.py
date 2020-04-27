@@ -1,6 +1,6 @@
 def button_style(style_name=None, **kwargs):
         style = {'color': 'black', 
-                 'margin-right': 20, 
+                 'margin-right': 5, 
                  'margin-bottom': '1.5em',
                  'background-color': 'lightgrey'}
         

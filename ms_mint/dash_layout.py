@@ -16,8 +16,8 @@ from .button_style import button_style
 n_cpus = cpu_count()
 
 slider_style = {'marginBottom': '3em'}
-info_style =   {'margin-top': 10, 'margin-bottom': 10, 'margin-left': 10,
-                'display': 'inline-block', 'float': 'right', 'color': 'grey'}
+info_style =   {'margin-top': 'auto', 'margin-bottom': 10, 'margin-left': 'auto',
+                'display': 'inline', 'float': 'right', 'color': 'grey'}
 
 
 ISSUE_TEXT = f'''
@@ -42,9 +42,12 @@ Layout = html.Div(
         #html.Button('Load', id='B_load', style=button_style('neutral')),
         html.Button('Reset', id='B_reset', style=button_style('warn')),
         
-        
+        html.A(href=f'https://soerendip.github.io/ms-mint/', 
+               children=[html.Button('Help', id='B_help', style=button_style('help', float="right"))],
+               target="_blank"), 
+               
         html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
-               children=[html.Button('Help / Issues', id='B_help', style=button_style('help', float="right"))],
+               children=[html.Button('Issues', id='B_issues', style=button_style('help', float="right"))],
                target="_blank"),
 
         html.Br(),
