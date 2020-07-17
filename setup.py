@@ -19,7 +19,7 @@ install_requires = [
     'plotly',
     'plotly_express',
     'dash',
-    'scipy=1.4',
+    'scipy==1.4',
     'setuptools',
     'statsmodels',
     'flask',
