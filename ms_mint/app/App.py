@@ -1,4 +1,3 @@
-
 import io
 
 import numpy as np
@@ -27,20 +26,23 @@ import plotly.figure_factory as ff
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
-from ms_mint.Mint import Mint
-from ms_mint.dash_layout import Layout
-from ms_mint.button_style import button_style
+from ..Mint import Mint
+from .Layout import Layout
+from .button_style import button_style
 from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d
 from ms_mint.tools import read_peaklists, PEAKLIST_COLUMNS, format_peaklist,\
      diff_peaklist, remove_all_zero_columns, sort_columns_by_median
 
 mint = Mint()
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, 
-                                                "https://codepen.io/chriddyp/pen/bWLwgP.css"])
+app = dash.Dash(__name__, external_stylesheets=[
+    dbc.themes.BOOTSTRAP, 
+    "https://codepen.io/chriddyp/pen/bWLwgP.css"
+                                                ])
 app.title = 'MINT'
 app.layout = Layout
 
+app.config['suppress_callback_exceptions']=True
 
 @app.callback(
     [Output("progress-bar", "value"), 
@@ -100,22 +102,31 @@ def update_files_text(n_clicks, n_clicks_clear):
     return '{} data files selected.'.format(mint.n_files), mint.n_files
 
 
-### Load peaklist files
+### Edit peaklist
 @app.callback(
     [Output('table-peaklist-container', 'children'),
      Output('peaklist-div', 'style')],
     [Input('B_peaklists', 'n_clicks'),
      Input('B_reset', 'value'),
-     Input('B_peaklist-add', 'n_clicks'),
+     Input('B_add_peak', 'n_clicks'),
+     Input('B_detect_peaks', 'n_clicks'),
+     Input('B_clear_peaklist', 'n_clicks'),
      Input('int-threshold', 'value'),
      Input('mz-width', 'value')],
-    [State('table-peaklist', 'data')] )
-def select_peaklist(nc_peaklists, nc_reset, add_row, int_thresh, mz_width, data):
-    
-    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
-    add_row = dash.callback_context.triggered[0]['prop_id'].startswith('B_peaklist-add')   
-    set_thresh = dash.callback_context.triggered[0]['prop_id'].startswith('int-threshold') 
-    set_mzwidth = dash.callback_context.triggered[0]['prop_id'].startswith('mz-width') 
+    [State('table-peaklist', 'data')])
+def select_peaklist(nc_peaklists, nc_reset, add_row, detect_peaks,
+                    clear_peaklist, int_thresh, mz_width, data):
+    clear = None
+    if len( dash.callback_context.triggered ) == 0:
+        set_thresh = False
+        set_mzwidth = False
+    else:
+        clear = ( dash.callback_context.triggered[0]['prop_id'].startswith('B_reset') or 
+                  dash.callback_context.triggered[0]['prop_id'].startswith('B_clear_peaklist') )
+        add_row = dash.callback_context.triggered[0]['prop_id'].startswith('B_peaklist-add')   
+        set_thresh = dash.callback_context.triggered[0]['prop_id'].startswith('int-threshold') 
+        set_mzwidth = dash.callback_context.triggered[0]['prop_id'].startswith('mz-width') 
+        detect_peaks = dash.callback_context.triggered[0]['prop_id'].startswith('B_detect_peaks')
 
     columns = [{"name": i, "id": i, 
                 "selectable": True}  for i in PEAKLIST_COLUMNS] 
@@ -124,6 +135,11 @@ def select_peaklist(nc_peaklists, nc_reset, add_row, int_thresh, mz_width, data)
         defaults = ['', 0 , 0, 0, 0, 0, 'manual']
         append = {c['id']: d for c,d in zip(columns, defaults)}
         data.append(append)
+    
+    elif detect_peaks:
+        mint.detect_peaks()
+        peaklist = mint.peaklist
+        data = peaklist.to_dict('records')
 
     elif set_thresh:
         data = pd.DataFrame(data)
@@ -133,8 +149,12 @@ def select_peaklist(nc_peaklists, nc_reset, add_row, int_thresh, mz_width, data)
     elif set_mzwidth:
         data = pd.DataFrame(data)
         data['mz_width'] = mz_width
-        data = data.to_dict('records')        
+        data = data.to_dict('records')
     
+    elif clear:
+        mint.clear_peaklist()
+        data = mint.peaklist.to_dict('records')
+
     elif (nc_peaklists is not None) and (not clear):
         root = Tk()
         root.withdraw()
@@ -304,6 +324,9 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus, peaklist, old_results):
      Input('table-value-select', 'value'),
      Input('B_reload', 'n_clicks')])
 def get_table(json, label_regex, col_value, clicks):
+    if json is None:
+        raise PreventUpdate
+
     df = pd.read_json(json, orient='split')
      
     print(df.peak_shape)
@@ -433,12 +456,12 @@ def plot_0(n_clicks, options, ndxs, data, column):
         df = df.iloc[Z,:]
         if 'corr' in options:
             df = df[df.index]
-            
-        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index)
+        print('Index', df.index)    
+        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list())
 
     heatmap = go.Heatmap(z=df.values,
                          x=df.columns,
-                         y=df.index,
+                         y=df.index.to_list(),
                          colorscale = colorscale)
     
     title = f'{plot_type} of {",".join(plot_attributes)} {column}'
@@ -525,7 +548,6 @@ def plot_1(n_clicks, n_cols, options, biomarkers):
         raise PreventUpdate
     return new_fig
 
-
 @lru_cache(maxsize=32)
 @app.callback(
     Output('peakShape3d', 'figure'),
@@ -570,4 +592,3 @@ def download_csv():
                      attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
                      as_attachment=True,
                      cache_timeout=0)
-

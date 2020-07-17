@@ -11,6 +11,8 @@ from .tools import read_peaklists, process,\
     check_peaklist, export_to_excel,\
     MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
 
+from .peak_detection import OpenMSPeakDetection
+
 import ms_mint
 
 class Mint(object):
@@ -21,6 +23,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print('Mint Version:', self.version , '\n')
+        self.peak_detector = OpenMSPeakDetection()
 
     @property
     def verbose(self):
@@ -44,6 +47,9 @@ class Mint(object):
         self.runtime = None
         self._status = 'waiting'
         self._messages = []
+
+    def clear_peaklist(self):
+        self._peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
 
     def run(self, nthreads=None, mode='standard'):
         '''
@@ -93,6 +99,11 @@ class Mint(object):
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
         self._status = 'done'
+
+    def detect_peaks(self):
+        detected = self.peak_detector.fit_transform(self.files)
+        if detected is not None:
+            self.peaklist = pd.concat([self.peaklist, detected])
 
     def run_parallel(self, nthreads=1, mode='standard'):
         pool = Pool(processes=nthreads)
@@ -179,6 +190,7 @@ class Mint(object):
     def peaklist(self, peaklist):
         errors = check_peaklist(peaklist)
         if len(errors) != 0:
+            peaklist = peaklist.drop_duplicates()
             error_string = '\n'.join(errors)
             if self.verbose:
                 print(f'Errors in peaklist:\n{error_string}')

@@ -10,7 +10,7 @@ from os.path import isfile
 from glob import glob
 
 import ms_mint
-from ms_mint.dash_gui import app, mint
+from ms_mint.app.App import app, mint
 
 
 if __name__ == '__main__':

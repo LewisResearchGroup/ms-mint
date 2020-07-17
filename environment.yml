@@ -4,24 +4,85 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - lxml
-  - numpy
-  - matplotlib
-  - pandas
-  - pandoc
-  - pip
-  - plotly
-  - plotly_express
-  - dash
-  - dash-bootstrap-components
-  - pyqt
+  - blas=1.0
+  - ca-certificates=2020.6.20
+  - certifi=2020.6.20
+  - click=7.1.2
+  - cycler=0.10.0
+  - dash=1.13.4
+  - dash-bootstrap-components=0.10.3
+  - dash-core-components=1.10.1
+  - dash-html-components=1.0.3
+  - dash-renderer=1.5.1
+  - dash-table=4.8.1
+  - flask=1.1.2
+  - flask-compress=1.4.0
+  - freetype=2.10.2
+  - future=0.18.2
+  - icc_rt=2019.0.0
+  - icu=64.2
+  - intel-openmp=2019.4
+  - itsdangerous=1.1.0
+  - jinja2=2.11.2
+  - jpeg=9d
+  - kiwisolver=1.2.0
+  - libblas=3.8.0
+  - libcblas=3.8.0
+  - libclang=9.0.1
+  - libiconv=1.15
+  - liblapack=3.8.0
+  - libpng=1.6.37
+  - libxml2=2.9.10
+  - libxslt=1.1.33
+  - lxml=4.5.2
+  - markupsafe=1.1.1
+  - matplotlib=3.2.2
+  - matplotlib-base=3.2.2
+  - mkl=2019.4
+  - mkl-service=2.3.0
+  - numpy=1.18.5
+  - openssl=1.1.1g
+  - pandas=1.0.5
+  - patsy=0.5.1
+  - pip=20.1.1
+  - plotly=4.8.2
+  - plotly_express=0.4.1
+  - pyparsing=2.4.7
+  - pyqt=5.12.3
   - python=3.7.2
-  - scipy
-  - setuptools
-  - sqlite
-  - statsmodels
+  - python-dateutil=2.8.1
+  - python_abi=3.7
+  - pytz=2020.1
+  - pyyaml=5.3.1
+  - qt=5.12.5
+  - retrying=1.3.3
+  - scipy=1.5.0
+  - setuptools=49.2.0
+  - six=1.15.0
+  - sqlite=3.32.3
+  - statsmodels=0.11.1
+  - tornado=6.0.4
+  - vc=14.1
+  - vs2015_runtime=14.16.27012
+  - werkzeug=1.0.1
+  - wheel=0.34.2
+  - wincertstore=0.2
+  - yaml=0.2.5
+  - zlib=1.2.11
   - pip:
+    - colorlover==0.3.0
+    - et-xmlfile==1.0.1
+    - jdcal==1.4.1
+    - joblib==0.16.0
     - openpyxl==2.6.0
+    - pandoc==1.0.2
+    - ply==3.11
+    - pyqt5-sip==4.19.18
+    - pyqtchart==5.12
+    - pyqtwebengine==5.12.1
     - pyteomics==4.0.1
-    - colorlover
+    - scikit-learn==0.23.1
+    - threadpoolctl==2.1.0
+    - xlrd==1.2.0
+prefix: C:\Users\soere\miniconda3\envs\ms-mint
 
