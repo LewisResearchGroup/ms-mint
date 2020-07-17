@@ -28,7 +28,8 @@ install_requires = [
     'colorlover',
     'dash-bootstrap-components',
     'scikit-learn',
-    'xlrd'
+    'xlrd',
+    'ipywidgets'
 ]
 
 config = {

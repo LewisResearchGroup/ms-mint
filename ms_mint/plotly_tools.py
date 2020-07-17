@@ -9,7 +9,7 @@ from os.path import basename
 from plotly.subplots import make_subplots
 
 
-def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
+def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None, verbose=False):
     '''
     Returns a plotly multiplost of all peak_shapes in mint.results
     grouped by peak_label.
@@ -17,7 +17,7 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
     
     res = mint.results[mint.results.peak_area > 0]
     files = list(res.ms_file.drop_duplicates())
-    labels = list(res.peak_label.drop_duplicates())
+    labels = list(mint.peaklist.peak_label.drop_duplicates())
     
     res = res.set_index(['peak_label', 'ms_file'])
     
@@ -32,10 +32,11 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None):
     if n_rows*n_cols < len(labels):
         n_rows += 1
     
-    print(n_rows, n_cols)
-    print('ms_files:', files)
-    print('peak_labels:', labels)
-    print('Data:', res)
+    if verbose:
+        print(n_rows, n_cols)
+        print('ms_files:', files)
+        print('peak_labels:', labels)
+        print('Data:', res)
     
     fig = make_subplots(rows=max(1, n_rows), 
                         cols=max(1, n_cols), 
