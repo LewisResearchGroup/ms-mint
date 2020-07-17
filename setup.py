@@ -19,7 +19,7 @@ install_requires = [
     'plotly',
     'plotly_express',
     'dash',
-    'scipy',
+    'scipy=1.4',
     'setuptools',
     'statsmodels',
     'flask',
@@ -29,7 +29,8 @@ install_requires = [
     'dash-bootstrap-components',
     'scikit-learn',
     'xlrd',
-    'ipywidgets'
+    'ipywidgets',
+    'pyopenms'
 ]
 
 config = {
