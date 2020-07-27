@@ -11,7 +11,7 @@ More information on how to install and run the program can be found in the [Docu
 
 
 ## Download Latest release
-For Windows 10 a build is provided [here](https://github.com/soerendip/ms-mint/releases/download/v0.0.30/Mint-0.0.30-Windows10.zip)
+For Windows 10 a build is provided [here](https://github.com/soerendip/ms-mint/releases/latest)
 
 Simply, unpack the zip-archive and start `Mint.exe`. Then navigate to http://localhost:9999 if the browser does not open automatically.
 
