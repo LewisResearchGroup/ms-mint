@@ -7,21 +7,18 @@ from ipywidgets import Button, HBox, VBox, Textarea,\
 from ipywidgets import IntProgress as Progress
 
 from .SelectFilesButton import SelectFilesButton
-from .Mint import Mint
+from .Mint import Mint as MintBase
 from .plotly_tools import plot_peak_shapes
+from copy import copy
 
+class Mint(MintBase):
+    def __init__(self):
+        super().__init__() 
 
-class JupyterGUI():
-    def __init__(self, mint=None):
-        
-        if mint is None:
-            self._mint = Mint()
-        else:
-            self._mint = mint
-        
         self.ms_files_button = SelectFilesButton(text='Select MS-files', callback=self.list_files)
         self.peaklist_files_button = SelectFilesButton(text='Peaklist', callback=self.list_files)
-        
+        self.detect_peaks_button = Button(description="Detect Peaks", callback=self.detect_peaks)
+
         self.message_box = Textarea(
             value='',
             placeholder='Please select some files and click on Run.',
@@ -40,88 +37,66 @@ class JupyterGUI():
         self.download_button.style.button_color = 'lightgray'
 
         self._results = None
-        self.progress = Progress(min=0, max=100, layout=Layout(width='90%'), 
+        self.progress_bar = Progress(min=0, max=100, layout=Layout(width='90%'), 
                                  description='Progress:', bar_style='info')
+
         self.output = widgets.Output()
-        self.mint.progress_callback = self.set_progress
+        self.progress_callback = self.set_progress
 
     def show(self):
         return VBox([
                     HBox([self.peaklist_files_button,
-                          self.ms_files_button, 
+                          self.ms_files_button,
+                          self.detect_peaks_button,
                            ]),
                     self.message_box,
                     HBox([self.run_button, 
                           self.download_button]),
-                    self.progress                    
+                    self.progress_bar                  
                 ])
             
     def list_files(self, b=None):
         text = 'mzXML files to process:\n'
-        self.mint.files = [i for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
+        [self.files.append(i) for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
         try:
-            self.mint.peaklist_files = [i for i in self.peaklist_files_button.files]
+            [self.peaklist_files.append(i) for i in self.peaklist_files_button.files]
         except:
             pass
-        for i, line in enumerate(self.mint.files):
+        for i, line in enumerate(self.files):
             text += line+'\n'
             if i > 10:
                 line+'...\n'
                 break
         text += '\nUsing peak list:\n'
-        if len(self.mint.peaklist_files) != 0:
-            text += '\n'.join([str(i) for i in self.mint.peaklist_files])
+        if len(self.peaklist_files) != 0:
+            text += '\n'.join([str(i) for i in self.peaklist_files])
         else:
             text += '\nNo peaklist defined.'
         self.message_box.value = text
-        if (self.mint.n_files != 0) and (self.mint.n_peaklist_files != 0):
+        if (self.n_files != 0) and (self.n_peaklist_files != 0):
             self.run_button.style.button_color = 'lightgreen'
         else:
             self.run_button.style.button_color = 'lightgray'
        
     def run(self, b=None, **kwargs):
-        self.mint.progress = 0
-        self.mint.run(**kwargs)
+        self.progress = 0
+        super(Mint, self).run(**kwargs)
         self.message_box.value += f'\n\nDone processing.'
-        if self.mint.results is not None:
+        if self.results is not None:
             self.download_button.style.button_color = 'lightgreen'
+    
+    def detect_peaks(self):
+        self.message_box.value += f'\n\nRun peak detection.'
+        self.progress_bar.value = 50
+        super(Mint, self).detect_peaks()
+        self.progress_bar.value = 100
 
     def set_progress(self, value):
-        self.progress.value = value
+        self.progress_bar.value = value
     
     def export(self, b):
         home = os.getenv("HOME")
         filename = os.path.join(home, 'MINT_output.xlsx')
-        self.mint.export(filename)
+        super(Mint, self).export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
-    
-    @property
-    def peaklist_files(self):
-        self.mint.peaklist_files
-        
-    @peaklist_files.setter
-    def peaklist_files(self, value):
-        self.mint.peaklist_files = value
 
-    @property
-    def files(self):
-        self.mint.files
-        
-    @files.setter
-    def files(self, value):
-        self.mint.files = value
-                    
-    @property
-    def results(self):
-        return self.mint.results
-    
-    @property
-    def crosstab(self):
-        return self.mint.crosstab    
-       
-    def plot_peak_shapes(self, **kwargs):
-        return plot_peak_shapes(self.mint, **kwargs)
-    
-    @property
-    def mint(self):
-        return self._mint
