@@ -112,23 +112,22 @@ class Mint(MintBase):
         super(Mint, self).export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
         
-    def plot_clustering(self, title=None, figsize=(8,8), vmin=-3, vmax=3, xnbins=50, ynbins=50):
+    def plot_clustering(self, data=None, title=None, figsize=(8,8), vmin=-3, vmax=3, xnbins=50, ynbins=50):
         simplefilter("ignore", ClusterWarning)
-        tmp = self.crosstab().apply(np.log1p)
-        tmp.columns = [os.path.basename(i) for i in tmp.columns]        
-        cols_bi = tmp.columns[ tmp.columns.str.contains('BI_') ]
-        tmp = tmp[cols_bi]
-        tmp = ((tmp.T - tmp.T.mean()) / tmp.T.std())
+        if data is None:
+            data = self.crosstab().apply(np.log1p)
+        data.columns = [os.path.basename(i) for i in data.columns]        
+        data = ((data.T - data.T.mean()) / data.T.std())
         self.clustered, fig = hierarchical_clustering( 
-            tmp, vmin=vmin, vmax=vmax, figsize=figsize )
-        ax= gca()
+            data, vmin=vmin, vmax=vmax, figsize=figsize )
+        ax = plt.gca()
         ax.yaxis.tick_right()
         ax.xaxis.tick_bottom()
 
-        _ = yticks(range(len(mint.clustered)), mint.clustered.index)
-        _ = xticks(range(len(mint.clustered.columns)), mint.clustered.columns, rotation=90)
+        _ = plt.yticks(range(len(mint.clustered)), mint.clustered.index)
+        _ = plt.xticks(range(len(mint.clustered.columns)), mint.clustered.columns, rotation=90)
 
-        pyplot.locator_params(axis='x', nbins=xnbins)
-        pyplot.locator_params(axis='y', nbins=ynbins)            
+        plt.locator_params(axis='x', nbins=xnbins)
+        plt.locator_params(axis='y', nbins=ynbins)            
         return fig
 
