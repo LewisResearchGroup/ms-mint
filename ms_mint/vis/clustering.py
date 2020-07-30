@@ -16,7 +16,7 @@ def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8)):
     cmap = cm.rainbow(np.linspace(0, 0, 1))
     hierarchy.set_link_color_palette([mpl.colors.rgb2hex(rgb[:3]) for rgb in cmap])
     
-    dm = df.values
+    dm = df.fillna(0).values
     D1 = squareform(pdist(dm, metric='euclidean'))
     D2 = squareform(pdist(dm.T, metric='euclidean'))
     fig = plt.figure(figsize=figsize)
