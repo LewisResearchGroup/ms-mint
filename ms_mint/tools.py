@@ -20,14 +20,14 @@ def example_results():
 RESULTS_COLUMNS = ['peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'peaklist', 'mz_mean', 'mz_width', 'rt_min', 'rt_max', 
-    'intensity_threshold', 'peak_shape', 'peak_shape_rt', 'peak_shape_int']
+    'intensity_threshold', 'peak_shape_rt', 'peak_shape_int']
 
 
 MINT_RESULTS_COLUMNS = ['peak_label', 'ms_file', 
     'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'file_size', 'intensity_sum', 'ms_path', 'peaklist', 
-    'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold', 'peak_shape',
+    'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold',
     'peak_shape_rt', 'peak_shape_int'
     ]
 
@@ -57,7 +57,7 @@ def integrate_peaks(ms_data, peaklist):
 
         results['peak_shape']  = shape
         results['peak_shape_rt'] = shape.index.to_list()
-        results['peak_shape_int'] = [shape.values]
+        results['peak_shape_int'] = shape.values
         results['peak_area']   = peak_area
         results['peak_max']    = peak_max
         results['peak_min']    = peak_min
@@ -331,7 +331,7 @@ def export_to_excel(mint, filename=None):
     # Write into file
     mint.results.to_excel(writer, 'MINT', index=False)
     mint.peaklist.to_excel(writer, 'Peaklist', index=False)
-    mint.crosstab().T.to_excel(writer, 'PeakArea', index=True)
+    #mint.crosstab().T.to_excel(writer, 'PeakArea', index=True)
     meta = pd.DataFrame({'MINT_version': [mint.version], 
                          'Date': [date_string]}).T[0]
     meta.to_excel(writer, 'Metadata', index=True, header=False)

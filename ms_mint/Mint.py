@@ -205,7 +205,7 @@ class Mint(object):
     
     @results.setter
     def results(self, df):
-        self._results = df
+        self._results = df.dropna()
 
     @property
     def rt_projections(self):
