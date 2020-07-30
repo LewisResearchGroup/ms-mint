@@ -1,15 +1,22 @@
 import os
+import numpy as np
 import ipywidgets as widgets
+import seaborn as sns
 
+from copy import copy
 from ipywidgets import Button, HBox, VBox, Textarea,\
     Layout
 
 from ipywidgets import IntProgress as Progress
+from matplotlib import pyplot as plt 
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
 from .plotly_tools import plot_peak_shapes
-from copy import copy
+from .vis.clustering import hierarchical_clustering
+
+from scipy.cluster.hierarchy import ClusterWarning
+from warnings import simplefilter
 
 class Mint(MintBase):
     def __init__(self):
@@ -55,6 +62,11 @@ class Mint(MintBase):
                     self.progress_bar                  
                 ])
             
+    def files(self, files):
+        super(Mint, self).files = files
+        self.ms_files_button.files = files
+        self.list_files()
+
     def list_files(self, b=None):
         text = 'mzXML files to process:\n'
         [self.files.append(i) for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
@@ -99,4 +111,15 @@ class Mint(MintBase):
         filename = os.path.join(home, 'MINT_output.xlsx')
         super(Mint, self).export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
+        
+    def plot_clustering(self, title=None, figsize=(8,8), vmin=-3, vmax=3):
+        simplefilter("ignore", ClusterWarning)
+        tmp = self.crosstab().apply(np.log1p)
+        tmp.columns = [os.path.basename(i) for i in tmp.columns]        
+        cols_bi = tmp.columns[ tmp.columns.str.contains('BI_') ]
+        tmp = tmp[cols_bi]
+        tmp = ((tmp.T - tmp.T.mean()) / tmp.T.std())
+        self.clustered, fig = hierarchical_clustering( 
+            tmp, vmin=vmin, vmax=vmax, figsize=figsize )
+        return fig
 
