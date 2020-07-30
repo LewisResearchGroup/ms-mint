@@ -124,8 +124,8 @@ class Mint(MintBase):
         ax.yaxis.tick_right()
         ax.xaxis.tick_bottom()
 
-        _ = plt.yticks(range(len(mint.clustered)), mint.clustered.index)
-        _ = plt.xticks(range(len(mint.clustered.columns)), mint.clustered.columns, rotation=90)
+        _ = plt.yticks(range(len(self.clustered)), mint.clustered.index)
+        _ = plt.xticks(range(len(self.clustered.columns)), mint.clustered.columns, rotation=90)
 
         plt.locator_params(axis='x', nbins=xnbins)
         plt.locator_params(axis='y', nbins=ynbins)            
