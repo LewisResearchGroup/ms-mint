@@ -30,3 +30,9 @@ Then the GUI can be started with
 
 Then navigate to http://localhost:9999 if the browser does not open automatically.
 
+
+### From source and creating windows executable
+
+    git clone ...
+    pip install -e . 
+    pyinstaller --one-dir specfiles\Mint__onedir__.spec
