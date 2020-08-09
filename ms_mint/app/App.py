@@ -20,18 +20,15 @@ from dash.exceptions import PreventUpdate
 from dash_table import DataTable
 import dash_html_components as html
 
-import plotly.graph_objects as go
-import plotly.figure_factory as ff
-
-from scipy.cluster.hierarchy import linkage, dendrogram
-from scipy.spatial.distance import pdist, squareform
-
 from ..Mint import Mint
 from .Layout import Layout
 from .button_style import button_style
-from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d
+from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d, plot_heatmap
 from ms_mint.tools import read_peaklists, PEAKLIST_COLUMNS, format_peaklist,\
      diff_peaklist, remove_all_zero_columns, sort_columns_by_median
+
+from plotly.graph_objs._figure import Figure
+
 
 mint = Mint()
 
@@ -207,7 +204,6 @@ def show_run_control(table):
         style = {'display': 'none'}
     else:
         style = {'display': 'inline'}
-    print(len(table))
     return style
 
 ### Button styles
@@ -287,8 +283,6 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus, peaklist, old_results):
     
         diff = diff_peaklist(old_peaklist_features, 
                              new_peak_list_features)
-        print('Run with:')
-        print(diff)
         if len(diff) == 0:
             raise PreventUpdate
         mint.peaklist = diff
@@ -328,8 +322,6 @@ def get_table(json, label_regex, col_value, clicks):
         raise PreventUpdate
 
     df = pd.read_json(json, orient='split')
-     
-    print(df.peak_shape)
     
     # Columns to show in frontend    
     cols = ['Label', 'peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min',
@@ -401,172 +393,100 @@ def get_table(json, label_regex, col_value, clicks):
 
 # HEATMAP TOOL
 @app.callback(
-    Output('heatmap', 'figure'),
-    [Input('B_heatmap', 'n_clicks'),
-     Input('checklist', 'value')],
-    [State('table', 'derived_virtual_indices'),
+    [Output('heatmap', 'figure'),
+     Output('heatmap', 'style')],
+    [Input('B_heatmap', 'n_clicks')],
+    [State('checklist', 'value'),
+     State('table', 'derived_virtual_indices'),
      State('table', 'data'),
      State('table-value-select', 'value')])
 def plot_0(n_clicks, options, ndxs, data, column):
     if (n_clicks is None) or (column == 'full') or (len(data) == 0):
-        raise PreventUpdate
+        return {}, {'display': 'none'}
     
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     df = pd.DataFrame(data).set_index('Label').select_dtypes(include=numerics)
     
     # Same order as data-table
     df = df.iloc[ndxs]
-    
-    max_is_not_zero = df.max(axis=1) != 0
-    non_zero_labels = max_is_not_zero[max_is_not_zero].index
-    df = df.loc[non_zero_labels]
+    print('Heatmap options:', options)
+    fig = plot_heatmap(df, 
+                       normed_by_cols = 'normed' in options,
+                       transposed = 'transposed' in options,
+                       correlation = 'correlation' in options,
+                       call_show = 'new_tab' in options,
+                       add_dendrogram = 'dendrogram' in options,
+                       clustered = 'clustered' in options,
+                       name=column)    
 
-    plot_type = 'Heatmap'
-    colorscale = 'Blues'
-    plot_attributes = []
-    
-    if 'normed' in options:
-        df = df.divide(df.max()).fillna(0)
-        plot_attributes.append('normalized')
-
-    if 'transposed' in options:
-        df = df.T
-        
-    if 'corr' in options:
-        plot_type = 'Correlation'
-        df = df.corr()
-        colorscale = [[0.0, "rgb(165,0,38)"],
-                [0.1111111111111111, "rgb(215,48,39)"],
-                [0.2222222222222222, "rgb(244,109,67)"],
-                [0.3333333333333333, "rgb(253,174,97)"],
-                [0.4444444444444444, "rgb(254,224,144)"],
-                [0.5555555555555556, "rgb(224,243,248)"],
-                [0.6666666666666666, "rgb(171,217,233)"],
-                [0.7777777777777778, "rgb(116,173,209)"],
-                [0.8888888888888888, "rgb(69,117,180)"],
-                [1.0, "rgb(49,54,149)"]]
+    if ('new_tab' in options) or (fig is None):
+        return {}, {'display': 'none'}
     else:
-        plot_type = 'Heatmap'
-        
-    if 'clustered' in options:
-        D = squareform(pdist(df, metric='seuclidean'))
-        Y = linkage(D, method='complete')
-        Z = dendrogram(Y, orientation='left', no_plot=True)['leaves']
-        Z.reverse()
-        df = df.iloc[Z,:]
-        if 'corr' in options:
-            df = df[df.index]
-        print('Index', df.index)    
-        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list())
-
-    heatmap = go.Heatmap(z=df.values,
-                         x=df.columns,
-                         y=df.index.to_list(),
-                         colorscale = colorscale)
-    
-    title = f'{plot_type} of {",".join(plot_attributes)} {column}'
-
-    # Figure without side-dendrogram
-    if (not 'dendrogram' in options) or (not 'clustered' in options):
-        fig = go.Figure(heatmap)
-        fig.update_layout(
-            title={'text': title,  },
-            yaxis={'title': '', 
-                   'tickmode': 'array', 
-                   'automargin': True}) 
-        fig.update_layout({'height':800, 
-                           'hovermode': 'closest'})
-        
-    else:  # Figure with side-dendrogram
-        fig = go.Figure()
-        
-        for i in range(len(dendro_side['data'])):
-            dendro_side['data'][i]['xaxis'] = 'x2'
-
-        for data in dendro_side['data']:
-            fig.add_trace(data)
-            
-        y_labels = heatmap['y']
-        heatmap['y'] = dendro_side['layout']['yaxis']['tickvals']
-        
-        fig.add_trace(heatmap)     
-
-        fig.update_layout(
-                {'height':800,
-                 'showlegend':False,
-                 'hovermode': 'closest',
-                 'paper_bgcolor': 'white',
-                 'plot_bgcolor': 'white'
-                },
-                title={'text': title},
-                
-                # X-axis of main figure
-                xaxis={'domain': [.11, 1],        
-                       'mirror': False,
-                       'showgrid': False,
-                       'showline': False,
-                       'zeroline': False,
-                       'showticklabels': True,
-                       'ticks':""
-                      },
-                # X-axis of side-dendrogram
-                xaxis2={'domain': [0, .1],  
-                        'mirror': False,
-                        'showgrid': True,
-                        'showline': False,
-                        'zeroline': False,
-                        'showticklabels': False,
-                        'ticks':""
-                       },
-                # Y-axis of main figure
-                yaxis={'domain': [0, 1],
-                       'mirror': False,
-                       'showgrid': False,
-                       'showline': False,
-                       'zeroline': False,
-                       'showticklabels': False,
-                      })
-        fig['layout']['yaxis']['ticktext'] = np.asarray(y_labels)
-        fig['layout']['yaxis']['tickvals'] = np.asarray(dendro_side['layout']['yaxis']['tickvals'])
-    return fig
-
+        return fig, {'min-height': 200, 'width': '100%', 
+                     'display': 'inline-block'}
 
 
 # PEAKEXPLORER
 # @lru_cache(maxsize=32)
 @app.callback(
-    Output('peakShape', 'figure'),
+    [Output('peakShape', 'figure'),
+     Output('peakShape', 'style')],
     [Input('B_shapes', 'n_clicks')],
     [State('n_cols', 'value'),
      State('check_peakShapes', 'value'),
      State('peakshapes-selection', 'value')])
 def plot_1(n_clicks, n_cols, options, biomarkers):
     if (len(mint.results) == 0) or (n_clicks == 0):
-        raise PreventUpdate
-    new_fig = plot_peak_shapes(mint, n_cols, biomarkers, options)
-    if new_fig is None:
-        raise PreventUpdate
-    return new_fig
+        return {}, {'display': 'none'}
+
+    if 'legend_horizontal' in options:
+        legend_orientation = "h"
+    else:
+        legend_orientation = 'v'
+
+
+    fig = plot_peak_shapes(mint.results, n_cols, biomarkers, 
+                               legend='legend' in options, 
+                               legend_orientation=legend_orientation,
+                               call_show='new_tab' in options)
+
+    if ('new_tab' in options) or (fig is None):
+        return {}, {'display': 'none'}
+    else:
+        return fig, {'display': 'inline-block', 'width': '100%'}
+
 
 @lru_cache(maxsize=32)
 @app.callback(
-    Output('peakShape3d', 'figure'),
-    [Input('B_shapes3d', 'n_clicks'),
-     Input('peak-select', 'value'),
-     Input('check_peakShapes3d', 'value')])
+    [Output('peakShape3d', 'figure'),
+     Output('peakShape3d', 'style')],
+    [Input('B_shapes3d', 'n_clicks')],
+    [State('peak-select', 'value'),
+     State('check_peakShapes3d', 'value')])
 def plot_3d(n_clicks, peak_label, options):
     if (n_clicks is None) or (len(mint.results) == 0) or (peak_label is None):
-        raise PreventUpdate
-    new_fig = plot_peak_shapes_3d(mint, peak_label, options)
-    if new_fig is None:
-        raise PreventUpdate
-    return new_fig
+        return {}, {'display': 'none'}
+
+    if 'legend_horizontal' in options:
+        legend_orientation = "h"
+    else:
+        legend_orientation = 'v'
+
+    fig = plot_peak_shapes_3d(mint.results, peak_label, legend='showlegend' in options, 
+                              legend_orientation=legend_orientation, 
+                              call_show='new_tab' in options)
+
+    if ('new_tab' in options) or (fig is None):
+        return {}, {'display': 'none'}
+    else:
+        return fig, {'height': 800, 'display': 'inline-block'}
+
 
 @app.callback(
     Output('heatmap-message', 'children'),
     [Input('table-value-select', 'value')]
 )
-def return_messave(value):
+def return_message(value):
     if value == 'full':
         return 'Heatmap does not work with "Full Table"'
     else:
@@ -592,3 +512,4 @@ def download_csv():
                      attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
                      as_attachment=True,
                      cache_timeout=0)
+
