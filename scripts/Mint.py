@@ -46,6 +46,7 @@ if __name__ == '__main__':
         DEBUG = True
         mint.verbose = True
         mint.peaklist = mint.peaklist
+        mint.peaklist_files = 'tests/data/example_peaklist.csv'
         print('MINT files:', mint.files)
         print('MINTegration list:')
         print(mint.peaklist.to_string())
