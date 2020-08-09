@@ -446,14 +446,14 @@ def plot_1(n_clicks, n_cols, options, biomarkers):
 
 
     fig = plot_peak_shapes(mint.results, n_cols, biomarkers, 
-                               legend='showlegend' in options, 
+                               legend='legend' in options, 
                                legend_orientation=legend_orientation,
                                call_show='new_tab' in options)
 
     if ('new_tab' in options) or (fig is None):
         return {}, {'display': 'none'}
     else:
-        return fig, {'display': 'inline-block'}
+        return fig, {'display': 'inline-block', 'width': '100%'}
 
 
 @lru_cache(maxsize=32)
