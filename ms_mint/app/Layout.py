@@ -170,9 +170,7 @@ results = html.Div(
             marks={i: f'{i} columns' for i in range(1, 6)}),
         style=slider_style),
     
-    dcc.Loading( children=[
-        dcc.Graph(id='peakShape', figure={}, style={'visibility': 'invisible'}, config=config)
-    ], type="graph", style={'visibility': 'invisible'}),
+    dcc.Loading( children=[ dcc.Graph(id='peakShape', figure={}, config=config) ]),
     
     html.Div(style={'padding': 50}),
     
@@ -193,8 +191,7 @@ results = html.Div(
 
     html.P(id='heatmap-message'),
     
-    dcc.Loading( children=[ dcc.Graph(id='heatmap', figure={}, config=config, 
-                              style={'visibility': 'invisible'}) ], type="graph" ),
+    dcc.Loading(children=[ dcc.Graph(id='heatmap', figure={}, config=config) ]),
                 
     html.Div(style={'padding': 50}),
 
@@ -206,15 +203,10 @@ results = html.Div(
         options=[{'label': 'Show Legend', 'value': 'legend'},
                  {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
                  {'label': 'Show in new tab', 'value': 'new_tab'}],
-        value=['legend'], style={'display': 'inline-block'}),
+        value=['legend']),
     
     dcc.Dropdown(id='peak-select', options=[]),
-    dcc.Loading([
-        dcc.Graph(id='peakShape3d', figure={}, 
-                  style={'visibility': 'invisible'}, 
-                  config=config)], 
-                  style={'min-height': 500},
-                  type="graph")
+    dcc.Loading([ dcc.Graph(id='peakShape3d', figure={}, config=config) ])
   ])
 
 Layout = html.Div(
