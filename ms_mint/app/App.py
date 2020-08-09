@@ -402,7 +402,7 @@ def get_table(json, label_regex, col_value, clicks):
      State('table-value-select', 'value')])
 def plot_0(n_clicks, options, ndxs, data, column):
     if (n_clicks is None) or (column == 'full') or (len(data) == 0):
-        return None, {'visibility': 'invisible'}
+        return {}, {'display': 'none'}
     
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     df = pd.DataFrame(data).set_index('Label').select_dtypes(include=numerics)
@@ -418,15 +418,12 @@ def plot_0(n_clicks, options, ndxs, data, column):
                        add_dendrogram = 'dendrogram' in options,
                        clustered = 'clustered' in options,
                        name=column)    
-   
-    if fig is None :
-        raise PreventUpdate
-    if ('new_tab' in options):
-        return None, {'visibility': 'invisible'}
+
+    if ('new_tab' in options) or (fig is None):
+        return {}, {'display': 'none'}
     else:
         return fig, {'min-height': 200, 'width': '100%', 
-                     'display': 'inline-block',
-                     'visibility': 'visible'}
+                     'display': 'inline-block'}
 
 
 # PEAKEXPLORER
@@ -440,7 +437,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
      State('peakshapes-selection', 'value')])
 def plot_1(n_clicks, n_cols, options, biomarkers):
     if (len(mint.results) == 0) or (n_clicks == 0):
-        return None, {'visibility': 'invisible'}
+        return {}, {'display': 'none'}
 
     if 'legend_horizontal' in options:
         legend_orientation = "h"
@@ -452,13 +449,11 @@ def plot_1(n_clicks, n_cols, options, biomarkers):
                                legend='showlegend' in options, 
                                legend_orientation=legend_orientation,
                                call_show='new_tab' in options)
-    
-    if fig is None :
-        raise PreventUpdate
-    if ('new_tab' in options):
-        return None, {'visibility': 'visible'}
+
+    if ('new_tab' in options) or (fig is None):
+        return {}, {'display': 'none'}
     else:
-        return fig, {'visibility': 'visible'}
+        return fig, {'display': 'inline-block'}
 
 
 @lru_cache(maxsize=32)
@@ -470,7 +465,7 @@ def plot_1(n_clicks, n_cols, options, biomarkers):
      State('check_peakShapes3d', 'value')])
 def plot_3d(n_clicks, peak_label, options):
     if (n_clicks is None) or (len(mint.results) == 0) or (peak_label is None):
-        return None, {'visibility': 'invisible'}
+        return {}, {'display': 'none'}
 
     if 'legend_horizontal' in options:
         legend_orientation = "h"
@@ -481,12 +476,10 @@ def plot_3d(n_clicks, peak_label, options):
                               legend_orientation=legend_orientation, 
                               call_show='new_tab' in options)
 
-    if fig is None :
-        raise PreventUpdate
-    if ('new_tab' in options):
-        return None, {'visibility': 'invisible'}
+    if ('new_tab' in options) or (fig is None):
+        return {}, {'display': 'none'}
     else:
-        return fig, {'height': 800, 'visibilty': 'visible'}
+        return fig, {'height': 800, 'display': 'inline-block'}
 
 
 @app.callback(
