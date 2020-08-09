@@ -32,6 +32,8 @@ layout_style = {'max-width': '80%',
 
 space = html.Div(style={'padding': 50})
 
+config={'displaylogo': False}
+
 ISSUE_TEXT = f'''
 %0A%0A%0A%0A%0A%0A%0A%0A%0A
 MINT: {__version__}%0A
@@ -160,7 +162,8 @@ results = html.Div(
     
     dcc.Checklist(id='check_peakShapes', 
         options=[{'label': 'Show Legend', 'value': 'legend'},
-            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}],
+                 {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
+                 {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
     
     html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
@@ -168,7 +171,7 @@ results = html.Div(
         style=slider_style),
     
     dcc.Loading( children=[
-      dcc.Graph(id='peakShape', figure={})
+        dcc.Graph(id='peakShape', figure={}, config=config)
     ], type="graph"),
     
     html.Div(style={'padding': 50}),
@@ -186,7 +189,7 @@ results = html.Div(
         value=['normed'], style={'display': 'inline-block'}),
     html.P(id='heatmap-message'),
     
-    dcc.Loading( children=[ dcc.Graph(id='heatmap', figure={}, 
+    dcc.Loading( children=[ dcc.Graph(id='heatmap', figure={}, config=config, 
                               style={'min-height': 200,
                               'width': '100%',
                               'display': 'inline-block'}) ] ),
@@ -199,12 +202,14 @@ results = html.Div(
     
     dcc.Checklist(id='check_peakShapes3d', 
         options=[{'label': 'Show Legend', 'value': 'legend'},
-            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
+                 {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
+                 {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
     
     dcc.Dropdown(id='peak-select', options=[]),
-    
-    dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}),
+    dcc.Loading([
+        dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}, config=config)
+    ], style={'min-height': 500})
   ])
 
 Layout = html.Div(
