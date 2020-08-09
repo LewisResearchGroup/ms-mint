@@ -109,7 +109,7 @@ run_mint = html.Div(id='run-mint-div',
     html.Button('Run', id='B_run'),
     html.A(html.Button('Export', id='B_export'), href="export"),
     # Progress bar
-    dcc.Interval(id="progress-interval", n_intervals=0, interval=10000, disabled=False),
+    dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     dbc.Progress(id="progress-bar", value=0),
     html.Div(id='progress', children=[], style=info_style),    
   ], style={'display': 'none'})
@@ -171,8 +171,8 @@ results = html.Div(
         style=slider_style),
     
     dcc.Loading( children=[
-        dcc.Graph(id='peakShape', figure={}, config=config)
-    ], type="graph"),
+        dcc.Graph(id='peakShape', figure={}, style={'visibility': 'invisible'}, config=config)
+    ], type="graph", style={'visibility': 'invisible'}),
     
     html.Div(style={'padding': 50}),
     
@@ -181,18 +181,20 @@ results = html.Div(
     html.Button('Heatmap', id='B_heatmap', style=button_style()),
     
     dcc.Checklist(id='checklist', 
-        options=[{ 'label': 'Normalized by biomarker', 'value': 'normed'},
+        options=[
+            { 'label': 'Normalized by biomarker', 'value': 'normed'},
             { 'label': 'Cluster', 'value': 'clustered'},
             { 'label': 'Dendrogram', 'value': 'dendrogram'},
             { 'label': 'Transposed', 'value': 'transposed'},
-            { 'label': 'Correlation', 'value': 'corr'} ], 
+            { 'label': 'Correlation', 'value': 'correlation'},
+            { 'label': 'Show in new tab', 'value': 'new_tab'}],
+
         value=['normed'], style={'display': 'inline-block'}),
+
     html.P(id='heatmap-message'),
     
     dcc.Loading( children=[ dcc.Graph(id='heatmap', figure={}, config=config, 
-                              style={'min-height': 200,
-                              'width': '100%',
-                              'display': 'inline-block'}) ] ),
+                              style={'visibility': 'invisible'}) ], type="graph" ),
                 
     html.Div(style={'padding': 50}),
 
@@ -208,8 +210,11 @@ results = html.Div(
     
     dcc.Dropdown(id='peak-select', options=[]),
     dcc.Loading([
-        dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}, config=config)
-    ], style={'min-height': 500})
+        dcc.Graph(id='peakShape3d', figure={}, 
+                  style={'visibility': 'invisible'}, 
+                  config=config)], 
+                  style={'min-height': 500},
+                  type="graph")
   ])
 
 Layout = html.Div(
