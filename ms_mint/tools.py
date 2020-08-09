@@ -10,16 +10,26 @@ MINT_ROOT = os.path.dirname(__file__)
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
 
+def example_peaklist():
+    return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_peaklist.csv')
+
+def example_results():
+    return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_results.csv')
+
+
 RESULTS_COLUMNS = ['peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'peaklist', 'mz_mean', 'mz_width', 'rt_min', 'rt_max', 
-    'intensity_threshold', 'peak_shape']
+    'intensity_threshold', 'peak_shape_rt', 'peak_shape_int']
+
 
 MINT_RESULTS_COLUMNS = ['peak_label', 'ms_file', 
     'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'file_size', 'intensity_sum', 'ms_path', 'peaklist', 
-    'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold', 'peak_shape']
+    'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold',
+    'peak_shape_rt', 'peak_shape_int'
+    ]
 
 
 def integrate_peaks(ms_data, peaklist):
@@ -45,7 +55,10 @@ def integrate_peaks(ms_data, peaklist):
 
         results = {}
 
-        results['peak_shape']  = shape
+        float_list_to_comma_sep_str = lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
+
+        results['peak_shape_rt'] = float_list_to_comma_sep_str( shape.index )
+        results['peak_shape_int'] = float_list_to_comma_sep_str ( shape.values )
         results['peak_area']   = peak_area
         results['peak_max']    = peak_max
         results['peak_min']    = peak_min
@@ -309,7 +322,6 @@ def generate_grid_peaklist(masses, dt, rt_max=10,
     return peaklist
 
 
-
 def export_to_excel(mint, filename=None):
     date_string = str(date.today())
     if filename is None:
@@ -320,7 +332,7 @@ def export_to_excel(mint, filename=None):
     # Write into file
     mint.results.to_excel(writer, 'MINT', index=False)
     mint.peaklist.to_excel(writer, 'Peaklist', index=False)
-    mint.crosstab().T.to_excel(writer, 'PeakArea', index=True)
+    #mint.crosstab().T.to_excel(writer, 'PeakArea', index=True)
     meta = pd.DataFrame({'MINT_version': [mint.version], 
                          'Date': [date_string]}).T[0]
     meta.to_excel(writer, 'Metadata', index=True, header=False)
@@ -332,7 +344,6 @@ def export_to_excel(mint, filename=None):
 
 def gaus(x,a,x0,sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
-
 
 
 def dataframe_difference(df1, df2, which=None):
@@ -352,10 +363,12 @@ def diff_peaklist(old_pklist, new_pklist):
     df = df[df['_merge'] == 'right_only']
     return df.drop('_merge', axis=1)
 
+
 def remove_all_zero_columns(df):
     is_zero = df.max() != 0
     is_zero = is_zero[is_zero].index
     return df[is_zero]
+
 
 def sort_columns_by_median(df):
     cols = df.median().sort_values(ascending=False).index

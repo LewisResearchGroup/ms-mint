@@ -160,7 +160,7 @@ class Mint(object):
         self._files = list_of_files
         if self.verbose:
             print( 'Set files to:\n' + '\n'.join(self.files) + '\n' )
-            
+
     @property
     def peaklist_files(self):
         return self._peaklist_files

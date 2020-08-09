@@ -32,6 +32,8 @@ layout_style = {'max-width': '80%',
 
 space = html.Div(style={'padding': 50})
 
+config={'displaylogo': False}
+
 ISSUE_TEXT = f'''
 %0A%0A%0A%0A%0A%0A%0A%0A%0A
 MINT: {__version__}%0A
@@ -107,7 +109,7 @@ run_mint = html.Div(id='run-mint-div',
     html.Button('Run', id='B_run'),
     html.A(html.Button('Export', id='B_export'), href="export"),
     # Progress bar
-    dcc.Interval(id="progress-interval", n_intervals=0, interval=10000, disabled=False),
+    dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     dbc.Progress(id="progress-bar", value=0),
     html.Div(id='progress', children=[], style=info_style),    
   ], style={'display': 'none'})
@@ -122,14 +124,14 @@ results = html.Div(
 
     dcc.Dropdown(id='table-value-select', value='full',
         options=[ 
-            {'label': 'Full Table', 'value': 'full'},
-            {'label': 'Peak Area', 'value': 'peak_area'},
+            {'label': 'Full table', 'value': 'full'},
+            {'label': 'Peak area', 'value': 'peak_area'},
             {'label': 'Retention time of maximum', 'value': 'peak_rt_of_max'},
             {'label': 'N Datapoints', 'value': 'peak_n_datapoints'},
-            {'label': 'Peak Max', 'value': 'peak_max'},
-            {'label': 'Peak Min', 'value': 'peak_min'},
-            {'label': 'Peak Median', 'value': 'peak_median'},
-            {'label': 'Peak Mean', 'value': 'peak_mean'},
+            {'label': 'Peak maximum', 'value': 'peak_max'},
+            {'label': 'Peak mininimum', 'value': 'peak_min'},
+            {'label': 'Peak median', 'value': 'peak_median'},
+            {'label': 'Peak mean', 'value': 'peak_mean'},
             {'label': 'First minus last intensity', 'value': 'peak_delta_int'}
         ]),
     
@@ -159,17 +161,16 @@ results = html.Div(
     html.Button('Peak Shapes', id='B_shapes', style=button_style()),
     
     dcc.Checklist(id='check_peakShapes', 
-        options=[{'label': 'Show Legend', 'value': 'legend'},
-            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}],
+        options=[{'label': 'Show legend', 'value': 'legend'},
+                 {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
+                 {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
     
     html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
             marks={i: f'{i} columns' for i in range(1, 6)}),
         style=slider_style),
     
-    dcc.Loading( children=[
-      dcc.Graph(id='peakShape', figure={})
-    ], type="graph"),
+    dcc.Loading( children=[ dcc.Graph(id='peakShape', figure={}, config=config) ]),
     
     html.Div(style={'padding': 50}),
     
@@ -178,18 +179,19 @@ results = html.Div(
     html.Button('Heatmap', id='B_heatmap', style=button_style()),
     
     dcc.Checklist(id='checklist', 
-        options=[{ 'label': 'Normalized by biomarker', 'value': 'normed'},
+        options=[
+            { 'label': 'Normalized by biomarker', 'value': 'normed'},
             { 'label': 'Cluster', 'value': 'clustered'},
             { 'label': 'Dendrogram', 'value': 'dendrogram'},
             { 'label': 'Transposed', 'value': 'transposed'},
-            { 'label': 'Correlation', 'value': 'corr'} ], 
+            { 'label': 'Correlation', 'value': 'correlation'},
+            { 'label': 'Show in new tab', 'value': 'new_tab'}],
+
         value=['normed'], style={'display': 'inline-block'}),
+
     html.P(id='heatmap-message'),
     
-    dcc.Loading( children=[ dcc.Graph(id='heatmap', figure={}, 
-                              style={'min-height': 200,
-                              'width': '100%',
-                              'display': 'inline-block'}) ] ),
+    dcc.Loading(children=[ dcc.Graph(id='heatmap', figure={}, config=config) ]),
                 
     html.Div(style={'padding': 50}),
 
@@ -198,13 +200,13 @@ results = html.Div(
     html.Button('Peak Shapes 3D', id='B_shapes3d', style=button_style()),
     
     dcc.Checklist(id='check_peakShapes3d', 
-        options=[{'label': 'Show Legend', 'value': 'legend'},
-            {'label': 'Horizontal legend', 'value': 'legend_horizontal'}], 
+        options=[{'label': 'Show legend', 'value': 'legend'},
+                 {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
+                 {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
     
     dcc.Dropdown(id='peak-select', options=[]),
-    
-    dcc.Graph(id='peakShape3d', figure={}, style={'height': 800}),
+    dcc.Loading([ dcc.Graph(id='peakShape3d', figure={}, config=config) ])
   ])
 
 Layout = html.Div(

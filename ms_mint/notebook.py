@@ -1,15 +1,22 @@
 import os
+import numpy as np
 import ipywidgets as widgets
+import seaborn as sns
 
+from copy import copy
 from ipywidgets import Button, HBox, VBox, Textarea,\
     Layout
 
 from ipywidgets import IntProgress as Progress
+from matplotlib import pyplot as plt 
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
 from .plotly_tools import plot_peak_shapes
-from copy import copy
+from .vis.clustering import hierarchical_clustering
+
+from scipy.cluster.hierarchy import ClusterWarning
+from warnings import simplefilter
 
 class Mint(MintBase):
     def __init__(self):
@@ -31,7 +38,7 @@ class Mint(MintBase):
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run)
         self.run_button.style.button_color = 'lightgray'
-
+        
         self.download_button = Button(description="Export")
         self.download_button.on_click(self.export)
         self.download_button.style.button_color = 'lightgray'
@@ -55,6 +62,11 @@ class Mint(MintBase):
                     self.progress_bar                  
                 ])
             
+    def files(self, files):
+        super(Mint, self).files = files
+        self.ms_files_button.files = files
+        self.list_files()
+
     def list_files(self, b=None):
         text = 'mzXML files to process:\n'
         [self.files.append(i) for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
@@ -94,9 +106,26 @@ class Mint(MintBase):
     def set_progress(self, value):
         self.progress_bar.value = value
     
-    def export(self, b):
+    def export(self, b=None, filename=None):
         home = os.getenv("HOME")
-        filename = os.path.join(home, 'MINT_output.xlsx')
+        if filename is None:
+            filename = 'MINT_output.xlsx'
+        filename = os.path.join(home, filename)
         super(Mint, self).export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
+        
+    def plot_clustering(self, data=None, title=None, figsize=(8,8), 
+                        vmin=-3, vmax=3, xnbins=None, ynbins=None):
+
+        simplefilter("ignore", ClusterWarning)
+        if data is None:
+            data = self.crosstab().apply(np.log1p)
+        data.columns = [os.path.basename(i) for i in data.columns]        
+        data = ((data.T - data.T.mean()) / data.T.std())
+    
+        self.clustered, fig = hierarchical_clustering( 
+            data, vmin=vmin, vmax=vmax, figsize=figsize, 
+            xnbins=xnbins, ynbins=ynbins )
+
+        return fig
 
