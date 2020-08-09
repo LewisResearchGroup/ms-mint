@@ -55,9 +55,10 @@ def integrate_peaks(ms_data, peaklist):
 
         results = {}
 
-        results['peak_shape']  = shape
-        results['peak_shape_rt'] = shape.index.to_list()
-        results['peak_shape_int'] = shape.values
+        float_list_to_comma_sep_str = lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
+
+        results['peak_shape_rt'] = float_list_to_comma_sep_str( shape.index )
+        results['peak_shape_int'] = float_list_to_comma_sep_str ( shape.values )
         results['peak_area']   = peak_area
         results['peak_max']    = peak_max
         results['peak_min']    = peak_min

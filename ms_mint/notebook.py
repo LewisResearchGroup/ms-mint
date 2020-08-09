@@ -118,16 +118,18 @@ class Mint(MintBase):
             data = self.crosstab().apply(np.log1p)
         data.columns = [os.path.basename(i) for i in data.columns]        
         data = ((data.T - data.T.mean()) / data.T.std())
+        
         self.clustered, fig = hierarchical_clustering( 
             data, vmin=vmin, vmax=vmax, figsize=figsize )
+
         ax = plt.gca()
         ax.yaxis.tick_right()
         ax.xaxis.tick_bottom()
-
-        _ = plt.yticks(range(len(self.clustered)), self.clustered.index)
-        _ = plt.xticks(range(len(self.clustered.columns)), self.clustered.columns, rotation=90)
-
-        plt.locator_params(axis='x', nbins=xnbins)
-        plt.locator_params(axis='y', nbins=ynbins)            
+        ndx_x = np.linspace(0,len(self.clustered.index)-1, xnbins)
+        ndx_y = np.linspace(0,len(self.clustered.columns)-1, ynbins)
+        ndx_x = [int(i) for i in ndx_x]
+        ndx_y = [int(i) for i in ndx_y]
+        _ = plt.yticks(ndx_x, self.clustered.iloc[ndx_x])
+        _ = plt.xticks(ndx_y, self.clustered.columns[ndx_y], rotation=90)
         return fig
 

@@ -207,7 +207,6 @@ def show_run_control(table):
         style = {'display': 'none'}
     else:
         style = {'display': 'inline'}
-    print(len(table))
     return style
 
 ### Button styles
@@ -287,8 +286,6 @@ def run_mint(n_clicks, n_clicks_clear, n_cpus, peaklist, old_results):
     
         diff = diff_peaklist(old_peaklist_features, 
                              new_peak_list_features)
-        print('Run with:')
-        print(diff)
         if len(diff) == 0:
             raise PreventUpdate
         mint.peaklist = diff
@@ -328,8 +325,6 @@ def get_table(json, label_regex, col_value, clicks):
         raise PreventUpdate
 
     df = pd.read_json(json, orient='split')
-     
-    print(df.peak_shape)
     
     # Columns to show in frontend    
     cols = ['Label', 'peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min',
@@ -456,7 +451,6 @@ def plot_0(n_clicks, options, ndxs, data, column):
         df = df.iloc[Z,:]
         if 'corr' in options:
             df = df[df.index]
-        print('Index', df.index)    
         dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list())
 
     heatmap = go.Heatmap(z=df.values,
@@ -470,10 +464,12 @@ def plot_0(n_clicks, options, ndxs, data, column):
     if (not 'dendrogram' in options) or (not 'clustered' in options):
         fig = go.Figure(heatmap)
         fig.update_layout(
-            title={'text': title,  },
+            {'title_x': 0.5},
+            title={'text': title},
             yaxis={'title': '', 
                    'tickmode': 'array', 
                    'automargin': True}) 
+
         fig.update_layout({'height':800, 
                            'hovermode': 'closest'})
         
@@ -496,7 +492,8 @@ def plot_0(n_clicks, options, ndxs, data, column):
                  'showlegend':False,
                  'hovermode': 'closest',
                  'paper_bgcolor': 'white',
-                 'plot_bgcolor': 'white'
+                 'plot_bgcolor': 'white',
+                 'title_x': 0.5
                 },
                 title={'text': title},
                 
@@ -528,6 +525,7 @@ def plot_0(n_clicks, options, ndxs, data, column):
                       })
         fig['layout']['yaxis']['ticktext'] = np.asarray(y_labels)
         fig['layout']['yaxis']['tickvals'] = np.asarray(dendro_side['layout']['yaxis']['tickvals'])
+
     return fig
 
 
@@ -535,7 +533,8 @@ def plot_0(n_clicks, options, ndxs, data, column):
 # PEAKEXPLORER
 # @lru_cache(maxsize=32)
 @app.callback(
-    Output('peakShape', 'figure'),
+    [Output('peakShape', 'figure'),
+     Output('peakShape', 'style')],
     [Input('B_shapes', 'n_clicks')],
     [State('n_cols', 'value'),
      State('check_peakShapes', 'value'),
@@ -543,10 +542,25 @@ def plot_0(n_clicks, options, ndxs, data, column):
 def plot_1(n_clicks, n_cols, options, biomarkers):
     if (len(mint.results) == 0) or (n_clicks == 0):
         raise PreventUpdate
-    new_fig = plot_peak_shapes(mint, n_cols, biomarkers, options)
-    if new_fig is None:
+
+    if 'legend_horizontal' in options:
+        legend_orientation = "h"
+    else:
+        legend_orientation = 'v'
+
+
+    fig = plot_peak_shapes(mint.results, n_cols, biomarkers, 
+                               legend='showlegend' in options, 
+                               legend_orientation=legend_orientation,
+                               call_show='new_tab' in options)
+    
+    if fig is None :
         raise PreventUpdate
-    return new_fig
+    if ('new_tab' in options):
+        return None, {'visibilty': 'invisible'}
+    else:
+        return fig, {}
+
 
 @lru_cache(maxsize=32)
 @app.callback(
@@ -557,10 +571,25 @@ def plot_1(n_clicks, n_cols, options, biomarkers):
 def plot_3d(n_clicks, peak_label, options):
     if (n_clicks is None) or (len(mint.results) == 0) or (peak_label is None):
         raise PreventUpdate
-    new_fig = plot_peak_shapes_3d(mint, peak_label, options)
-    if new_fig is None:
+
+    if 'legend_horizontal' in options:
+        legend_orientation = "h"
+    else:
+        legend_orientation = 'v'
+
+    fig = plot_peak_shapes_3d(mint.results, peak_label, legend='showlegend' in options, 
+                              legend_orientation=legend_orientation, 
+                              call_show='new_tab' in options)
+
+    if fig is None :
         raise PreventUpdate
-    return new_fig
+    if ('new_tab' in options):
+        return None, {'visibilty': 'invisible'}
+    else:
+        return fig, {}
+
+
+
 
 @app.callback(
     Output('heatmap-message', 'children'),
@@ -592,3 +621,4 @@ def download_csv():
                      attachment_filename=f'MINT__results_{now}-{uid}.xlsx',
                      as_attachment=True,
                      cache_timeout=0)
+

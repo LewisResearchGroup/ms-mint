@@ -9,24 +9,28 @@ from os.path import basename
 from plotly.subplots import make_subplots
 
 
-def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None, verbose=False):
+
+def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True, 
+                     verbose=False, legend_orientation='v', call_show=False):
     '''
     Returns a plotly multiplost of all peak_shapes in mint.results
     grouped by peak_label.
     '''
+    mint_results = mint_results.copy()
+    mint_results.ms_file = [basename(i) for i in mint_results.ms_file]
     
-    res = mint.results[mint.results.peak_area > 0]
+    res = mint_results[mint_results.peak_area > 0]
     files = list(res.ms_file.drop_duplicates())
-    labels = list(mint.peaklist.peak_label.drop_duplicates())
+    labels = list(mint_results.peak_label.drop_duplicates())
     
     res = res.set_index(['peak_label', 'ms_file'])
-    
-    if options is None:
-        options = []
+
+    if biomarkers is None:
+        biomarkers = []
 
     if len(biomarkers) != 0:
         labels = [str(i) for i in biomarkers]
-            
+    
     # Calculate neccessary number of rows
     n_rows = len(labels)//n_cols
     if n_rows*n_cols < len(labels):
@@ -50,24 +54,29 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None, verbose=Fals
     for label_i, label in enumerate(labels):
         for file_i, file in enumerate(files):
             try:
-                data = res.loc[(label, file), 'peak_shape']
+                x, y = res.loc[(label, file), ['peak_shape_rt', 'peak_shape_int']]
+
             except:
                 continue
-            if not isinstance(data,  Iterable):
+            if not isinstance(x,  Iterable):
                 continue
             
+            if isinstance(x, str):
+                x = x.split(',')
+                y = y.split(',')
+                
             ndx_r = (label_i // n_cols)+1
             ndx_c = label_i % n_cols + 1
                         
-            if len(data) == 1:
+            if len(x) == 1:
                 mode='markers'
             else:
                 mode='lines'
             
             fig.add_trace(
                 go.Scatter(
-                        x=data.index, 
-                        y=data.values,
+                        x=x, 
+                        y=y,
                         name=basename(file),
                         mode=mode,
                         legendgroup=file_i,
@@ -78,42 +87,51 @@ def plot_peak_shapes(mint, n_cols=3, biomarkers=None, options=None, verbose=Fals
                 col=ndx_c,
             )
 
-            fig.update_xaxes(title_text="Retention Time", row=ndx_r, col=ndx_c)
+            fig.update_xaxes(title_text="Scan Time", row=ndx_r, col=ndx_c)
             fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
 
     # Layout
-    if 'legend_horizontal' in options:
-        fig.update_layout(legend_orientation="h")
-    if 'legend' in options:
-        fig.update_layout(showlegend=True)
+    if legend:
+        fig.update_layout(legend_orientation=legend_orientation)
+    
+    fig.update_layout(showlegend=legend)
+    
     fig.update_layout(height=400*n_rows, title_text="Peak Shapes")
+    if call_show: fig.show(config={'displaylogo': False})
     return fig
 
 
-def plot_peak_shapes_3d(mint, peak_label, options=None):
+def plot_peak_shapes_3d(mint_results, peak_label=None, legend=True, 
+                        legend_orientation='v', call_show=False, verbose=False):
     '''
     Returns a plotly 3D plot of all peak_shapes in mint.results
     where mint.results.peak_label == peak_label.
     '''
-    if options is None:
-        options = []
-    data = mint.results[mint.results.peak_label == peak_label].groupby('ms_file')
-    filenames = mint.files
+
+    mint_results = mint_results.copy()
+    mint_results.ms_file = [basename(i) for i in mint_results.ms_file]
+
+    data = mint_results[mint_results.peak_label == peak_label]
+    files = list( data.ms_file.drop_duplicates() )
+
+    grps = data.groupby('ms_file')
+
     # Peak labels are supposed to be strings
     # Sometimes they are converted to int though
    
     samples = []
-    for i, fn in enumerate(filenames):
+    for i, fn in enumerate(files):
+        grp = grps.get_group(fn)
         try:
-            sample = data.get_group(fn)['peak_shape'].values[0]
+            x, y, peak_max = grp[['peak_shape_rt', 'peak_shape_int', 'peak_max']].values[0]
         except:
             continue
-        if not isinstance(sample, Iterable):
-            continue
-        else:
-            sample = sample.to_frame().reset_index()
-        sample.columns = ['retentionTime', 'intensity']
-        sample['peak_area'] = sample.intensity.sum()
+            
+        if isinstance(x, str):
+            x = x.split(',')
+            y = y.split(',')
+        sample = pd.DataFrame({'Scan Time': x, 'Intensity': y})
+        sample['peak_max'] = peak_max
         sample['ms_file'] = basename(fn)
         samples.append(sample)
     
@@ -121,11 +139,16 @@ def plot_peak_shapes_3d(mint, peak_label, options=None):
         return None
     
     samples = pd.concat(samples)
-    fig = px.line_3d(samples, x='retentionTime', y='peak_area' , z='intensity', color='ms_file')
-    fig.update_layout({'height': 800})
-    if 'legend_horizontal' in options:
-        fig.update_layout(legend_orientation="h")
-    if not 'legend' in options:
-        fig.update_layout(showlegend=False)
+    
+    fig = px.line_3d(samples, x='Scan Time', y='peak_max' , z='Intensity', color='ms_file')
+    fig.update_layout({'height': 1000, 'width': 1000})
+    
+    # Layout
+    if legend:
+        fig.update_layout(legend_orientation=legend_orientation)
+    
+    fig.update_layout(showlegend=legend)
+        
     fig.update_layout({'title': peak_label, 'title_x': 0.5})
+    if call_show: fig.show(config={'displaylogo': False})
     return fig
