@@ -38,7 +38,7 @@ class Mint(MintBase):
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run)
         self.run_button.style.button_color = 'lightgray'
-
+        
         self.download_button = Button(description="Export")
         self.download_button.on_click(self.export)
         self.download_button.style.button_color = 'lightgray'
@@ -106,30 +106,26 @@ class Mint(MintBase):
     def set_progress(self, value):
         self.progress_bar.value = value
     
-    def export(self, b):
+    def export(self, b=None, filename=None):
         home = os.getenv("HOME")
-        filename = os.path.join(home, 'MINT_output.xlsx')
+        if filename is None:
+            filename = 'MINT_output.xlsx'
+        filename = os.path.join(home, filename)
         super(Mint, self).export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
         
-    def plot_clustering(self, data=None, title=None, figsize=(8,8), vmin=-3, vmax=3, xnbins=50, ynbins=50):
+    def plot_clustering(self, data=None, title=None, figsize=(8,8), 
+                        vmin=-3, vmax=3, xnbins=None, ynbins=None):
+
         simplefilter("ignore", ClusterWarning)
         if data is None:
             data = self.crosstab().apply(np.log1p)
         data.columns = [os.path.basename(i) for i in data.columns]        
         data = ((data.T - data.T.mean()) / data.T.std())
-        
+    
         self.clustered, fig = hierarchical_clustering( 
-            data, vmin=vmin, vmax=vmax, figsize=figsize )
+            data, vmin=vmin, vmax=vmax, figsize=figsize, 
+            xnbins=xnbins, ynbins=ynbins )
 
-        ax = plt.gca()
-        ax.yaxis.tick_right()
-        ax.xaxis.tick_bottom()
-        ndx_x = np.linspace(0,len(self.clustered.index)-1, xnbins)
-        ndx_y = np.linspace(0,len(self.clustered.columns)-1, ynbins)
-        ndx_x = [int(i) for i in ndx_x]
-        ndx_y = [int(i) for i in ndx_y]
-        _ = plt.yticks(ndx_x, self.clustered.iloc[ndx_x])
-        _ = plt.xticks(ndx_y, self.clustered.columns[ndx_y], rotation=90)
         return fig
 

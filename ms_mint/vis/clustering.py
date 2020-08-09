@@ -6,16 +6,28 @@ from scipy.spatial.distance import pdist, squareform
 from scipy.cluster import hierarchy
 
 
-def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8)):
+def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8), xnbins=None, ynbins=None):
     '''based on heatmap function from
     http://nbviewer.ipython.org/github/herrfz/dataanalysis/
     blob/master/week3/svd_pca.ipynb
     Generates a heatmap from the input matrix.
-    ''' 
+    '''
+
+    df = df.copy()
+
     cm = plt.cm
     cmap = cm.rainbow(np.linspace(0, 0, 1))
     hierarchy.set_link_color_palette([mpl.colors.rgb2hex(rgb[:3]) for rgb in cmap])
     
+    ydim, xdim = df.shape
+
+    if xnbins is None:
+        xnbins = min(20, xdim)
+    if ynbins is None:
+        ynbins = min(20, ydim)
+
+    print(xnbins, ynbins)
+
     dm = df.fillna(0).values
     D1 = squareform(pdist(dm, metric='euclidean'))
     D2 = squareform(pdist(dm.T, metric='euclidean'))
@@ -39,8 +51,25 @@ def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8)):
     idx2 = Z2['leaves']
     D = dm[idx1, :]
     D = D[:, idx2]
+
     fig = axmatrix.matshow(D[::-1], aspect='auto', cmap='hot',
                            vmin=vmin, vmax=vmax)
+
     axmatrix.set_xticks([])
     axmatrix.set_yticks([])
-    return df.iloc[Z1['leaves'][::-1], Z2['leaves']], fig
+    
+    ax = plt.gca()
+    ax.yaxis.tick_right()
+    ax.xaxis.tick_bottom()
+
+    clustered = df.iloc[Z1['leaves'][::-1], Z2['leaves']]
+
+    ndx_y = np.linspace(0,len(clustered.index)-1, ynbins)
+    ndx_x = np.linspace(0,len(clustered.columns)-1, xnbins)
+    ndx_y = [int(i) for i in ndx_y]
+    ndx_x = [int(i) for i in ndx_x]
+
+    _ = plt.yticks(ndx_y, clustered.iloc[ndx_y].index)
+    _ = plt.xticks(ndx_x, clustered.columns[ndx_x], rotation=90)
+
+    return clustered, fig

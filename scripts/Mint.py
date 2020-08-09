@@ -17,6 +17,7 @@ if __name__ == '__main__':
     
     args = sys.argv
 
+
     url = 'http://localhost:9999'
     
     if not '--no-browser' in args:
