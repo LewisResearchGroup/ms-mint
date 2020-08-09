@@ -124,14 +124,14 @@ results = html.Div(
 
     dcc.Dropdown(id='table-value-select', value='full',
         options=[ 
-            {'label': 'Full Table', 'value': 'full'},
-            {'label': 'Peak Area', 'value': 'peak_area'},
+            {'label': 'Full table', 'value': 'full'},
+            {'label': 'Peak area', 'value': 'peak_area'},
             {'label': 'Retention time of maximum', 'value': 'peak_rt_of_max'},
             {'label': 'N Datapoints', 'value': 'peak_n_datapoints'},
-            {'label': 'Peak Max', 'value': 'peak_max'},
-            {'label': 'Peak Min', 'value': 'peak_min'},
-            {'label': 'Peak Median', 'value': 'peak_median'},
-            {'label': 'Peak Mean', 'value': 'peak_mean'},
+            {'label': 'Peak maximum', 'value': 'peak_max'},
+            {'label': 'Peak mininimum', 'value': 'peak_min'},
+            {'label': 'Peak median', 'value': 'peak_median'},
+            {'label': 'Peak mean', 'value': 'peak_mean'},
             {'label': 'First minus last intensity', 'value': 'peak_delta_int'}
         ]),
     
@@ -161,7 +161,7 @@ results = html.Div(
     html.Button('Peak Shapes', id='B_shapes', style=button_style()),
     
     dcc.Checklist(id='check_peakShapes', 
-        options=[{'label': 'Show Legend', 'value': 'legend'},
+        options=[{'label': 'Show legend', 'value': 'legend'},
                  {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
                  {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
@@ -200,10 +200,10 @@ results = html.Div(
     html.Button('Peak Shapes 3D', id='B_shapes3d', style=button_style()),
     
     dcc.Checklist(id='check_peakShapes3d', 
-        options=[{'label': 'Show Legend', 'value': 'legend'},
+        options=[{'label': 'Show legend', 'value': 'legend'},
                  {'label': 'Horizontal legend', 'value': 'legend_horizontal'},
                  {'label': 'Show in new tab', 'value': 'new_tab'}],
-        value=['legend']),
+        value=['legend'], style={'display': 'inline-block'}),
     
     dcc.Dropdown(id='peak-select', options=[]),
     dcc.Loading([ dcc.Graph(id='peakShape3d', figure={}, config=config) ])
