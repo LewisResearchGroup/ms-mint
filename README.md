@@ -1,5 +1,6 @@
 # MINT (Metabolomics Integrator)
 
+
 ![GUI](./docs/image/mint-overview.png "The GUI")
 
 MINT is an app for processing mzML and mzXML mass-spectrometry (MS) files in MS1 mode. Its main function is to sum up intensity values from usually pre-defined windows in m/z and scan-time (also called retention time) space. These windows can be provided in a `csv-file` or set programmatically. Therefore, a large number of MS-files can be processed in very standardized and reproducible manner.
