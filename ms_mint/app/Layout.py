@@ -64,6 +64,23 @@ ms_files = html.Div([
                   options=[{ 'label': 'Add files from directory', 'value': 'by-dir' }], 
                   value=['by-dir'], style={'display': 'inline-block'}),
     html.Div(id='files-text', children='', style=info_style),
+
+    dcc.Loading( children=[ html.Div(id='table-ms-files-container', 
+                                     style={'min-height':  100, 'margin-top': 10},
+                                     children=[
+                                         DataTable(id='table-ms-files',
+                                                   columns=[ {"name": i, "id": i, "selectable": True}  
+                                                             for i in ['MS-files']],
+                                                   data=[],
+                                                   row_selectable=False,
+                                                   row_deletable=True,
+                                                   style_cell={'textAlign': 'left'},
+                                                   sort_action='native'
+                                                   )
+                                            ])
+                        ]
+                ),
+
     html.Div(style={'padding': 50}),
 ])
 

@@ -11,7 +11,7 @@ from .tools import read_peaklists, process,\
     check_peaklist, export_to_excel,\
     MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
 
-from .peak_detection import OpenMSPeakDetection
+from .peak_detection import OpenMSFFMetabo
 
 import ms_mint
 
@@ -23,7 +23,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print('Mint Version:', self.version , '\n')
-        self.peak_detector = OpenMSPeakDetection()
+        self.peak_detector = OpenMSFFMetabo()
 
     @property
     def verbose(self):
@@ -100,8 +100,8 @@ class Mint(object):
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
         self._status = 'done'
 
-    def detect_peaks(self):
-        detected = self.peak_detector.fit_transform(self.files)
+    def detect_peaks(self, **kwargs):
+        detected = self.peak_detector.fit_transform(self.files, **kwargs)
         if detected is not None:
             self.peaklist = pd.concat([self.peaklist, detected])
 

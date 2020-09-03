@@ -31,6 +31,7 @@ def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True,
 
     if biomarkers is None:
         biomarkers = []
+        #biomarkers = mint_results.groupby('peak_label').mean().peak_max.sort_values(ascending=False).index.astype(str) 
 
     if len(biomarkers) != 0:
         labels = [str(i) for i in biomarkers]
