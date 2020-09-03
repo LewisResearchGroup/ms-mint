@@ -1,14 +1,10 @@
 import os
 import numpy as np
 import ipywidgets as widgets
-import seaborn as sns
 
-from copy import copy
-from ipywidgets import Button, HBox, VBox, Textarea,\
-    Layout
+from ipywidgets import Button, HBox, VBox, Textarea, Layout
 
 from ipywidgets import IntProgress as Progress
-from matplotlib import pyplot as plt 
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
@@ -128,4 +124,7 @@ class Mint(MintBase):
             xnbins=xnbins, ynbins=ynbins )
 
         return fig
+    
+    def plot_peak_shapes(self, **kwargs):
+            plot_peak_shapes(self.results, **kwargs)
 

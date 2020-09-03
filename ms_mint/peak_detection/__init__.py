@@ -1,1 +1,1 @@
-from .OpenMSPeakDetection import OpenMSPeakDetection
+from .OpenMSPeakDetection import OpenMSFFMetabo
