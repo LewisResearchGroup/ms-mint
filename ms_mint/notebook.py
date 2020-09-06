@@ -8,7 +8,7 @@ from ipywidgets import IntProgress as Progress
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
-from .plotly_tools import plot_peak_shapes
+from .plotly_tools import plot_peak_shapes, plot_heatmap
 from .vis.clustering import hierarchical_clustering
 
 from scipy.cluster.hierarchy import ClusterWarning
@@ -126,5 +126,7 @@ class Mint(MintBase):
         return fig
     
     def plot_peak_shapes(self, **kwargs):
-            plot_peak_shapes(self.results, **kwargs)
+        return plot_peak_shapes(self.results, **kwargs)
 
+    def plot_heatmap(self, **kwargs):
+        return plot_heatmap(self.results, **kwargs)

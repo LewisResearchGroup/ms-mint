@@ -3,9 +3,12 @@ import platform
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
+import subprocess
+
 from dash_table import DataTable
 
 import numpy as np
+import pandas as pd
 
 from multiprocessing import cpu_count
 from ms_mint import __version__
@@ -34,10 +37,21 @@ space = html.Div(style={'padding': 50})
 
 config={'displaylogo': False}
 
+def get_versions():
+    string = ''
+    try:
+        string += subprocess.getoutput('conda env export --no-build')
+    except:
+        pass
+    return string
+
+
 ISSUE_TEXT = f'''
 %0A%0A%0A%0A%0A%0A%0A%0A%0A
-MINT: {__version__}%0A
+MINT version: {__version__}%0A
 OS: {platform.platform()}%0A
+Versions:
+{get_versions()}
 '''
 
 

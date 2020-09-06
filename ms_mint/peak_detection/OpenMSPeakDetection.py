@@ -14,6 +14,7 @@ class OpenMSPeakDetection():
         self.kind_peaklist = kind_peaklist
 
     def fit(self, filenames):
+        print('Peak detection')
         if self.kind_ff == 'centroided':
             self.centroided(filenames)
 
@@ -85,11 +86,11 @@ class OpenMSPeakDetection():
 
 class OpenMSFFMetabo():
     def __init__(self):
-        print('Feature detector: OpenMSFFMetabo')
         self._feature_map = None
         self._progress = 0
 
     def fit(self, filenames):
+        print('Peak detection')
         feature_map = oms.FeatureMap()
         for fn in tqdm(filenames):
             feature_map += oms_ffmetabo_single_file(fn)
@@ -104,7 +105,7 @@ class OpenMSFFMetabo():
             if ( min_quality is not None ) and ( quality < min_quality ):
                 continue
 
-            rt_min = max(0, (feat.getRT() - feat.getWidth()) / 60)
+            rt_min = max([0, (feat.getRT() - feat.getWidth()) / 60])
             rt_max = (feat.getRT() + feat.getWidth()) / 60
             
             data = {'peak_label': f'{feat.getMZ():06.3f}-{feat.getRT():06.3f}', 
@@ -185,6 +186,7 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
 
 
 def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1):
+    print('Condensing peaklist')
     cols = ['mz_mean', 'rt_min', 'rt_max', 'rt']
     peaklist = peaklist.sort_values(cols)[cols]
     new_peaklist = pd.DataFrame(columns=cols)
@@ -212,16 +214,16 @@ def merge_peaks(peak_a, peak_b):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
     mz_b, rt_min_b, rt_max_b, rt_b = peak_b
     return (mean([mz_a, mz_b]), 
-            min(rt_min_a, rt_min_b), 
-            max(rt_max_a, rt_max_b), 
+            min([rt_min_a, rt_min_b]), 
+            max([rt_max_a, rt_max_b]), 
             mean([rt_a, rt_b]))
 
 
 def peaks_are_close(peak_a, peak_b, max_delta_mz_ppm=10, max_delta_rt=0.1):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
     mz_b, rt_min_b, rt_max_b, rt_b = peak_b
-    mz_limit = max(mz_a*max_delta_mz_ppm*1e-6, 
-                   mz_b*max_delta_mz_ppm*1e-6)    
+    mz_limit = max([mz_a*max_delta_mz_ppm*1e-6, 
+                    mz_b*max_delta_mz_ppm*1e-6])    
     if rt_a is None or rt_b is None:
         rt_mean_a = mean([rt_min_a, rt_max_a])
         rt_mean_b = mean([rt_min_b, rt_max_b])
