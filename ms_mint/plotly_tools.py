@@ -200,19 +200,21 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         plot_type = 'Heatmap'
         
     if clustered:
-        D = squareform(pdist(df, metric='seuclidean'))
-        Y = linkage(D, method='complete')
-        Z = dendrogram(Y, orientation='left', no_plot=True)['leaves']
-        Z.reverse()
-        df = df.iloc[Z,:]
+        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list(),
+                                           color_threshold=0, colorscale=['black']*8)
+        dendro_leaves = dendro_side['layout']['yaxis']['ticktext']
+        df = df.loc[dendro_leaves,:]
         if correlation:
-            df = df[df.index]
-        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list())
+            df = df[df.index]        
 
-    heatmap = go.Heatmap(z=df.values,
-                         x=df.columns,
-                         y=df.index.to_list(),
-                         colorscale = colorscale)
+    x = df.columns
+    if clustered:
+        y=dendro_leaves
+    else:
+        y = df.index.to_list()
+    z = df.values
+
+    heatmap = go.Heatmap(x=x, y=y, z=z, colorscale = colorscale)
     
     title = f'{plot_type} of {",".join(plot_attributes)} {name}'
 

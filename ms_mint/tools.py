@@ -7,6 +7,7 @@ from datetime import date
 from .io import ms_file_to_df
 
 MINT_ROOT = os.path.dirname(__file__)
+
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
                     'rt_min', 'rt_max', 'intensity_threshold', 'peaklist']
 
@@ -28,8 +29,7 @@ MINT_RESULTS_COLUMNS = ['peak_label', 'ms_file',
     'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
     'peak_rt_of_max', 'file_size', 'intensity_sum', 'ms_path', 'peaklist', 
     'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold',
-    'peak_shape_rt', 'peak_shape_int'
-    ]
+    'peak_shape_rt', 'peak_shape_int']
 
 
 def integrate_peaks(ms_data, peaklist):
@@ -69,14 +69,12 @@ def integrate_peaks(ms_data, peaklist):
         results['peak_delta_int'] = results['peak_int_last'] - results['peak_int_first']
         results['peak_rt_of_max'] = shape[shape == peak_max].index
         results['peak_n_datapoints'] = len(shape)
-        
+    
         if len(results['peak_rt_of_max']) > 0:
             results['peak_rt_of_max'] = np.mean(results['peak_rt_of_max'])
         else:
             results['peak_rt_of_max'] = np.nan
-                    
         results.update(peak)
-
         return results
     
     base = np.vectorize(base)

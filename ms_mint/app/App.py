@@ -9,6 +9,7 @@ from flask import send_file
 from functools import lru_cache
 from glob import glob
 from tkinter import Tk, filedialog
+from pathlib import Path as P
 
 from os.path import basename, isfile, abspath, join
 
@@ -195,9 +196,6 @@ def select_peaklist(nc_peaklists, nc_reset, add_row, detect_peaks,
                 merge_duplicate_headers=True
             )    
 
-    #if len(data) == 0:
-    #    style = {'display': 'none'}
-    #else:
     style = {'display': 'inline'}   
     return [table], style 
 
@@ -278,8 +276,15 @@ def run_mint(n_clicks, n_clicks_clear, ms_files, peaklist, n_cpus, old_results):
         files = []
     else:
         files = ms_files['MS-files'].values
-    
-    peaklist = format_peaklist(pd.DataFrame(peaklist))
+        files = [str(P(i)) for i in files]
+
+
+    peaklist = pd.DataFrame(peaklist)
+    if 'peak_label' not in peaklist.columns:
+        print('No column "peak_label" in peaklist.')
+        raise PreventUpdate
+
+    peaklist = format_peaklist(peaklist)    
 
     if mint.status == 'running' or len(peaklist) == 0 :
         print('MINT status:', mint.status)
@@ -316,21 +321,30 @@ def run_mint(n_clicks, n_clicks_clear, ms_files, peaklist, n_cpus, old_results):
     if run_mint:
         print("Running MINT")
         mint.run(nthreads=n_cpus)
-        new_results = mint.results
     
+    new_results = mint.results
+
+    print('Old results:', old_results)
+
     # Update results data with new data
-    if old_results is not None:        
+    if (old_results is not None) and (len(old_results) > 0):        
         old_results = old_results.set_index(['peak_label', 'ms_file'])
         new_results = mint.results.set_index(['peak_label', 'ms_file'])
         old_results = old_results.drop(new_results.index, errors='ignore')
         new_results = pd.concat([old_results, new_results]).reset_index()
 
     # Restrict results to files in file list and peak_labels in peaklist
+    print('Results lenght before:', len(new_results))
+    print('Files:', files)
+    print('Files in results:', new_results.ms_file.drop_duplicates().values)
+    print('Peak labels:', peaklist.peak_label)
+    print('Peak labels in results:', new_results.peak_label.values)
+
     new_results = new_results[new_results.ms_file.isin(files) & 
                               new_results.peak_label.isin(peaklist.peak_label)]
 
-    print('Results columns:', new_results.columns)
-    print('Results len:', len(new_results))
+    #print('Results columns:', new_results.columns)
+    print('Results length after:', len(new_results))
 
     return new_results.to_json(orient='split')
 
@@ -384,7 +398,7 @@ def get_table(json, label_regex, col_value, clicks):
         df.fillna(0, inplace=True)
         
     # Generate labels 
-    if label_regex is not None:
+    if (label_regex is not None) and (label_regex != ''):
         labels = [ '.'.join(i.split('.')[:-1]).split('_')[int(label_regex)] for i in df.ms_file ]
         df['Label'] = labels
     else:

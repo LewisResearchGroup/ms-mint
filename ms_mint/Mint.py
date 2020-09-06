@@ -7,6 +7,8 @@ from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
+from tqdm import tqdm
+
 from .tools import read_peaklists, process,\
     check_peaklist, export_to_excel,\
     MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
@@ -79,7 +81,7 @@ class Mint(object):
             self.run_parallel(nthreads=nthreads, mode=mode)
         else:
             results = []
-            for i, filename in enumerate(self.files):
+            for i, filename in tqdm(enumerate(self.files), total=self.n_files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q': None, 
@@ -98,6 +100,7 @@ class Mint(object):
             print(f'Total runtime: {self.runtime:.2f}s')
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
+            print(f'Results:', self.results )
         self._status = 'done'
 
     def detect_peaks(self, **kwargs):
@@ -124,8 +127,9 @@ class Mint(object):
                 break
             else:
                 size = q.qsize()
-                self.progress = int(100 * (size / self.n_files))
+                self.progress = max(0, min(nthreads/2, int(100 * (size-nthreads / self.n_files) ) ) )
                 time.sleep(1)
+    
         self.progress = 100
 
         pool.close()
@@ -144,13 +148,22 @@ class Mint(object):
     @property
     def files(self):
         return self._files
+
+    @property
+    def ms_files(self):
+        return self._files
     
+    @files.setter
+    def files(self, list_of_files):
+        print('Mint.files is deprecated, please use Mint.ms_files instead!')
+        self.ms_files = list_of_files
+
     @property
     def n_files(self):
         return len(self.files)
     
-    @files.setter
-    def files(self, list_of_files):
+    @ms_files.setter
+    def ms_files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         list_of_files = [str(P(i)) for i in list_of_files]
