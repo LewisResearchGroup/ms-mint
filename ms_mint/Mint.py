@@ -81,7 +81,7 @@ class Mint(object):
             self.run_parallel(nthreads=nthreads, mode=mode)
         else:
             results = []
-            for i, filename in tqdm(enumerate(self.files), total=self.n_files):
+            for i, filename in tqdm(enumerate(self.ms_files), total=self.n_files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q': None, 
@@ -104,7 +104,7 @@ class Mint(object):
         self._status = 'done'
 
     def detect_peaks(self, **kwargs):
-        detected = self.peak_detector.fit_transform(self.files, **kwargs)
+        detected = self.peak_detector.fit_transform(self.ms_files, **kwargs)
         if detected is not None:
             self.peaklist = pd.concat([self.peaklist, detected])
 
@@ -113,7 +113,7 @@ class Mint(object):
         m = Manager()
         q = m.Queue()
         args = []
-        for i, filename in enumerate(self.files):
+        for i, filename in enumerate(self.ms_files):
             args.append({'filename': filename,
                          'peaklist': self.peaklist,
                          'queue': q,
@@ -160,7 +160,7 @@ class Mint(object):
 
     @property
     def n_files(self):
-        return len(self.files)
+        return len(self.ms_files)
     
     @ms_files.setter
     def ms_files(self, list_of_files):
@@ -169,10 +169,10 @@ class Mint(object):
         list_of_files = [str(P(i)) for i in list_of_files]
         for f in list_of_files:
             if not os.path.isfile(f): 
-                print(f'File not found ({f})')
+                print(f'W File not found ({f})')
         self._files = list_of_files
         if self.verbose:
-            print( 'Set files to:\n' + '\n'.join(self.files) + '\n' )
+            print( 'Set files to:\n' + '\n'.join(self.ms_files) + '\n' )
 
     @property
     def peaklist_files(self):
@@ -251,6 +251,27 @@ class Mint(object):
             self.progress_callback(value)
 
     def export(self, filename=None):
-        buffer = export_to_excel(self, filename=filename)
-        if filename is None:
+        fn = filename
+        if fn is None:
+            buffer = export_to_excel(self, filename=fn)
             return buffer
+        elif fn.endswith('.xlsx'):
+            export_to_excel(self, filename=fn)
+        elif fn.endswith('.csv'):
+            self.results.to_csv(fn, index=False)
+
+    def load(self, filename):
+        fn = filename
+        if fn.endswith('.xlsx'):
+            results = pd.read_excel(fn, sheet_name='Results')
+            ms_files = results.ms_file.drop_duplicates()
+            self.results = pd.read_excel(fn, sheet_name='Results')
+            self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
+            self.ms_files = ms_files
+        elif fn.endswith('.csv'):
+            results = pd.read_csv(fn)
+            ms_files = results.ms_file.drop_duplicates()
+            peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+            self.results = results
+            self.ms_files = ms_files
+            self.peaklist = peaklist

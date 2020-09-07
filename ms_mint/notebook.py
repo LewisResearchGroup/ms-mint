@@ -15,8 +15,8 @@ from scipy.cluster.hierarchy import ClusterWarning
 from warnings import simplefilter
 
 class Mint(MintBase):
-    def __init__(self):
-        super().__init__() 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs) 
 
         self.ms_files_button = SelectFilesButton(text='Select MS-files', callback=self.list_files)
         self.peaklist_files_button = SelectFilesButton(text='Peaklist', callback=self.list_files)
@@ -36,7 +36,7 @@ class Mint(MintBase):
         self.run_button.style.button_color = 'lightgray'
         
         self.download_button = Button(description="Export")
-        self.download_button.on_click(self.export)
+        self.download_button.on_click(self.export_action)
         self.download_button.style.button_color = 'lightgray'
 
         self._results = None
@@ -65,12 +65,12 @@ class Mint(MintBase):
 
     def list_files(self, b=None):
         text = 'mzXML files to process:\n'
-        [self.files.append(i) for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
+        [self.ms_files.append(i) for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
         try:
             [self.peaklist_files.append(i) for i in self.peaklist_files_button.files]
         except:
             pass
-        for i, line in enumerate(self.files):
+        for i, line in enumerate(self.ms_files):
             text += line+'\n'
             if i > 10:
                 line+'...\n'
@@ -102,14 +102,13 @@ class Mint(MintBase):
     def set_progress(self, value):
         self.progress_bar.value = value
     
-    def export(self, b=None, filename=None):
-        home = os.getenv("HOME")
+    def export_action(self, b=None, filename=None):
         if filename is None:
-            filename = 'MINT_output.xlsx'
-        filename = os.path.join(home, filename)
-        super(Mint, self).export(filename)
+            filename = 'MINT__results.xlsx'
+            filename = os.path.join(home, filename)
+        self.export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
-        
+       
     def plot_clustering(self, data=None, title=None, figsize=(8,8), 
                         vmin=-3, vmax=3, xnbins=None, ynbins=None):
 
@@ -128,5 +127,5 @@ class Mint(MintBase):
     def plot_peak_shapes(self, **kwargs):
         return plot_peak_shapes(self.results, **kwargs)
 
-    def plot_heatmap(self, **kwargs):
-        return plot_heatmap(self.results, **kwargs)
+    def plot_heatmap(self, key='peak_area', **kwargs):
+        return plot_heatmap(self.crosstab(key), **kwargs)
