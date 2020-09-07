@@ -6,6 +6,7 @@ from ms_mint.Mint import Mint
 from ms_mint.tools import check_peaklist, MINT_RESULTS_COLUMNS
 
 mint = Mint(verbose=True)
+mint_b = Mint(verbose=True)
 
 class TestClass():
     
@@ -65,15 +66,8 @@ class TestClass():
         print(peaklist)
         check_peaklist(peaklist)
         mint.peaklist = peaklist
-        mint.run(nthreads=2)
-    
-    def test__export(self, tmp_path):
-        print(mint.export())
-        filename = os.path.join(tmp_path, 'output.xlsx')
-        print(mint.crosstab())
-        mint.export(filename)
-        assert os.path.isfile(filename), mint.crosstab()
-        
+        mint.run(nthreads=2)   
+      
     def test__mzxml_equals_mzml(self):
         mint.reset()
         mint.files = ['tests/data/test.mzXML' , 'tests/data/test.mzML']

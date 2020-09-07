@@ -328,9 +328,8 @@ def export_to_excel(mint, filename=None):
     else:
         writer = pd.ExcelWriter(filename)
     # Write into file
-    mint.results.to_excel(writer, 'MINT', index=False)
     mint.peaklist.to_excel(writer, 'Peaklist', index=False)
-    #mint.crosstab().T.to_excel(writer, 'PeakArea', index=True)
+    mint.results.to_excel(writer, 'Results', index=False)
     meta = pd.DataFrame({'MINT_version': [mint.version], 
                          'Date': [date_string]}).T[0]
     meta.to_excel(writer, 'Metadata', index=True, header=False)
