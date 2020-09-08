@@ -197,8 +197,8 @@ results = html.Div(
                  {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
     
-    html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
-            marks={i: f'{i} columns' for i in range(1, 6)}),
+    html.Div(dcc.Slider(id='n_cols', min=1, max=12, step=1, value=2,
+            marks={i: f'{i} columns' for i in range(1, 13)}),
         style=slider_style),
     
     dcc.Loading( children=[ dcc.Graph(id='peakShape', figure={}, config=config) ]),
