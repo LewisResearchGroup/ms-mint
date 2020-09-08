@@ -64,8 +64,10 @@ class Mint(MintBase):
         self.list_files()
 
     def list_files(self, b=None):
-        text = 'mzXML files to process:\n'
-        [self.ms_files.append(i) for i in self.ms_files_button.files if (i.endswith('.mzXML') or (i.endswith('.mzML')))]
+        text = f'{self.n_files} MS-files to process:\n'
+        [self.ms_files.append(i) for i in self.ms_files_button.files 
+                                 if (i.lower().endswith('.mzxml') or 
+                                    (i.lower.endswith('.mzml')))]
         try:
             [self.peaklist_files.append(i) for i in self.peaklist_files_button.files]
         except:
@@ -73,7 +75,7 @@ class Mint(MintBase):
         for i, line in enumerate(self.ms_files):
             text += line+'\n'
             if i > 10:
-                line+'...\n'
+                text += line+'\n...\n'
                 break
         text += '\nUsing peak list:\n'
         if len(self.peaklist_files) != 0:
@@ -110,7 +112,7 @@ class Mint(MintBase):
         self.message_box.value += f'\n\nExported results to: {filename}'
        
     def plot_clustering(self, data=None, title=None, figsize=(8,8), 
-                        vmin=-3, vmax=3, xnbins=None, ynbins=None):
+                        vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None):
 
         simplefilter("ignore", ClusterWarning)
         if data is None:
@@ -120,7 +122,7 @@ class Mint(MintBase):
     
         self.clustered, fig = hierarchical_clustering( 
             data, vmin=vmin, vmax=vmax, figsize=figsize, 
-            xnbins=xnbins, ynbins=ynbins )
+            xmaxticks=xmaxticks, ymaxticks=ymaxticks )
 
         return fig
     

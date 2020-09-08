@@ -6,7 +6,8 @@ from scipy.spatial.distance import pdist, squareform
 from scipy.cluster import hierarchy
 
 
-def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8), xnbins=None, ynbins=None):
+def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), 
+                            xmaxticks=None, ymaxticks=None, metric='euclidean'):
     '''based on heatmap function from
     http://nbviewer.ipython.org/github/herrfz/dataanalysis/
     blob/master/week3/svd_pca.ipynb
@@ -21,19 +22,18 @@ def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8), xnbins=None, ynbi
     
     ydim, xdim = df.shape
 
-    if xnbins is None:
-        xnbins = min(20, xdim)
-    if ynbins is None:
-        ynbins = min(20, ydim)
-
-    print(xnbins, ynbins)
+    if xmaxticks is None:
+        xmaxticks = min(20, xdim)
+    if ymaxticks is None:
+        ymaxticks = min(20, ydim)
 
     dm = df.fillna(0).values
-    D1 = squareform(pdist(dm, metric='euclidean'))
-    D2 = squareform(pdist(dm.T, metric='euclidean'))
+    D1 = squareform(pdist(dm, metric=metric))
+    D2 = squareform(pdist(dm.T, metric=metric))
     fig = plt.figure(figsize=figsize)
     fig.set_tight_layout(False)
     # add first dendrogram
+
     ax1 = fig.add_axes([0.09, 0.1, 0.2, 0.6], frameon=False)
     Y = linkage(D1, method='complete')
     Z1 = dendrogram(Y, orientation='left', color_threshold=0, above_threshold_color='k')
@@ -64,8 +64,8 @@ def hierarchical_clustering(df, vmin=0, vmax=1, figsize=(8,8), xnbins=None, ynbi
 
     clustered = df.iloc[Z1['leaves'][::-1], Z2['leaves']]
 
-    ndx_y = np.linspace(0,len(clustered.index)-1, ynbins)
-    ndx_x = np.linspace(0,len(clustered.columns)-1, xnbins)
+    ndx_y = np.linspace(0,len(clustered.index)-1, ymaxticks)
+    ndx_x = np.linspace(0,len(clustered.columns)-1, xmaxticks)
     ndx_y = [int(i) for i in ndx_y]
     ndx_x = [int(i) for i in ndx_x]
 
