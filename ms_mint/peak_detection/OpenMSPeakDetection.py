@@ -90,14 +90,12 @@ class OpenMSFFMetabo():
         self._progress = 0
 
     def fit(self, filenames):
-        print('Peak detection')
         feature_map = oms.FeatureMap()
         for fn in tqdm(filenames):
             feature_map += oms_ffmetabo_single_file(fn)
         self._feature_map = feature_map
     
     def transform(self, min_quality=1e-3, condensed=True):
-        print('Minimum OpenMS quality:', min_quality)
         features = []
         for feat in tqdm(self._feature_map, total=self._feature_map.size()):    
             

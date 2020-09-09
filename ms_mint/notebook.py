@@ -80,6 +80,8 @@ class Mint(MintBase):
         text += '\nUsing peak list:\n'
         if len(self.peaklist_files) != 0:
             text += '\n'.join([str(i) for i in self.peaklist_files])
+        elif len(self.peaklist) != 0:
+            text += self.peaklist.to_string()
         else:
             text += '\nNo peaklist defined.'
         self.message_box.value = text
@@ -95,10 +97,10 @@ class Mint(MintBase):
         if self.results is not None:
             self.download_button.style.button_color = 'lightgreen'
     
-    def detect_peaks(self):
+    def detect_peaks(self, **kwargs):
         self.message_box.value += f'\n\nRun peak detection.'
         self.progress_bar.value = 50
-        super(Mint, self).detect_peaks()
+        super(Mint, self).detect_peaks(**kwargs)
         self.progress_bar.value = 100
 
     def set_progress(self, value):
