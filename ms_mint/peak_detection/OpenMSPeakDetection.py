@@ -95,7 +95,8 @@ class OpenMSFFMetabo():
             feature_map += oms_ffmetabo_single_file(fn)
         self._feature_map = feature_map
     
-    def transform(self, min_quality=1e-3, condensed=True):
+    def transform(self, min_quality=1e-3, condensed=True, 
+                  max_delta_mz_ppm=10, max_delta_rt=0.1):
         features = []
         for feat in tqdm(self._feature_map, total=self._feature_map.size()):    
             
@@ -119,7 +120,9 @@ class OpenMSFFMetabo():
         peaklist = peaklist.reset_index(drop=True)
 
         if condensed:
-            peaklist = condense_peaklist(peaklist)  
+            peaklist = condense_peaklist(peaklist, 
+                        max_delta_mz_ppm=max_delta_mz_ppm, 
+                        max_delta_rt=max_delta_rt)  
         return peaklist
 
 
