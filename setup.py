@@ -35,6 +35,7 @@ install_requires = [
 config = {
     'name': 'ms-mint',
     'version': versioneer.get_version(),
+    'cmdclass': versioneer.get_cmdclass(),
     'description': 'Metabolomics Integrator (Mint)',
     'long_description': long_description,
     'author': 'Soren Wacker',
@@ -51,7 +52,6 @@ config = {
     ],
    'python_requires': '>=3.5',
    'install_requires': install_requires,
-   'cmdclass': versioneer.get_cmdclass()
 }
 
 setup(**config)
