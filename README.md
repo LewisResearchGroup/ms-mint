@@ -43,5 +43,4 @@ Then navigate to http://localhost:9999 if the browser does not open automaticall
 # Developer Notes
 
     python3 setup.py sdist bdist_wheel
-    python3 -m twine upload --repository testpypi dist/ms*mint-*
-    
+    python3 -m twine upload --repository ms-mint dist/ms*mint-*
