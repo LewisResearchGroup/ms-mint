@@ -38,3 +38,10 @@ Then navigate to http://localhost:9999 if the browser does not open automaticall
     git clone ...
     pip install -e . 
     pyinstaller --one-dir specfiles\Mint__onedir__.spec
+
+
+# Developer Notes
+
+    python3 setup.py sdist bdist_wheel
+    python3 -m twine upload --repository testpypi dist/ms*mint-*
+    
