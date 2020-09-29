@@ -3,6 +3,8 @@ import platform
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
+import subprocess
+
 from dash_table import DataTable
 
 import numpy as np
@@ -34,10 +36,21 @@ space = html.Div(style={'padding': 50})
 
 config={'displaylogo': False}
 
+def get_versions():
+    string = ''
+    try:
+        string += subprocess.getoutput('conda env export --no-build')
+    except:
+        pass
+    return string
+
+
 ISSUE_TEXT = f'''
 %0A%0A%0A%0A%0A%0A%0A%0A%0A
-MINT: {__version__}%0A
+MINT version: {__version__}%0A
 OS: {platform.platform()}%0A
+Versions:
+{get_versions()}
 '''
 
 
@@ -47,7 +60,7 @@ status = html.Div([
     html.Div(id='n_peaklist_selected', children=0, style={'display': 'none'}),
     html.Div(id='n_files_selected', children=0, style={'display': 'none'}),
     html.Button('Reset', id='B_reset', style=button_style('warn')),
-    html.A(href=f'https://soerendip.github.io/ms-mint/', 
+    html.A(href='https://soerendip.github.io/ms-mint/', 
          children=[html.Button('Help', id='B_help', style=button_style('help', float="right"))],
          target="_blank"),
     html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
@@ -64,6 +77,23 @@ ms_files = html.Div([
                   options=[{ 'label': 'Add files from directory', 'value': 'by-dir' }], 
                   value=['by-dir'], style={'display': 'inline-block'}),
     html.Div(id='files-text', children='', style=info_style),
+
+    dcc.Loading( children=[ html.Div(id='table-ms-files-container', 
+                                     style={'min-height':  100, 'margin-top': 10},
+                                     children=[
+                                         DataTable(id='table-ms-files',
+                                                   columns=[ {"name": i, "id": i, "selectable": True}  
+                                                             for i in ['MS-files']],
+                                                   data=[],
+                                                   row_selectable=False,
+                                                   row_deletable=True,
+                                                   style_cell={'textAlign': 'left'},
+                                                   sort_action='native'
+                                                   )
+                                            ])
+                        ]
+                ),
+
     html.Div(style={'padding': 50}),
 ])
 
@@ -166,8 +196,8 @@ results = html.Div(
                  {'label': 'Show in new tab', 'value': 'new_tab'}],
         value=['legend'], style={'display': 'inline-block'}),
     
-    html.Div(dcc.Slider(id='n_cols', min=1, max=5, step=1, value=2,
-            marks={i: f'{i} columns' for i in range(1, 6)}),
+    html.Div(dcc.Slider(id='n_cols', min=1, max=12, step=1, value=2,
+            marks={i: f'{i} columns' for i in range(1, 13)}),
         style=slider_style),
     
     dcc.Loading( children=[ dcc.Graph(id='peakShape', figure={}, config=config) ]),

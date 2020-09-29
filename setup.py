@@ -1,10 +1,6 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
-from ms_mint._version import get_versions
-__version__ = get_versions()['version']
+import versioneer
 
 
 with open("README.md", "r") as fh:
@@ -13,7 +9,7 @@ with open("README.md", "r") as fh:
 install_requires = [
     'pandas>=1',
     'plotly',
-    'lxml', 
+    'lxml',
     'matplotlib',
     'pandoc',
     'plotly',
@@ -30,19 +26,21 @@ install_requires = [
     'scikit-learn',
     'xlrd',
     'ipywidgets',
-    'pyopenms'
+    'pyopenms',
+    'tqdm'
 ]
 
 config = {
     'name': 'ms-mint',
-    'version': __version__,
+    'version': versioneer.get_version(),
+    'cmdclass': versioneer.get_cmdclass(),
     'description': 'Metabolomics Integrator (Mint)',
     'long_description': long_description,
     'author': 'Soren Wacker',
     'url': 'https://github.com/soerendip/ms-mint',
     'author_email': 'swacker@ucalgary.ca',
     'scripts': ['scripts/Mint.py', 'scripts/Mint.bat'],
-    'packages': ['ms_mint'],
+    'packages': find_packages(),
     'data_files': [('scripts', ['scripts/Mint.py', 'scripts/Mint.bat']),
                    ('static', ['static/Standard_Peaklist.csv'])],
     'classifiers': [
@@ -51,7 +49,7 @@ config = {
         "Operating System :: OS Independent",
     ],
    'python_requires': '>=3.5',
-   'install_requires': install_requires
+   'install_requires': install_requires,
 }
 
 setup(**config)

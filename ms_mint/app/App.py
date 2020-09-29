@@ -9,6 +9,7 @@ from flask import send_file
 from functools import lru_cache
 from glob import glob
 from tkinter import Tk, filedialog
+from pathlib import Path as P
 
 from os.path import basename, isfile, abspath, join
 
@@ -18,7 +19,6 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_table import DataTable
-import dash_html_components as html
 
 from ..Mint import Mint
 from .Layout import Layout
@@ -26,8 +26,6 @@ from .button_style import button_style
 from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d, plot_heatmap
 from ms_mint.tools import read_peaklists, PEAKLIST_COLUMNS, format_peaklist,\
      diff_peaklist, remove_all_zero_columns, sort_columns_by_median
-
-from plotly.graph_objs._figure import Figure
 
 
 mint = Mint()
@@ -39,7 +37,7 @@ app = dash.Dash(__name__, external_stylesheets=[
 app.title = 'MINT'
 app.layout = Layout
 
-app.config['suppress_callback_exceptions']=True
+app.config['suppress_callback_exceptions'] = True
 
 @app.callback(
     [Output("progress-bar", "value"), 
@@ -52,10 +50,13 @@ def update_progress(n):
 
 ### Load MS-files
 @app.callback(
-    Output('B_add_files', 'value'),
+    [Output('B_add_files', 'value'),
+     Output('table-ms-files', 'data')],
     [Input('B_add_files', 'n_clicks')],
-    [State('files-check', 'value')] )
-def select_files(n_clicks, options):
+    [State('files-check', 'value'),
+     State('table-ms-files', 'data')] )
+def select_files(n_clicks, options, ms_files):
+    files = []
     if n_clicks is not None:
         root = Tk()
         root.withdraw()
@@ -77,7 +78,9 @@ def select_files(n_clicks, options):
             mint.files += files
             mint.progress = 0
         root.destroy()
-    return str(n_clicks)
+        ms_files +=  [{'MS-files': fn } for fn in files]
+    ms_files = [i for n, i in enumerate(ms_files) if i not in ms_files[n + 1:]]
+    return str(n_clicks), ms_files
 
 ### Clear files
 @app.callback(
@@ -94,9 +97,10 @@ def clear_files(n_clicks):
     [Output('files-text', 'children'),
      Output('n_files_selected', 'children')],
     [Input('B_add_files', 'value'),
-     Input('B_reset', 'value')])    
-def update_files_text(n_clicks, n_clicks_clear):
-    return '{} data files selected.'.format(mint.n_files), mint.n_files
+     Input('B_reset', 'value'),
+     Input('table-ms-files', 'data')])    
+def update_files_text(n_clicks, n_clicks_clear, ms_files):
+    return '{} data files selected.'.format(mint.n_files), len(ms_files)
 
 
 ### Edit peaklist
@@ -120,7 +124,7 @@ def select_peaklist(nc_peaklists, nc_reset, add_row, detect_peaks,
     else:
         clear = ( dash.callback_context.triggered[0]['prop_id'].startswith('B_reset') or 
                   dash.callback_context.triggered[0]['prop_id'].startswith('B_clear_peaklist') )
-        add_row = dash.callback_context.triggered[0]['prop_id'].startswith('B_peaklist-add')   
+        add_row = dash.callback_context.triggered[0]['prop_id'].startswith('B_add_peak')   
         set_thresh = dash.callback_context.triggered[0]['prop_id'].startswith('int-threshold') 
         set_mzwidth = dash.callback_context.triggered[0]['prop_id'].startswith('mz-width') 
         detect_peaks = dash.callback_context.triggered[0]['prop_id'].startswith('B_detect_peaks')
@@ -189,9 +193,6 @@ def select_peaklist(nc_peaklists, nc_reset, add_row, detect_peaks,
                 merge_duplicate_headers=True
             )    
 
-    #if len(data) == 0:
-    #    style = {'display': 'none'}
-    #else:
     style = {'display': 'inline'}   
     return [table], style 
 
@@ -256,54 +257,92 @@ def mint_cpu_info(value):
 @app.callback(
     Output('storage', 'children'),
     [Input('B_run', 'n_clicks'),
-     Input('B_reset', 'value')],
+     Input('B_reset', 'value'),
+     Input('table-ms-files', 'data'),
+     Input('table-peaklist', 'data')],
     [State('n_cpus', 'value'),
-     State('table-peaklist', 'data'),
-     State('storage', 'children')])
-def run_mint(n_clicks, n_clicks_clear, n_cpus, peaklist, old_results):
+     State('storage', 'children'),
+    ])
+def run_mint(n_clicks, n_clicks_clear, ms_files, peaklist, n_cpus, old_results):
     
+    if n_clicks == 0:
+        raise PreventUpdate
+
+    ms_files = pd.DataFrame(ms_files)
+    if len(ms_files) == 0 :
+        files = []
+    else:
+        files = ms_files['MS-files'].values
+        files = [str(P(i)) for i in files]
+
+
+    peaklist = pd.DataFrame(peaklist)
+    if 'peak_label' not in peaklist.columns:
+        print('No column "peak_label" in peaklist.')
+        raise PreventUpdate
+
+    peaklist = format_peaklist(peaklist)    
+
     if mint.status == 'running' or len(peaklist) == 0 :
+        print('MINT status:', mint.status)
+        print('Len peaklist:', len(peaklist))
         raise PreventUpdate
     
-    clear = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
-    
-    peaklist = format_peaklist(pd.DataFrame(peaklist))
-    
-    if old_results is None:
+    #reset = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
+    run_mint = dash.callback_context.triggered[0]['prop_id'].startswith('B_run')
+
+    #mint = Mint()
+    if run_mint:
         mint.peaklist = peaklist
-    else:
+        mint.files = files
+
+    if old_results is not None:
         #old_results = pd.read_json(old_results, orient='split')
         old_results = mint.results
+        
         feat_cols = ['peak_label', 'mz_mean', 'mz_width', 
                      'rt_min', 'rt_max', 'intensity_threshold', 
                      'peaklist']
         
         old_peaklist_features = format_peaklist(old_results[feat_cols].drop_duplicates())
-        new_peak_list_features = format_peaklist(peaklist[feat_cols].drop_duplicates())
+        new_peaklist_features = format_peaklist(peaklist[feat_cols].drop_duplicates())
     
         diff = diff_peaklist(old_peaklist_features, 
-                             new_peak_list_features)
+                             new_peaklist_features)
+
         if len(diff) == 0:
-            raise PreventUpdate
-        mint.peaklist = diff
-        
-    if (n_clicks is not None) and (not clear):
+            print('No difference in peaklist')
+        else:
+            print(diff)
+
+    if run_mint:
+        print("Running MINT")
         mint.run(nthreads=n_cpus)
     
-    
+    new_results = mint.results
+
+    print('Old results:', old_results)
+
     # Update results data with new data
-    if old_results is None:
-        new_results = mint.results
-    else:
+    if (old_results is not None) and (len(old_results) > 0):        
         old_results = old_results.set_index(['peak_label', 'ms_file'])
         new_results = mint.results.set_index(['peak_label', 'ms_file'])
-
         old_results = old_results.drop(new_results.index, errors='ignore')
-        
         new_results = pd.concat([old_results, new_results]).reset_index()
-    
-        mint.results = new_results
-        
+
+    # Restrict results to files in file list and peak_labels in peaklist
+    print('Results lenght before:', len(new_results))
+    print('Files:', files)
+    print('Files in results:', new_results.ms_file.drop_duplicates().values)
+    print('Peak labels:', peaklist.peak_label)
+    print('Peak labels in results:', new_results.peak_label.values)
+
+    new_results = new_results[new_results.ms_file.isin(files) & 
+                              new_results.peak_label.isin(peaklist.peak_label)]
+
+    #print('Results columns:', new_results.columns)
+    print('Results length after:', len(new_results))
+
     return new_results.to_json(orient='split')
 
 
@@ -324,7 +363,7 @@ def get_table(json, label_regex, col_value, clicks):
     df = pd.read_json(json, orient='split')
     
     # Columns to show in frontend    
-    cols = ['Label', 'peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min',
+    cols = ['ms_file', 'peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min',
             'peak_median', 'peak_mean', 'file_size', 'peak_delta_int',
             'peak_rt_of_max']     
     
@@ -336,23 +375,17 @@ def get_table(json, label_regex, col_value, clicks):
     if df['ms_file'].apply(basename).value_counts().max() > 1:
         df['ms_file'] = df['ms_file'].apply(basename)
     
-    # Generate labels 
-    try:
-        labels = [ '.'.join(i.split('.')[:-1]).split('_')[int(label_regex)] for i in df.ms_file ]
-        df['Label'] = labels
-    except:
-        df['Label'] = df.ms_file
         
     # Extract names of biomarkers for other fontend elements
     # before reducing it to frontend version
-    biomarkers = df.peak_label.astype(str).drop_duplicates().sort_values().values        
+    biomarkers = df.groupby('peak_label').mean().peak_max.sort_values(ascending=False).index.astype(str)        
     biomarker_options = [ {'label': i, 'value': i} for i in biomarkers]
     
     # Order dataframe columns               
     df = df[cols]
     
     if col_value != 'full':
-        df = pd.crosstab(df.peak_label, df.Label, df[col_value].astype(np.float64), aggfunc=np.mean).T
+        df = pd.crosstab(df.peak_label, df.ms_file, df[col_value].astype(np.float64), aggfunc=np.mean).T
         df = df.loc[:, (df != 0).any(axis=0)]  # remove columns with only zeros
         df = remove_all_zero_columns(df)
         df = sort_columns_by_median(df)
@@ -360,7 +393,16 @@ def get_table(json, label_regex, col_value, clicks):
             df = df.round(0)
         df.reset_index(inplace=True)
         df.fillna(0, inplace=True)
+        
+    # Generate labels 
+    if (label_regex is not None) and (label_regex != ''):
+        labels = [ '.'.join(i.split('.')[:-1]).split('_')[int(label_regex)] for i in df.ms_file ]
+        df['Label'] = labels
+    else:
+        df['Label'] = df.ms_file
     
+    df = df.set_index('Label').reset_index()
+
     df.columns = df.columns.astype(str)
         
     table = DataTable(

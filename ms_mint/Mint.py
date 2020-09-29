@@ -7,11 +7,13 @@ from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
+from tqdm import tqdm
+
 from .tools import read_peaklists, process,\
     check_peaklist, export_to_excel,\
     MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
 
-from .peak_detection import OpenMSPeakDetection
+from .peak_detection import OpenMSFFMetabo
 
 import ms_mint
 
@@ -23,7 +25,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print('Mint Version:', self.version , '\n')
-        self.peak_detector = OpenMSPeakDetection()
+        self.peak_detector = OpenMSFFMetabo()
 
     @property
     def verbose(self):
@@ -79,7 +81,7 @@ class Mint(object):
             self.run_parallel(nthreads=nthreads, mode=mode)
         else:
             results = []
-            for i, filename in enumerate(self.files):
+            for i, filename in tqdm(enumerate(self.ms_files), total=self.n_files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q': None, 
@@ -98,10 +100,11 @@ class Mint(object):
             print(f'Total runtime: {self.runtime:.2f}s')
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
+            print('Results:', self.results )
         self._status = 'done'
 
-    def detect_peaks(self):
-        detected = self.peak_detector.fit_transform(self.files)
+    def detect_peaks(self, **kwargs):
+        detected = self.peak_detector.fit_transform(self.ms_files, **kwargs)
         if detected is not None:
             self.peaklist = pd.concat([self.peaklist, detected])
 
@@ -110,7 +113,7 @@ class Mint(object):
         m = Manager()
         q = m.Queue()
         args = []
-        for i, filename in enumerate(self.files):
+        for i, filename in enumerate(self.ms_files):
             args.append({'filename': filename,
                          'peaklist': self.peaklist,
                          'queue': q,
@@ -124,8 +127,9 @@ class Mint(object):
                 break
             else:
                 size = q.qsize()
-                self.progress = int(100 * (size / self.n_files))
+                self.progress = max(0, min(nthreads/2, int(100 * (size-nthreads / self.n_files) ) ) )
                 time.sleep(1)
+    
         self.progress = 100
 
         pool.close()
@@ -144,22 +148,31 @@ class Mint(object):
     @property
     def files(self):
         return self._files
-    
+
     @property
-    def n_files(self):
-        return len(self.files)
+    def ms_files(self):
+        return self._files
     
     @files.setter
     def files(self, list_of_files):
+        print('Mint.files is deprecated, please use Mint.ms_files instead!')
+        self.ms_files = list_of_files
+
+    @property
+    def n_files(self):
+        return len(self.ms_files)
+    
+    @ms_files.setter
+    def ms_files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         list_of_files = [str(P(i)) for i in list_of_files]
         for f in list_of_files:
             if not os.path.isfile(f): 
-                print(f'File not found ({f})')
+                print(f'W File not found ({f})')
         self._files = list_of_files
         if self.verbose:
-            print( 'Set files to:\n' + '\n'.join(self.files) + '\n' )
+            print( 'Set files to:\n' + '\n'.join(self.ms_files) + '\n' )
 
     @property
     def peaklist_files(self):
@@ -238,6 +251,35 @@ class Mint(object):
             self.progress_callback(value)
 
     def export(self, filename=None):
-        buffer = export_to_excel(self, filename=filename)
-        if filename is None:
+        fn = filename
+        if fn is None:
+            buffer = export_to_excel(self, filename=fn)
             return buffer
+        elif fn.endswith('.xlsx'):
+            export_to_excel(self, filename=fn)
+        elif fn.endswith('.csv'):
+            self.results.to_csv(fn, index=False)
+
+    def load(self, fn):
+        if self.verbose: print('Loading MINT state')
+        try:
+            results = pd.read_excel(fn, sheet_name='Results')
+            ms_files = results.ms_file.drop_duplicates()
+            self.results = pd.read_excel(fn, sheet_name='Results')
+            self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
+            self.ms_files = ms_files
+            return None
+        except:
+            pass
+
+        try:
+            results = pd.read_csv(fn)
+            ms_files = results.ms_file.drop_duplicates()
+            peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+            self.results = results
+            self.ms_files = ms_files
+            self.peaklist = peaklist
+            return None
+        except:
+            pass
+        

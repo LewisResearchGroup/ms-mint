@@ -1,4 +1,6 @@
 # MINT (Metabolomics Integrator)
+ 
+
 
 ![GUI](./docs/image/mint-overview.png "The GUI")
 
@@ -36,3 +38,12 @@ Then navigate to http://localhost:9999 if the browser does not open automaticall
     git clone ...
     pip install -e . 
     pyinstaller --one-dir specfiles\Mint__onedir__.spec
+
+
+# Developer Notes
+
+    python3 setup.py sdist bdist_wheel
+    python3 -m twine upload --repository ms-mint dist/ms*mint-*
+
+### On windows
+    pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec
