@@ -11,10 +11,8 @@ from collections.abc import Iterable
 from os.path import basename
 from plotly.subplots import make_subplots
 
-from scipy.cluster.hierarchy import linkage, dendrogram
-from scipy.spatial.distance import pdist, squareform
 
-def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True, 
+def plot_peak_shapes(mint_results, n_cols=1, biomarkers=None, peak_labels=None, legend=True, 
                      verbose=False, legend_orientation='v', call_show=False):
     '''
     Returns a plotly multiplost of all peak_shapes in mint.results
@@ -30,7 +28,14 @@ def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True,
     res = res.set_index(['peak_label', 'ms_file'])
 
     if biomarkers is None:
+        biomarkers = peak_labels
+
+    if biomarkers is None:
         biomarkers = []
+        #biomarkers = mint_results.groupby('peak_label').mean().peak_max.sort_values(ascending=False).index.astype(str) 
+
+    if isinstance(biomarkers, str):
+        biomarkers = [biomarkers]
 
     if len(biomarkers) != 0:
         labels = [str(i) for i in biomarkers]
@@ -99,8 +104,8 @@ def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True,
         fig.update_layout(legend_orientation=legend_orientation)
     
     fig.update_layout(showlegend=legend)
-    
     fig.update_layout(height=400*n_rows, title_text="Peak Shapes")
+
     if call_show: 
         fig.show(config={'displaylogo': False})
     else:
@@ -156,6 +161,7 @@ def plot_peak_shapes_3d(mint_results, peak_label=None, legend=True,
     fig.update_layout(showlegend=legend)
         
     fig.update_layout({'title': peak_label, 'title_x': 0.5})
+    
     if call_show: 
         fig.show(config={'displaylogo': False})
     else:
@@ -199,19 +205,21 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         plot_type = 'Heatmap'
         
     if clustered:
-        D = squareform(pdist(df, metric='seuclidean'))
-        Y = linkage(D, method='complete')
-        Z = dendrogram(Y, orientation='left', no_plot=True)['leaves']
-        Z.reverse()
-        df = df.iloc[Z,:]
+        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list(),
+                                           color_threshold=0, colorscale=['black']*8)
+        dendro_leaves = dendro_side['layout']['yaxis']['ticktext']
+        df = df.loc[dendro_leaves,:]
         if correlation:
-            df = df[df.index]
-        dendro_side = ff.create_dendrogram(df, orientation='right', labels=df.index.to_list())
+            df = df[df.index]        
 
-    heatmap = go.Heatmap(z=df.values,
-                         x=df.columns,
-                         y=df.index.to_list(),
-                         colorscale = colorscale)
+    x = df.columns
+    if clustered:
+        y = dendro_leaves
+    else:
+        y = df.index.to_list()
+    z = df.values
+
+    heatmap = go.Heatmap(x=x, y=y, z=z, colorscale = colorscale)
     
     title = f'{plot_type} of {",".join(plot_attributes)} {name}'
 
@@ -278,6 +286,7 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
                        'zeroline': False,
                        'showticklabels': False,
                       })
+
         fig['layout']['yaxis']['ticktext'] = np.asarray(y_labels)
         fig['layout']['yaxis']['tickvals'] = np.asarray(dendro_side['layout']['yaxis']['tickvals'])
 

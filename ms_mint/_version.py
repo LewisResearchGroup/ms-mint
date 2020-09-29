@@ -40,9 +40,9 @@ def get_config():
     # _version.py
     cfg = VersioneerConfig()
     cfg.VCS = "git"
-    cfg.style = ""
+    cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "mint-"
+    cfg.parentdir_prefix = ""
     cfg.versionfile_source = "ms_mint/_version.py"
     cfg.verbose = False
     return cfg

@@ -53,10 +53,10 @@ if __name__ == '__main__':
 
     if '--data' in args:
         mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/*/**.mzXML', recursive=True)[:4]
-        mint.peaklist = mint.peaklist
         mint.peaklist_files = 'tests/data/example_peaklist.csv'
+
         print('MINT files:', mint.files)
         print('MINTegration list:')
         print(mint.peaklist.to_string())
-
+        
     app.run_server(debug=DEBUG, port=9999)
