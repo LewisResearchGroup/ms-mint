@@ -35,6 +35,7 @@ class TestExportAndLoad():
 
     def test__load_from_excel(self, tmp_path):
         fn = os.path.join(tmp_path, 'results.xlsx')
+        print('Filename:', fn)
         mint_b.load(fn)
 
         actual_results = mint_b.results.round(8)
@@ -57,6 +58,7 @@ class TestExportAndLoad():
 
     def test__load_from_csv(self, tmp_path):
         fn = os.path.join(tmp_path, 'results.csv')
+        print('Filename:', fn)
         mint_c.load(fn)
 
         actual_results = mint_c.results.round(3)

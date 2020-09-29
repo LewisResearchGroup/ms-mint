@@ -44,3 +44,6 @@ Then navigate to http://localhost:9999 if the browser does not open automaticall
 
     python3 setup.py sdist bdist_wheel
     python3 -m twine upload --repository ms-mint dist/ms*mint-*
+
+### On windows
+    pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec

@@ -21,7 +21,7 @@ class TestClass():
     def test__mint_list(self):
         mint.list_files()
         result = mint.message_box.value
-        expect = ('\n'.join(['mzXML files to process:',
+        expect = ('\n'.join(['4 MS-files to process:',
                              'tests/data/ms_files/fileA.mzXML',
                              'tests/data/ms_files/fileB.mzxml',
                              'tests/data/ms_files/fileC.mzML',

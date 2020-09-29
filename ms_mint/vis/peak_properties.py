@@ -1,6 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-from scipy.signal import find_peaks, find_peaks_cwt
+#from scipy.signal import find_peaks, find_peaks_cwt
 
 def plot_peak_properties(peak_data, show_legend=True, find_peaks=False):
     peak_shape_int = [float(i) for i in peak_data.peak_shape_int.split(',')]
@@ -35,21 +35,21 @@ def plot_peak_properties(peak_data, show_legend=True, find_peaks=False):
 
     # Find peaks
     if find_peaks:
-       n_rolling = 1
-       if len(shape) > 25:
-              n_rolling = max(1, int(len(shape) / 5))
+        n_rolling = 1
+        if len(shape) > 25:
+            n_rolling = max(1, int(len(shape) / 5))
               
-       r_shape = (3*shape.rolling(n_rolling, center=True).max() + 
-                     shape.rolling(n_rolling, center=True).mean())
+        r_shape = (3*shape.rolling(n_rolling, center=True).max() + 
+        shape.rolling(n_rolling, center=True).mean())
        
-       a, h = find_peaks(r_shape, height=1e5, rel_height=1e4)
-       print(f'Found {len(a)} peaks.')
+        a, h = find_peaks(r_shape, height=1e5, rel_height=1e4)
+        print(f'Found {len(a)} peaks.')
        
-       shape.iloc[a].plot(lw=0, marker='x', ms=5, 
-                            mew=1, label='Detected Peaks', color='green')
+        shape.iloc[a].plot(lw=0, marker='x', ms=5, 
+                           mew=1, label='Detected Peaks', color='green')
         
     if show_legend:
-       plt.legend(loc=0, bbox_to_anchor=(1,1), fontsize=8)
+        plt.legend(loc=0, bbox_to_anchor=(1,1), fontsize=8)
     
     # Formating the figure
     plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
@@ -57,6 +57,6 @@ def plot_peak_properties(peak_data, show_legend=True, find_peaks=False):
     plt.xlabel('Retention Time [min]')
     plt.ylabel('Intensity')
     if show_legend:
-       plt.legend(loc=0, bbox_to_anchor=(1,1), fontsize=8)
+        plt.legend(loc=0, bbox_to_anchor=(1,1), fontsize=8)
     plt.tight_layout()
 

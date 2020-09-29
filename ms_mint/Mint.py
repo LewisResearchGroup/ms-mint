@@ -100,7 +100,7 @@ class Mint(object):
             print(f'Total runtime: {self.runtime:.2f}s')
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
-            print(f'Results:', self.results )
+            print('Results:', self.results )
         self._status = 'done'
 
     def detect_peaks(self, **kwargs):
@@ -260,18 +260,26 @@ class Mint(object):
         elif fn.endswith('.csv'):
             self.results.to_csv(fn, index=False)
 
-    def load(self, filename):
-        fn = filename
-        if fn.endswith('.xlsx'):
+    def load(self, fn):
+        if self.verbose: print('Loading MINT state')
+        try:
             results = pd.read_excel(fn, sheet_name='Results')
             ms_files = results.ms_file.drop_duplicates()
             self.results = pd.read_excel(fn, sheet_name='Results')
             self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
             self.ms_files = ms_files
-        elif fn.endswith('.csv'):
+            return None
+        except:
+            pass
+
+        try:
             results = pd.read_csv(fn)
             ms_files = results.ms_file.drop_duplicates()
             peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
             self.results = results
             self.ms_files = ms_files
             self.peaklist = peaklist
+            return None
+        except:
+            pass
+        
