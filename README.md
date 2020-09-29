@@ -47,3 +47,4 @@ Then navigate to http://localhost:9999 if the browser does not open automaticall
 
 ### On windows
     pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec
+
