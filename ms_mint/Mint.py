@@ -10,7 +10,7 @@ from multiprocessing import Pool, Manager, cpu_count
 from tqdm import tqdm
 
 from .tools import read_peaklists, process,\
-    check_peaklist, export_to_excel,\
+    check_peaklist, fix_peaklist, export_to_excel,\
     MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
 
 from .peak_detection import OpenMSFFMetabo
@@ -201,6 +201,7 @@ class Mint(object):
 
     @peaklist.setter
     def peaklist(self, peaklist):
+        peaklist = fix_peaklist(peaklist)
         errors = check_peaklist(peaklist)
         if len(errors) != 0:
             peaklist = peaklist.drop_duplicates()

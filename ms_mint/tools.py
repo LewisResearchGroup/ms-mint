@@ -18,88 +18,162 @@ def example_results():
     return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_results.csv')
 
 
-RESULTS_COLUMNS = ['peak_label', 'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
-    'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
-    'peak_rt_of_max', 'peaklist', 'mz_mean', 'mz_width', 'rt_min', 'rt_max', 
-    'intensity_threshold', 'peak_shape_rt', 'peak_shape_int']
+# The controls the order of columns in mint.results
+RESULTS_COLUMNS = [
+    'peak_area', 
+    'peak_n_datapoints', 'peak_max', 
+    'peak_min', 'peak_median',
+    'peak_mean', 'peak_delta_int',
+    'peak_shape_rt', 'peak_shape_int', 
+    'peak_mass_diff_25pc', 'peak_mass_diff_50pc', 
+    'peak_mass_diff_75pc']
+
+MINT_RESULTS_COLUMNS = ['ms_file']+ PEAKLIST_COLUMNS + RESULTS_COLUMNS
+
+def integrator_base(ms_data: pd.DataFrame, peaklist):
+
+        collection = []
+        for peak in to_peaks(peaklist):
+            print(peak)
+            slizE = slice_ms1_df(ms_data, **peak)
+            # projected in mz dimension
+            shape = slizE[['retentionTime', 'm/z array', 'intensity array']]\
+                            .groupby(['retentionTime', 'm/z array']).max()\
+                            .unstack()\
+                            .sum(axis=1)
+            
+            if len(shape) == 0:
+                results = peak.copy()
+                results.update({'peak_area': 0})
+                return results
+        
+            peak_area = np.int64(shape.sum())
+            peak_med = np.float64(shape[shape != 0].median())
+            peak_avg = np.float64(shape[shape != 0].mean())
+            peak_max = np.float64(shape.max())
+            peak_max_raw = np.float64(slizE['intensity array'].max()) 
+            peak_min = np.float64(shape.min())
+
+            mass_stats = ( shape['m/z array']-peak['mz_mean'] ).describe()
+
+            peak_mass_diff_mean = np.float64( mass_stats['50%'] )
+            peak_mass_diff_25pc = np.float64( mass_stats['25%'] )
+            peak_mass_diff_75pc = np.float64( mass_stats['75%'] )
+
+            results = {}
+
+            float_list_to_comma_sep_str = lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
+
+            results['peak_shape_rt'] = float_list_to_comma_sep_str( shape.index )
+            results['peak_shape_int'] = float_list_to_comma_sep_str ( shape.values )
+            results['peak_area']   = peak_area
+            results['peak_max']    = peak_max
+            results['peak_max_raw'] = peak_max_raw
+            results['peak_min']    = peak_min
+            results['peak_median'] = peak_med
+            results['peak_mean']   = peak_avg
+            results['peak_int_first'] = shape.values[0]
+            results['peak_int_last'] = shape.values[-1]
+            results['peak_delta_int'] = results['peak_int_last'] - results['peak_int_first']
+            results['peak_rt_of_max'] = shape[shape == peak_max].index
+            results['peak_n_datapoints'] = len(shape)
+            results['peak_mass_diff_50pc'] = peak_mass_diff_50pc
+            results['peak_mass_diff_25pc'] = peak_mass_diff_25pc
+            results['peak_mass_diff_75pc'] = peak_mass_diff_75pc
+
+            if len(results['peak_rt_of_max']) > 0:
+                results['peak_rt_of_max'] = np.mean(results['peak_rt_of_max'])
+            else:
+                results['peak_rt_of_max'] = np.nan
+            results.update(peak)
+            collection.append(results)
+
+        return pd.concat(collection)
 
 
-MINT_RESULTS_COLUMNS = ['peak_label', 'ms_file', 
-    'peak_area', 'peak_n_datapoints', 'peak_max', 'peak_min', 'peak_median',
-    'peak_mean', 'peak_int_first', 'peak_int_last', 'peak_delta_int',
-    'peak_rt_of_max', 'file_size', 'intensity_sum', 'ms_path', 'peaklist', 
-    'mz_mean', 'mz_width', 'rt_min', 'rt_max', 'intensity_threshold',
-    'peak_shape_rt', 'peak_shape_int']
+#integrator_base = np.vectorize(integrator_base)
 
 
 def integrate_peaks(ms_data, peaklist):
-    
-    def base(peak):        
-        slizE = slice_ms1_mzxml(ms_data, **peak)
-
-        shape = slizE[['retentionTime', 'm/z array', 'intensity array']]\
-                        .groupby(['retentionTime', 'm/z array']).sum()\
-                        .unstack()\
-                        .sum(axis=1)
-        
-        if len(shape) == 0:
-            results = peak.copy()
-            results.update({'peak_area': 0})
-            return results
-    
-        peak_area = np.int64(shape.sum())
-        peak_med = np.float64(shape[shape != 0].median())
-        peak_avg = np.float64(shape[shape != 0].mean())
-        peak_max = np.float64(shape.max())
-        peak_min = np.float64(shape.min())
-
-        results = {}
-
-        float_list_to_comma_sep_str = lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
-
-        results['peak_shape_rt'] = float_list_to_comma_sep_str( shape.index )
-        results['peak_shape_int'] = float_list_to_comma_sep_str ( shape.values )
-        results['peak_area']   = peak_area
-        results['peak_max']    = peak_max
-        results['peak_min']    = peak_min
-        results['peak_median'] = peak_med
-        results['peak_mean']   = peak_avg
-        results['peak_int_first'] = shape.values[0]
-        results['peak_int_last'] = shape.values[-1]
-        results['peak_delta_int'] = results['peak_int_last'] - results['peak_int_first']
-        results['peak_rt_of_max'] = shape[shape == peak_max].index
-        results['peak_n_datapoints'] = len(shape)
-    
-        if len(results['peak_rt_of_max']) > 0:
-            results['peak_rt_of_max'] = np.mean(results['peak_rt_of_max'])
-        else:
-            results['peak_rt_of_max'] = np.nan
-        results.update(peak)
-        return results
-    
-    base = np.vectorize(base)
-    results = base(to_peaks(peaklist))
-    results = pd.merge(pd.DataFrame(list(results)), peaklist[['peaklist', 'peak_label']], on=['peak_label'])
-    
+    results = integrate_peaks_from_df(ms_data, peaklist)
+    results = pd.DataFrame(results, columns=['peak_label']+RESULTS_COLUMNS)
+    results = pd.merge(peaklist, results, on=['peak_label'])
+    results = results.reset_index(drop=True)
     # Make sure all columns are present
     for col in RESULTS_COLUMNS:
             if not col in results.keys():
                 results[col] = np.NaN
-                
-    return results[RESULTS_COLUMNS]
+    return results
 
-def integrate_peak(ms_data, mz_mean, mz_width, rt_min, rt_max, 
-                   intensity_threshold, peak_label):
-    peaklist = pd.DataFrame([dict(mz_mean=mz_mean, 
-                                  mz_width=mz_width,
-                                  rt_min=rt_min,
-                                  rt_max=rt_max, 
-                                  intensity_threshold=intensity_threshold, 
-                                  peak_label=peak_label,
-                                  peaklist='single_peak')], index=[0])
-    result = integrate_peaks(ms_data, peaklist)
+
+def integrate_peaks_from_df(df, peaklist):
+    peak_cols = ['mz_mean', 'mz_width', 'rt_min', 'rt_max', 
+                 'intensity_threshold', 'peak_label']
+    array_peaks = peaklist[peak_cols].values
+    array_data = df[['retentionTime', 'm/z array', 'intensity array']].values
+    result = integrate_peaks_from_numpy(array_data, array_peaks)
     return result
-    
+
+
+def integrate_peaks_from_numpy(array, peaks):
+    results = []
+    for (mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label) in peaks:
+        props = integrate_peak_from_numpy(array, mz_mean=mz_mean, 
+                    mz_width=mz_width, rt_min=rt_min, rt_max=rt_max, 
+                    intensity_threshold=intensity_threshold, peak_label=peak_label)
+        if props is None:
+            continue
+        results.append([props[col] for col in ['peak_label']+RESULTS_COLUMNS])
+    return results
+
+def integrate_peak_from_numpy(array, mz_mean, mz_width, rt_min, rt_max, 
+                              intensity_threshold, peak_label=None):
+    _slice = slice_ms1_array(array=array, mz_mean=mz_mean, mz_width=mz_width,
+                             rt_min=rt_min, rt_max=rt_max, 
+                             intensity_threshold=intensity_threshold)
+    props = get_props(_slice)
+    if props is None:
+        return
+    if peak_label is not None:
+        props['peak_label'] = peak_label
+    return props
+
+
+
+def get_props(array):
+
+    float_list_to_comma_sep_str = lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
+
+    projection = array[:,[0,1]]
+    times = array[:,0]
+    masses = array[:,1]
+    intensities = array[:,2]
+    peak_n_datapoints = len(array)
+    if peak_n_datapoints == 0:
+        return None
+
+    peak_area = intensities.sum()
+    peak_mean = intensities.mean()
+    peak_max = intensities.max()
+    peak_min = intensities.min()
+    peak_median = np.median(intensities)
+
+    peak_rt_of_max = times[masses.argmax()]
+    peak_delta_int = np.abs(intensities[0] - intensities[-1])
+
+    peak_mass_diff_25pc, peak_mass_diff_50pc, peak_mass_diff_75pc = \
+        np.quantile( masses, [.25,.5,.75] )
+
+    peak_shape_rt = float_list_to_comma_sep_str( projection[:,0] )
+    peak_shape_int = float_list_to_comma_sep_str ( projection[:,1] )
+
+    return dict(peak_area=peak_area, peak_max=peak_max, peak_min=peak_min, peak_mean=peak_mean, 
+                peak_rt_of_max=peak_rt_of_max, peak_median=peak_median,
+                peak_delta_int=peak_delta_int, peak_n_datapoints=peak_n_datapoints,
+                peak_mass_diff_25pc=peak_mass_diff_25pc, 
+                peak_mass_diff_50pc=peak_mass_diff_50pc, 
+                peak_mass_diff_75pc=peak_mass_diff_75pc,
+                peak_shape_rt=peak_shape_rt, peak_shape_int=peak_shape_int)
 
 
 def read_peaklists(filenames):
@@ -196,6 +270,7 @@ def to_peaks(peaklist):
                       'peak_label']
                       
     tmp = [list(i) for i in list(peaklist[cols_to_import].values)]
+    
     output = [{'mz_mean': el[0],
                'mz_width': el[1], 
                'rt_min': el[2],
@@ -206,7 +281,28 @@ def to_peaks(peaklist):
     return output
 
 
-def slice_ms1_mzxml(df, rt_min, rt_max, mz_mean, mz_width, intensity_threshold, peak_label=None):
+def peak_window_from_peaklist(peaklist):
+    '''
+    Takes a dataframe with at least the columns:
+        ['mz_mean', 'mz_width', 
+         'rt_min',  'rt_max', 
+         'peak_label', 'intensity_threshold'].
+    Returns a list of dictionaries that define peaks.
+    '''
+    cols_to_import = ['mz_mean', 
+                      'mz_width',
+                      'rt_min', 
+                      'rt_max', 
+                      'intensity_threshold',
+                      'peak_label']
+
+    peaklist_array = peaklist[cols_to_import].values
+    for row in peaklist_array:
+        yield row
+
+
+def slice_ms1_df(df: pd.DataFrame, rt_min, rt_max, mz_mean, mz_width, 
+                    intensity_threshold, peak_label=None):
     '''
     Returns a slize of a metabolomics mzXML file.
     - df: pandas.DataFrame that has columns 
@@ -226,6 +322,32 @@ def slice_ms1_mzxml(df, rt_min, rt_max, mz_mean, mz_width, intensity_threshold, 
                       (df['m/z array'] <= mz_mean+delta_mass) &
                       (df['intensity array'] >= intensity_threshold)]
     return df_slice
+
+
+def slice_ms1_array(array: np.array, rt_min, rt_max, mz_mean, mz_width, 
+                    intensity_threshold):
+
+    delta_mass = mz_width*mz_mean*1e-6
+
+    array = array[(array[:, 0] >= rt_min)]
+    array = array[(array[:, 0] <= rt_max)]
+    array = array[(np.abs(array[:, 1]-mz_mean) <= delta_mass)]
+    array = array[(array[:, 2] >= intensity_threshold)]
+
+    return array
+
+
+
+
+def fix_peaklist(peaklist):
+    cols = peaklist.columns
+    if 'intensity_threshold' not in cols:
+        peaklist['intensity_threshold'] = 0
+    if 'mz_width' not in cols:
+        peaklist['mz_width'] = 10
+    if 'peaklist' not in cols:
+        peaklist['peaklist'] = 'unknown'
+    return peaklist
 
 
 def check_peaklist(peaklist):
@@ -287,12 +409,13 @@ def process(args):
         df = ms_file_to_df(filename=filename)[cols]
     except:
         return pd.DataFrame()
+
     results = integrate_peaks(df, peaklist)
     results['ms_file'] = filename
     results['ms_path'] = os.path.dirname(filename)
     results['file_size'] = os.path.getsize(filename) / 1024 / 1024
     results['intensity_sum'] = df['intensity array'].sum()
-    
+
     return results[MINT_RESULTS_COLUMNS]
 
 
@@ -313,7 +436,8 @@ def generate_grid_peaklist(masses, dt, rt_max=10,
     del peaklist[0]
     peaklist.columns = ['mz_mean', 'rt_min']
     peaklist['rt_max'] = peaklist.rt_min+(1*dt)
-    peaklist['peak_label'] =  peaklist.mz_mean.apply(lambda x: '{:.3f}'.format(x)) + '__' + peaklist.rt_min.apply(lambda x: '{:2.2f}'.format(x))
+    peaklist['peak_label'] =  peaklist.mz_mean.apply(lambda x: '{:.3f}'.format(x))\
+                              + '__' + peaklist.rt_min.apply(lambda x: '{:2.2f}'.format(x))
     peaklist['mz_width'] = mz_ppm
     peaklist['intensity_threshold'] = intensity_threshold
     peaklist['peaklist'] = 'Generated'
