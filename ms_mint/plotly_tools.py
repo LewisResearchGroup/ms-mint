@@ -14,7 +14,7 @@ from plotly.subplots import make_subplots
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
-def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True, 
+def plot_peak_shapes(mint_results, n_cols=1, legend=True, peak_labels=None,
                      verbose=False, legend_orientation='v', call_show=False):
     '''
     Returns a plotly multiplost of all peak_shapes in mint.results
@@ -28,13 +28,13 @@ def plot_peak_shapes(mint_results, n_cols=3, biomarkers=None, legend=True,
     labels = list(mint_results.peak_label.drop_duplicates())
     
     res = res.set_index(['peak_label', 'ms_file'])
+    
+    if peak_labels is None:
+        peak_labels = []
+        #peak_labels = mint_results.groupby('peak_label').mean().peak_max.sort_values(ascending=False).index.astype(str) 
 
-    if biomarkers is None:
-        biomarkers = []
-        #biomarkers = mint_results.groupby('peak_label').mean().peak_max.sort_values(ascending=False).index.astype(str) 
-
-    if len(biomarkers) != 0:
-        labels = [str(i) for i in biomarkers]
+    if len(peak_labels) != 0:
+        labels = [str(i) for i in peak_labels]
     
     # Calculate neccessary number of rows
     n_rows = len(labels)//n_cols

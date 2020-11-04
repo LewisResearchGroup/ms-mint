@@ -104,14 +104,17 @@ class OpenMSFFMetabo():
             if ( min_quality is not None ) and ( quality < min_quality ):
                 continue
 
-            rt_min = max([0, (feat.getRT() - feat.getWidth()) / 60])
-            rt_max = (feat.getRT() + feat.getWidth()) / 60
+            mz = feat.getMZ()
+            rt = feat.getRT() / 60
+            rt_width = feat.getWidth() / 60
+            rt_min = max([0, (rt - rt_width)])
+            rt_max = (rt + rt_width)
             
-            data = {'peak_label': f'{feat.getMZ():06.3f}-{feat.getRT():06.3f}', 
-                    'mz_mean': feat.getMZ(), 'mz_width': 10, 
-                    'rt_min': rt_min, 'rt_max': rt_max, 'rt': feat.getRT() / 60, 
-                    'intensity_threshold': 0, 
-                    'oms_quality': quality, 
+            data = {'peak_label': f'mz:{mz:07.4f}-rt:{rt:03.1f}',
+                    'mz_mean': mz, 'mz_width': 10,
+                    'rt_min': rt_min, 'rt_max': rt_max, 'rt': rt, 
+                    'intensity_threshold': 0,
+                    'oms_quality': quality,
                     'peaklist': 'OpenMSFFMetabo'}
             
             features.append(data)
@@ -190,35 +193,40 @@ def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1):
     print('Condensing peaklist')
     cols = ['mz_mean', 'rt_min', 'rt_max', 'rt']
     peaklist = peaklist.sort_values(cols)[cols]
-    new_peaklist = pd.DataFrame(columns=cols)
-    
-    for ndx_a, peak_a in tqdm(peaklist.iterrows(), total=len(peaklist)):
-        mz_a, rt_min_a, rt_max_a, rt_a = peak_a
-        merged = False
-        for ndx_b, peak_b in new_peaklist.iterrows():
-            if ( peaks_are_close(peak_a, peak_b, 
-                                 max_delta_mz_ppm=max_delta_mz_ppm, 
-                                 max_delta_rt=max_delta_rt) ):
-                
-                merged_peak = merge_peaks(peak_a, peak_b)
-                new_peaklist.loc[ndx_b, cols] = merged_peak
-                merged = True
-                break        
-        if not merged:
-            new_peaklist = pd.concat([new_peaklist, as_df(peak_a)])\
-                             .sort_values(cols).reset_index(drop=True)
-            
-    return fix_peaklist(new_peaklist.reset_index(drop=True))
 
+    n_before = len(peaklist)
+    n_after = None
+
+    while n_before != n_after:
+        n_before = len(peaklist)
+        new_peaklist = pd.DataFrame(columns=cols)
+        for ndx_a, peak_a in tqdm(peaklist.iterrows(), total=len(peaklist)):
+            mz_a, rt_min_a, rt_max_a, rt_a = peak_a
+            merged = False
+            for ndx_b, peak_b in new_peaklist[ abs(new_peaklist.mz_mean - mz_a) < 0.01 ].iterrows():
+                if ( peaks_are_close(peak_a, peak_b, 
+                                    max_delta_mz_ppm=max_delta_mz_ppm, 
+                                    max_delta_rt=max_delta_rt) ):
+                    
+                    merged_peak = merge_peaks(peak_a, peak_b)
+                    new_peaklist.loc[ndx_b, cols] = merged_peak
+                    merged = True
+                    break        
+            if not merged:
+                new_peaklist = pd.concat([new_peaklist, as_df(peak_a)])\
+                                .sort_values(cols).reset_index(drop=True)
+        peaklist = new_peaklist
+        n_after = len(new_peaklist)
+        
+    return fix_peaklist(new_peaklist.reset_index(drop=True))
 
 def merge_peaks(peak_a, peak_b):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
     mz_b, rt_min_b, rt_max_b, rt_b = peak_b
     return (mean([mz_a, mz_b]), 
-            min([rt_min_a, rt_min_b]), 
-            max([rt_max_a, rt_max_b]), 
+            min([rt_min_a, rt_min_b, rt_max_a, rt_max_b]), 
+            max([rt_min_a, rt_min_b, rt_max_a, rt_max_b]), 
             mean([rt_a, rt_b]))
-
 
 def peaks_are_close(peak_a, peak_b, max_delta_mz_ppm=10, max_delta_rt=0.1):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
@@ -247,13 +255,13 @@ def as_df(peak):
 def fix_peaklist(peaklist):
     to_formated_str = lambda x: f'{x:.3f}'
     if 'peak_label' not in peaklist.columns:     
-        peaklist['peak_label'] = ( peaklist.index.astype(str) + '-' +
-                                   peaklist.mz_mean.apply(to_formated_str) + '-' +
-                                   peaklist['rt_min'].apply(to_formated_str) )
+        peaklist['peak_label'] = ( peaklist.index.astype(str) + '_' +
+                                   'mz:' + peaklist.mz_mean.apply(lambda x: f'{x:7.3f}') + '_' +
+                                   'rt:' + peaklist['rt'].apply(lambda x: f'{x:3.1f}') )
     if 'mz_width' not in peaklist.columns:     
         peaklist['mz_width'] = 10
     if 'peaklist' not in peaklist.columns:
-        peaklist['peaklist'] = 'experimental'
+        peaklist['peaklist'] = 'condensed'
     if 'intensity_threshold' not in peaklist.columns:
         peaklist['intensity_threshold'] = 0
     if 'rt' not in peaklist.columns:

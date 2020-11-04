@@ -30,5 +30,5 @@ class TestClass():
                              'Using peak list:',
                              '',
                              'No peaklist defined.']))
-        assert expect == result
+        assert expect == result, result
 
