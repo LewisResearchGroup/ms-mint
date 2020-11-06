@@ -4,84 +4,7 @@ import pyopenms as oms
 from os.path import basename
 from numpy import mean, max, min, abs
 from tqdm import tqdm
-
-
-
-class OpenMSPeakDetection():
-    def __init__(self, kind_ff='centroided', kind_peaklist='basic'):
-        self.features = None
-        self.kind_ff = kind_ff
-        self.kind_peaklist = kind_peaklist
-
-    def fit(self, filenames):
-        print('Peak detection')
-        if self.kind_ff == 'centroided':
-            self.centroided(filenames)
-
-    def transform(self, kind_peaklist=None):
-        if self.features is None:
-            return None
-        if kind_peaklist is None:
-            kind_peaklist =self.kind_peaklist
-        if kind_peaklist == 'unique_masses':
-            return self.peaklist_by_unique_masses()
-        elif kind_peaklist == 'basic':
-            return self.initial_peaklist()
-
-    def fit_transform(self, filenames):
-        self.fit(filenames)
-        return self.transform()
-
-    def centroided(self, filenames):
-        options = oms.PeakFileOptions()
-        options.setMSLevels([1])
-        fh = oms.MzXMLFile()
-        fh.setOptions(options)
-
-        # Load data
-        input_map = oms.MSExperiment()
-        for fn in filenames:
-            fh.load(fn, input_map)
-        input_map.updateRanges()
-        
-        ff = oms.FeatureFinder()
-        ff.setLogType(oms.LogType.CMD)
-
-        # Run the feature finder
-        name = "centroided"
-        features = oms.FeatureMap()
-        seeds = oms.FeatureMap()
-        params = oms.FeatureFinder().getParameters(name)
-        ff.run(name, input_map, features, params, seeds)
-        self.features = features
-
-    def peaklist_by_unique_masses(self):
-        features = self.features
-        mz_values = pd.DataFrame([ f.getMZ() for f in features], columns=['MZ'])
-        unique_masses = mz_values.MZ.round(3).value_counts().index
-        peaklist = pd.DataFrame(unique_masses.sort_values(), columns=['mz_mean'])
-        peaklist['mz_width'] = 10
-        peaklist['rt_min'] = 0
-        peaklist['rt_max'] = 12
-        peaklist['peak_label'] = peaklist['mz_mean'].astype(str)
-        peaklist['peaklist'] = 'FeatureFinder'
-        peaklist['intensity_threshold'] = 0
-        return peaklist
-
-    def initial_peaklist(self):
-        features = self.features        
-        peaklist = pd.DataFrame([(f.getRT()/60, f.getMZ()) for f in features] , 
-                                columns=['rt_mean', 'mz_mean']).round(3)
-        peaklist['mz_width'] = 10
-        peaklist['rt_min'] = peaklist.rt_mean - 0.3
-        peaklist['rt_max'] = peaklist.rt_mean + 0.3
-        peaklist['peak_label'] = peaklist['mz_mean'].astype(str) + '-' + peaklist['rt_mean'].astype(str)
-        peaklist['peaklist'] = 'FeatureFinder'
-        peaklist['intensity_threshold'] = 0
-        return peaklist
-    
-    def get_peaklist(self):
-        return self.initial_peaklist()
+from ..peaklists import standardize_peaklist 
 
 
 class OpenMSFFMetabo():
@@ -134,7 +57,7 @@ class OpenMSFFMetabo():
         return self.transform(**kwargs)
 
 
-def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
+def oms_ffmetabo_single_file(filename, max_peaks=5000):
 
     feature_map = oms.FeatureMap()
 
@@ -142,8 +65,9 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
     mass_traces_split = []
     mass_traces_filtered = []
     exp = oms.MSExperiment()
-
+    peak_map = oms.PeakMap()
     options = oms.PeakFileOptions()
+    
     options.setMSLevels([1])
 
     if filename.lower().endswith('.mzxml'):
@@ -154,12 +78,10 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
     fh.setOptions(options)
 
     # Peak map
-    peak_map = oms.PeakMap()
-
     fh.load(filename, exp)
 
-    for chrom in exp.getChromatograms():
-        peak_map.addChrom(chrom)
+    #for chrom in exp.getChromatograms():
+    #    peak_map.addChrom(chrom)
 
     for spec in exp.getSpectra():
         peak_map.addSpectrum(spec)
@@ -175,15 +97,6 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
                 mass_traces_split,
                 feature_map,
                 mass_traces_filtered)
-
-    if verbose:
-        print('# Filename:', basename(filename))
-        print('# Spectra:', len( exp.getSpectra() ))
-        print('# Chromatograms:', len( exp.getChromatograms() ) )
-        print('# Mass traces:', len(mass_traces) )
-        print('# Mass traces split:', len(mass_traces_split) )
-        print('# Mass traces filtered:', len(mass_traces_filtered) )
-        print('# Features:', feature_map.size() )
 
     feature_map.sortByOverallQuality()
     return feature_map
@@ -220,6 +133,7 @@ def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1):
         
     return fix_peaklist(new_peaklist.reset_index(drop=True))
 
+
 def merge_peaks(peak_a, peak_b):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
     mz_b, rt_min_b, rt_max_b, rt_b = peak_b
@@ -227,6 +141,7 @@ def merge_peaks(peak_a, peak_b):
             min([rt_min_a, rt_min_b, rt_max_a, rt_max_b]), 
             max([rt_min_a, rt_min_b, rt_max_a, rt_max_b]), 
             mean([rt_a, rt_b]))
+
 
 def peaks_are_close(peak_a, peak_b, max_delta_mz_ppm=10, max_delta_rt=0.1):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
@@ -260,8 +175,8 @@ def fix_peaklist(peaklist):
                                    'rt:' + peaklist['rt'].apply(lambda x: f'{x:3.1f}') )
     if 'mz_width' not in peaklist.columns:     
         peaklist['mz_width'] = 10
-    if 'peaklist' not in peaklist.columns:
-        peaklist['peaklist'] = 'condensed'
+    if 'peaklist_name' not in peaklist.columns:
+        peaklist['peaklist_name'] = 'OMS'
     if 'intensity_threshold' not in peaklist.columns:
         peaklist['intensity_threshold'] = 0
     if 'rt' not in peaklist.columns:

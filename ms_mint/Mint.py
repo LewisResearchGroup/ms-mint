@@ -1,3 +1,5 @@
+# ms_mint/Mint.py
+
 import os
 import pandas as pd
 import numpy as np
@@ -9,10 +11,10 @@ from multiprocessing import Pool, Manager, cpu_count
 
 from tqdm import tqdm
 
-from .tools import read_peaklists, process,\
-    check_peaklist, fix_peaklist, export_to_excel,\
-    MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS
-
+from .processing import process_ms1_files_in_parallel
+from .io import export_to_excel
+from .standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRICATED_LABELS
+from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
 from .peak_detection import OpenMSFFMetabo
 
 import ms_mint
@@ -86,7 +88,7 @@ class Mint(object):
                         'peaklist': self.peaklist,
                         'q': None, 
                         'mode': mode}
-                results.append(process(args))
+                results.append(process_ms1_files_in_parallel(args))
                 self.progress = int(100 * (i / self.n_files))
             self.results = pd.concat(results)
             self.progress = 100
@@ -100,7 +102,7 @@ class Mint(object):
             print(f'Total runtime: {self.runtime:.2f}s')
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
-            print(f'Results:', self.results )
+            print('Results:', self.results )
         self._status = 'done'
 
     def detect_peaks(self, **kwargs):
@@ -119,7 +121,7 @@ class Mint(object):
                          'queue': q,
                          'mode': mode})
                    
-        results = pool.map_async(process, args)
+        results = pool.map_async(process_ms1_files_in_parallel, args)
         
         # monitor progress
         while True:
@@ -187,7 +189,7 @@ class Mint(object):
         for f in list_of_files:
             assert os.path.isfile(f), f'File not found ({f})' 
         self._peaklist_files = list_of_files
-        if self.verbose: print( 'Set peaklist files to:\n' + 'hallo\n'.join(self.peaklist_files) + '\n')
+        if self.verbose: print( 'Set peaklist files to:\n'.join(self.peaklist_files) + '\n')
         self.peaklist = read_peaklists(list_of_files)
 
         
@@ -201,7 +203,7 @@ class Mint(object):
 
     @peaklist.setter
     def peaklist(self, peaklist):
-        peaklist = fix_peaklist(peaklist)
+        peaklist = standardize_peaklist(peaklist)
         errors = check_peaklist(peaklist)
         if len(errors) != 0:
             peaklist = peaklist.drop_duplicates()
@@ -261,18 +263,22 @@ class Mint(object):
         elif fn.endswith('.csv'):
             self.results.to_csv(fn, index=False)
 
-    def load(self, filename):
-        fn = filename
-        if fn.endswith('.xlsx'):
-            results = pd.read_excel(fn, sheet_name='Results')
-            ms_files = results.ms_file.drop_duplicates()
-            self.results = pd.read_excel(fn, sheet_name='Results')
-            self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
-            self.ms_files = ms_files
-        elif fn.endswith('.csv'):
-            results = pd.read_csv(fn)
-            ms_files = results.ms_file.drop_duplicates()
-            peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
-            self.results = results
-            self.ms_files = ms_files
-            self.peaklist = peaklist
+    def load(self, fn):
+        if self.verbose: print('Loading MINT state')
+        if isinstance(fn, str):
+            if fn.endswith('xlsx'):
+                results = pd.read_excel(fn, sheet_name='Results').rename(columns=DEPRICATED_LABELS)
+                ms_files = results.ms_file.drop_duplicates()
+                self.results = results
+                self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
+                self.ms_files = ms_files
+                return None
+            elif fn.endswith('.csv'):
+                results = pd.read_csv(fn).rename(columns=DEPRICATED_LABELS)
+                ms_files = results.ms_file.drop_duplicates()
+                peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+                self.results = results
+                self.ms_files = ms_files
+                self.peaklist = peaklist
+                return None
+        

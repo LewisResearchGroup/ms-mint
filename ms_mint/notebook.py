@@ -8,11 +8,14 @@ from ipywidgets import IntProgress as Progress
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
-from .plotly_tools import plot_heatmap
-from .vis import plot_peak_shapes, hierarchical_clustering
+from .vis.plotly.plotly_tools import plot_heatmap
+from .vis.mpl import plot_peak_shapes, hierarchical_clustering
 
 from scipy.cluster.hierarchy import ClusterWarning
 from warnings import simplefilter
+from pathlib import Path as P 
+
+HOME = str(P.home())
 
 class Mint(MintBase):
     def __init__(self, *args, **kwargs):
@@ -93,12 +96,12 @@ class Mint(MintBase):
     def run(self, b=None, **kwargs):
         self.progress = 0
         super(Mint, self).run(**kwargs)
-        self.message_box.value += f'\n\nDone processing.'
+        self.message_box.value += '\n\nDone processing.'
         if self.results is not None:
             self.download_button.style.button_color = 'lightgreen'
     
     def detect_peaks(self, **kwargs):
-        self.message_box.value += f'\n\nRun peak detection.'
+        self.message_box.value += '\n\nRun peak detection.'
         self.progress_bar.value = 50
         super(Mint, self).detect_peaks(**kwargs)
         self.progress_bar.value = 100
@@ -109,7 +112,7 @@ class Mint(MintBase):
     def export_action(self, b=None, filename=None):
         if filename is None:
             filename = 'MINT__results.xlsx'
-            filename = os.path.join(home, filename)
+            filename = os.path.join(HOME, filename)
         self.export(filename)
         self.message_box.value += f'\n\nExported results to: {filename}'
        

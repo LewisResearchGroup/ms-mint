@@ -19,7 +19,6 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_table import DataTable
-import dash_html_components as html
 
 from ..Mint import Mint
 from .Layout import Layout
@@ -27,8 +26,6 @@ from .button_style import button_style
 from ms_mint.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d, plot_heatmap
 from ms_mint.tools import read_peaklists, PEAKLIST_COLUMNS, format_peaklist,\
      diff_peaklist, remove_all_zero_columns, sort_columns_by_median
-
-from plotly.graph_objs._figure import Figure
 
 
 mint = Mint()
@@ -291,7 +288,7 @@ def run_mint(n_clicks, n_clicks_clear, ms_files, peaklist, n_cpus, old_results):
         print('Len peaklist:', len(peaklist))
         raise PreventUpdate
     
-    reset = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
+    #reset = dash.callback_context.triggered[0]['prop_id'].startswith('B_reset')
     run_mint = dash.callback_context.triggered[0]['prop_id'].startswith('B_run')
 
     #mint = Mint()

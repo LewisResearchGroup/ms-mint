@@ -8,7 +8,6 @@ import subprocess
 from dash_table import DataTable
 
 import numpy as np
-import pandas as pd
 
 from multiprocessing import cpu_count
 from ms_mint import __version__
@@ -61,7 +60,7 @@ status = html.Div([
     html.Div(id='n_peaklist_selected', children=0, style={'display': 'none'}),
     html.Div(id='n_files_selected', children=0, style={'display': 'none'}),
     html.Button('Reset', id='B_reset', style=button_style('warn')),
-    html.A(href=f'https://soerendip.github.io/ms-mint/', 
+    html.A(href='https://soerendip.github.io/ms-mint/', 
          children=[html.Button('Help', id='B_help', style=button_style('help', float="right"))],
          target="_blank"),
     html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
