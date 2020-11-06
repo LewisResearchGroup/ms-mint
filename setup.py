@@ -1,7 +1,4 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 import versioneer
 
@@ -29,7 +26,8 @@ install_requires = [
     'scikit-learn',
     'xlrd',
     'ipywidgets',
-    'pyopenms'
+    'pyopenms',
+    'tqdm'
 ]
 
 config = {
@@ -42,7 +40,7 @@ config = {
     'url': 'https://github.com/soerendip/ms-mint',
     'author_email': 'swacker@ucalgary.ca',
     'scripts': ['scripts/Mint.py', 'scripts/Mint.bat'],
-    'packages': ['ms_mint'],
+    'packages': find_packages(),
     'data_files': [('scripts', ['scripts/Mint.py', 'scripts/Mint.bat']),
                    ('static', ['static/Standard_Peaklist.csv'])],
     'classifiers': [

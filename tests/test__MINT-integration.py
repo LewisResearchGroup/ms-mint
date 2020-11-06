@@ -1,9 +1,11 @@
 import os
 import pandas as pd
+
 from sklearn.metrics import r2_score
 
 from ms_mint.Mint import Mint
-from ms_mint.tools import check_peaklist, MINT_RESULTS_COLUMNS
+from ms_mint.peaklists import check_peaklist
+from ms_mint.standards import MINT_RESULTS_COLUMNS
 
 mint = Mint(verbose=True)
 mint_b = Mint(verbose=True)
@@ -15,7 +17,7 @@ class TestClass():
     
     def test__add_experimental_data(self):
         assert mint.n_files == 0, mint.n_files
-        mint.files = ['tests/data/test.mzXML']
+        mint.ms_files = ['tests/data/test.mzXML']
         assert mint.n_files == 1, mint.n_files
         assert mint.files == ['tests/data/test.mzXML']
 
@@ -62,9 +64,7 @@ class TestClass():
                       'rt_max': [0.2],
                       'intensity_threshold': [0],
                       'peak_label': ['test'],
-                      'peaklist': ['no-file']})
-        print(peaklist)
-        check_peaklist(peaklist)
+                      'peaklist_name': ['no-file']})
         mint.peaklist = peaklist
         mint.run(nthreads=2)   
       
@@ -81,10 +81,11 @@ class TestClass():
     def test__peaklist_v0_equals_v1(self):
         mint.reset()
         mint.files = ['tests/data/test.mzXML']
-        mint.peaklist_files = ['tests/data/peaklist_v0.csv', 'tests/data/peaklist_v1.csv']
+        mint.peaklist_files = ['tests/data/peaklist_v0.csv', 
+                               'tests/data/peaklist_v1.csv']
         mint.run()
         results = []
-        for _, grp in mint.results.groupby('peaklist'):
+        for _, grp in mint.results.groupby('peaklist_name'):
             results.append(grp.peak_area.values)
         assert (results[0] == results[1]).all(), results
     
@@ -100,3 +101,13 @@ class TestClass():
         mint.reset()
         mint.peaklist_files = 'tests/data/peaklist_v0.csv'
         assert mint.run() is None
+
+
+class TestClass():
+    
+    def test__add_experimental_data(self):
+        mint.ms_files = ['tests/data/test.mzXML', 
+                         'tests/data/test.mzML']
+        mint.detect_peaks()
+        print(mint.peaklist)
+        assert len(mint.peaklist) > 0, mint.peaklist

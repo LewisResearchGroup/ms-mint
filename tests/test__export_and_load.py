@@ -3,7 +3,8 @@ import pandas as pd
 import pytest
 
 from ms_mint.Mint import Mint
-from ms_mint.tools import check_peaklist, MINT_RESULTS_COLUMNS
+from ms_mint.peaklists import check_peaklist
+from ms_mint.standards import MINT_RESULTS_COLUMNS
 
 mint_a = Mint()
 mint_b = Mint()
@@ -35,6 +36,7 @@ class TestExportAndLoad():
 
     def test__load_from_excel(self, tmp_path):
         fn = os.path.join(tmp_path, 'results.xlsx')
+        print('Filename:', fn)
         mint_b.load(fn)
 
         actual_results = mint_b.results.round(8)
@@ -57,12 +59,15 @@ class TestExportAndLoad():
 
     def test__load_from_csv(self, tmp_path):
         fn = os.path.join(tmp_path, 'results.csv')
+        print('Filename:', fn)
         mint_c.load(fn)
 
         actual_results = mint_c.results.round(3)
         expect_results = mint_a.results.round(3)
         actual_files = mint_c.ms_files
         expect_files = mint_a.ms_files
+
+        assert len(actual_results) == len(expect_results), pd.read_csv(fn).to_csv('/home/swacker/test.csv')
 
         print('Expected results:\n', expect_results)
         print('Actual results:\n', actual_results)
