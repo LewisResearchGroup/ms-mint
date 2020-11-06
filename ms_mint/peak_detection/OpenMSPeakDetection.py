@@ -12,18 +12,22 @@ class OpenMSFFMetabo():
         self._feature_map = None
         self._progress = 0
 
-    def fit(self, filenames):
+    def fit(self, filenames, max_peaks_per_file=1000):
         feature_map = oms.FeatureMap()
         for fn in tqdm(filenames):
-            feature_map += oms_ffmetabo_single_file(fn)
+            feature_map += oms_ffmetabo_single_file(
+                fn, max_peaks_per_file=max_peaks_per_file
+            )
         self._feature_map = feature_map
     
     def transform(self, min_quality=1e-3, condensed=True, 
                   max_delta_mz_ppm=10, max_delta_rt=0.1):
+
         features = []
         for feat in tqdm(self._feature_map, total=self._feature_map.size()):    
             
             quality = feat.getOverallQuality()
+
             if ( min_quality is not None ) and ( quality < min_quality ):
                 continue
 
@@ -52,15 +56,18 @@ class OpenMSFFMetabo():
         return peaklist
 
 
-    def fit_transform(self, filenames, **kwargs):
-        self.fit(filenames)
-        return self.transform(**kwargs)
+    def fit_transform(self, filenames, max_peaks_per_file=1000, 
+                      min_quality=1e-3, condensed=True, 
+                      max_delta_mz_ppm=10, max_delta_rt=0.1):
+
+        self.fit(filenames, max_peaks_per_file=max_peaks_per_file)
+        return self.transform(min_quality=1e-3, condensed=True, 
+                              max_delta_mz_ppm=10, max_delta_rt=0.1)
 
 
-def oms_ffmetabo_single_file(filename, max_peaks=5000):
+def oms_ffmetabo_single_file(filename, max_peaks_per_file=5000):
 
     feature_map = oms.FeatureMap()
-
     mass_traces = []
     mass_traces_split = []
     mass_traces_filtered = []
@@ -87,7 +94,7 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000):
         peak_map.addSpectrum(spec)
 
     mass_trace_detect = oms.MassTraceDetection()
-    mass_trace_detect.run(peak_map, mass_traces, max_peaks)
+    mass_trace_detect.run(peak_map, mass_traces, max_peaks_per_file)
 
     elution_peak_detection = oms.ElutionPeakDetection()
     elution_peak_detection.detectPeaks(mass_traces, mass_traces_split)
