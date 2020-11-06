@@ -42,7 +42,6 @@ class Mint(MintBase):
         self.download_button.on_click(self.export_action)
         self.download_button.style.button_color = 'lightgray'
 
-        self._results = None
         self.progress_bar = Progress(min=0, max=100, layout=Layout(width='90%'), 
                                  description='Progress:', bar_style='info')
 
