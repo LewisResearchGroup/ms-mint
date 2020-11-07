@@ -9,13 +9,17 @@ PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width',
 RESULTS_COLUMNS = [
     'peak_area', 
     'peak_n_datapoints', 'peak_max', 
+    'peak_rt_of_max',
     'peak_min', 'peak_median',
     'peak_mean', 'peak_delta_int',
     'peak_shape_rt', 'peak_shape_int', 
     'peak_mass_diff_25pc', 'peak_mass_diff_50pc', 
     'peak_mass_diff_75pc']
 
-MINT_RESULTS_COLUMNS = (['ms_file'] 
+print(PEAKLIST_COLUMNS)
+print(RESULTS_COLUMNS)
+
+MINT_RESULTS_COLUMNS = (['ms_file']
                         + PEAKLIST_COLUMNS
                         + RESULTS_COLUMNS
                         + ['total_intensity', 'ms_path', 'ms_file_size']

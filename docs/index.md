@@ -2,6 +2,7 @@
 
 MINT (Metabolomics Integrator) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
 Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
+The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests or for the identification of pathogens such as Methicillin resistant _Staphylococcus aureus_ (MRSA) or _SARS-Cov-2_ for example. 
 
 A typical biological sample can contain thousands of metabolites with overlapping masses. 
 
@@ -14,7 +15,7 @@ After the data has been collected and stored in a vendor specific format the dat
 
 ![](image/cluster_analysis_wide.png)
 
-The tool can be used for targeted analysis where the m/z-values (mass to charge ratios) and chromatographic retention times are known. Alternatively, MINT can be used in an untargeted approach where new biomarkers can be explored without prior knowledge to find treatments for diseases or for the development of diagnostic tests and the identification of pathogens such as Methicillin resistant _Staphylococcus aureus_ (MRSA) or _SARS-Cov-2_ for example. 
+The tool can be used for targeted analysis where the m/z-values (mass to charge ratios) and chromatographic retention times are known. Alternatively, MINT can be used in an untargeted approach where new biomarkers can be explored without prior knowledge.
 
 MINT currently supports only the open data formats mzML and mzXML. 
 
