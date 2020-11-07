@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 from .standards import PEAKLIST_COLUMNS, DEPRICATED_LABELS
-
+from .helpers import dataframe_difference
 
 
 def read_peaklists(filenames):
@@ -98,3 +98,9 @@ def generate_grid_peaklist(masses, dt, rt_max=10,
     peaklist['intensity_threshold'] = intensity_threshold
     peaklist['peaklist_name'] = 'Generated'
     return peaklist
+
+
+def diff_peaklist(old_pklist, new_pklist):
+    df = dataframe_difference(old_pklist, new_pklist)
+    df = df[df['_merge'] == 'right_only']
+    return df.drop('_merge', axis=1)
