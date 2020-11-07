@@ -27,7 +27,8 @@ install_requires = [
     'xlrd',
     'ipywidgets',
     'pyopenms',
-    'tqdm'
+    'tqdm',
+    'seaborn'
 ]
 
 config = {
