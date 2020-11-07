@@ -1,9 +1,7 @@
 import numpy as np
-import matplotlib as mpl    
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
-from scipy.cluster import hierarchy
 
 
 def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=2, left_width=2,

@@ -1,10 +1,8 @@
 import pandas as pd
 import pyopenms as oms
 
-from os.path import basename
 from numpy import mean, max, min, abs
 from tqdm import tqdm
-from ..peaklists import standardize_peaklist 
 
 
 class OpenMSFFMetabo():
@@ -175,7 +173,6 @@ def as_df(peak):
 
 
 def fix_peaklist(peaklist):
-    to_formated_str = lambda x: f'{x:.3f}'
     if 'peak_label' not in peaklist.columns:     
         peaklist['peak_label'] = ( peaklist.index.astype(str) + '_' +
                                    'mz:' + peaklist.mz_mean.apply(lambda x: f'{x:7.3f}') + '_' +
