@@ -46,6 +46,7 @@ def test__process_ms1():
                              'peak_area': {0: 3},
                              'peak_n_datapoints': {0: 1},
                              'peak_max': {0: 3},
+                             'peak_rt_of_max': {0: 2},
                              'peak_min': {0: 3},
                              'peak_median': {0: 3.0},
                              'peak_mean': {0: 3.0},
