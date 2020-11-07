@@ -139,6 +139,7 @@ def extract_ms1_properties(array):
     peak_median = np.median(intensities)
 
     peak_rt_of_max = times[masses.argmax()]
+
     peak_delta_int = np.abs(intensities[0] - intensities[-1])
 
     peak_mass_diff_25pc, peak_mass_diff_50pc, peak_mass_diff_75pc = \
@@ -171,32 +172,3 @@ def slice_ms1_array(array: np.array, rt_min, rt_max, mz_mean, mz_width,
 
 #def gaus(x,a,x0,sigma):
 #    return a*np.exp(-(x-x0)**2/(2*sigma**2))
-
-'''
-def dataframe_difference(df1, df2, which=None):
-    """Find rows which are different between two DataFrames."""
-    comparison_df = df1.merge(df2,
-                              indicator=True,
-                              how='outer')
-    if which is None:
-        diff_df = comparison_df[comparison_df['_merge'] != 'both']
-    else:
-        diff_df = comparison_df[comparison_df['_merge'] == which]
-    return diff_df
-
-
-def diff_peaklist(old_pklist, new_pklist):
-    df = dataframe_difference(old_pklist, new_pklist)
-    df = df[df['_merge'] == 'right_only']
-    return df.drop('_merge', axis=1)
-
-
-def remove_all_zero_columns(df):
-    is_zero = df.max() != 0
-    is_zero = is_zero[is_zero].index
-    return df[is_zero]
-
-def sort_columns_by_median(df):
-    cols = df.median().sort_values(ascending=False).index
-    return df[cols]
-'''

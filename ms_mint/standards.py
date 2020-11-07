@@ -16,9 +16,6 @@ RESULTS_COLUMNS = [
     'peak_mass_diff_25pc', 'peak_mass_diff_50pc', 
     'peak_mass_diff_75pc']
 
-print(PEAKLIST_COLUMNS)
-print(RESULTS_COLUMNS)
-
 MINT_RESULTS_COLUMNS = (['ms_file']
                         + PEAKLIST_COLUMNS
                         + RESULTS_COLUMNS

@@ -11,7 +11,7 @@ import numpy as np
 
 from multiprocessing import cpu_count
 from ms_mint import __version__
-from ms_mint.tools import PEAKLIST_COLUMNS
+from ms_mint.standards import PEAKLIST_COLUMNS
 
 from .button_style import button_style
 
