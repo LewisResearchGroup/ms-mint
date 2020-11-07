@@ -1,87 +1,8 @@
 import pandas as pd
 import pyopenms as oms
 
-from os.path import basename
 from numpy import mean, max, min, abs
 from tqdm import tqdm
-
-
-
-class OpenMSPeakDetection():
-    def __init__(self, kind_ff='centroided', kind_peaklist='basic'):
-        self.features = None
-        self.kind_ff = kind_ff
-        self.kind_peaklist = kind_peaklist
-
-    def fit(self, filenames):
-        print('Peak detection')
-        if self.kind_ff == 'centroided':
-            self.centroided(filenames)
-
-    def transform(self, kind_peaklist=None):
-        if self.features is None:
-            return None
-        if kind_peaklist is None:
-            kind_peaklist =self.kind_peaklist
-        if kind_peaklist == 'unique_masses':
-            return self.peaklist_by_unique_masses()
-        elif kind_peaklist == 'basic':
-            return self.initial_peaklist()
-
-    def fit_transform(self, filenames):
-        self.fit(filenames)
-        return self.transform()
-
-    def centroided(self, filenames):
-        options = oms.PeakFileOptions()
-        options.setMSLevels([1])
-        fh = oms.MzXMLFile()
-        fh.setOptions(options)
-
-        # Load data
-        input_map = oms.MSExperiment()
-        for fn in filenames:
-            fh.load(fn, input_map)
-        input_map.updateRanges()
-        
-        ff = oms.FeatureFinder()
-        ff.setLogType(oms.LogType.CMD)
-
-        # Run the feature finder
-        name = "centroided"
-        features = oms.FeatureMap()
-        seeds = oms.FeatureMap()
-        params = oms.FeatureFinder().getParameters(name)
-        ff.run(name, input_map, features, params, seeds)
-        self.features = features
-
-    def peaklist_by_unique_masses(self):
-        features = self.features
-        mz_values = pd.DataFrame([ f.getMZ() for f in features], columns=['MZ'])
-        unique_masses = mz_values.MZ.round(3).value_counts().index
-        peaklist = pd.DataFrame(unique_masses.sort_values(), columns=['mz_mean'])
-        peaklist['mz_width'] = 10
-        peaklist['rt_min'] = 0
-        peaklist['rt_max'] = 12
-        peaklist['peak_label'] = peaklist['mz_mean'].astype(str)
-        peaklist['peaklist'] = 'FeatureFinder'
-        peaklist['intensity_threshold'] = 0
-        return peaklist
-
-    def initial_peaklist(self):
-        features = self.features        
-        peaklist = pd.DataFrame([(f.getRT()/60, f.getMZ()) for f in features] , 
-                                columns=['rt_mean', 'mz_mean']).round(3)
-        peaklist['mz_width'] = 10
-        peaklist['rt_min'] = peaklist.rt_mean - 0.3
-        peaklist['rt_max'] = peaklist.rt_mean + 0.3
-        peaklist['peak_label'] = peaklist['mz_mean'].astype(str) + '-' + peaklist['rt_mean'].astype(str)
-        peaklist['peaklist'] = 'FeatureFinder'
-        peaklist['intensity_threshold'] = 0
-        return peaklist
-    
-    def get_peaklist(self):
-        return self.initial_peaklist()
 
 
 class OpenMSFFMetabo():
@@ -89,29 +10,36 @@ class OpenMSFFMetabo():
         self._feature_map = None
         self._progress = 0
 
-    def fit(self, filenames):
+    def fit(self, filenames, max_peaks_per_file=1000):
         feature_map = oms.FeatureMap()
         for fn in tqdm(filenames):
-            feature_map += oms_ffmetabo_single_file(fn)
+            feature_map += oms_ffmetabo_single_file(
+                fn, max_peaks_per_file=max_peaks_per_file
+            )
         self._feature_map = feature_map
     
     def transform(self, min_quality=1e-3, condensed=True, 
                   max_delta_mz_ppm=10, max_delta_rt=0.1):
+
         features = []
         for feat in tqdm(self._feature_map, total=self._feature_map.size()):    
             
             quality = feat.getOverallQuality()
+
             if ( min_quality is not None ) and ( quality < min_quality ):
                 continue
 
-            rt_min = max([0, (feat.getRT() - feat.getWidth()) / 60])
-            rt_max = (feat.getRT() + feat.getWidth()) / 60
+            mz = feat.getMZ()
+            rt = feat.getRT() / 60
+            rt_width = feat.getWidth() / 60
+            rt_min = max([0, (rt - rt_width)])
+            rt_max = (rt + rt_width)
             
-            data = {'peak_label': f'{feat.getMZ():06.3f}-{feat.getRT():06.3f}', 
-                    'mz_mean': feat.getMZ(), 'mz_width': 10, 
-                    'rt_min': rt_min, 'rt_max': rt_max, 'rt': feat.getRT() / 60, 
-                    'intensity_threshold': 0, 
-                    'oms_quality': quality, 
+            data = {'peak_label': f'mz:{mz:07.4f}-rt:{rt:03.1f}',
+                    'mz_mean': mz, 'mz_width': 10,
+                    'rt_min': rt_min, 'rt_max': rt_max, 'rt': rt, 
+                    'intensity_threshold': 0,
+                    'oms_quality': quality,
                     'peaklist': 'OpenMSFFMetabo'}
             
             features.append(data)
@@ -126,21 +54,25 @@ class OpenMSFFMetabo():
         return peaklist
 
 
-    def fit_transform(self, filenames, **kwargs):
-        self.fit(filenames)
-        return self.transform(**kwargs)
+    def fit_transform(self, filenames, max_peaks_per_file=1000, 
+                      min_quality=1e-3, condensed=True, 
+                      max_delta_mz_ppm=10, max_delta_rt=0.1):
+
+        self.fit(filenames, max_peaks_per_file=max_peaks_per_file)
+        return self.transform(min_quality=1e-3, condensed=True, 
+                              max_delta_mz_ppm=10, max_delta_rt=0.1)
 
 
-def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
+def oms_ffmetabo_single_file(filename, max_peaks_per_file=5000):
 
     feature_map = oms.FeatureMap()
-
     mass_traces = []
     mass_traces_split = []
     mass_traces_filtered = []
     exp = oms.MSExperiment()
-
+    peak_map = oms.PeakMap()
     options = oms.PeakFileOptions()
+    
     options.setMSLevels([1])
 
     if filename.lower().endswith('.mzxml'):
@@ -151,18 +83,16 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
     fh.setOptions(options)
 
     # Peak map
-    peak_map = oms.PeakMap()
-
     fh.load(filename, exp)
 
-    for chrom in exp.getChromatograms():
-        peak_map.addChrom(chrom)
+    #for chrom in exp.getChromatograms():
+    #    peak_map.addChrom(chrom)
 
     for spec in exp.getSpectra():
         peak_map.addSpectrum(spec)
 
     mass_trace_detect = oms.MassTraceDetection()
-    mass_trace_detect.run(peak_map, mass_traces, max_peaks)
+    mass_trace_detect.run(peak_map, mass_traces, max_peaks_per_file)
 
     elution_peak_detection = oms.ElutionPeakDetection()
     elution_peak_detection.detectPeaks(mass_traces, mass_traces_split)
@@ -173,15 +103,6 @@ def oms_ffmetabo_single_file(filename, max_peaks=5000, verbose=False):
                 feature_map,
                 mass_traces_filtered)
 
-    if verbose:
-        print('# Filename:', basename(filename))
-        print('# Spectra:', len( exp.getSpectra() ))
-        print('# Chromatograms:', len( exp.getChromatograms() ) )
-        print('# Mass traces:', len(mass_traces) )
-        print('# Mass traces split:', len(mass_traces_split) )
-        print('# Mass traces filtered:', len(mass_traces_filtered) )
-        print('# Features:', feature_map.size() )
-
     feature_map.sortByOverallQuality()
     return feature_map
 
@@ -190,24 +111,31 @@ def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1):
     print('Condensing peaklist')
     cols = ['mz_mean', 'rt_min', 'rt_max', 'rt']
     peaklist = peaklist.sort_values(cols)[cols]
-    new_peaklist = pd.DataFrame(columns=cols)
-    
-    for ndx_a, peak_a in tqdm(peaklist.iterrows(), total=len(peaklist)):
-        mz_a, rt_min_a, rt_max_a, rt_a = peak_a
-        merged = False
-        for ndx_b, peak_b in new_peaklist.iterrows():
-            if ( peaks_are_close(peak_a, peak_b, 
-                                 max_delta_mz_ppm=max_delta_mz_ppm, 
-                                 max_delta_rt=max_delta_rt) ):
-                
-                merged_peak = merge_peaks(peak_a, peak_b)
-                new_peaklist.loc[ndx_b, cols] = merged_peak
-                merged = True
-                break        
-        if not merged:
-            new_peaklist = pd.concat([new_peaklist, as_df(peak_a)])\
-                             .sort_values(cols).reset_index(drop=True)
-            
+
+    n_before = len(peaklist)
+    n_after = None
+
+    while n_before != n_after:
+        n_before = len(peaklist)
+        new_peaklist = pd.DataFrame(columns=cols)
+        for ndx_a, peak_a in tqdm(peaklist.iterrows(), total=len(peaklist)):
+            mz_a, rt_min_a, rt_max_a, rt_a = peak_a
+            merged = False
+            for ndx_b, peak_b in new_peaklist[ abs(new_peaklist.mz_mean - mz_a) < 0.01 ].iterrows():
+                if ( peaks_are_close(peak_a, peak_b, 
+                                    max_delta_mz_ppm=max_delta_mz_ppm, 
+                                    max_delta_rt=max_delta_rt) ):
+                    
+                    merged_peak = merge_peaks(peak_a, peak_b)
+                    new_peaklist.loc[ndx_b, cols] = merged_peak
+                    merged = True
+                    break        
+            if not merged:
+                new_peaklist = pd.concat([new_peaklist, as_df(peak_a)])\
+                                .sort_values(cols).reset_index(drop=True)
+        peaklist = new_peaklist
+        n_after = len(new_peaklist)
+        
     return fix_peaklist(new_peaklist.reset_index(drop=True))
 
 
@@ -215,8 +143,8 @@ def merge_peaks(peak_a, peak_b):
     mz_a, rt_min_a, rt_max_a, rt_a = peak_a
     mz_b, rt_min_b, rt_max_b, rt_b = peak_b
     return (mean([mz_a, mz_b]), 
-            min([rt_min_a, rt_min_b]), 
-            max([rt_max_a, rt_max_b]), 
+            min([rt_min_a, rt_min_b, rt_max_a, rt_max_b]), 
+            max([rt_min_a, rt_min_b, rt_max_a, rt_max_b]), 
             mean([rt_a, rt_b]))
 
 
@@ -245,15 +173,14 @@ def as_df(peak):
 
 
 def fix_peaklist(peaklist):
-    to_formated_str = lambda x: f'{x:.3f}'
     if 'peak_label' not in peaklist.columns:     
-        peaklist['peak_label'] = ( peaklist.index.astype(str) + '-' +
-                                   peaklist.mz_mean.apply(to_formated_str) + '-' +
-                                   peaklist['rt_min'].apply(to_formated_str) )
+        peaklist['peak_label'] = ( peaklist.index.astype(str) + '_' +
+                                   'mz:' + peaklist.mz_mean.apply(lambda x: f'{x:7.3f}') + '_' +
+                                   'rt:' + peaklist['rt'].apply(lambda x: f'{x:3.1f}') )
     if 'mz_width' not in peaklist.columns:     
         peaklist['mz_width'] = 10
-    if 'peaklist' not in peaklist.columns:
-        peaklist['peaklist'] = 'experimental'
+    if 'peaklist_name' not in peaklist.columns:
+        peaklist['peaklist_name'] = 'OMS'
     if 'intensity_threshold' not in peaklist.columns:
         peaklist['intensity_threshold'] = 0
     if 'rt' not in peaklist.columns:

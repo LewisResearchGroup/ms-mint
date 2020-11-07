@@ -3,7 +3,8 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 from ms_mint.notebook import Mint
-from ms_mint.tools import check_peaklist, MINT_RESULTS_COLUMNS
+from ms_mint.peaklists import check_peaklist
+from ms_mint.processing import MINT_RESULTS_COLUMNS
 
 mint = Mint(verbose=True)
 
@@ -30,5 +31,5 @@ class TestClass():
                              'Using peak list:',
                              '',
                              'No peaklist defined.']))
-        assert expect == result
+        assert expect == result, result
 

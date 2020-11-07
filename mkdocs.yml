@@ -5,6 +5,7 @@ nav:
   - Home: 'index.md'
   - Installation: 'install.md'
   - Peaklists: 'peaklists.md'
+  - Peak detection: 'peak_detection.md'
   - GUI: 'gui.md'
   - Python: 'python.md'
   - Jupyter: 'jupyter.md'
