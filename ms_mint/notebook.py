@@ -141,7 +141,7 @@ class Mint(MintBase):
         if transform_func is not None:
             tmp_data = tmp_data.apply(transform_func)
 
-        if transform_filenames_func is 'basename':
+        if transform_filenames_func == 'basename':
             transform_filenames_func = os.path.basename
 
         if transform_filenames_func is not None:

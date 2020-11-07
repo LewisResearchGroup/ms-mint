@@ -1,13 +1,12 @@
 # ms_mint/processing.py
 
-import io
 import os
 import pandas as pd
 import numpy as np
 
 from .io import ms_file_to_df
 
-from .standards import PEAKLIST_COLUMNS, RESULTS_COLUMNS,\
+from .standards import RESULTS_COLUMNS,\
     MINT_RESULTS_COLUMNS
 
 

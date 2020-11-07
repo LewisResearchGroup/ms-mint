@@ -27,7 +27,7 @@ from ms_mint.vis.plotly.plotly_tools import plot_peak_shapes, plot_peak_shapes_3
    
 from ms_mint.peaklists import read_peaklists, standardize_peaklist, diff_peaklist
 from ms_mint.standards import PEAKLIST_COLUMNS
-from ms_mint.helpers import remove_all_zero_columns
+from ms_mint.helpers import remove_all_zero_columns, sort_columns_by_median
 
 mint = Mint()
 

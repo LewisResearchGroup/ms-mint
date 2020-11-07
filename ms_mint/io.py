@@ -1,7 +1,7 @@
 # ms_mint/io.py
 
-import os
 import pandas as pd
+import io
 
 from datetime import date
 from pyteomics import mzxml, mzml
