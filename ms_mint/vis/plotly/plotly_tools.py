@@ -11,6 +11,17 @@ from collections.abc import Iterable
 from os.path import basename
 from plotly.subplots import make_subplots
 
+import plotly.io as pio
+
+
+def set_template():
+    pio.templates["draft"] = go.layout.Template(
+        layout=dict(font={'size': 10}),
+    )
+
+    pio.templates.default = "draft"
+
+set_template()
 
 def plot_peak_shapes(mint_results, n_cols=1, biomarkers=None, peak_labels=None, legend=True, 
                      verbose=False, legend_orientation='v', call_show=False):

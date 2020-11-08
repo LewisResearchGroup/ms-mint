@@ -22,7 +22,7 @@ MINT_RESULTS_COLUMNS = (['ms_file']
                         + ['total_intensity', 'ms_path', 'ms_file_size']
                        )
 
-DEPRICATED_LABELS = {'peakLabel': 'peak_label',
+DEPRECATED_LABELS = {'peakLabel': 'peak_label',
                      'peakMz': 'mz_mean',
                      'peakMzWidth[ppm]': 'mz_width',
                      'rtmin': 'rt_min',
