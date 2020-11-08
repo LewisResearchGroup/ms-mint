@@ -127,7 +127,7 @@ def extract_ms1_properties(array):
         lambda x: ','.join( [ str(int(i)) for i in x ] )
     
     projection = pd.DataFrame( array[:,[0,2]], columns=['rt', 'int'])
-    projection['rt'] = projection['rt'].round(1)
+    projection['rt'] = projection['rt'].round(2)
     projection['int'] = projection['int'].astype(int)
     projection = projection.groupby('rt').max().reset_index().values
 
