@@ -29,7 +29,6 @@ install_requires = [
     'pyopenms',
     'tqdm',
     'seaborn',
-    'tkinter'
 ]
 
 config = {
