@@ -120,10 +120,13 @@ def _process_ms1_from_numpy(array, mz_mean, mz_width, rt_min, rt_max,
 
 
 def extract_ms1_properties(array):
+
     float_list_to_comma_sep_str = \
         lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
+    int_list_to_comma_sep_str = \
+        lambda x: ','.join( [ str(int(i)) for i in x ] )
 
-    projection = array[:,[0,1]]
+    projection = array[:,[0,2]]
     times = array[:,0]
     masses = array[:,1]
     intensities = array[:,2]
@@ -145,7 +148,7 @@ def extract_ms1_properties(array):
         np.quantile( masses, [.25,.5,.75] )
 
     peak_shape_rt = float_list_to_comma_sep_str( projection[:,0] )
-    peak_shape_int = float_list_to_comma_sep_str ( projection[:,1] )
+    peak_shape_int = int_list_to_comma_sep_str( projection[:,1] )
 
     return dict(peak_area=peak_area, peak_max=peak_max, 
                 peak_min=peak_min, peak_mean=peak_mean, 
