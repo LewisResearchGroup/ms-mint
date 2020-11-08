@@ -52,12 +52,13 @@ def test__process_ms1():
                              'peak_mean': {0: 3.0},
                              'peak_delta_int': {0: 0},
                              'peak_shape_rt': {0: '2'},
-                             'peak_shape_int': {0: '200'},
+                             'peak_shape_int': {0: '3'},
                              'peak_mass_diff_25pc': {0: 200.0},
                              'peak_mass_diff_50pc': {0: 200.0},
                              'peak_mass_diff_75pc': {0: 200.0}})
     print(result.values)
     print(expected.values)
+    print(result.columns.to_list())
     assert result.equals(expected), result
 
 
