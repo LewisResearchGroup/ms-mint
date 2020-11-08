@@ -5,13 +5,20 @@ Metabolomics is the study of all metabolites (small chemical compounds) in a bio
 The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests 
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 
-A typical biological sample can contain thousands of metabolites with overlapping masses. If all metabolites would be analysed at the same time with the mass spectrometer, it would be impossible to separate the signal from different components as the same mass can originate from many different and distinct chemical structures. 
+A typical biological sample can contain thousands of metabolites with overlapping masses. If all metabolites would be analysed at the same 
+time with the mass spectrometer, it would be impossible to separate the signal from different components as the same mass can originate 
+from many different and distinct chemical structures. 
+
+To reduce the complexity of the dataset, compounds are sorted with a chromatographic column and spread out over time, 
+therefore adding a second dimension. That way various metabolites can be analysed successively over time. 
+As the compounds have to pass through the column which delays certain compounds more than others according 
+to some chemical properties e.g. their hydrophilicity. 
+
+However, even after spreading out the compounds over several minutes the generated data is rich on information. 
 
 ![](image/Saureus-metabolomics-high-res.jpeg)
+![](image/Saureus-metabolomics-high-res_zoom.jpeg)
 ![](image/Saureus-metabolomics-high-res_zoom_zoom.jpeg)
-
-
-To reduce the complexity of the dataset, compounds are sorted with a chromatographic column and spread out over time, therefore adding a second dimension. That way various metabolites can be analysed successively over time. As the compounds have to pass through the column which delays certain compounds more than others according to some chemical properties e.g. their hydrophilicity. 
 
 After the data has been collected and stored in a vendor specific format the data has to be analysed and deconvoluted. In other words, the data to be grouped by the originating or underlying metabolites in order to measure the specific amounts. This means to bring the unstructured data into a structured format where each column stands for one particular metabolite. The structured data can then be subjected to common data anayses such as dimensionality reduction, or clustering analysis.
 
