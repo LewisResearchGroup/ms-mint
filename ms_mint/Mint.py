@@ -13,21 +13,21 @@ from tqdm import tqdm
 
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
-from .standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRICATED_LABELS
+from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
 from .peak_detection import OpenMSFFMetabo
 
 import ms_mint
 
 class Mint(object):
-    def __init__(self, verbose:bool=False):
+    def __init__(self, verbose:bool=False, progress_callback=None):
         self._verbose = verbose
         self._version = ms_mint.__version__
-        self._progress_callback = None
+        self._progress_callback = progress_callback
         self.reset()
         if self.verbose:
             print('Mint Version:', self.version , '\n')
-        self.peak_detector = OpenMSFFMetabo()
+        self.peak_detector = OpenMSFFMetabo(progress_callback=progress_callback)
 
     @property
     def verbose(self):
@@ -53,7 +53,13 @@ class Mint(object):
         self._messages = []
 
     def clear_peaklist(self):
-        self._peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
+        self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
+
+    def clear_results(self):
+        self.results = pd.DataFrame(columns=MINT_RESULTS_COLUMNS)
+
+    def clear_ms_files(self):
+        self.ms_files = []
 
     def run(self, nthreads=None, mode='standard'):
         '''
@@ -69,7 +75,9 @@ class Mint(object):
                 * 'express': omits calculation of other features, only peak_areas
         '''
         self._status = 'running'
-            
+        
+        print('Progress callback', self._progress_callback)
+        
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
 
@@ -129,7 +137,7 @@ class Mint(object):
                 break
             else:
                 size = q.qsize()
-                self.progress = max(0, min(nthreads/2, int(100 * (size-nthreads / self.n_files) ) ) )
+                self.progress = 100 * size / self.n_files
                 time.sleep(1)
     
         self.progress = 100
@@ -267,18 +275,24 @@ class Mint(object):
         if self.verbose: print('Loading MINT state')
         if isinstance(fn, str):
             if fn.endswith('xlsx'):
-                results = pd.read_excel(fn, sheet_name='Results').rename(columns=DEPRICATED_LABELS)
+                results = pd.read_excel(fn, sheet_name='Results').rename(columns=DEPRECATED_LABELS)
                 ms_files = results.ms_file.drop_duplicates()
                 self.results = results
                 self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
                 self.ms_files = ms_files
-                return None
+
             elif fn.endswith('.csv'):
-                results = pd.read_csv(fn).rename(columns=DEPRICATED_LABELS)
+                results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
                 ms_files = results.ms_file.drop_duplicates()
                 peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
                 self.results = results
                 self.ms_files = ms_files
                 self.peaklist = peaklist
                 return None
-        
+        else:
+            results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
+            ms_files = results.ms_file.drop_duplicates()
+            peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+            self.results = results
+            self.ms_files = ms_files
+            self.peaklist = peaklist

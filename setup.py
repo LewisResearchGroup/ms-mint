@@ -28,7 +28,8 @@ install_requires = [
     'ipywidgets',
     'pyopenms',
     'tqdm',
-    'seaborn'
+    'seaborn',
+    'tkinter'
 ]
 
 config = {

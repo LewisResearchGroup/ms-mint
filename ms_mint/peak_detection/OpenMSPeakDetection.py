@@ -6,24 +6,45 @@ from tqdm import tqdm
 
 
 class OpenMSFFMetabo():
-    def __init__(self):
+    def __init__(self, progress_callback=None):
         self._feature_map = None
         self._progress = 0
+        self._progress_callback = progress_callback
 
     def fit(self, filenames, max_peaks_per_file=1000):
-        feature_map = oms.FeatureMap()
-        for fn in tqdm(filenames):
+        try:
+            feature_map = oms.FeatureMap()
+        except:
+            pass
+        n_files = len(filenames)
+        for i, fn in tqdm(enumerate(filenames)):
+            self.progress = 100*(i+1)/n_files
             feature_map += oms_ffmetabo_single_file(
                 fn, max_peaks_per_file=max_peaks_per_file
             )
         self._feature_map = feature_map
     
+    @property
+    def progress(self):
+        return self._progress
+    
+    @progress.setter    
+    def progress(self, x):
+        self._progress = x
+        print('PROGRESS: ', x)
+        if self._progress_callback is not None:
+            self._progress_callback(x)
+            print('Callback')
+
     def transform(self, min_quality=1e-3, condensed=True, 
                   max_delta_mz_ppm=10, max_delta_rt=0.1):
 
         features = []
-        for feat in tqdm(self._feature_map, total=self._feature_map.size()):    
-            
+        n_total = self._feature_map.size()
+        for i, feat in tqdm( enumerate(self._feature_map), total=n_total):    
+
+            self.progress = 100*(i+1)/n_total
+
             quality = feat.getOverallQuality()
 
             if ( min_quality is not None ) and ( quality < min_quality ):
@@ -50,13 +71,15 @@ class OpenMSFFMetabo():
         if condensed:
             peaklist = condense_peaklist(peaklist, 
                         max_delta_mz_ppm=max_delta_mz_ppm, 
-                        max_delta_rt=max_delta_rt)  
+                        max_delta_rt=max_delta_rt,
+                        progress_callback=self._progress_callback)  
         return peaklist
 
 
     def fit_transform(self, filenames, max_peaks_per_file=1000, 
                       min_quality=1e-3, condensed=True, 
-                      max_delta_mz_ppm=10, max_delta_rt=0.1):
+                      max_delta_mz_ppm=10, max_delta_rt=0.1, 
+                      progress_callback=None):
 
         self.fit(filenames, max_peaks_per_file=max_peaks_per_file)
         return self.transform(min_quality=1e-3, condensed=True, 
@@ -107,7 +130,7 @@ def oms_ffmetabo_single_file(filename, max_peaks_per_file=5000):
     return feature_map
 
 
-def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1):
+def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1, progress_callback=None):
     print('Condensing peaklist')
     cols = ['mz_mean', 'rt_min', 'rt_max', 'rt']
     peaklist = peaklist.sort_values(cols)[cols]
@@ -118,7 +141,10 @@ def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1):
     while n_before != n_after:
         n_before = len(peaklist)
         new_peaklist = pd.DataFrame(columns=cols)
-        for ndx_a, peak_a in tqdm(peaklist.iterrows(), total=len(peaklist)):
+
+        for i, (ndx_a, peak_a) in tqdm(enumerate( peaklist.iterrows() ), total=n_before):
+            if progress_callback is not None:
+                progress_callback(100*(i+1)/n_before)
             mz_a, rt_min_a, rt_max_a, rt_a = peak_a
             merged = False
             for ndx_b, peak_b in new_peaklist[ abs(new_peaklist.mz_mean - mz_a) < 0.01 ].iterrows():
