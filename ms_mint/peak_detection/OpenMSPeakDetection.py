@@ -31,10 +31,8 @@ class OpenMSFFMetabo():
     @progress.setter    
     def progress(self, x):
         self._progress = x
-        print('PROGRESS: ', x)
         if self._progress_callback is not None:
             self._progress_callback(x)
-            print('Callback')
 
     def transform(self, min_quality=1e-3, condensed=True, 
                   max_delta_mz_ppm=10, max_delta_rt=0.1):
