@@ -26,6 +26,7 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
             df = pd.DataFrame({'RT': peak_rt, 'X': peak_int, 
                                'ms_file': ms_file, 'peak_label': peak_label})
             dfs.append(df)
+            
     df = pd.concat(dfs)
     
     if n_cols is not None:
@@ -42,5 +43,5 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
         )
 
     fig.set_titles(row_template = '{row_name}', col_template = '{col_name}')
-
+    
     return fig
