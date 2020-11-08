@@ -11,6 +11,17 @@ from collections.abc import Iterable
 from os.path import basename
 from plotly.subplots import make_subplots
 
+import plotly.io as pio
+
+
+def set_template():
+    pio.templates["draft"] = go.layout.Template(
+        layout=dict(font={'size': 10}),
+    )
+
+    pio.templates.default = "draft"
+
+set_template()
 
 def plot_peak_shapes(mint_results, n_cols=1, biomarkers=None, peak_labels=None, legend=True, 
                      verbose=False, legend_orientation='v', call_show=False):
@@ -22,6 +33,7 @@ def plot_peak_shapes(mint_results, n_cols=1, biomarkers=None, peak_labels=None, 
     mint_results.ms_file = [basename(i) for i in mint_results.ms_file]
     
     res = mint_results[mint_results.peak_area > 0]
+
     files = list(res.ms_file.drop_duplicates())
     labels = list(mint_results.peak_label.drop_duplicates())
     
@@ -68,7 +80,6 @@ def plot_peak_shapes(mint_results, n_cols=1, biomarkers=None, peak_labels=None, 
         for file_i, file in enumerate(files):
             try:
                 x, y = res.loc[(label, file), ['peak_shape_rt', 'peak_shape_int']]
-
             except:
                 continue
             if not isinstance(x,  Iterable):

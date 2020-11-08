@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from .standards import PEAKLIST_COLUMNS, DEPRICATED_LABELS
+from .standards import PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .helpers import dataframe_difference
 
 
@@ -41,7 +41,7 @@ def read_peaklists(filenames):
 
 def standardize_peaklist(peaklist):
     cols = peaklist.columns
-    peaklist = peaklist.rename(columns=DEPRICATED_LABELS)
+    peaklist = peaklist.rename(columns=DEPRECATED_LABELS)
     if 'intensity_threshold' not in cols:
         peaklist['intensity_threshold'] = 0
     if 'mz_width' not in cols:
