@@ -12,23 +12,32 @@ from many different and distinct chemical structures.
 To reduce the complexity of the dataset, compounds are sorted with a chromatographic column and spread out over time, 
 therefore adding a second dimension. That way various metabolites can be analysed successively over time. 
 As the compounds have to pass through the column which delays certain compounds more than others according 
-to some chemical properties e.g. their hydrophilicity. 
+to some chemical properties e.g. their hydrophilicity.
 
-However, even after spreading out the compounds over several minutes the generated data is rich on information. 
+![Example](image/demo_Saureus_sample_raw.png)
+![](image/demo_Saureus_sample_raw_succinate.png)
 
-![](image/Saureus-metabolomics-high-res.jpeg)
-![](image/Saureus-metabolomics-high-res_zoom.jpeg)
-![](image/Saureus-metabolomics-high-res_zoom_zoom.jpeg)
+After the data has been collected on a m MS instrument and stored in a vendor specific format the data has to be analysed and deconvoluted. 
+The data has to be grouped and assigned to the underlying metabolites in order to draw quantitative conclusions. 
+This means to bring the unstructured data into a structured format where each column stands for one particular metabolite. 
+The structured data can then be subjected to common data anayses such as dimensionality reduction, or clustering analysis.
 
-After the data has been collected and stored in a vendor specific format the data has to be analysed and deconvoluted. In other words, the data to be grouped by the originating or underlying metabolites in order to measure the specific amounts. This means to bring the unstructured data into a structured format where each column stands for one particular metabolite. The structured data can then be subjected to common data anayses such as dimensionality reduction, or clustering analysis.
+![](/image/demo_extracted_peaks.png)
+![](image/demo_hierachical_clustering.png )
 
-The tool can be used for targeted analysis where the m/z-values (mass to charge ratios) and chromatographic retention times are known. Alternatively, MINT can be used in an untargeted approach where new biomarkers can be explored without prior knowledge.
+The tool can be used for targeted analysis where the m/z-values (mass to charge ratios) and chromatographic retention times are known. 
+Alternatively, MINT can be used in an untargeted approach where new biomarkers can be explored without prior knowledge.
 
 ![](image/cluster_analysis_wide.png)
 
-MINT currently supports the open data formats mzML and mzXML. The main function is to extract and characterise measured intensities in a given m/z and retention time (RT) window. These windows can be provided in form of a [peaklist](peaklists.md) or created interactively in the [GUI](gui.md). With this setup large numbers of LCMS-files can be processed automatically, standardized and perfectly reproducible.
+MINT currently supports the open data formats mzML and mzXML. The main function is to extract and characterise measured 
+intensities in a given m/z and retention time (RT) window. These windows can be provided in form of a [peaklist](peaklists.md) 
+or created interactively in the [GUI](gui.md). With this setup large numbers of LCMS-files can be processed automatically, 
+standardized and perfectly reproducible.
 
-The tool can be used with a browser based graphical user interface (GUI) implemented as interactive dashboard with [Plotly-Dash](https://plot.ly/dash/). Alternatively, the `ms_mint` package can be imported as python library to be integrated in any regular Python code as part of a larger processing pipeline or interacively in the [Jupyter Notebook](jupyter.md).
+The tool can be used with a browser based graphical user interface (GUI) implemented as interactive dashboard with 
+[Plotly-Dash](https://plot.ly/dash/). Alternatively, the `ms_mint` package can be imported as python library to be 
+integrated in any regular Python code as part of a larger processing pipeline or interacively in the [Jupyter Notebook](jupyter.md).
 
 ![MINT](image/mint-overview.png)
 
