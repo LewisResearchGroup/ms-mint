@@ -75,9 +75,7 @@ class Mint(object):
                 * 'express': omits calculation of other features, only peak_areas
         '''
         self._status = 'running'
-        
-        print('Progress callback', self._progress_callback)
-        
+            
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
 
