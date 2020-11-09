@@ -16,6 +16,12 @@ from .io import export_to_excel
 from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
 from .peak_detection import OpenMSFFMetabo
+from .helpers import is_ms_file
+from .vis.plotly.plotly_tools import plot_heatmap
+from .vis.mpl import plot_peak_shapes, hierarchical_clustering
+
+from warnings import simplefilter
+from scipy.cluster.hierarchy import ClusterWarning
 
 import ms_mint
 
@@ -174,7 +180,7 @@ class Mint(object):
     def ms_files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
-        list_of_files = [str(P(i)) for i in list_of_files]
+        list_of_files = [str(P(i)) for i in list_of_files if is_ms_file(i)]
         for f in list_of_files:
             if not os.path.isfile(f): 
                 print(f'W File not found ({f})')
@@ -294,3 +300,60 @@ class Mint(object):
             self.results = results
             self.ms_files = ms_files
             self.peaklist = peaklist
+
+    
+    def plot_clustering(self, data=None, title=None, figsize=(8,8), target_var='peak_max',
+                        vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None, transpose=False,
+                        normalize_by_row=True, transform_func='log1p', 
+                        transform_filenames_func='basename', **kwargs):
+        '''
+        Performs a cluster analysis and plots a heatmap. If no data is provided, 
+        data is taken form self.crosstab(target_var).
+        First the data is transformed with the transform function (default is log(x+1)).
+        If normalize_by_row==True the (transformed) data is also row-normalized (z=(x-μ)/σ)).
+        A hierachical cluster analysis is performed with the (transformed) data.
+        The original data is then re-ordered accoring to the resulting clusters.
+        The result is stored in self.clustered.
+        '''
+
+        simplefilter("ignore", ClusterWarning)
+        if data is None:
+            data = self.crosstab(target_var).copy()
+
+        tmp_data = data.copy()
+
+        if transform_func == 'log1p':
+            transform_func = np.log1p
+
+        if transform_func is not None:
+            tmp_data = tmp_data.apply(transform_func)
+
+        if transform_filenames_func == 'basename':
+            transform_filenames_func = os.path.basename
+
+        if transform_filenames_func is not None:
+            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns] 
+
+        if normalize_by_row:
+            tmp_data = ((tmp_data.T - tmp_data.T.mean()) / tmp_data.T.std())
+
+        if transpose: tmp_data = tmp_data.T    
+
+        clustered, fig, ndx_x, ndx_y = hierarchical_clustering( 
+            tmp_data, vmin=vmin, vmax=vmax, figsize=figsize, 
+            xmaxticks=xmaxticks, ymaxticks=ymaxticks, **kwargs )
+
+        if not transpose:
+            self.clustered = data.iloc[ndx_y, ndx_x]
+        else:
+            self.clustered = data.iloc[ndx_x, ndx_y]
+
+        return fig
+    
+
+    def plot_peak_shapes(self, **kwargs):
+        return plot_peak_shapes(self.results, **kwargs)
+
+
+    def plot_heatmap(self, target_var='peak_max', **kwargs):
+        return plot_heatmap(self.crosstab(target_var), **kwargs)

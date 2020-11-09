@@ -48,6 +48,10 @@ def standardize_peaklist(peaklist):
         peaklist['mz_width'] = 10
     if 'peaklist_name' not in cols:
         peaklist['peaklist_name'] = 'unknown'
+    for c in ['rt', 'rt_min', 'rt_max']:
+        if c not in cols:
+            peaklist[c] = None
+    del c    
     peaklist['peak_label'] = peaklist['peak_label'].astype(str)
     peaklist.index = range(len(peaklist))
     return peaklist[PEAKLIST_COLUMNS]
@@ -63,7 +67,6 @@ def check_peaklist(peaklist):
     If list is empty peaklist is OK.
     '''
     errors = []
-    print(peaklist)
     if not isinstance(peaklist, pd.DataFrame):
         errors.append('Peaklist is not a dataframe.')
     peaklist[PEAKLIST_COLUMNS]

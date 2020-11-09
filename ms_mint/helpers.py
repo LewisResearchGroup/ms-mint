@@ -22,3 +22,10 @@ def remove_all_zero_columns(df):
     is_zero = df.max() != 0
     is_zero = is_zero[is_zero].index
     return df[is_zero]
+
+def is_ms_file(fn):
+    if (fn.lower().endswith('mzxml')) or \
+       (fn.lower().endswith('mzml')):
+       return True
+    else:
+        return False

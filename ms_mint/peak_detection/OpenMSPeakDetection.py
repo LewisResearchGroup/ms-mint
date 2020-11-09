@@ -17,7 +17,7 @@ class OpenMSFFMetabo():
         except:
             pass
         n_files = len(filenames)
-        for i, fn in tqdm(enumerate(filenames)):
+        for i, fn in enumerate(filenames):
             self.progress = 100*(i+1)/n_files
             feature_map += oms_ffmetabo_single_file(
                 fn, max_peaks_per_file=max_peaks_per_file
@@ -39,7 +39,7 @@ class OpenMSFFMetabo():
 
         features = []
         n_total = self._feature_map.size()
-        for i, feat in tqdm( enumerate(self._feature_map), total=n_total):    
+        for i, feat in enumerate(self._feature_map):    
 
             self.progress = 100*(i+1)/n_total
 
@@ -98,8 +98,11 @@ def oms_ffmetabo_single_file(filename, max_peaks_per_file=5000):
 
     if filename.lower().endswith('.mzxml'):
         fh = oms.MzXMLFile()
+
     elif filename.lower().endswith('.mzml'):
         fh = oms.MzMLFile()
+    else:
+        assert False, filename
 
     fh.setOptions(options)
 
@@ -140,7 +143,7 @@ def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1, progress_
         n_before = len(peaklist)
         new_peaklist = pd.DataFrame(columns=cols)
 
-        for i, (ndx_a, peak_a) in tqdm(enumerate( peaklist.iterrows() ), total=n_before):
+        for i, (ndx_a, peak_a) in enumerate( peaklist.iterrows() ):
             if progress_callback is not None:
                 progress_callback(100*(i+1)/n_before)
             mz_a, rt_min_a, rt_max_a, rt_a = peak_a
