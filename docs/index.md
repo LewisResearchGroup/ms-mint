@@ -23,6 +23,8 @@ This means to bring the unstructured data into a structured format where each co
 The structured data can then be subjected to common data anayses such as dimensionality reduction, or clustering analysis.
 
 ![](/image/demo_extracted_peaks.png)
+
+
 ![](image/demo_hierachical_clustering.png )
 
 The tool can be used for targeted analysis where the m/z-values (mass to charge ratios) and chromatographic retention times are known. 
