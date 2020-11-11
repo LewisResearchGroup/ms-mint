@@ -97,7 +97,7 @@ def _process_ms1_from_numpy(array, mz_mean, mz_width, rt_min, rt_max,
     _slice = slice_ms1_array(array=array, mz_mean=mz_mean, mz_width=mz_width,
                              rt_min=rt_min, rt_max=rt_max, 
                              intensity_threshold=intensity_threshold)
-    props = extract_ms1_properties(_slice)
+    props = extract_ms1_properties(_slice, mz_mean)
     if props is None:
         return
     if peak_label is not None:
@@ -105,7 +105,7 @@ def _process_ms1_from_numpy(array, mz_mean, mz_width, rt_min, rt_max,
     return props
 
 
-def extract_ms1_properties(array):
+def extract_ms1_properties(array, mz_mean):
 
     float_list_to_comma_sep_str = \
         lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
@@ -136,6 +136,14 @@ def extract_ms1_properties(array):
 
     peak_mass_diff_25pc, peak_mass_diff_50pc, peak_mass_diff_75pc = \
         np.quantile( masses, [.25,.5,.75] )
+    
+    peak_mass_diff_25pc -= mz_mean
+    peak_mass_diff_50pc -= mz_mean
+    peak_mass_diff_75pc -= mz_mean
+
+    peak_mass_diff_25pc /= 1e-6*mz_mean
+    peak_mass_diff_50pc /= 1e-6*mz_mean
+    peak_mass_diff_75pc /= 1e-6*mz_mean
 
     peak_shape_rt = float_list_to_comma_sep_str( projection[:,0] )
     peak_shape_int = int_list_to_comma_sep_str( projection[:,1] )
