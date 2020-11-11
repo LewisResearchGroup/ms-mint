@@ -2,8 +2,6 @@ import os
 import pandas as pd 
 import numpy as np
 
-from pathlib import Path as P
-
 from ms_mint.standards import MINT_ROOT
 from ms_mint import processing
 
@@ -37,7 +35,7 @@ def test__process_ms1():
 
     result = processing.process_ms1(ms_data, peaklist)
 
-    expected = pd.DataFrame({'peak_label': {0: 'A'},
+    expect= pd.DataFrame({'peak_label': {0: 'A'},
                              'mz_mean': {0: 200},
                              'mz_width': {0: 10},
                              'intensity_threshold': {0: 0},
@@ -57,9 +55,9 @@ def test__process_ms1():
                              'peak_mass_diff_50pc': {0: 0.0},
                              'peak_mass_diff_75pc': {0: 0.0}})
     print(result.values)
-    print(expected.values)
+    print(expect.values)
     print(result.columns.to_list())
-    assert result.equals(expected), result
+    assert result.equals(expect), result
 
 
 def test__process_ms1_from_df():
@@ -74,11 +72,11 @@ def test__process_ms1_from_df():
          'rt_min': [0],
          'rt_max': [10]})
     result = processing.process_ms1_from_df(df, peaklist)
-    expected = [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 
+    expect= [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 
                  0, '2', '3', 0.0, 0.0, 0.0]]
     print(result)
-    print(expected) 
-    assert result == expected
+    print(expect) 
+    assert result == expect
 
 
 def test__slice_ms1_array():
@@ -87,8 +85,10 @@ def test__slice_ms1_array():
                       [  3, 300,   7]])
     result = processing.slice_ms1_array(array,  rt_min=1.5, rt_max=2.5, 
         mz_mean=200, mz_width=10, intensity_threshold=0)
-    expected = np.array([[  2, 200,   3]])
-    assert np.array_equal(result, expected), result
+    expect = np.array([[  2, 200,   3]])
+    print(expect)
+    print(result)
+    assert np.array_equal(result, expect)
 
 
 def test__process_ms1_from_numpy():
@@ -99,31 +99,13 @@ def test__process_ms1_from_numpy():
     peaks = [(100, 10, .5, 1.5, 0, 'A'), 
              (200, 10, 1.5, 2.5, 0, 'B')]
 
-    results = processing.process_ms1_from_numpy(array, peaks)
+    result = processing.process_ms1_from_numpy(array, peaks)
 
-    expected = [{'peak_area': 2,
-                 'peak_max': 2,
-                 'peak_min': 2,
-                 'peak_mean': 2.0,
-                 'peak_rt_of_max': 1,
-                 'peak_delta_int': 0,
-                 'peak_n_datapoints': 1,
-                 'peak_mass_diff_mean': 100.0,
-                 'peak_mass_diff_25pc': 100.0,
-                 'peak_mass_diff_75pc': 100.0,
-                 'peak_shape_rt': '1',
-                 'peak_shape_int': '100',
-                 'peak_label': 'A'},
-                {'peak_area': 3,
-                 'peak_max': 3,
-                 'peak_min': 3,
-                 'peak_mean': 3.0,
-                 'peak_rt_of_max': 2,
-                 'peak_delta_int': 0,
-                 'peak_n_datapoints': 1,
-                 'peak_mass_diff_mean': 0.0,
-                 'peak_mass_diff_25pc': 0.0,
-                 'peak_mass_diff_75pc': 0.0,
-                 'peak_shape_rt': '2',
-                 'peak_shape_int': '200',
-                 'peak_label': 'B'}]
+    expect = [['A', 2, 1, 2, 1, 2, 2.0, 2.0, 0, '1', '2', 0.0, 0.0, 0.0],
+              ['B', 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0]]
+    
+    print('Expected:')
+    [print(i) for i in expect]
+    print('Actual')
+    [print(i) for i in result]
+    assert result == expect

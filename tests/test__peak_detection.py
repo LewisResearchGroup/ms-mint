@@ -1,8 +1,4 @@
-import os
-import pandas as pd
-
 from ms_mint.peak_detection import OpenMSPeakDetection as OMS
-
 
 
 def test__peaks_are_close__identical_peaks():
