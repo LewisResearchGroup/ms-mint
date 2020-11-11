@@ -3,8 +3,6 @@ import pandas as pd
 import pytest
 
 from ms_mint.Mint import Mint
-from ms_mint.peaklists import check_peaklist
-from ms_mint.standards import MINT_RESULTS_COLUMNS
 
 mint_a = Mint()
 mint_b = Mint()
@@ -66,6 +64,12 @@ class TestExportAndLoad():
         expect_results = mint_a.results.round(3)
         actual_files = mint_c.ms_files
         expect_files = mint_a.ms_files
+
+        print(actual_results)
+        print(expect_results)
+
+        print(actual_files)
+        print(expect_files)
 
         assert len(actual_results) == len(expect_results), pd.read_csv(fn).to_csv('/home/swacker/test.csv')
 

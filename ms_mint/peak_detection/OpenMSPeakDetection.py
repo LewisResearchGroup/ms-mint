@@ -2,8 +2,6 @@ import pandas as pd
 import pyopenms as oms
 
 from numpy import mean, max, min, abs
-from tqdm import tqdm
-
 
 class OpenMSFFMetabo():
     def __init__(self, progress_callback=None):

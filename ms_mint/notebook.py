@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import ipywidgets as widgets
 
 from ipywidgets import Button, HBox, VBox, Textarea, Layout
@@ -35,6 +34,9 @@ class Mint(MintBase):
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run)
         self.run_button.style.button_color = 'lightgray'
+
+        self.optimize_rt_button = Button(description="Optimize RT")
+        self.optimize_rt_button.on_click(self.optimize_retention_times)
         
         self.download_button = Button(description="Export")
         self.download_button.on_click(self.export_action)
@@ -45,18 +47,20 @@ class Mint(MintBase):
 
         self.output = widgets.Output()
 
-
-    def show(self):
-        return VBox([
+        self.layout = VBox([
                     HBox([self.peaklist_files_button,
                           self.ms_files_button,
-                          self.detect_peaks_button,
                            ]),
+                    HBox([self.detect_peaks_button,
+                          self.optimize_rt_button]),
                     self.message_box,
                     HBox([self.run_button, 
                           self.download_button]),
                     self.progress_bar                  
                 ])
+
+    def show(self):
+        return self.layout
             
     def files(self, files):
         super(Mint, self).files = files
