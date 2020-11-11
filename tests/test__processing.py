@@ -53,9 +53,9 @@ def test__process_ms1():
                              'peak_delta_int': {0: 0},
                              'peak_shape_rt': {0: '2'},
                              'peak_shape_int': {0: '3'},
-                             'peak_mass_diff_25pc': {0: 200.0},
-                             'peak_mass_diff_50pc': {0: 200.0},
-                             'peak_mass_diff_75pc': {0: 200.0}})
+                             'peak_mass_diff_25pc': {0: 0.0},
+                             'peak_mass_diff_50pc': {0: 0.0},
+                             'peak_mass_diff_75pc': {0: 0.0}})
     print(result.values)
     print(expected.values)
     print(result.columns.to_list())
@@ -75,7 +75,7 @@ def test__process_ms1_from_df():
          'rt_max': [10]})
     result = processing.process_ms1_from_df(df, peaklist)
     expected = [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 
-                 0, '2', '3', 200.0, 200.0, 200.0]]
+                 0, '2', '3', 0.0, 0.0, 0.0]]
     print(result)
     print(expected) 
     assert result == expected
@@ -121,9 +121,9 @@ def test__process_ms1_from_numpy():
                  'peak_rt_of_max': 2,
                  'peak_delta_int': 0,
                  'peak_n_datapoints': 1,
-                 'peak_mass_diff_mean': 200.0,
-                 'peak_mass_diff_25pc': 200.0,
-                 'peak_mass_diff_75pc': 200.0,
+                 'peak_mass_diff_mean': 0.0,
+                 'peak_mass_diff_25pc': 0.0,
+                 'peak_mass_diff_75pc': 0.0,
                  'peak_shape_rt': '2',
                  'peak_shape_int': '200',
                  'peak_label': 'B'}]
