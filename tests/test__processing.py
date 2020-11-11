@@ -74,7 +74,11 @@ def test__process_ms1_from_df():
          'rt_min': [0],
          'rt_max': [10]})
     result = processing.process_ms1_from_df(df, peaklist)
-    expected = pd.DataFrame()
+    expected = [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 
+                 0, '2', '3', 200.0, 200.0, 200.0]]
+    print(result)
+    print(expected) 
+    assert result == expected
 
 
 def test__slice_ms1_array():

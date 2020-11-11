@@ -1,10 +1,8 @@
-import os
 import pandas as pd
 
 from sklearn.metrics import r2_score
 
 from ms_mint.Mint import Mint
-from ms_mint.peaklists import check_peaklist
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 
 mint = Mint(verbose=True)
@@ -102,12 +100,3 @@ class TestClass():
         mint.peaklist_files = 'tests/data/peaklist_v0.csv'
         assert mint.run() is None
 
-
-class TestClass():
-    
-    def test__add_experimental_data(self):
-        mint.ms_files = ['tests/data/test.mzXML', 
-                         'tests/data/test.mzML']
-        mint.detect_peaks()
-        print(mint.peaklist)
-        assert len(mint.peaklist) > 0, mint.peaklist

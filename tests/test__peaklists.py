@@ -1,6 +1,6 @@
 import pandas as pd
 from ms_mint import peaklists
-
+from ms_mint.standards import PEAKLIST_COLUMNS
 
 def test__read_peaklists():
     pass
@@ -21,11 +21,16 @@ def test__standardize_peaklist():
          'mz_width': {0: 10},
          'rt_min': {0: 1},
          'rt_max': {0: 2},
+         'rt': {0: None},
          'intensity_threshold': {0: 0},
-         'peaklist_name': {0: 'unknown'}}
-    )
+         'peaklist_name': {0: 'TEST'}}, index=range(0,1)
+    )[PEAKLIST_COLUMNS]
 
     result = peaklists.standardize_peaklist(peaklist)
+    print(result.values)
+    print(expected.values)    
+    print(result.index)
+    print(expected.index)
     assert result.equals(expected)
 
 def test__check_peaklist():

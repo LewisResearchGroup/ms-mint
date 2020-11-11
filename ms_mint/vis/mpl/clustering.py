@@ -63,7 +63,7 @@ def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=
     D = dm[idx1, :]
     D = D[:, idx2]
 
-    if cmap is None: cmap='hot'
+    if cmap is None: cmap='coolwarm'
     fig = axmatrix.matshow(D[::-1], aspect='auto', cmap=cmap,
                            vmin=vmin, vmax=vmax)
 

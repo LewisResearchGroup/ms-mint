@@ -1,15 +1,13 @@
 # ms_mint/Mint.py
 
 import os
-import pandas as pd
 import numpy as np
+import pandas as pd
 import time
 
 from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
-
-from tqdm import tqdm
 
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
@@ -19,7 +17,7 @@ from .peak_detection import OpenMSFFMetabo
 from .helpers import is_ms_file
 from .vis.plotly.plotly_tools import plot_heatmap
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
-
+from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
 
@@ -34,6 +32,7 @@ class Mint(object):
         if self.verbose:
             print('Mint Version:', self.version , '\n')
         self.peak_detector = OpenMSFFMetabo(progress_callback=progress_callback)
+        self._rt_optimizer = RetentionTimeOptimizer(self)
 
     @property
     def verbose(self):
@@ -57,6 +56,9 @@ class Mint(object):
         self.runtime = None
         self._status = 'waiting'
         self._messages = []
+
+    def optimize_retention_times(self, **kwargs):
+        return self._rt_optimizer.fit_transform(**kwargs)
 
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
@@ -95,7 +97,7 @@ class Mint(object):
             self.run_parallel(nthreads=nthreads, mode=mode)
         else:
             results = []
-            for i, filename in tqdm(enumerate(self.ms_files), total=self.n_files):
+            for i, filename in enumerate(self.ms_files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q': None, 
@@ -288,7 +290,9 @@ class Mint(object):
             elif fn.endswith('.csv'):
                 results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
                 ms_files = results.ms_file.drop_duplicates()
-                peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+                peaklist = results[
+                        [col for col in PEAKLIST_COLUMNS if col in results.columns]
+                    ].drop_duplicates()
                 self.results = results
                 self.ms_files = ms_files
                 self.peaklist = peaklist
@@ -296,7 +300,7 @@ class Mint(object):
         else:
             results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
             ms_files = results.ms_file.drop_duplicates()
-            peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+            peaklist = results[[col for col in PEAKLIST_COLUMNS if col in results.columns]].drop_duplicates()
             self.results = results
             self.ms_files = ms_files
             self.peaklist = peaklist

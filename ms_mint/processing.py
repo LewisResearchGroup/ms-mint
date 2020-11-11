@@ -10,16 +10,6 @@ from .standards import RESULTS_COLUMNS,\
     MINT_RESULTS_COLUMNS
 
 
-#
-#def example_peaklist():
-#    return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_peaklist.csv')
-#
-#def example_results():
-#    return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_results.csv')
-#
-
-
-# The controls the order of columns in mint.results
 
 def process_ms1_files_in_parallel(args):
     '''
@@ -74,10 +64,6 @@ def process_ms1(df, peaklist):
     results = pd.DataFrame(results, columns=['peak_label']+RESULTS_COLUMNS)
     results = pd.merge(peaklist, results, on=['peak_label'])
     results = results.reset_index(drop=True)
-    # Make sure all columns are present
-    #for col in RESULTS_COLUMNS:
-    #        if not col in results.keys():
-    #            results[col] = np.NaN
     return results
 
 
@@ -178,3 +164,10 @@ def slice_ms1_array(array: np.array, rt_min, rt_max, mz_mean, mz_width,
 
 #def gaus(x,a,x0,sigma):
 #    return a*np.exp(-(x-x0)**2/(2*sigma**2))
+
+def score_peaks(mint_results):
+    R = mint_results.copy()
+    scores = (((1-R.peak_delta_int.apply(abs)/R.peak_max)) 
+              * ( np.tanh(R.peak_n_datapoints/20) )
+              * ( 1/(1+abs(R.peak_rt_of_max - R[['rt_min', 'rt_max']].mean(axis=1) )) ))
+    return scores
