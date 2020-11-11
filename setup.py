@@ -42,7 +42,7 @@ config = {
     'author_email': 'swacker@ucalgary.ca',
     'scripts': ['scripts/Mint.py', 'scripts/Mint.bat'],
     'packages': find_packages(),
-    'data_files': [('scripts', ['scripts/Mint.py', 'scripts/Mint.bat']),
+    'data_files': [('scripts', ['scripts/Mint.py']),
                    ('static', ['static/Standard_Peaklist.csv'])],
     'classifiers': [
         "Programming Language :: Python :: 3",
