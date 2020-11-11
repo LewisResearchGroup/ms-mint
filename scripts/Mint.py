@@ -5,8 +5,6 @@ import sys
 import subprocess
 import multiprocessing
 
-import pandas as pd
-from os.path import isfile
 from glob import glob
 
 import ms_mint

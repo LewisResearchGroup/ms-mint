@@ -42,7 +42,7 @@ class RetentionTimeOptimizer():
     def fit(self, show_plots=False, **kwargs):
         return optimize_retention_times(self._mint.results, self._interim_peaklist, **kwargs)
 
-    def get_peaklist():
+    def get_peaklist(self):
         return self._mint.peaklist
 
 def optimize_retention_times(results, peaklist, show_plots=True, **kwargs):
