@@ -37,6 +37,7 @@ config = {
     'cmdclass': versioneer.get_cmdclass(),
     'description': 'Metabolomics Integrator (Mint)',
     'long_description': long_description,
+    'long_description_content_type': 'text/markdown',
     'author': 'Soren Wacker',
     'url': 'https://github.com/soerendip/ms-mint',
     'author_email': 'swacker@ucalgary.ca',
