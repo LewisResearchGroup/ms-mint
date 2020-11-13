@@ -23,6 +23,7 @@ from dash_table import DataTable
 from ..Mint import Mint
 from .Layout import Layout
 from .button_style import button_style
+
 from ms_mint.vis.plotly.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d, plot_heatmap
    
 from ms_mint.peaklists import read_peaklists, standardize_peaklist, diff_peaklist
@@ -48,6 +49,7 @@ def update_progress(n):
     progress = mint.progress
     # only add text after 5% progress to ensure text isn't squashed too much
     return progress, (f"Progress: {progress} %" if progress >= 5 else "")
+
 
 ### Load MS-files
 @app.callback(
@@ -76,8 +78,8 @@ def select_files(n_clicks, options, ms_files):
             else:
                 files = []
         if len(files) != 0:
-            mint.files += files
-            mint.progress = 0
+            mint.ms_files += files
+            #mint.progress = 0
         root.destroy()
         ms_files +=  [{'MS-files': fn } for fn in files]
     ms_files = [i for n, i in enumerate(ms_files) if i not in ms_files[n + 1:]]
@@ -301,13 +303,9 @@ def run_mint(n_clicks, n_clicks_clear, ms_files, peaklist, n_cpus, old_results):
     if old_results is not None:
         #old_results = pd.read_json(old_results, orient='split')
         old_results = mint.results
-        
-        feat_cols = ['peak_label', 'mz_mean', 'mz_width', 
-                     'rt_min', 'rt_max', 'intensity_threshold', 
-                     'peaklist']
-        
-        old_peaklist_features = standardize_peaklist(old_results[feat_cols].drop_duplicates())
-        new_peaklist_features = standardize_peaklist(peaklist[feat_cols].drop_duplicates())
+
+        old_peaklist_features = standardize_peaklist(old_results[PEAKLIST_COLUMNS].drop_duplicates())
+        new_peaklist_features = standardize_peaklist(peaklist[PEAKLIST_COLUMNS].drop_duplicates())
     
         diff = diff_peaklist(old_peaklist_features, 
                              new_peaklist_features)

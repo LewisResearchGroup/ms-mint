@@ -50,10 +50,10 @@ if __name__ == '__main__':
         mint.verbose = True
 
     if '--data' in args:
-        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/*/**.mzXML', recursive=True)[:4]
+        mint.ms_files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/*/**.mzXML', recursive=True)[:4]
         mint.peaklist_files = 'tests/data/example_peaklist.csv'
 
-        print('MINT files:', mint.files)
+        print('MINT files:', mint.ms_files)
         print('MINTegration list:')
         print(mint.peaklist.to_string())
         

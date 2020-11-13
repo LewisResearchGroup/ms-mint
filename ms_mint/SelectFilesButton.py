@@ -7,7 +7,7 @@ from tkinter import Tk, filedialog
 class SelectFilesButton(widgets.Button):
     """A file widget that leverages tkinter.filedialog."""
 
-    def __init__(self, text='Button', default_color='orange', callback=None, assign_to=None):
+    def __init__(self, text='Button', default_color=None, callback=None, assign_to=None):
         super(SelectFilesButton, self).__init__()
         # Add the selected_files trait
         self.add_traits(files=traitlets.traitlets.List())
@@ -23,15 +23,14 @@ class SelectFilesButton(widgets.Button):
         display(HTML("<style>.container { width:%d%% !important; }</style>" %90))
    
     def do_stuff(self, b):
-        self.select_files(b)
+        try:
+            self.select_files(b)
+        except:
+            return None
         if self.assign_to is not None:
             self.assign_to = b.files
         if self.callback is not None:
             self.callback()
-        if len(self.files) > 0:
-            self.style.button_color = "lightgreen"
-        else:
-            self.style.button_color = "orange"
 
     @staticmethod
     def select_files(b):
