@@ -2,7 +2,7 @@ import seaborn as sns
 import pandas as pd
 
 def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, aspect=1,
-                     n_cols=None, col_wrap=4, hue='ms_file', top=None, **kwargs):
+                     n_cols=None, col_wrap=4, hue='ms_file', top=None, title=None, **kwargs):
     
     R = mint_results.copy()
     
@@ -23,7 +23,7 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
             peak_rt = [float(i) for i in row.peak_shape_rt.split(',')]
             peak_int = [float(i) for i in row.peak_shape_int.split(',')]
             ms_file = row.ms_file
-            df = pd.DataFrame({'RT': peak_rt, 'X': peak_int, 
+            df = pd.DataFrame({'Retention Time [min]': peak_rt, 'MS-Intensity': peak_int, 
                                'ms_file': ms_file, 'peak_label': peak_label})
             dfs.append(df)
             
@@ -34,7 +34,7 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
 
     fig = sns.relplot(
         data=df,
-        x="RT", y="X",
+        x="Retention Time [min]", y="MS-Intensity",
         hue=hue, col="peak_label",
         kind="line", col_wrap=col_wrap,
         height=height, aspect=aspect, 
@@ -44,4 +44,16 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
 
     fig.set_titles(row_template = '{row_name}', col_template = '{col_name}')
     
+    for ax in fig.axes.flatten():
+        ax.ticklabel_format(style='sci', scilimits=(0,0), axis='both')
+        try:
+            sca(ax)
+            plot_diagonal(color='k', ls='--')
+            grid()
+        except:
+            pass
+        
+    if title is not None:
+        fig.fig.suptitle(title, y=1.01)
+
     return fig
