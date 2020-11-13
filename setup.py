@@ -30,6 +30,7 @@ install_requires = [
     'pyopenms',
     'tqdm',
     'seaborn',
+    'ipyfilechooser'
 ]
 
 config = {
