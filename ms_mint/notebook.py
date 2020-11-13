@@ -1,13 +1,19 @@
-import os
+import os, io
 import ipywidgets as widgets
+import tempfile
 
-from ipywidgets import Button, HBox, VBox, Textarea, Layout
+from glob import glob
+from pathlib import Path as P 
 
+from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
 from ipywidgets import IntProgress as Progress
+from ipyfilechooser import FileChooser
+from IPython.display import display
+from IPython.core.display import HTML
 
 from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
-from pathlib import Path as P 
+
 
 HOME = str(P.home())
 
@@ -18,9 +24,25 @@ class Mint(MintBase):
 
         super().__init__(progress_callback=self.progress_callback, *args, **kwargs) 
 
-        self.ms_files_button = SelectFilesButton(text='Select MS-files', callback=self.list_files)
-        self.peaklist_files_button = SelectFilesButton(text='Peaklist', callback=self.list_files)
-        self.detect_peaks_button = Button(description="Detect Peaks", callback=self.detect_peaks)
+        
+        fc = FileChooser()
+        fc.show_only_dirs = True
+        fc.default_path = tempfile.gettempdir()
+        
+        self.ms_storage_path = fc
+        self.ms_upload = FileUpload()
+
+        self.peaklist_files_button = FileUpload(description='Peaklists', accept='csv,xlsx', multiple=False)
+
+        self.peaklist_files_button.observe(self.load_peaklist, names='value')
+
+
+        self.load_ms_button = Button(description='Load MS-files')
+
+        self.load_ms_button.on_click(self.search_files)
+
+        self.detect_peaks_button = Button(description="Detect Peaks")
+        self.detect_peaks_button.on_click(self.detect_peaks)
 
         self.message_box = Textarea(
             value='',
@@ -36,7 +58,7 @@ class Mint(MintBase):
         self.run_button.style.button_color = 'lightgray'
 
         self.optimize_rt_button = Button(description="Optimize RT")
-        self.optimize_rt_button.on_click(self.optimize_retention_times)
+        self.optimize_rt_button.on_click(self.action_optimize_rt)
         
         self.download_button = Button(description="Export")
         self.download_button.on_click(self.export_action)
@@ -47,35 +69,65 @@ class Mint(MintBase):
 
         self.output = widgets.Output()
 
-        self.layout = VBox([
-                    HBox([self.peaklist_files_button,
-                          self.ms_files_button,
-                           ]),
-                    HBox([self.detect_peaks_button,
-                          self.optimize_rt_button]),
-                    self.message_box,
-                    HBox([self.run_button, 
-                          self.download_button]),
-                    self.progress_bar                  
+        tabs = Tab()
+        tabs.children = [
+                         HBox([self.ms_storage_path, self.ms_upload, self.load_ms_button]),
+                         HBox([self.peaklist_files_button, self.detect_peaks_button, self.optimize_rt_button]),
+                         ]
+
+        tabs.set_title(0, 'MS-Files')
+        tabs.set_title(1, 'Peaklists')
+
+        self.layout = VBox([                      
+                      tabs,
+                            self.message_box,
+                      HBox([self.run_button, 
+                            self.download_button]),
+                            self.progress_bar   
                 ])
+    
+    def load_peaklist(self, value):
+        for fn, data in value['new'].items():
+            self.load(io.BytesIO(data['content']))
+        self.list_files()
+
+    def action_optimize_rt(self, b):
+        if (self.n_files > 0) and len(self.peaklist)>0:
+            self.optimize_retention_times()
+        
+    def message(self, text):
+        self.message_box.value = f'{text}\n\n' + self.message_box.value
+
+    def clear_messages(self):
+        self.message_box.value = ''
+
+    def search_files(self, b=None):
+        self.ms_files = (glob(os.path.join(self.ms_storage_path.selected_path, '*mzXML')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzML')))
+        self.list_files()
 
     def show(self):
+        display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
+
         return self.layout
             
     def files(self, files):
-        super(Mint, self).files = files
+        super(Mint, self).ms_files = files
         self.ms_files_button.files = files
+        self.list_files()
+
+    def add_ms_files(self, fns):
+        if fns is not None:
+            self.ms_files = self.ms_files + fns
+        self.list_files()
+
+    def add_peaklist_files(self, fns):
+        if fns is not None:
+            self.peaklist_files = self.peaklist_files + fns
         self.list_files()
 
     def list_files(self, b=None):
         text = f'{self.n_files} MS-files to process:\n'
-        [self.ms_files.append(i) for i in self.ms_files_button.files 
-                                 if (i.lower().endswith('.mzxml') or 
-                                    (i.lower.endswith('.mzml')))]
-        try:
-            [self.peaklist_files.append(i) for i in self.peaklist_files_button.files]
-        except:
-            pass
         for i, line in enumerate(self.ms_files):
             text += line+'\n'
             if i > 10:
@@ -88,7 +140,7 @@ class Mint(MintBase):
             text += self.peaklist.to_string()
         else:
             text += '\nNo peaklist defined.'
-        self.message_box.value = text
+        self.message(text)
         if (self.n_files != 0) and (self.n_peaklist_files != 0):
             self.run_button.style.button_color = 'lightgreen'
         else:
@@ -97,12 +149,12 @@ class Mint(MintBase):
     def run(self, b=None, **kwargs):
         self.progress = 0
         super(Mint, self).run(**kwargs)
-        self.message_box.value += '\n\nDone processing.'
+        self.message('\n\nDone processing.')
         if self.results is not None:
             self.download_button.style.button_color = 'lightgreen'
     
-    def detect_peaks(self, **kwargs):
-        self.message_box.value += '\n\nRun peak detection.'
+    def detect_peaks(self, b=None, **kwargs):
+        self.message('\n\nRun peak detection.')
         super(Mint, self).detect_peaks(**kwargs)
 
     def set_progress(self, value):
@@ -113,4 +165,4 @@ class Mint(MintBase):
             filename = 'MINT__results.xlsx'
             filename = os.path.join(HOME, filename)
         self.export(filename)
-        self.message_box.value += f'\n\nExported results to: {filename}'
+        self.message(f'\n\nExported results to: {filename}')

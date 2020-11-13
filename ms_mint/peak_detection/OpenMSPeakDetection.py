@@ -130,7 +130,6 @@ def oms_ffmetabo_single_file(filename, max_peaks_per_file=5000):
 
 
 def condense_peaklist(peaklist, max_delta_mz_ppm=10, max_delta_rt=0.1, progress_callback=None):
-    print('Condensing peaklist')
     cols = ['mz_mean', 'rt_min', 'rt_max', 'rt']
     peaklist = peaklist.sort_values(cols)[cols]
 

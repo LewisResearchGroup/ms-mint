@@ -298,11 +298,12 @@ class Mint(object):
                 self.peaklist = peaklist
                 return None
         else:
-            results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
-            ms_files = results.ms_file.drop_duplicates()
-            peaklist = results[[col for col in PEAKLIST_COLUMNS if col in results.columns]].drop_duplicates()
-            self.results = results
-            self.ms_files = ms_files
+            data = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
+            if 'ms_file' in data.columns:
+                ms_files = data.ms_file.drop_duplicates()
+                self.results = data
+                self.ms_files = ms_files
+            peaklist = data[[col for col in PEAKLIST_COLUMNS if col in data.columns]].drop_duplicates()
             self.peaklist = peaklist
 
     
@@ -319,7 +320,8 @@ class Mint(object):
         The original data is then re-ordered accoring to the resulting clusters.
         The result is stored in self.clustered.
         '''
-
+        if len(self.results) == 0:
+            return None
         simplefilter("ignore", ClusterWarning)
         if data is None:
             data = self.crosstab(target_var).copy()
@@ -351,13 +353,14 @@ class Mint(object):
             self.clustered = data.iloc[ndx_y, ndx_x]
         else:
             self.clustered = data.iloc[ndx_x, ndx_y]
-
         return fig
     
 
     def plot_peak_shapes(self, **kwargs):
-        return plot_peak_shapes(self.results, **kwargs)
+        if len(self.results) > 0:
+            return plot_peak_shapes(self.results, **kwargs)
 
 
     def plot_heatmap(self, target_var='peak_max', **kwargs):
-        return plot_heatmap(self.crosstab(target_var), **kwargs)
+        if len(self.results) > 0:
+            return plot_heatmap(self.crosstab(target_var), **kwargs)
