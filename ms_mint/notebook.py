@@ -96,7 +96,7 @@ class Mint(MintBase):
             self.optimize_retention_times()
         
     def message(self, text):
-        self.message_box.value = f'{text}\n\n' + self.message_box.value
+        self.message_box.value = f'{text}\n' + self.message_box.value
 
     def clear_messages(self):
         self.message_box.value = ''
@@ -149,7 +149,7 @@ class Mint(MintBase):
     def run(self, b=None, **kwargs):
         self.progress = 0
         super(Mint, self).run(**kwargs)
-        self.message('\n\nDone processing.')
+        self.message('Done processing MS-files.')
         if self.results is not None:
             self.download_button.style.button_color = 'lightgreen'
     
