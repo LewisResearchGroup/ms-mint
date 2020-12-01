@@ -1,7 +1,7 @@
 import seaborn as sns
 import pandas as pd
 
-def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, aspect=1,
+def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, aspect=1, legend=False,
                      n_cols=None, col_wrap=4, hue='ms_file', top=None, title=None, **kwargs):
     
     R = mint_results.copy()
@@ -12,7 +12,6 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
         R = R[R.peak_label.isin(peak_labels)]
     else:
         peak_labels = R.peak_label.drop_duplicates().values
-        hue = None
 
     if ms_files is not None:
         R = R[R.ms_file.isin(ms_files)]
@@ -38,7 +37,8 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
         hue=hue, col="peak_label",
         kind="line", col_wrap=col_wrap,
         height=height, aspect=aspect, 
-        facet_kws=dict(sharex=False, sharey=False), 
+        facet_kws=dict(sharex=False, sharey=False),
+        legend=legend,
         **kwargs
         )
 
