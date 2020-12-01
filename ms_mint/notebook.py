@@ -22,20 +22,19 @@ class Mint(MintBase):
 
         self.progress_callback = self.set_progress
 
-        super().__init__(progress_callback=self.progress_callback, *args, **kwargs) 
-
+        super().__init__(progress_callback=self.progress_callback, *args, **kwargs)
         
         fc = FileChooser()
         fc.show_only_dirs = True
         fc.default_path = tempfile.gettempdir()
         
         self.ms_storage_path = fc
+
         self.ms_upload = FileUpload()
 
         self.peaklist_files_button = FileUpload(description='Peaklists', accept='csv,xlsx', multiple=False)
 
         self.peaklist_files_button.observe(self.load_peaklist, names='value')
-
 
         self.load_ms_button = Button(description='Load MS-files')
 
