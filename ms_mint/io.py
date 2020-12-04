@@ -5,8 +5,9 @@ import io
 
 from datetime import date
 from pyteomics import mzxml, mzml
+from functools  import  lru_cache
 
-
+@lru_cache(1000)
 def ms_file_to_df(filename):
     if filename.lower().endswith('.mzxml'):
         return mzxml_to_pandas_df(filename)
