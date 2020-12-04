@@ -107,7 +107,6 @@ class Mint(MintBase):
 
     def show(self):
         display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
-
         return self.layout
             
     def files(self, files):
@@ -165,3 +164,4 @@ class Mint(MintBase):
             filename = os.path.join(HOME, filename)
         self.export(filename)
         self.message(f'\n\nExported results to: {filename}')
+
