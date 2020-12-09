@@ -102,7 +102,11 @@ class Mint(MintBase):
 
     def search_files(self, b=None):
         self.ms_files = (glob(os.path.join(self.ms_storage_path.selected_path, '*mzXML')) +
-                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzML')))
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzML')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzHDF')) + 
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzxml')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzml')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzhdf')) )
         self.list_files()
 
     def show(self):

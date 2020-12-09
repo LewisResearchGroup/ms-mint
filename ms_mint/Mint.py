@@ -57,8 +57,8 @@ class Mint(object):
         self._status = 'waiting'
         self._messages = []
 
-    def optimize_retention_times(self, **kwargs):
-        return self._rt_optimizer.fit_transform(**kwargs)
+    def optimize_retention_times(self, peak_labels=None, **kwargs):
+        return self._rt_optimizer.fit_transform(peak_labels=peak_labels, **kwargs)
 
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
