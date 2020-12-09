@@ -270,10 +270,10 @@ class Mint(object):
     def export(self, filename=None):
         fn = filename
         if fn is None:
-            buffer = export_to_excel(self, filename=fn)
+            buffer = export_to_excel(self, fn=fn)
             return buffer
         elif fn.endswith('.xlsx'):
-            export_to_excel(self, filename=fn)
+            export_to_excel(self, fn=fn)
         elif fn.endswith('.csv'):
             self.results.to_csv(fn, index=False)
 

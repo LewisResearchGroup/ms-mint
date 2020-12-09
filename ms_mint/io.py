@@ -1,6 +1,7 @@
 # ms_mint/io.py
 
 import pandas as pd
+import numpy as np
 import io
 import pymzml
 
@@ -27,11 +28,15 @@ def mzxml_to_pandas_df(fn):
     file = mzxml.MzXML(fn)
     while True:
         try:
-            slices.append( pd.DataFrame(file.next()) ) 
-        except:
-            break
-    df = pd.concat(slices)[cols]
-    df_to_numeric(df)
+            data = file.next()     
+            df = pd.DataFrame({col: np.array(data[col]) for col in cols} )
+            slices.append( df )
+        except:         
+            break  
+    df = pd.concat(slices)
+    df['retentionTime'] =  df['retentionTime'].astype(np.float32)
+    df['m/z array'] = df['m/z array'].astype(np.float32)
+    df['intensity array'] = df['intensity array'].astype(int)
     return df
 
 
@@ -52,6 +57,7 @@ def mzml_to_pandas_df(fn):
             break
     df = pd.concat(slices)[cols]
     df_to_numeric(df)
+    df['intensity array'] = df['intensity array'].astype(int)
     return df
 
 
@@ -78,11 +84,10 @@ def mzml_to_df(fn, assume_time_unit='seconds'):
     df = pd.DataFrame(data).explode(1)
 
     df['m/z array'] = df[1].apply(lambda x: x[0])
-    df['intensity array'] = df[1].apply(lambda x: x[1])
-
+    df['intensity array'] = df[1].apply(lambda x: x[1]).astype(int)
+    df = df.rename(columns={0: 'retentionTime'})
     del df[1]
-
-    return df.rename(columns={0: 'retentionTime'})
+    return df
 
 
 def df_to_numeric(df):
