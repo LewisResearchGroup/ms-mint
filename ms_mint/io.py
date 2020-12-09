@@ -2,26 +2,29 @@
 
 import pandas as pd
 import io
+import pymzml
 
 from datetime import date
 from pyteomics import mzxml, mzml
-from functools  import  lru_cache
-
-@lru_cache(1000)
-def ms_file_to_df(filename):
-    if filename.lower().endswith('.mzxml'):
-        return mzxml_to_pandas_df(filename)
-    elif  filename.lower().endswith('.mzml'):
-        return mzml_to_pandas_df(filename)
 
 
-def mzxml_to_pandas_df(filename):
+
+def ms_file_to_df(fn):
+    if fn.lower().endswith('.mzxml'):
+        return mzxml_to_pandas_df(fn)
+    elif fn.lower().endswith('.mzml'):
+        return mzml_to_df(fn)
+    elif fn.lower().endswith('hdf'):
+        return pd.read_hdf(fn)
+
+
+def mzxml_to_pandas_df(fn):
     '''
     Reads mzXML file and returns a pandas.DataFrame.
     '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
-    file = mzxml.MzXML(filename)
+    file = mzxml.MzXML(fn)
     while True:
         try:
             slices.append( pd.DataFrame(file.next()) ) 
@@ -32,13 +35,13 @@ def mzxml_to_pandas_df(filename):
     return df
 
 
-def mzml_to_pandas_df(filename):
+def mzml_to_pandas_df(fn):
     '''
     Reads mzML file and returns a pandas.DataFrame.
     '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
-    file = mzml.MzML(filename)
+    file = mzml.MzML(fn)
     while True:
         try:
             data = file.next()
@@ -52,6 +55,36 @@ def mzml_to_pandas_df(filename):
     return df
 
 
+def mzml_to_df(fn, assume_time_unit='seconds'):
+    run = pymzml.run.Reader(fn)
+    data = []
+    for spectrum in run:
+        ID = spectrum.ID
+        # Try to convert time units with build-in method
+        # some files have no time unit set. Then convert 
+        # to minutes assuming the time unit is as set
+        # by assume_time_unit argument.
+        try:
+            RT = spectrum.scan_time_in_minutes()
+        except:
+            if assume_time_unit == 'seconds':
+                RT = spectrum.scan_time[0] / 60.
+            elif assume_time_unit == 'minutes':
+                RT = spectrum.scan_time[0]
+            
+        peaks = spectrum.peaks("centroided")
+        data.append((RT,peaks))
+
+    df = pd.DataFrame(data).explode(1)
+
+    df['m/z array'] = df[1].apply(lambda x: x[0])
+    df['intensity array'] = df[1].apply(lambda x: x[1])
+
+    del df[1]
+
+    return df.rename(columns={0: 'retentionTime'})
+
+
 def df_to_numeric(df):
     '''
     Converts dataframe to numeric types if possible.
@@ -60,13 +93,13 @@ def df_to_numeric(df):
         df.loc[:, col] = pd.to_numeric(df[col], errors='ignore')
 
 
-def export_to_excel(mint, filename=None):
+def export_to_excel(mint, fn=None):
     date_string = str(date.today())
-    if filename is None:
+    if fn is None:
         file_buffer = io.BytesIO()
         writer = pd.ExcelWriter(file_buffer)
     else:
-        writer = pd.ExcelWriter(filename)
+        writer = pd.ExcelWriter(fn)
     # Write into file
     mint.peaklist.to_excel(writer, 'Peaklist', index=False)
     mint.results.to_excel(writer, 'Results', index=False)
@@ -75,5 +108,5 @@ def export_to_excel(mint, filename=None):
     meta.to_excel(writer, 'Metadata', index=True, header=False)
     # Close writer and maybe return file buffer
     writer.close()
-    if filename is None:
+    if fn is None:
         return file_buffer.seek(0)

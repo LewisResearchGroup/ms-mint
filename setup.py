@@ -28,6 +28,7 @@ install_requires = [
     'xlrd',
     'ipywidgets',
     'pyopenms',
+    'pymzml',
     'tqdm',
     'seaborn',
     'ipyfilechooser'] 
