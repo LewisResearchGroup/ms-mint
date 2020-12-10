@@ -69,7 +69,7 @@ class Mint(object):
     def clear_ms_files(self):
         self.ms_files = []
 
-    def run(self, nthreads=None, mode='standard'):
+    def run(self, nthreads=None, rt_margin=.5, mode='standard'):
         '''
         Run MINT with set up peaklist and ms-files.
         ----
@@ -86,6 +86,14 @@ class Mint(object):
             
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
+
+        peaklist = self.peaklist
+        if 'rt' in peaklist.columns:
+            ndx = ((peaklist.rt_min.isna()) & (~peaklist.rt.isna()))
+            peaklist.loc[ndx, 'rt_min'] = peaklist.loc[ndx, 'rt'] - rt_margin
+            ndx = ((peaklist.rt_max.isna()) & (~peaklist.rt.isna()))
+            peaklist.loc[ndx, 'rt_max'] = peaklist.loc[ndx, 'rt'] + rt_margin
+            del ndx
 
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
