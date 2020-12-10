@@ -139,8 +139,8 @@ def optimize_retention_times(results, peaklist, show_plots=True, how='closest', 
         t_0 -= t_buffer
         t_1 += t_buffer
         
-        interim_peaklist.loc[label, 'rt_min'] = t_0                     
-        interim_peaklist.loc[label, 'rt_max'] = t_1
+        interim_peaklist.loc[label, 'rt_min'] = np.round(t_0, 3)
+        interim_peaklist.loc[label, 'rt_max'] = np.round(t_1, 3)
                              
         fig = plt.figure()
         plt.plot(smoothed.rt, smoothed.intensity, label='Smoothed')
