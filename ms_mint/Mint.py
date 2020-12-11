@@ -251,8 +251,8 @@ class Mint(object):
                                  'directly stored in the results table (mint.results).')
         
     def crosstab(self, col_name='peak_area'):
-        return pd.crosstab(self.results.peak_label, 
-                           self.results.ms_file, 
+        return pd.crosstab(self.results.ms_file, 
+                           self.results.peak_label, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
     @property
