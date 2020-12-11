@@ -53,7 +53,7 @@ def process_ms1_file(filename, peaklist):
     df = ms_file_to_df(filename)
     results = process_ms1(df, peaklist)
     results['total_intensity'] = df['intensity array'].sum()
-    results['ms_file'] = filename
+    results['ms_file'] = os.path.basename(filename)
     results['ms_path'] = os.path.dirname(filename)
     results['ms_file_size'] = os.path.getsize(filename) / 1024 / 1024
     return results[MINT_RESULTS_COLUMNS]
