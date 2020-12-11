@@ -27,6 +27,9 @@ class RetentionTimeOptimizer():
                     margin = 0
                 peaklist.loc[ndx, 'rt_min'] = max( 0, row['rt'] - margin)
                 peaklist.loc[ndx, 'rt_max'] = row['rt'] + margin
+            # I f rt is none set it to the mean of rt_min and rt_max
+            peaklist.loc[peaklist['rt'].isna(), 'rt'] = \
+                peaklist.loc[peaklist['rt'].isna(), ['rt_min', 'rt_max']].mean(axis=1)
         self._interim_peaklist = peaklist
         return peaklist
 
@@ -44,6 +47,7 @@ class RetentionTimeOptimizer():
 
     def get_peaklist(self):
         return self._mint.peaklist
+
 
 def optimize_retention_times(results, peaklist, show_plots=True, how='closest', **kwargs):
     print('Optimize RT')
@@ -70,7 +74,7 @@ def optimize_retention_times(results, peaklist, show_plots=True, how='closest', 
             print('Smoothed to small')
             continue
 
-        smoothed = df.groupby('rt').max().rolling(8, center=True).mean().dropna().reset_index()
+        smoothed = df.groupby('rt').mean().rolling(8, center=True).mean().dropna().reset_index()
 
         t_min = smoothed.rt.min()
         t_max = smoothed.rt.max()
