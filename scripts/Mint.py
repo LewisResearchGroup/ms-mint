@@ -8,13 +8,12 @@ import multiprocessing
 from glob import glob
 
 import ms_mint
-from ms_mint.app.App2 import app, mint
+from ms_mint.app.app import app
 
 
 if __name__ == '__main__':
     
     args = sys.argv
-
 
     url = 'http://localhost:9999'
     
@@ -45,16 +44,5 @@ if __name__ == '__main__':
 
     else:
         DEBUG = False
-
-    if '--verbose' in args:
-        mint.verbose = True
-
-    if '--data' in args:
-        mint.ms_files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/*/**.mzXML', recursive=True)[:4]
-        mint.peaklist_files = 'tests/data/example_peaklist.csv'
-
-        print('MINT files:', mint.ms_files)
-        print('MINTegration list:')
-        print(mint.peaklist.to_string())
         
     app.run_server(debug=DEBUG, port=9999)

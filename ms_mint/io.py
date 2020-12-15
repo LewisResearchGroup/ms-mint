@@ -10,7 +10,6 @@ from datetime import date
 from pyteomics import mzxml, mzml
 
 
-
 def ms_file_to_df(fn):
     if fn.lower().endswith('.mzxml'):
         return mzxml_to_pandas_df(fn)
@@ -128,3 +127,4 @@ def convert_ms_file_to_feather(fn, fn_out=None):
     if fn_out is None:
         fn_out = base+'.feather'
     ms_file_to_df(fn).reset_index(drop=True).to_feather(fn_out)
+    return fn_out
