@@ -4,18 +4,31 @@ import os
 import sys
 import subprocess
 import multiprocessing
+import argparse
 
 import ms_mint
-from ms_mint.app.app import app
+
 
 
 if __name__ == '__main__':
     
-    args = sys.argv
+    parser = argparse.ArgumentParser(description='MINT frontend.')
 
-    url = 'http://localhost:9999'
+    parser.add_argument('--no-browser', action='store_true', default=False)
+    parser.add_argument('--version', default=False, action='store_true')
+    parser.add_argument('--data-dir', default=None)
+    parser.add_argument('--debug', default=False, action='store_true')
+    parser.add_argument('--port', type=int, default=9999)
+
+    args = parser.parse_args()
+
+    if args.version:
+        print('Mint version:', ms_mint.__version__)
+        exit()
+
+    url = f'http://localhost:{args.port}'
     
-    if not '--no-browser' in args:
+    if not args.no_browser:
         if os.name == 'nt':
             # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
             multiprocessing.freeze_support()
@@ -32,14 +45,9 @@ if __name__ == '__main__':
             except OSError:
                 print('Please open a browser on: ', url)
 
-    if '--version' in args:
-        print('Mint version:', ms_mint.__version__)
-        exit()
     
-    if '--debug' in args:
-        DEBUG = True
+    os.environ["MINT_DATA_DIR"] = args.data_dir
 
-    else:
-        DEBUG = False
-        
-    app.run_server(debug=DEBUG, port=9999)
+    from ms_mint.app.app import app
+
+    app.run_server(debug=args.debug, port=args.port)

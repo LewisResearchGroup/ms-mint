@@ -47,12 +47,16 @@ config = {
 def make_dirs():
     tmpdir = tempfile.gettempdir()
     tmpdir = os.path.join(tmpdir, 'MINT')
+    tmpdir = os.getenv('MINT_DATA_DIR', default=tmpdir)
     cachedir = os.path.join(tmpdir, '.cache')
     os.makedirs(tmpdir, exist_ok=True)
     os.makedirs(cachedir, exist_ok=True)
     return tmpdir, cachedir
 
 TMPDIR, CACHEDIR = make_dirs()
+
+print(TMPDIR, CACHEDIR)
+
 fsc = FileSystemCache(CACHEDIR)
 
 app = dash.Dash(__name__, external_stylesheets=[
