@@ -15,7 +15,7 @@ def tmp_path(tmpdir_factory):
     return path
 
 
-class TestExportAndLoad():
+class _TestExportAndLoad():
 
     def test__load_example_data(self):
         fn = 'tests/data/demo_results.xlsx'
