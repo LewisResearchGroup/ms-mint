@@ -1,21 +1,25 @@
 # ms_mint/Mint.py
 
 import os
-import pandas as pd
 import numpy as np
+import pandas as pd
 import time
 
 from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
-from tqdm import tqdm
-
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
 from .peak_detection import OpenMSFFMetabo
+from .helpers import is_ms_file
+from .vis.plotly.plotly_tools import plot_heatmap
+from .vis.mpl import plot_peak_shapes, hierarchical_clustering
+from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
+from warnings import simplefilter
+from scipy.cluster.hierarchy import ClusterWarning
 
 import ms_mint
 
@@ -28,6 +32,7 @@ class Mint(object):
         if self.verbose:
             print('Mint Version:', self.version , '\n')
         self.peak_detector = OpenMSFFMetabo(progress_callback=progress_callback)
+        self._rt_optimizer = RetentionTimeOptimizer(self)
 
     @property
     def verbose(self):
@@ -52,6 +57,9 @@ class Mint(object):
         self._status = 'waiting'
         self._messages = []
 
+    def optimize_retention_times(self, peak_labels=None, **kwargs):
+        return self._rt_optimizer.fit_transform(peak_labels=peak_labels, **kwargs)
+
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
 
@@ -61,7 +69,7 @@ class Mint(object):
     def clear_ms_files(self):
         self.ms_files = []
 
-    def run(self, nthreads=None, mode='standard'):
+    def run(self, nthreads=None, rt_margin=.5, mode='standard'):
         '''
         Run MINT with set up peaklist and ms-files.
         ----
@@ -75,11 +83,17 @@ class Mint(object):
                 * 'express': omits calculation of other features, only peak_areas
         '''
         self._status = 'running'
-        
-        print('Progress callback', self._progress_callback)
-        
+            
         if (self.n_files == 0) or ( len(self.peaklist) == 0):
             return None
+
+        peaklist = self.peaklist
+        if 'rt' in peaklist.columns:
+            ndx = ((peaklist.rt_min.isna()) & (~peaklist.rt.isna()))
+            peaklist.loc[ndx, 'rt_min'] = peaklist.loc[ndx, 'rt'] - rt_margin
+            ndx = ((peaklist.rt_max.isna()) & (~peaklist.rt.isna()))
+            peaklist.loc[ndx, 'rt_max'] = peaklist.loc[ndx, 'rt'] + rt_margin
+            del ndx
 
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
@@ -91,7 +105,7 @@ class Mint(object):
             self.run_parallel(nthreads=nthreads, mode=mode)
         else:
             results = []
-            for i, filename in tqdm(enumerate(self.ms_files), total=self.n_files):
+            for i, filename in enumerate(self.ms_files):
                 args = {'filename': filename,
                         'peaklist': self.peaklist,
                         'q': None, 
@@ -176,7 +190,7 @@ class Mint(object):
     def ms_files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
-        list_of_files = [str(P(i)) for i in list_of_files]
+        list_of_files = [str(P(i)) for i in list_of_files if is_ms_file(i)]
         for f in list_of_files:
             if not os.path.isfile(f): 
                 print(f'W File not found ({f})')
@@ -200,7 +214,6 @@ class Mint(object):
         if self.verbose: print( 'Set peaklist files to:\n'.join(self.peaklist_files) + '\n')
         self.peaklist = read_peaklists(list_of_files)
 
-        
     @property
     def n_peaklist_files(self):
         return len(self.peaklist_files)
@@ -237,8 +250,8 @@ class Mint(object):
                                  'directly stored in the results table (mint.results).')
         
     def crosstab(self, col_name='peak_area'):
-        return pd.crosstab(self.results.peak_label, 
-                           self.results.ms_file, 
+        return pd.crosstab(self.results.ms_file, 
+                           self.results.peak_label, 
                            self.results[col_name], 
                            aggfunc=sum).astype(np.float64)
     @property
@@ -264,10 +277,10 @@ class Mint(object):
     def export(self, filename=None):
         fn = filename
         if fn is None:
-            buffer = export_to_excel(self, filename=fn)
+            buffer = export_to_excel(self, fn=fn)
             return buffer
         elif fn.endswith('.xlsx'):
-            export_to_excel(self, filename=fn)
+            export_to_excel(self, fn=fn)
         elif fn.endswith('.csv'):
             self.results.to_csv(fn, index=False)
 
@@ -284,15 +297,77 @@ class Mint(object):
             elif fn.endswith('.csv'):
                 results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
                 ms_files = results.ms_file.drop_duplicates()
-                peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
+                peaklist = results[
+                        [col for col in PEAKLIST_COLUMNS if col in results.columns]
+                    ].drop_duplicates()
                 self.results = results
                 self.ms_files = ms_files
                 self.peaklist = peaklist
                 return None
         else:
-            results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
-            ms_files = results.ms_file.drop_duplicates()
-            peaklist = results[PEAKLIST_COLUMNS].drop_duplicates()
-            self.results = results
-            self.ms_files = ms_files
+            data = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
+            if 'ms_file' in data.columns:
+                ms_files = data.ms_file.drop_duplicates()
+                self.results = data
+                self.ms_files = ms_files
+            peaklist = data[[col for col in PEAKLIST_COLUMNS if col in data.columns]].drop_duplicates()
             self.peaklist = peaklist
+
+    
+    def plot_clustering(self, data=None, title=None, figsize=(8,8), target_var='peak_max',
+                        vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None, transpose=False,
+                        normalize_by_row=True, transform_func='log1p', 
+                        transform_filenames_func='basename', **kwargs):
+        '''
+        Performs a cluster analysis and plots a heatmap. If no data is provided, 
+        data is taken form self.crosstab(target_var).
+        First the data is transformed with the transform function (default is log(x+1)).
+        If normalize_by_row==True the (transformed) data is also row-normalized (z=(x-μ)/σ)).
+        A hierachical cluster analysis is performed with the (transformed) data.
+        The original data is then re-ordered accoring to the resulting clusters.
+        The result is stored in self.clustered.
+        '''
+        if len(self.results) == 0:
+            return None
+        simplefilter("ignore", ClusterWarning)
+        if data is None:
+            data = self.crosstab(target_var).copy()
+
+        tmp_data = data.copy()
+
+        if transform_func == 'log1p':
+            transform_func = np.log1p
+
+        if transform_func is not None:
+            tmp_data = tmp_data.apply(transform_func)
+
+        if transform_filenames_func == 'basename':
+            transform_filenames_func = os.path.basename
+
+        if transform_filenames_func is not None:
+            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns] 
+
+        if normalize_by_row:
+            tmp_data = ((tmp_data.T - tmp_data.T.mean()) / tmp_data.T.std())
+
+        if transpose: tmp_data = tmp_data.T    
+
+        clustered, fig, ndx_x, ndx_y = hierarchical_clustering( 
+            tmp_data, vmin=vmin, vmax=vmax, figsize=figsize, 
+            xmaxticks=xmaxticks, ymaxticks=ymaxticks, **kwargs )
+
+        if not transpose:
+            self.clustered = data.iloc[ndx_y, ndx_x]
+        else:
+            self.clustered = data.iloc[ndx_x, ndx_y]
+        return fig
+    
+
+    def plot_peak_shapes(self, **kwargs):
+        if len(self.results) > 0:
+            return plot_peak_shapes(self.results, **kwargs)
+
+
+    def plot_heatmap(self, target_var='peak_max', **kwargs):
+        if len(self.results) > 0:
+            return plot_heatmap(self.crosstab(target_var), **kwargs)

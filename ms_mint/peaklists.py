@@ -40,17 +40,37 @@ def read_peaklists(filenames):
 
 
 def standardize_peaklist(peaklist):
-    cols = peaklist.columns
     peaklist = peaklist.rename(columns=DEPRECATED_LABELS)
+    cols = peaklist.columns
     if 'intensity_threshold' not in cols:
         peaklist['intensity_threshold'] = 0
     if 'mz_width' not in cols:
         peaklist['mz_width'] = 10
     if 'peaklist_name' not in cols:
         peaklist['peaklist_name'] = 'unknown'
+    for c in ['rt', 'rt_min', 'rt_max']:
+        if c not in cols:
+            peaklist[c] = None
+    del c
+    
+    if 'peak_label' not in cols:
+        peaklist['peak_label'] = [f'C_{i}' for i in range(len(peaklist)) ]        
+
     peaklist['peak_label'] = peaklist['peak_label'].astype(str)
     peaklist.index = range(len(peaklist))
     return peaklist[PEAKLIST_COLUMNS]
+
+def update_retention_time_columns(peaklist):
+    for ndx, row in peaklist.iterrows():
+        if row['rt'] is not None:
+            if ['rt_min'] is None:
+                peaklist.loc[ndx, 'rt_min'] = 5 #max( 0, row['rt'] - 0.2 )
+            if row['rt_max'] is None:
+                peaklist.loc[ndx, 'rt_max'] = row['rt'] + 0.2
+        else:
+            if (row['rt_min'] is not None) & (row['rt_max'] is not None):
+                peaklist.loc[ndx, 'row'] = row[['rt_min', 'rt_max']].mean(axis=1)
+
 
 
 def check_peaklist(peaklist):
@@ -63,11 +83,10 @@ def check_peaklist(peaklist):
     If list is empty peaklist is OK.
     '''
     errors = []
-    print(peaklist)
     if not isinstance(peaklist, pd.DataFrame):
         errors.append('Peaklist is not a dataframe.')
     peaklist[PEAKLIST_COLUMNS]
-    if not peaklist.dtypes['peak_label'] == np.dtype('O'):
+    if not (peaklist.dtypes['peak_label'] == np.dtype('O')):
         errors.append('Provided peak labels are not strings.', 
                        peaklist.dtypes['peak_label'] )
     if not peaklist.peak_label.value_counts().max() == 1:
