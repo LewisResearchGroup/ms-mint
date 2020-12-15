@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 import io
+import os
 import pymzml
 
 from datetime import date
@@ -17,6 +18,8 @@ def ms_file_to_df(fn):
         return mzml_to_df(fn)
     elif fn.lower().endswith('hdf'):
         return pd.read_hdf(fn)
+    elif fn.lower().endswith('feather'):
+        return pd.read_feather(fn)
 
 
 def mzxml_to_pandas_df(fn):
@@ -37,6 +40,7 @@ def mzxml_to_pandas_df(fn):
     df['retentionTime'] =  df['retentionTime'].astype(np.float32)
     df['m/z array'] = df['m/z array'].astype(np.float32)
     df['intensity array'] = df['intensity array'].astype(int)
+    df = df.reset_index(drop=True)
     return df
 
 
@@ -58,6 +62,7 @@ def mzml_to_pandas_df(fn):
     df = pd.concat(slices)[cols]
     df_to_numeric(df)
     df['intensity array'] = df['intensity array'].astype(int)
+    df = df.reset_index(drop=True)
     return df
 
 
@@ -87,6 +92,7 @@ def mzml_to_df(fn, assume_time_unit='seconds'):
     df['intensity array'] = df[1].apply(lambda x: x[1]).astype(int)
     df = df.rename(columns={0: 'retentionTime'})
     del df[1]
+    df = df.reset_index(drop=True)
     return df
 
 
@@ -115,3 +121,10 @@ def export_to_excel(mint, fn=None):
     writer.close()
     if fn is None:
         return file_buffer.seek(0)
+
+
+def convert_ms_file_to_feather(fn, fn_out=None):
+    base, ext = os.path.splitext(fn)
+    if fn_out is None:
+        fn_out = base+'.feather'
+    ms_file_to_df(fn).reset_index(drop=True).to_feather(fn_out)

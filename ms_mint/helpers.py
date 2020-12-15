@@ -28,7 +28,8 @@ def remove_all_zero_columns(df):
 def is_ms_file(fn):
     if (fn.lower().endswith('.mzxml')) or \
        (fn.lower().endswith('.mzml'))  or \
-       (fn.lower().endswith('.mzhdf')) :
+       (fn.lower().endswith('.mzhdf')) or \
+       (fn.lower().endswith('.feather')):
         return True
     else:
         return False
