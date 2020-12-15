@@ -266,7 +266,7 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         fig.add_trace(heatmap)     
 
         fig.update_layout(
-                {'height':800,
+                {'height': 800,
                  'showlegend':False,
                  'hovermode': 'closest',
                  'paper_bgcolor': 'white',
@@ -304,6 +304,10 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
 
         fig['layout']['yaxis']['ticktext'] = np.asarray(y_labels)
         fig['layout']['yaxis']['tickvals'] = np.asarray(dendro_side['layout']['yaxis']['tickvals'])
+
+    fig.update_layout(
+        margin=dict( l=50, r=10, b=200, t=50, pad=0 ),
+        hovermode='closest')
 
     if call_show: 
         fig.show(config={'displaylogo': False})

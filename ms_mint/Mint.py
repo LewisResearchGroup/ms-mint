@@ -214,7 +214,6 @@ class Mint(object):
         if self.verbose: print( 'Set peaklist files to:\n'.join(self.peaklist_files) + '\n')
         self.peaklist = read_peaklists(list_of_files)
 
-        
     @property
     def n_peaklist_files(self):
         return len(self.peaklist_files)
