@@ -3,5 +3,5 @@ EXPOSE 9999
 COPY . /app
 WORKDIR /app
 RUN pip3 install .
-CMD python Mint.py
+CMD python scripts/Mint.py
  
