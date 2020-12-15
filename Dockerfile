@@ -3,5 +3,6 @@ EXPOSE 9999
 COPY . /app
 WORKDIR /app
 RUN pip3 install .
-CMD python scripts/Mint.py
+RUN mkdir -p /data
+CMD python scripts/Mint.py --data-dir /data
  
