@@ -1,6 +1,8 @@
 import seaborn as sns
 import pandas as pd
 
+
+
 def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, aspect=1, legend=False,
                      n_cols=None, col_wrap=4, hue='ms_file', top=None, title=None, **kwargs):
     
@@ -46,12 +48,6 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
     
     for ax in fig.axes.flatten():
         ax.ticklabel_format(style='sci', scilimits=(0,0), axis='both')
-        try:
-            sca(ax)
-            plot_diagonal(color='k', ls='--')
-            grid()
-        except:
-            pass
         
     if title is not None:
         fig.fig.suptitle(title, y=1.01)

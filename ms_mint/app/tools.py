@@ -3,11 +3,10 @@ import os
 import io
 
 import numpy as np
-from glob import glob
 import pandas as pd
 from tqdm import tqdm
 
-from ms_mint.io import mzml_to_pandas_df, mzxml_to_pandas_df, ms_file_to_df
+from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
 
 
@@ -34,7 +33,6 @@ def get_dirnames(path):
 
 def create_chromatograms(ms_files, peaklist, wdir):
     for fn in tqdm(ms_files):
-        df = ms_file_to_df(fn)
         fn_out = os.path.basename(fn)
         fn_out, _ = os.path.splitext(fn_out) 
         fn_out += '.feather'

@@ -11,7 +11,6 @@ from ipyfilechooser import FileChooser
 from IPython.display import display
 from IPython.core.display import HTML
 
-from .SelectFilesButton import SelectFilesButton
 from .Mint import Mint as MintBase
 
 

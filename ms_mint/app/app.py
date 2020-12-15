@@ -15,18 +15,18 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from dash_table import DataTable
-from dash_extensions.enrich import Output, Dash, Trigger, FileSystemCache
+
+from dash_extensions.enrich import FileSystemCache
 
 import plotly.graph_objects as go
-import plotly.express as px
 
 from ms_mint.Mint import Mint
 from ms_mint.peaklists import read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
+from ms_mint.vis.plotly.plotly_tools import plot_heatmap
 
 from .tools import parse_ms_files, get_dirnames, parse_pkl_files, get_chromatogram, create_chromatograms,\
-    get_metadata_fn, get_results_fn, update_peaklist, get_peaklist, get_peaklist_fn
+    get_metadata_fn, get_results_fn, update_peaklist
 
 from .ms_files import ms_layout
 from .workspaces import ws_layout
@@ -163,7 +163,7 @@ def ms_table(value, wdir, files_deleted, set_labels, ms_input,
 
     if prop_id.startswith('ms-set-labels'):
         if ndxs_selected is []:
-            ndxs = ms-set-labels
+            ndxs = ndxs_selected
         else: ndxs = ndxs_filtered
         data.loc[ndxs, 'Label'] = ms_input
     return data.to_dict('records')
@@ -376,7 +376,7 @@ def pko_controls(tab, wdir):
     if tab != 'pko':
         raise PreventUpdate
     peaklist = pd.read_csv( os.path.join(wdir, 'peaklist', 'peaklist.csv') )
-    ms_files = glob( os.path.join( wdir, 'ms_files', '*.*') )
+    #ms_files = glob( os.path.join( wdir, 'ms_files', '*.*') )
     options = [{'label':i, 'value': i} for i in peaklist.peak_label]
     #create_chromatograms(ms_files, peaklist, wdir)
     return options
@@ -409,10 +409,6 @@ def pko_figure(peak_label, n_clicks, wdir, fig):
     if True or fig is None:
         fig = go.Figure()
         fig.layout.hovermode = 'closest'
-        rangeslider=dict( 
-            visible=True
-        ),
-        
         fig.layout.xaxis.range=[rt_min, rt_max]
 
         fig.update_layout( 
@@ -488,7 +484,6 @@ def res_delete(n_clicks, wdir):
     return 'Results file deleted.'
 
 
-from ms_mint.vis.plotly.plotly_tools import plot_peak_shapes, plot_peak_shapes_3d, plot_heatmap
 
 @app.callback(
 Output('res-heatmap-figure', 'figure'),

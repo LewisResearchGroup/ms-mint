@@ -1,6 +1,5 @@
 # ms_mint/helpers.py
 
-import numpy as np
 
 def dataframe_difference(df1, df2, which=None):
     """Find rows which are different between two DataFrames."""

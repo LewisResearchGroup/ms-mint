@@ -69,7 +69,6 @@ def mzml_to_df(fn, assume_time_unit='seconds'):
     run = pymzml.run.Reader(fn)
     data = []
     for spectrum in run:
-        ID = spectrum.ID
         # Try to convert time units with build-in method
         # some files have no time unit set. Then convert 
         # to minutes assuming the time unit is as set

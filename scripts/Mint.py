@@ -5,8 +5,6 @@ import sys
 import subprocess
 import multiprocessing
 
-from glob import glob
-
 import ms_mint
 from ms_mint.app.app import app
 
@@ -40,7 +38,6 @@ if __name__ == '__main__':
     
     if '--debug' in args:
         DEBUG = True
-        mint.verbose = True
 
     else:
         DEBUG = False
