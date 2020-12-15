@@ -24,6 +24,7 @@ install_requires = [
     'openpyxl',
     'colorlover',
     'dash-bootstrap-components',
+    'dash-extensions',
     'scikit-learn',
     'xlrd',
     'ipywidgets',
