@@ -1,29 +1,46 @@
-import os
-import numpy as np
+import os, io
 import ipywidgets as widgets
+import tempfile
 
-from ipywidgets import Button, HBox, VBox, Textarea, Layout
-
-from ipywidgets import IntProgress as Progress
-
-from .SelectFilesButton import SelectFilesButton
-from .Mint import Mint as MintBase
-from .vis.plotly.plotly_tools import plot_heatmap
-from .vis.mpl import plot_peak_shapes, hierarchical_clustering
-
-from scipy.cluster.hierarchy import ClusterWarning
-from warnings import simplefilter
+from glob import glob
 from pathlib import Path as P 
+
+from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
+from ipywidgets import IntProgress as Progress
+from ipyfilechooser import FileChooser
+from IPython.display import display
+from IPython.core.display import HTML
+
+from .Mint import Mint as MintBase
+
 
 HOME = str(P.home())
 
 class Mint(MintBase):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs) 
 
-        self.ms_files_button = SelectFilesButton(text='Select MS-files', callback=self.list_files)
-        self.peaklist_files_button = SelectFilesButton(text='Peaklist', callback=self.list_files)
-        self.detect_peaks_button = Button(description="Detect Peaks", callback=self.detect_peaks)
+        self.progress_callback = self.set_progress
+
+        super().__init__(progress_callback=self.progress_callback, *args, **kwargs)
+        
+        fc = FileChooser()
+        fc.show_only_dirs = True
+        fc.default_path = tempfile.gettempdir()
+        
+        self.ms_storage_path = fc
+
+        self.ms_upload = FileUpload()
+
+        self.peaklist_files_button = FileUpload(description='Peaklists', accept='csv,xlsx', multiple=False)
+
+        self.peaklist_files_button.observe(self.load_peaklist, names='value')
+
+        self.load_ms_button = Button(description='Load MS-files')
+
+        self.load_ms_button.on_click(self.search_files)
+
+        self.detect_peaks_button = Button(description="Detect Peaks")
+        self.detect_peaks_button.on_click(self.detect_peaks)
 
         self.message_box = Textarea(
             value='',
@@ -37,6 +54,9 @@ class Mint(MintBase):
         self.run_button = Button(description="Run")
         self.run_button.on_click(self.run)
         self.run_button.style.button_color = 'lightgray'
+
+        self.optimize_rt_button = Button(description="Optimize RT")
+        self.optimize_rt_button.on_click(self.action_optimize_rt)
         
         self.download_button = Button(description="Export")
         self.download_button.on_click(self.export_action)
@@ -46,34 +66,69 @@ class Mint(MintBase):
                                  description='Progress:', bar_style='info')
 
         self.output = widgets.Output()
-        self.progress_callback = self.set_progress
+
+        tabs = Tab()
+        tabs.children = [
+                         HBox([self.ms_storage_path, self.ms_upload, self.load_ms_button]),
+                         HBox([self.peaklist_files_button, self.detect_peaks_button, self.optimize_rt_button]),
+                         ]
+
+        tabs.set_title(0, 'MS-Files')
+        tabs.set_title(1, 'Peaklists')
+
+        self.layout = VBox([                      
+                      tabs,
+                            self.message_box,
+                      HBox([self.run_button, 
+                            self.download_button]),
+                            self.progress_bar   
+                ])
+    
+    def load_peaklist(self, value):
+        for fn, data in value['new'].items():
+            self.load(io.BytesIO(data['content']))
+        self.list_files()
+
+    def action_optimize_rt(self, b):
+        if (self.n_files > 0) and len(self.peaklist)>0:
+            self.optimize_retention_times()
+        
+    def message(self, text):
+        self.message_box.value = f'{text}\n' + self.message_box.value
+
+    def clear_messages(self):
+        self.message_box.value = ''
+
+    def search_files(self, b=None):
+        self.ms_files = (glob(os.path.join(self.ms_storage_path.selected_path, '*mzXML')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzML')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzHDF')) + 
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzxml')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzml')) +
+                         glob(os.path.join(self.ms_storage_path.selected_path, '*mzhdf')) )
+        self.list_files()
 
     def show(self):
-        return VBox([
-                    HBox([self.peaklist_files_button,
-                          self.ms_files_button,
-                          self.detect_peaks_button,
-                           ]),
-                    self.message_box,
-                    HBox([self.run_button, 
-                          self.download_button]),
-                    self.progress_bar                  
-                ])
+        display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
+        return self.layout
             
     def files(self, files):
-        super(Mint, self).files = files
+        super(Mint, self).ms_files = files
         self.ms_files_button.files = files
+        self.list_files()
+
+    def add_ms_files(self, fns):
+        if fns is not None:
+            self.ms_files = self.ms_files + fns
+        self.list_files()
+
+    def add_peaklist_files(self, fns):
+        if fns is not None:
+            self.peaklist_files = self.peaklist_files + fns
         self.list_files()
 
     def list_files(self, b=None):
         text = f'{self.n_files} MS-files to process:\n'
-        [self.ms_files.append(i) for i in self.ms_files_button.files 
-                                 if (i.lower().endswith('.mzxml') or 
-                                    (i.lower.endswith('.mzml')))]
-        try:
-            [self.peaklist_files.append(i) for i in self.peaklist_files_button.files]
-        except:
-            pass
         for i, line in enumerate(self.ms_files):
             text += line+'\n'
             if i > 10:
@@ -86,7 +141,7 @@ class Mint(MintBase):
             text += self.peaklist.to_string()
         else:
             text += '\nNo peaklist defined.'
-        self.message_box.value = text
+        self.message(text)
         if (self.n_files != 0) and (self.n_peaklist_files != 0):
             self.run_button.style.button_color = 'lightgreen'
         else:
@@ -95,15 +150,13 @@ class Mint(MintBase):
     def run(self, b=None, **kwargs):
         self.progress = 0
         super(Mint, self).run(**kwargs)
-        self.message_box.value += '\n\nDone processing.'
+        self.message('Done processing MS-files.')
         if self.results is not None:
             self.download_button.style.button_color = 'lightgreen'
     
-    def detect_peaks(self, **kwargs):
-        self.message_box.value += '\n\nRun peak detection.'
-        self.progress_bar.value = 50
+    def detect_peaks(self, b=None, **kwargs):
+        self.message('\n\nRun peak detection.')
         super(Mint, self).detect_peaks(**kwargs)
-        self.progress_bar.value = 100
 
     def set_progress(self, value):
         self.progress_bar.value = value
@@ -113,58 +166,5 @@ class Mint(MintBase):
             filename = 'MINT__results.xlsx'
             filename = os.path.join(HOME, filename)
         self.export(filename)
-        self.message_box.value += f'\n\nExported results to: {filename}'
-       
-    def plot_clustering(self, data=None, title=None, figsize=(8,8), target_var='peak_max',
-                        vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None, transpose=False,
-                        normalize_by_row=True, transform_func='log1p', 
-                        transform_filenames_func='basename', **kwargs):
-        '''
-        Performs a cluster analysis and plots a heatmap. If no data is provided, 
-        data is taken form self.crosstab(target_var).
-        First the data is transformed with the transform function (default is log(x+1)).
-        If normalize_by_row==True the (transformed) data is also row-normalized (z=(x-μ)/σ)).
-        A hierachical cluster analysis is performed with the (transformed) data.
-        The original data is then re-ordered accoring to the resulting clusters.
-        The result is stored in self.clustered.
-        '''
+        self.message(f'\n\nExported results to: {filename}')
 
-        simplefilter("ignore", ClusterWarning)
-        if data is None:
-            data = self.crosstab(target_var).copy()
-
-        tmp_data = data.copy()
-
-        if transform_func == 'log1p':
-            transform_func = np.log1p
-
-        if transform_func is not None:
-            tmp_data = tmp_data.apply(transform_func)
-
-        if transform_filenames_func == 'basename':
-            transform_filenames_func = os.path.basename
-
-        if transform_filenames_func is not None:
-            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns] 
-
-        if normalize_by_row:
-            tmp_data = ((tmp_data.T - tmp_data.T.mean()) / tmp_data.T.std())
-
-        if transpose: tmp_data = tmp_data.T    
-
-        clustered, fig, ndx_x, ndx_y = hierarchical_clustering( 
-            tmp_data, vmin=vmin, vmax=vmax, figsize=figsize, 
-            xmaxticks=xmaxticks, ymaxticks=ymaxticks, **kwargs )
-
-        if not transpose:
-            self.clustered = data.iloc[ndx_y, ndx_x]
-        else:
-            self.clustered = data.iloc[ndx_x, ndx_y]
-
-        return fig
-    
-    def plot_peak_shapes(self, **kwargs):
-        return plot_peak_shapes(self.results, **kwargs)
-
-    def plot_heatmap(self, target_var='peak_max', **kwargs):
-        return plot_heatmap(self.crosstab(target_var), **kwargs)

@@ -10,16 +10,6 @@ from .standards import RESULTS_COLUMNS,\
     MINT_RESULTS_COLUMNS
 
 
-#
-#def example_peaklist():
-#    return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_peaklist.csv')
-#
-#def example_results():
-#    return pd.read_csv(f'{MINT_ROOT}/../tests/data/example_results.csv')
-#
-
-
-# The controls the order of columns in mint.results
 
 def process_ms1_files_in_parallel(args):
     '''
@@ -63,7 +53,7 @@ def process_ms1_file(filename, peaklist):
     df = ms_file_to_df(filename)
     results = process_ms1(df, peaklist)
     results['total_intensity'] = df['intensity array'].sum()
-    results['ms_file'] = filename
+    results['ms_file'] = os.path.basename(filename)
     results['ms_path'] = os.path.dirname(filename)
     results['ms_file_size'] = os.path.getsize(filename) / 1024 / 1024
     return results[MINT_RESULTS_COLUMNS]
@@ -74,10 +64,6 @@ def process_ms1(df, peaklist):
     results = pd.DataFrame(results, columns=['peak_label']+RESULTS_COLUMNS)
     results = pd.merge(peaklist, results, on=['peak_label'])
     results = results.reset_index(drop=True)
-    # Make sure all columns are present
-    #for col in RESULTS_COLUMNS:
-    #        if not col in results.keys():
-    #            results[col] = np.NaN
     return results
 
 
@@ -111,7 +97,7 @@ def _process_ms1_from_numpy(array, mz_mean, mz_width, rt_min, rt_max,
     _slice = slice_ms1_array(array=array, mz_mean=mz_mean, mz_width=mz_width,
                              rt_min=rt_min, rt_max=rt_max, 
                              intensity_threshold=intensity_threshold)
-    props = extract_ms1_properties(_slice)
+    props = extract_ms1_properties(_slice, mz_mean)
     if props is None:
         return
     if peak_label is not None:
@@ -119,7 +105,7 @@ def _process_ms1_from_numpy(array, mz_mean, mz_width, rt_min, rt_max,
     return props
 
 
-def extract_ms1_properties(array):
+def extract_ms1_properties(array, mz_mean):
 
     float_list_to_comma_sep_str = \
         lambda x: ','.join( [ str(np.round(i, 4)) for i in x ] )
@@ -127,7 +113,7 @@ def extract_ms1_properties(array):
         lambda x: ','.join( [ str(int(i)) for i in x ] )
     
     projection = pd.DataFrame( array[:,[0,2]], columns=['rt', 'int'])
-    projection['rt'] = projection['rt'].round(1)
+    projection['rt'] = projection['rt'].round(2)
     projection['int'] = projection['int'].astype(int)
     projection = projection.groupby('rt').max().reset_index().values
 
@@ -150,6 +136,14 @@ def extract_ms1_properties(array):
 
     peak_mass_diff_25pc, peak_mass_diff_50pc, peak_mass_diff_75pc = \
         np.quantile( masses, [.25,.5,.75] )
+    
+    peak_mass_diff_25pc -= mz_mean
+    peak_mass_diff_50pc -= mz_mean
+    peak_mass_diff_75pc -= mz_mean
+
+    peak_mass_diff_25pc /= 1e-6*mz_mean
+    peak_mass_diff_50pc /= 1e-6*mz_mean
+    peak_mass_diff_75pc /= 1e-6*mz_mean
 
     peak_shape_rt = float_list_to_comma_sep_str( projection[:,0] )
     peak_shape_int = int_list_to_comma_sep_str( projection[:,1] )
@@ -178,3 +172,10 @@ def slice_ms1_array(array: np.array, rt_min, rt_max, mz_mean, mz_width,
 
 #def gaus(x,a,x0,sigma):
 #    return a*np.exp(-(x-x0)**2/(2*sigma**2))
+
+def score_peaks(mint_results):
+    R = mint_results.copy()
+    scores = (((1-R.peak_delta_int.apply(abs)/R.peak_max)) 
+              * ( np.tanh(R.peak_n_datapoints/20) )
+              * ( 1/(1+abs(R.peak_rt_of_max - R[['rt_min', 'rt_max']].mean(axis=1) )) ))
+    return scores

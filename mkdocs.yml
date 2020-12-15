@@ -1,11 +1,12 @@
-site_name: Metabolomics INTegratior
+site_name: Metabolomics Integrator (MINT)
 site_url: https://github.com/soerendip/ms-mint
 site_author: Soren Wacker
 nav:
   - Home: 'index.md'
   - Installation: 'install.md'
   - Peaklists: 'peaklists.md'
-  - Peak detection: 'peak_detection.md'
+  - Peak detection: 'peak-detection.md'
   - GUI: 'gui.md'
   - Python: 'python.md'
   - Jupyter: 'jupyter.md'
+  - Developer Notes: 'developer-notes.md'

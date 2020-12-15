@@ -1,15 +1,21 @@
 # MINT (Metabolomics Integrator)
- 
 
+The Metabolomics Integrator (MINT)) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
+Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
+The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests 
+or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). More information on how to install and run the program can be found in the [Documentation](https://soerendip.github.io/ms-mint/).
 
 ![GUI](./docs/image/mint-overview.png "The GUI")
 
-MINT is an app for processing mzML and mzXML mass-spectrometry (MS) files in MS1 mode. Its main function is to sum up intensity values from usually pre-defined windows in m/z and scan-time (also called retention time) space. These windows can be provided in a `csv-file` or set programmatically. Therefore, a large number of MS-files can be processed in very standardized and reproducible manner.
 
-The tool can be used with a browser based graphical user interface (GUI) implemented as interactive dashboard with [Plotly-Dash](https://plot.ly/dash/). A second (experimental) GUI is available that runs integrated in a `Jupyter Notebook`. Alternatively, the `ms_mint` package can be imported as python library to be integrated in any Python script and processing pipeline to automate MS-file processing.
+## News
 
-More information on how to install and run the program can be found in the [Documentation](https://soerendip.github.io/ms-mint/).
+MINT is now available as a [Docker](https://www.docker.com/) container on DockerHub with a new [interface](https://github.com/soerendip/ms-mint-streamlit). Containers are a standardized unit of software that allows developers to isolate their application from its environment, solving the 'it works on my machine' headache. Every computer that runs docker can now run MINT as well. You can pull and run the latest image with:
 
+    docker pull msmint/msmint:latest
+    docker run -p 8501:8501 -it msmint/msmint:latest
+
+Then navigate to http://localhost:8501.
 
 
 ## Download Latest release
@@ -38,13 +44,3 @@ Then navigate to http://localhost:9999 if the browser does not open automaticall
     git clone ...
     pip install -e . 
     pyinstaller --one-dir specfiles\Mint__onedir__.spec
-
-
-# Developer Notes
-
-    python3 setup.py sdist bdist_wheel
-    python3 -m twine upload --repository ms-mint dist/ms*mint-*
-
-### On windows
-    pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec
-

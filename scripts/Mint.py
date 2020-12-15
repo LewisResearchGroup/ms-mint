@@ -5,18 +5,13 @@ import sys
 import subprocess
 import multiprocessing
 
-import pandas as pd
-from os.path import isfile
-from glob import glob
-
 import ms_mint
-from ms_mint.app.App import app, mint
+from ms_mint.app.app import app
 
 
 if __name__ == '__main__':
     
     args = sys.argv
-
 
     url = 'http://localhost:9999'
     
@@ -43,20 +38,8 @@ if __name__ == '__main__':
     
     if '--debug' in args:
         DEBUG = True
-        mint.verbose = True
 
     else:
         DEBUG = False
-
-    if '--verbose' in args:
-        mint.verbose = True
-
-    if '--data' in args:
-        mint.files = glob('/data/metabolomics_storage/MINT/MINT_demofiles/*/**.mzXML', recursive=True)[:4]
-        mint.peaklist_files = 'tests/data/example_peaklist.csv'
-
-        print('MINT files:', mint.files)
-        print('MINTegration list:')
-        print(mint.peaklist.to_string())
         
     app.run_server(debug=DEBUG, port=9999)
