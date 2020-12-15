@@ -10,7 +10,7 @@ ws_table = html.Div(id='ws-table-container',
             columns=[ {"name": i, "id": i, "selectable": True}  
                                 for i in ['Workspace']],
                     data=[],
-                    row_selectable='multi',
+                    row_selectable='single',
                     row_deletable=False,
                     style_cell={'textAlign': 'left'},
                     sort_action='native'
@@ -23,6 +23,10 @@ ws_layout = html.Div([
     dcc.Input(id='ws-name', placeholder='New workspace name'),
     html.Button('Create Workspace', id='ws-create'),
     html.P(id='ws-create-output'),
-    ws_table
+    dcc.Markdown(id='ws-activate-output'),
+    html.P(id='ws-delete-output'),
+    ws_table,
+    html.Button('Activate', id='ws-activate'),
+    html.Button('Delete', id='ws-delete', style={'float':'right'})
 ])
 
