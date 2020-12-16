@@ -64,7 +64,7 @@ app = dash.Dash(__name__,
         dbc.themes.BOOTSTRAP, 
         "https://codepen.io/chriddyp/pen/bWLwgP.css"],
     requests_pathname_prefix='/mint/',
-    routes_pathname_prefix='mint'
+    routes_pathname_prefix='/mint'
     )
 
 app.title = 'MINT'
