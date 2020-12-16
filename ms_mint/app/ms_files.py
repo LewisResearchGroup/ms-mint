@@ -41,10 +41,10 @@ ms_layout = html.Div([
             multiple=True
         ),
     html.Button('Convert to Feather', id='ms-convert'),
-    html.Div(id='ms-upload-output'),
+    dcc.Loading( html.Div(id='ms-upload-output') ),
     html.Div(id='ms-convert-output'),
     html.Div(id='ms-delete-output'),
-    ms_table, 
+    dcc.Loading( ms_table ), 
     html.Div(id='ms-save-output'),
     dcc.Input(id='ms-input'),
     html.Button('Set Labels', id='ms-set-labels'),
