@@ -5,6 +5,7 @@ import sys
 import subprocess
 import multiprocessing
 import argparse
+from waitress import serve
 
 import ms_mint
 
@@ -46,8 +47,10 @@ if __name__ == '__main__':
                 print('Please open a browser on: ', url)
 
     
-    os.environ["MINT_DATA_DIR"] = args.data_dir
+    if  args.data_dir is not None: 
+        os.environ["MINT_DATA_DIR"] = args.data_dir
 
     from ms_mint.app.app import app
 
-    app.run_server(debug=args.debug, port=args.port)
+    #app.run_server(debug=args.debug, port=args.port)
+    serve(app.server, port=9999)
