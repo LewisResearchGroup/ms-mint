@@ -278,7 +278,7 @@ def ws_activate(n_clicks, ndx, data, tmpdir):
         with open(fn_ws_info, 'r') as file:
             ws_name = file.read()
     else:
-        if len(ndx) != 1:
+        if ndx is None or len(ndx) != 1:
             raise PreventUpdate
         ndx = ndx[0]
         ws_name = data[ndx]['Workspace']
