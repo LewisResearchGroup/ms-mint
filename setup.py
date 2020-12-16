@@ -32,7 +32,8 @@ install_requires = [
     'pymzml',
     'tqdm',
     'seaborn',
-    'ipyfilechooser'] 
+    'ipyfilechooser',
+    'waitress'] 
 
 config = {
     'name': 'ms-mint',
