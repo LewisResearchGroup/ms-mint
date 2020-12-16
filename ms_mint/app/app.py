@@ -59,10 +59,14 @@ print(TMPDIR, CACHEDIR)
 
 fsc = FileSystemCache(CACHEDIR)
 
-app = dash.Dash(__name__, external_stylesheets=[
-    dbc.themes.BOOTSTRAP, 
-    "https://codepen.io/chriddyp/pen/bWLwgP.css"
-                                                ])
+app = dash.Dash(__name__, 
+    external_stylesheets=[
+        dbc.themes.BOOTSTRAP, 
+        "https://codepen.io/chriddyp/pen/bWLwgP.css"],
+    requests_pathname_prefix='/mint/',
+    routes_pathname_prefix='mint'
+    )
+
 app.title = 'MINT'
 
 app.config['suppress_callback_exceptions'] = True
@@ -199,8 +203,9 @@ def ms_convert(n_clicks, wdir):
         raise PreventUpdate
     fns = glob(os.path.join(target_dir, '*.*'))
     print(fns)
-    for fn in fns: 
-        print('Convert to feather:', fn)
+    n_total = len(fns)
+    for i, fn in enumerate( fns ):
+        fsc.set('progress', int(100*(i+1)/n_total))
         new_fn = convert_ms_file_to_feather(fn)
         if os.path.isfile(new_fn): os.remove(fn)
     return 'Files converted to feather format.'
@@ -433,7 +438,7 @@ def pko_figure(peak_label, n_clicks, wdir, fig):
 
     n_files = len(ms_files)
     for i, fn in tqdm(enumerate(ms_files)):
-        fsc.set('progress', int(100*i/n_files))
+        fsc.set('progress', int(100*(i+1)/n_files))
         name = os.path.basename(fn)
         name, _ = os.path.splitext(name)
         chrom = get_chromatogram(fn, mz_mean, mz_width, wdir)

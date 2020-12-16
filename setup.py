@@ -33,7 +33,8 @@ install_requires = [
     'tqdm',
     'seaborn',
     'ipyfilechooser',
-    'waitress'] 
+    'waitress',
+    'pyarrow'] 
 
 config = {
     'name': 'ms-mint',
