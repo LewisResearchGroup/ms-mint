@@ -11,7 +11,10 @@ _feather_ format first.'
 
 pko_layout = html.Div([
     html.H3('Peak Optimization'),
+    html.Button('Generate peak previews', id='pko-peak-preview'),
     html.Button('Find closest peaks', id='pko-find-closest-peak'),
+    dcc.Markdown('---'),
+    html.Div(id='pko-peak-preview-output'),
     dcc.Markdown(id='pko-find-closest-peak-output'),
 
     html.Div(id='pko-controls'),
@@ -23,5 +26,9 @@ pko_layout = html.Div([
     dcc.Loading( dcc.Graph('pko-figure') ),
     dcc.Markdown(id='pko-set-rt-output'),
     html.Button('Set RT to current view', id='pko-set-rt'),
-    html.Button('Fit Retention Time', id='pko-fit-rt'),
+
+    html.Div([
+        html.Button('<< Previous', id='pko-prev'),
+        html.Button('Next >>', id='pko-next')],
+        style={'text-align': 'center', 'margin': 'auto'})
 ])
