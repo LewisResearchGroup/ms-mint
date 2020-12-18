@@ -40,7 +40,7 @@ class RetentionTimeOptimizer():
         peaklist, figures = self.fit(**kwargs)
         self._mint.peaklist = peaklist
         self._mint.clear_results()
-        return figures
+        return peaklist
         
     def fit(self, show_plots=False, **kwargs):
         return optimize_retention_times(self._mint.results, self._interim_peaklist, **kwargs)
@@ -49,10 +49,10 @@ class RetentionTimeOptimizer():
         return self._mint.peaklist
 
 
-def optimize_retention_times(results, peaklist, show_plots=True, how='closest', **kwargs):
+def optimize_retention_times(results, peaklist, create_plots=False, show_plots=True, how='closest', **kwargs):
     print('Optimize RT')
 
-    assert how in ['closest', 'largest']
+    assert how in ['closest', 'max']
 
     interim_peaklist = peaklist.set_index('peak_label').copy()
     figures = {}
@@ -123,7 +123,7 @@ def optimize_retention_times(results, peaklist, show_plots=True, how='closest', 
 
         if how == 'closest':
             ndx_selected_peak = (np.argmin(np.abs(t_peaks - rt)))
-        elif how == 'largest':
+        elif how == 'max':
             ndx_selected_peak = (np.argmax(x_peaks))
 
 
@@ -145,34 +145,35 @@ def optimize_retention_times(results, peaklist, show_plots=True, how='closest', 
         
         interim_peaklist.loc[label, 'rt_min'] = np.round(t_0, 3)
         interim_peaklist.loc[label, 'rt_max'] = np.round(t_1, 3)
-                             
-        fig = plt.figure()
-        plt.plot(smoothed.rt, smoothed.intensity, label='Smoothed')
-        plt.plot(interpolated.rt, interpolated.intensity, label='Interpolated')
-        plt.plot(t_peaks, x_peaks, "x")
 
-        plt.plot(t_minima, x_minima, "|", ms=10, label='Detected minima')
+        if create_plots:       
+            fig = plt.figure()
+            plt.plot(smoothed.rt, smoothed.intensity, label='Smoothed')
+            plt.plot(interpolated.rt, interpolated.intensity, label='Interpolated')
+            plt.plot(t_peaks, x_peaks, "x")
 
-        plt.hlines(results_half[1], x_to_t(results_half[2]), x_to_t(results_half[3]), color="C2")
-        plt.hlines(results_bottom[1], x_to_t(results_bottom[2]), x_to_t(results_bottom[3]), color="C2")
-        
-        plt.vlines([rt_min, rt_max], 0, max(x), label='RT span')
-        plt.vlines([t_min, t_max], 0, max(x), ls='--', label='RT span smoothed')
-        
-        plt.vlines([rt], 0, max(x), color='C4', lw=2, label='Original RT')
+            plt.plot(t_minima, x_minima, "|", ms=10, label='Detected minima')
 
-        plt.plot(t_selected_peak, x_selected_peak, "o", color='red', ms=10, label='Selected peak')
-        
-        plt.hlines(0, t_0, t_1, lw=2, label='Selected RT span')
+            plt.hlines(results_half[1], x_to_t(results_half[2]), x_to_t(results_half[3]), color="C2")
+            plt.hlines(results_bottom[1], x_to_t(results_bottom[2]), x_to_t(results_bottom[3]), color="C2")
+            
+            plt.vlines([rt_min, rt_max], 0, max(x), label='RT span')
+            plt.vlines([t_min, t_max], 0, max(x), ls='--', label='RT span smoothed')
+            
+            plt.vlines([rt], 0, max(x), color='C4', lw=2, label='Original RT')
 
-        plt.title(label)
-        plt.xlabel('Retention Time [min]')
-        plt.ylabel('Peak Intensity')
-        plt.legend()
-        plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
-        plt.grid()
-        figures['label'] = fig
-        
-        if show_plots: plt.show()
+            plt.plot(t_selected_peak, x_selected_peak, "o", color='red', ms=10, label='Selected peak')
+            
+            plt.hlines(0, t_0, t_1, lw=2, label='Selected RT span')
+
+            plt.title(label)
+            plt.xlabel('Retention Time [min]')
+            plt.ylabel('Peak Intensity')
+            plt.legend()
+            plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+            plt.grid()
+            figures['label'] = fig
+            
+            if show_plots: plt.show()
 
     return interim_peaklist.reset_index(), figures

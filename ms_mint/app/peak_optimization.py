@@ -11,6 +11,9 @@ _feather_ format first.'
 
 pko_layout = html.Div([
     html.H3('Peak Optimization'),
+    html.Button('Find closest peaks', id='pko-find-closest-peak'),
+    dcc.Markdown(id='pko-find-closest-peak-output'),
+
     html.Div(id='pko-controls'),
     dcc.Dropdown(
         id='pko-dropdown',

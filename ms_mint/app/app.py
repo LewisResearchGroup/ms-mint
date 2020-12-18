@@ -15,6 +15,8 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame, send_file, send_bytes
 
 from dash_extensions.enrich import FileSystemCache
 
@@ -24,9 +26,10 @@ from ms_mint.Mint import Mint
 from ms_mint.peaklists import read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
 from ms_mint.vis.plotly.plotly_tools import plot_heatmap
+import ms_mint
 
 from .tools import parse_ms_files, get_dirnames, parse_pkl_files, get_chromatogram, create_chromatograms,\
-    get_metadata_fn, get_results_fn, update_peaklist
+    get_metadata_fn, get_results_fn, update_peaklist, today
 
 from .ms_files import ms_layout
 from .workspaces import ws_layout
@@ -34,6 +37,7 @@ from .peaklist import pkl_layout
 from .results import res_layout, res_layout_empty, res_layout_non_empty
 from .peak_optimization import pko_layout
 
+import platform
 
 from tqdm import tqdm
 
@@ -43,6 +47,21 @@ config = {
     "CACHE_DEFAULT_TIMEOUT": 300
 }
 
+def get_versions():
+    string = ''
+    try:
+        string += subprocess.getoutput('conda env export --no-build')
+    except:
+        pass
+    return string
+
+ISSUE_TEXT = f'''
+%0A%0A%0A%0A%0A%0A%0A%0A%0A
+MINT version: {ms_mint.__version__}%0A
+OS: {platform.platform()}%0A
+Versions:
+{get_versions()}
+'''
 
 def make_dirs():
     tmpdir = tempfile.gettempdir()
@@ -55,16 +74,14 @@ def make_dirs():
 
 TMPDIR, CACHEDIR = make_dirs()
 
-print(TMPDIR, CACHEDIR)
-
 fsc = FileSystemCache(CACHEDIR)
 
 app = dash.Dash(__name__, 
     external_stylesheets=[
         dbc.themes.BOOTSTRAP, 
         "https://codepen.io/chriddyp/pen/bWLwgP.css"],
-    requests_pathname_prefix='/mint/',
-    routes_pathname_prefix='/mint/'
+    requests_pathname_prefix=os.getenv('MINT_SERVE_PATH', default='/'),
+    routes_pathname_prefix=os.getenv('MINT_SERVE_PATH', default='/')
     )
 
 app.title = 'MINT'
@@ -74,6 +91,14 @@ app.config['suppress_callback_exceptions'] = True
 layout = html.Div([
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     html.Button('Run MINT', id='run-mint'),
+    html.Button('Download', id='res-download'),
+    html.A(href='https://soerendip.github.io/ms-mint/', 
+         children=[html.Button('Documentation', id='B_help', style={'float': 'right'})],
+         target="_blank"),
+    html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={ISSUE_TEXT}', 
+         children=[html.Button('Issues', id='B_issues', style={'float': 'right'})],
+         target="_blank"),   
+    Download(id='res-download-data'),
     html.Div(id='run-mint-output'),
     dbc.Progress(id="progress-bar", value=100, style={'margin-bottom': '20px'}),
     html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
@@ -83,7 +108,9 @@ layout = html.Div([
         dcc.Tab(label='MS-files', value='msfiles'),
         dcc.Tab(label='Peaklist', value='peaklist'),
         dcc.Tab(label='Peak Optimization', value='pko'),
-        dcc.Tab(label='Results', value='results'),
+        dcc.Tab(label='Quality Control', value='qc'),
+        dcc.Tab(label='Heatmap', value='results'),
+        dcc.Tab(label='Cluster Analysis', value='clustering'),
     ]),
     html.Div(id='tab-content', style={'margin': '5%'})
 ], style={'margin':'2%'})
@@ -117,30 +144,35 @@ def run_mint(n_clicks, wdir):
     def set_progress(x):
         fsc.set('progress', x)
 
-    mint = Mint(verbose=True, progress_callback=set_progress)
+    mint = Mint(verbose=False, progress_callback=set_progress)
     mint.peaklist_files = os.path.join(wdir, 'peaklist', 'peaklist.csv')
     mint.ms_files = glob( os.path.join(wdir, 'ms_files', '*.*'))
     mint.run()
     mint.export( os.path.join(wdir, 'results', 'results.csv'))
 
+
 # MS-FILES
 @app.callback(
 Output('ms-upload-output', 'children'),
 Input('ms-upload', 'contents'),
+Input('ms-convert-output', 'children'),
 State('ms-upload', 'filename'),
 State('ms-upload', 'last_modified'),
 State('wdir', 'children'))
-def ms_upload(list_of_contents, list_of_names, list_of_dates, wdir):
+def ms_upload(list_of_contents, converted, list_of_names, list_of_dates, wdir):
     target_dir = os.path.join(wdir, 'ms_files')
     if list_of_contents is not None:
         n_total = len(list_of_contents)
-        n_uploaded = 0 
-        for c, n, d in tqdm( zip(list_of_contents, list_of_names, list_of_dates), total=n_total ):
-            try:
-                parse_ms_files(c, n, d, target_dir)
-                n_uploaded += 1
-            except:
-                pass
+        n_uploaded = 0
+
+        for i, (c, n, d) in tqdm( enumerate( zip(list_of_contents, list_of_names, list_of_dates) ), total=n_total):
+            fsc.set('progress', int( 100*(i+1)/n_total ))
+            if n.lower().endswith('mzxml') or n.lower().endswith('mzml'):
+                try:
+                    parse_ms_files(c, n, d, target_dir)
+                    n_uploaded += 1
+                except:
+                    pass
         return html.P(f'{n_uploaded} files uploaded.')
     
 
@@ -202,7 +234,7 @@ def ms_convert(n_clicks, wdir):
     if n_clicks is None:
         raise PreventUpdate
     fns = glob(os.path.join(target_dir, '*.*'))
-    print(fns)
+    fns = [fn for fn in fns if not fn.endswith('.feather')]
     n_total = len(fns)
     for i, fn in enumerate( fns ):
         fsc.set('progress', int(100*(i+1)/n_total))
@@ -251,7 +283,7 @@ def create_workspace(n_clicks, ws_name, tmpdir):
         os.makedirs(os.path.join(tmpdir, ws_name, 'peaklist'))
         os.makedirs(os.path.join(tmpdir, ws_name, 'results'))
         os.makedirs(os.path.join(tmpdir, ws_name, 'figures'))
-        os.makedirs(os.path.join(tmpdir, ws_name, 'chromatograms'))
+        os.makedirs(os.path.join(tmpdir, ws_name, 'chromato'))
         return f'Created workspace "{ws_name}"'
 
     return 'Nothing'
@@ -413,8 +445,6 @@ def pko_figure(peak_label, n_clicks, wdir, fig):
     if (rt_max is None) or np.isnan(rt_max): rt_max = rt+0.2
     if (rt is None) or np.isnan(rt): rt = np.mean([rt_min, rt_max])
 
-    #print(peak_label, mz_mean, mz_width, rt, rt_min, rt_max )
-
     if True or fig is None:
         fig = go.Figure()
         fig.layout.hovermode = 'closest'
@@ -446,8 +476,31 @@ def pko_figure(peak_label, n_clicks, wdir, fig):
             go.Scatter(x=chrom.retentionTime, y=chrom['intensity array'], name=name)
         )
 
-
     return fig
+
+
+from ms_mint.peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer as RTOpt
+
+@app.callback(
+Output('pko-find-closest-peak-output', 'children'),
+Input('pko-find-closest-peak', 'n_clicks'),
+State('wdir', 'children'))
+def pko_find_closest_peak(n_clicks, wdir):
+    if n_clicks is None:
+        raise PreventUpdate
+    fn_pkl = os.path.join( wdir, 'peaklist', 'peaklist.csv') 
+    print('Run peak optimization')
+    
+    def set_progress(x):
+        fsc.set('progress', x)
+
+    mint = Mint(verbose=True, progress_callback=set_progress)
+    mint.peaklist_files = fn_pkl
+    mint.ms_files = glob( os.path.join( wdir, 'ms_files', '*.*'))
+    rtopt = RTOpt(mint)
+    new_peaklist = rtopt.fit_transform(margin=1, how='max')
+    new_peaklist.to_csv(fn_pkl)
+    print('Done')
 
 
 @app.callback(
@@ -507,8 +560,6 @@ def res_heatmap(n_clicks, options, wdir):
 
     data = mint.crosstab('peak_max')
 
-
-
     data.fillna(0, inplace=True)
     fig = plot_heatmap(data, 
         normed_by_cols='normed_by_cols' in options, 
@@ -518,9 +569,21 @@ def res_heatmap(n_clicks, options, wdir):
         correlation='correlation' in options, 
         call_show='call_show' in options,
         name='peak_max')
+
     return fig
 
 
+@app.callback([
+Output('res-download-data', 'data'),
+Input('res-download', 'n_clicks'),
+State('wdir', 'children')
+])
+def update_link(n_clicks, wdir):
+    if n_clicks is None:
+        raise PreventUpdate
+    fn = get_results_fn(wdir)
+    workspace = os.path.basename( wdir )
+    return [send_file(fn, filename=f'{today()}-MINT-results_{workspace}.csv')]
 
 
 if __name__ == '__main__':

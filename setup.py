@@ -34,7 +34,8 @@ install_requires = [
     'seaborn',
     'ipyfilechooser',
     'waitress',
-    'pyarrow'] 
+    'pyarrow',
+    'flask-compress'] 
 
 config = {
     'name': 'ms-mint',
