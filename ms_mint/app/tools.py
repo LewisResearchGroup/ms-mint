@@ -4,7 +4,9 @@ import io
 
 import numpy as np
 import pandas as pd
+
 from tqdm import tqdm
+from glob import glob
 
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
@@ -93,10 +95,20 @@ def get_peaklist(wdir):
 
 def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None):
     peaklist = get_peaklist(wdir)
-    if not np.isnan(rt_min):
-        peaklist.loc[peak_label, 'rt_min'] = rt_min
-    if not np.isnan(rt_max):
-        peaklist.loc[peak_label, 'rt_max'] = rt_max
+
+    if isinstance(peak_label, str):
+        if not np.isnan(rt_min):
+            peaklist.loc[peak_label, 'rt_min'] = rt_min
+        if not np.isnan(rt_max):
+            peaklist.loc[peak_label, 'rt_max'] = rt_max
+
+    if isinstance(peak_label, int):
+        peaklist = peaklist.reset_index()
+        if not np.isnan(rt_min):
+            peaklist.loc[peak_label, 'rt_min'] = rt_min
+        if not np.isnan(rt_max):
+            peaklist.loc[peak_label, 'rt_max'] = rt_max
+        peaklist = peaklist.set_index('peak_label')
     peaklist.to_csv(get_peaklist_fn(wdir))
 
 
@@ -109,3 +121,7 @@ def get_metadata_fn(wdir):
     dirname = os.path.dirname(fn)
     if not os.path.isdir(dirname): os.makedirs(dirname)
     return fn
+
+def get_ms_fns(wdir):
+    fns = glob(os.path.join(wdir, 'ms_files', '*.feather'))
+    return fns
