@@ -11,7 +11,7 @@ res_layout = html.Div([
 
 
 heatmap_options = [
-    { 'label': 'Normalized by biomarker', 'value': 'normed'},
+    { 'label': 'Normalized by biomarker', 'value': 'normed_by_cols'},
     { 'label': 'Cluster', 'value': 'clustered'},
     { 'label': 'Dendrogram', 'value': 'add_dendrogram'},
     { 'label': 'Transposed', 'value': 'transposed'},
@@ -42,7 +42,6 @@ res_layout_empty = html.Div([
 ])
 
 res_layout_non_empty = html.Div([
-    html.Button('Download', id='res-download'),
     html.Button('Delete results', id='ms-delete', style={'float': 'right'}),
     html.H3('Heatmap'),
     html.Button('Heatmap', id='res-heatmap'),

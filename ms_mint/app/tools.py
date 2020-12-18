@@ -8,6 +8,14 @@ from tqdm import tqdm
 
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
+from ms_mint.io import convert_ms_file_to_feather
+
+from datetime import date
+
+
+
+def today():
+    return date.today().strftime('%y%m%d')
 
 
 def parse_ms_files(contents, filename, date, target_dir):
@@ -16,6 +24,9 @@ def parse_ms_files(contents, filename, date, target_dir):
     fn_abs = os.path.join(target_dir, filename)
     with open(fn_abs, 'wb') as file:
         file.write(decoded)
+    new_fn = convert_ms_file_to_feather(fn_abs)
+    print(f'Convert {fn_abs} to {new_fn}')
+    if os.path.isfile(new_fn): os.remove(fn_abs)
 
 
 def parse_pkl_files(contents, filename, date, target_dir):
@@ -23,6 +34,7 @@ def parse_pkl_files(contents, filename, date, target_dir):
     decoded = base64.b64decode(content_string)
     df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
     df = standardize_peaklist(df)
+    df = df.drop_duplicates()
     return df
 
 
