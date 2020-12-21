@@ -23,7 +23,6 @@ flask_compress.__version__ attribute. Known to work with dash==1.16.3 and
 PyInstaller==3.6.
 """
 
-import sys
 from collections import namedtuple
 
 import pkg_resources

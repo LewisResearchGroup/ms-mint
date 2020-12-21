@@ -1,13 +1,25 @@
+
+import io
 import os
 import re
+import base64
 
 import shutil
 import tempfile
+import subprocess
+import platform
 
 from glob import glob
+from tqdm import tqdm
 
 import pandas as pd
 import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')
+
+from matplotlib import pyplot as plt
+import seaborn as sns    
 
 import dash
 import dash_bootstrap_components as dbc
@@ -16,7 +28,7 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_extensions import Download
-from dash_extensions.snippets import send_data_frame, send_file, send_bytes
+from dash_extensions.snippets import send_file
 from dash_extensions.enrich import FileSystemCache
 
 from flask_caching import Cache
@@ -31,7 +43,7 @@ from ms_mint.peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimi
 
 import ms_mint
 
-from .tools import parse_ms_files, get_dirnames, parse_pkl_files, get_chromatogram, create_chromatograms,\
+from .tools import parse_ms_files, get_dirnames, parse_pkl_files, get_chromatogram,\
     get_metadata_fn, get_results_fn, update_peaklist, today, get_ms_fns, get_peaklist
 
 from .ms_files import ms_layout
@@ -40,9 +52,6 @@ from .peaklist import pkl_layout
 from .results import res_layout, res_layout_empty, res_layout_non_empty
 from .peak_optimization import pko_layout
 
-import platform
-
-from tqdm import tqdm
 
 config = {
     "DEBUG": True,          # some Flask specific configs
@@ -119,9 +128,9 @@ layout = html.Div([
         dcc.Tab(label='MS-files', value='msfiles'),
         dcc.Tab(label='Peaklist', value='peaklist'),
         dcc.Tab(label='Peak Optimization', value='pko'),
-        dcc.Tab(label='Quality Control', value='qc'),
+        #dcc.Tab(label='Quality Control', value='qc'),
         dcc.Tab(label='Heatmap', value='results'),
-        dcc.Tab(label='Cluster Analysis', value='clustering'),
+        #dcc.Tab(label='Cluster Analysis', value='clustering'),
     ]),
     html.Div(id='tab-content', style={'margin': '5%'})
 ], style={'margin':'2%'})
@@ -544,16 +553,6 @@ def pko_prev_next(n_prev, n_next, value, options):
     if prop_id.startswith('pko-next'):
         return (value + 1) % len(options)
 
-
-
-import io
-import base64
-
-import matplotlib
-matplotlib.use('Agg')
-from plotly.tools import mpl_to_plotly
-from matplotlib import pyplot as plt
-import seaborn as sns    
 
 def fig_to_src():
     out_img = io.BytesIO()   
