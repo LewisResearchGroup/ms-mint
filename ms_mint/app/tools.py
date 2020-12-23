@@ -116,12 +116,40 @@ def get_results_fn(wdir):
     return os.path.join(wdir, 'results', 'results.csv')
 
 
+def get_results( wdir ):
+    fn = get_results_fn( wdir )
+    df = pd.read_csv( fn )
+    df['MS-file'] = df['ms_file']
+    return df
+    
+
+def get_metadata(wdir):
+    fn = get_metadata_fn( wdir )
+    return pd.read_csv( fn )
+
+
 def get_metadata_fn(wdir):
     fn = os.path.join(wdir, 'metadata','metadata.csv')
     dirname = os.path.dirname(fn)
     if not os.path.isdir(dirname): os.makedirs(dirname)
     return fn
 
+
 def get_ms_fns(wdir):
     fns = glob(os.path.join(wdir, 'ms_files', '*.feather'))
     return fns
+
+    
+def Basename(fn):
+    fn = os.path.basename(fn)
+    fn, _ = os.path.splitext(fn)
+    return fn
+
+
+def get_complete_results( wdir ):
+    meta = get_metadata( wdir )
+    resu = get_results( wdir )
+    resu['MS-file'] = [ Basename(fn) for fn in resu['MS-file']]
+    df = pd.merge(meta, resu, on='MS-file')
+    df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
+    return df
