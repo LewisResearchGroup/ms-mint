@@ -25,6 +25,7 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
+
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_extensions import Download
@@ -44,14 +45,16 @@ from ms_mint.peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimi
 import ms_mint
 
 from .tools import parse_ms_files, get_dirnames, parse_pkl_files, get_chromatogram,\
-    get_metadata_fn, get_results_fn, update_peaklist, today, get_ms_fns, get_peaklist
+    get_metadata_fn, get_results_fn, update_peaklist, today, get_ms_fns, get_peaklist,\
+    Basename, get_metadata, get_results, get_complete_results
 
 from .ms_files import ms_layout
 from .workspaces import ws_layout
 from .peaklist import pkl_layout
 from .results import res_layout, res_layout_empty, res_layout_non_empty
 from .peak_optimization import pko_layout
-
+from .metadata import meta_layout
+from .quality_control import qc_layout
 
 config = {
     "DEBUG": True,          # some Flask specific configs
@@ -75,7 +78,7 @@ Versions:
 {get_versions()}
 '''
 
-
+pd.options.display.max_colwidth= 1000
 
 
 def make_dirs():
@@ -126,9 +129,10 @@ layout = html.Div([
     dcc.Tabs(id='tab', value='workspaces', children=[
         dcc.Tab(label='Workspace', value='workspaces'),
         dcc.Tab(label='MS-files', value='msfiles'),
+        dcc.Tab(label='Metadata', value='metadata'),
         dcc.Tab(label='Peaklist', value='peaklist'),
         dcc.Tab(label='Peak Optimization', value='pko'),
-        #dcc.Tab(label='Quality Control', value='qc'),
+        dcc.Tab(label='Quality Control', value='qc'),
         dcc.Tab(label='Heatmap', value='results'),
         #dcc.Tab(label='Cluster Analysis', value='clustering'),
     ]),
@@ -150,6 +154,10 @@ def render_content(tab):
         return res_layout
     elif tab == 'pko':
         return pko_layout
+    elif tab == 'metadata':
+        return meta_layout
+    elif tab == 'qc':
+        return qc_layout
 
 
 @app.callback(
@@ -171,7 +179,11 @@ def run_mint(n_clicks, wdir):
     mint.export( os.path.join(wdir, 'results', 'results.csv'))
 
 
-# MS-FILES
+# MS-FILES ############################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
 @app.callback(
 Output('ms-upload-output', 'children'),
 Input('ms-upload', 'contents'),
@@ -198,50 +210,17 @@ def ms_upload(list_of_contents, converted, list_of_names, list_of_dates, wdir):
 
 @app.callback(
 Output('ms-table', 'data'),
-[Input('ms-upload-output', 'children'),
- Input('wdir', 'children'), 
- Input('ms-delete-output', 'children'),
- Input('ms-set-labels', 'n_clicks')],
-[State('ms-input', 'value'),
- State('ms-table', 'derived_virtual_selected_rows'),
- State('ms-table', 'derived_virtual_indices')
-]
+Input('ms-upload-output', 'children'),
+Input('wdir', 'children'), 
+Input('ms-delete-output', 'children'),
+State('ms-table', 'derived_virtual_selected_rows'),
+State('ms-table', 'derived_virtual_indices')
 )
-def ms_table(value, wdir, files_deleted, set_labels, ms_input, 
-    ndxs_selected, ndxs_filtered):   
-
+def ms_table(value, wdir, files_deleted, ndxs_selected, ndxs_filtered):   
     target_dir = os.path.join(wdir, 'ms_files')
     ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
     data =  pd.DataFrame([{'MS-file': os.path.basename(fn) } for fn in ms_files])
-
-    fn = get_metadata_fn(wdir)
-    if os.path.isfile(fn):
-        metadata = pd.read_csv(fn)
-        data = pd.merge(data, metadata, on='MS-file', how='left')
-
-    prop_id = dash.callback_context.triggered[0]['prop_id']
-
-    if prop_id.startswith('ms-set-labels'):
-        if ndxs_selected is []:
-            ndxs = ndxs_selected
-        else: ndxs = ndxs_filtered
-        data.loc[ndxs, 'Label'] = ms_input
     return data.to_dict('records')
-
-
-@app.callback(
-Output('ms-save-output', 'children'),
-Input('ms-table', 'data'),
-State('wdir', 'children')
-)
-def ms_save_meta(data, wdir):
-    if data is None:
-        raise PreventUpdate
-    fn = get_metadata_fn(wdir)
-    if len(data) > 0:
-        pd.DataFrame(data).to_csv(fn, index=False)
-        return 'Metadata saved.'
-    return ''
 
 
 @app.callback(
@@ -279,8 +258,75 @@ def ms_delete(n_clicks, ndxs, data, wdir):
         os.remove(fn)
     return 'Files deleted'
 
+# METADATA ############################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
 
-# WORKSPACES
+@app.callback(
+Output('meta-table', 'data'),
+Input('meta-upload', 'contents'),
+Input('meta-apply-output', 'children'),
+State('wdir', 'children')
+)
+def meta_upload(contents, message, wdir):
+
+    target_dir = os.path.join(wdir, 'ms_files')
+    ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
+
+    data = pd.DataFrame([{'MS-file': Basename(fn) } for fn in ms_files])
+
+    fn = get_metadata_fn(wdir)
+
+    if os.path.isfile(fn):
+        metadata = pd.read_csv(fn)
+        metadata['MS-file'] = [Basename(fn) for fn in metadata['MS-file'] ]
+        data = pd.merge(data, metadata, on='MS-file', how='left')
+
+    data = data.reset_index()
+    
+    for col in ['Batch', 'Color', 'Label', 'Type', 'Concentration']:
+        if col not in data.columns:
+            data[col] = ''
+      
+    return data.to_dict('records')
+
+
+@app.callback(
+Output('meta-apply-output', 'children'),
+Input('meta-apply', 'n_clicks'),
+State('meta-table', 'multiRowsClicked'),
+State('meta-table', 'data'),
+State('meta-table', 'dataFiltered'),
+State('meta-action', 'value'),
+State('meta-column', 'value'),
+State('meta-input', 'value'),
+State('wdir', 'children'),
+)
+def meta_save(n_clicks, selected_rows, data, data_filtered, action, column, value, wdir):
+    if n_clicks is None:
+        raise PreventUpdate
+    fn = get_metadata_fn( wdir )
+    df = pd.DataFrame(data).set_index('index')
+
+    filtered_rows = [r for r in data_filtered['rows'] if r is not None]
+    filtered_ndx = [r['index'] for r in filtered_rows]
+
+    ndxs = [r['index'] for r in selected_rows if r['index'] in filtered_ndx]
+
+    if len(ndxs) == 0:
+        return 'No rows selected.'
+
+    df.loc[ndxs, column] = value
+    df.to_csv(fn, index=False)
+    return 'Data saved.'
+
+
+# WORKSPACES ##########################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
 @app.callback(
 Output('ws-create-output', 'children'),
 Input('ws-create', 'n_clicks'),
@@ -393,7 +439,12 @@ def ws_delete_confirmed(n_clicks, ndxs, data, tmpdir):
 
 
 
-# PEAKLIST
+# PEAKLIST ############################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+
 @app.callback(
 Output('pkl-table', 'data'),
 Input('pkl-upload', 'contents'),
@@ -427,7 +478,13 @@ def plk_save(n_clicks, data, wdir):
 
 
 
-# PEAK OPTIMIZATION
+
+# PEAK OPTIMIZATION ###################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+
 @app.callback(
 Output('pko-dropdown', 'options'),
 Input('tab', 'value'),
@@ -554,13 +611,14 @@ def pko_prev_next(n_prev, n_next, value, options):
         return (value + 1) % len(options)
 
 
-def fig_to_src():
+def fig_to_src(dpi=100):
     out_img = io.BytesIO()   
-    plt.savefig(out_img, format='png', bbox_inches='tight')
+    plt.savefig(out_img, format='png', bbox_inches='tight', dpi=dpi)
     plt.close('all')
     out_img.seek(0)  # rewind file
     encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
     return "data:image/png;base64,{}".format(encoded)
+
 
 TIMEOUT = 60
 @app.callback(
@@ -603,7 +661,98 @@ def peak_preview(n_clicks, wdir):
     return images
 
 
-# RESULTS
+# QUALITY CONTROL #####################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+import gc
+
+
+@app.callback(
+Output('qc-figures', 'children'),
+Input('qc-update', 'n_clicks'),
+State('tab', 'value'),
+State('qc-groupby', 'value'),
+State('qc-graphs', 'value'),
+State('qc-select', 'value'),
+State('file-types', 'value'),
+State('wdir', 'children')
+)
+def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, wdir):
+    if n_clicks is None:
+        raise PreventUpdate
+
+    df = get_complete_results( wdir )
+
+    if file_types is not None and file_types != []:
+        df = df[df.Type.isin(file_types)]
+
+    sns.set_context('paper')
+    
+    by_col = 'Label'
+    by_col = 'Batch'
+    quant_col = 'peak_max'
+    quant_col = 'log(peak_max+1)'
+
+    if options is None:
+        options = []
+
+    figures = []
+    n_total = len(df.peak_label.drop_duplicates())
+    for i, (peak_label, grp) in tqdm( enumerate(df.groupby('peak_label')), total=n_total ):
+
+        if not 'Dense' in options: figures.append(dcc.Markdown(f'#### `{peak_label}`', style={'float': 'center'}))
+        fsc.set('progress', int(100*(i+1)/n_total))
+
+        df = get_complete_results( wdir )
+
+        if len(grp) < 1:
+            continue
+
+        if 'hist' in kinds: 
+            fig = sns.displot(data=grp, x=quant_col, height=3, hue=groupby, aspect=1)
+            plt.title(peak_label)
+            src = fig_to_src(dpi=150)
+            figures.append( html.Img(src=src, style={'width': '300px'}) )
+
+        if 'boxplot' in kinds: 
+            fig = sns.catplot(data=grp, y=quant_col, x=groupby, height=3, kind='box', aspect=1.3, color='w')
+            if quant_col in ['peak_max', 'peak_area']:
+                plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+            plt.title(peak_label)
+            src = fig_to_src(dpi=150)
+            figures.append( html.Img(src=src, style={'width': '300px'}) )
+
+        if not 'Dense' in options: figures.append(dcc.Markdown('---'))
+
+        #if i == 3: break
+
+    print(len(figures))
+    return figures
+
+
+@app.callback(
+Output('file-types', 'options'),
+Output('file-types', 'value'),
+Input('tab', 'value'),
+State('wdir', 'children')
+)
+def qc_file_types(tab, wdir):
+    if not tab in ['qc', 'results']:
+        raise PreventUpdate
+    meta = get_metadata( wdir )
+    file_types = meta['Type'].drop_duplicates()
+    options = [{'value': i, 'label': i} for i in file_types]
+    return options, file_types
+
+
+# RESULTS #############################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+
 @app.callback(
 Output('res-controls', 'children'),
 [Input('tab', 'value'),
@@ -633,15 +782,21 @@ def res_delete(n_clicks, wdir):
 @app.callback(
 Output('res-heatmap-figure', 'figure'),
 Input('res-heatmap', 'n_clicks'),
-[State('res-heatmap-options', 'value'),
- State('wdir', 'children')]
+State('file-types', 'value'),
+State('res-heatmap-options', 'value'),
+State('wdir', 'children')
 )
-def res_heatmap(n_clicks, options, wdir):
-    fn = get_results_fn(wdir)
+def res_heatmap(n_clicks, file_types, options, wdir):
     mint = Mint()
-    mint.load(fn)
+
+    df = get_complete_results(wdir)
+    if file_types is not None and file_types != []:
+        df = df[df.Type.isin(file_types)]
+
+    mint.results = df
 
     data = mint.crosstab('peak_max')
+    data.index = [ Basename(i) for i in data.index ]
 
     data.fillna(0, inplace=True)
     fig = plot_heatmap(data, 

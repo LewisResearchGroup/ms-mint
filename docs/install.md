@@ -3,7 +3,9 @@
 
 ### Download release (Windows 10)
 
-For Windows 10 a build is provided [here](https://github.com/soerendip/ms-mint/releases/download/v0.0.30/Mint-0.0.30-Windows10.zip). Simply, unpack the zip-archive and start `Mint.exe`. Then navigate to [http://localhost:9999](http://localhost:9999) if the browser does not open automatically.
+For Windows 10 a build is provided [here](https://github.com/soerendip/ms-mint/releases/latest). 
+Simply, unpack the zip-archive and start `Mint.exe`. 
+Then navigate to [http://localhost:9999](http://localhost:9999) if the browser does not open automatically.
 
 
 ### Installation with pip

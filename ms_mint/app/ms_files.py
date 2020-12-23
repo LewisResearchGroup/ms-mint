@@ -9,7 +9,7 @@ ms_table = html.Div(id='ms-table-container',
     children=[
         DataTable(id='ms-table',
             columns=[ {"name": i, "id": i, "selectable": True, 'editable': i != 'MS-file'}  
-                                for i in ['MS-file', 'Label']],
+                                for i in ['MS-file']],
                     data=None,
                     row_selectable='multi',
                     row_deletable=False,
@@ -41,13 +41,13 @@ ms_layout = html.Div([
             multiple=True
         ),
     html.Button('Convert to Feather', id='ms-convert'),
+    html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
     dcc.Loading( html.Div(id='ms-upload-output') ),
     html.Div(id='ms-convert-output'),
     html.Div(id='ms-delete-output'),
-    dcc.Loading( ms_table ), 
     html.Div(id='ms-save-output'),
-    dcc.Input(id='ms-input'),
-    html.Button('Set Labels', id='ms-set-labels'),
+    dcc.Loading( ms_table ), 
+    #dcc.Input(id='ms-input'),
+    #html.Button('Set Labels', id='ms-set-labels'),
     #html.Button('Set Batch', id='ms-set-batch'),
-    html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
 ])

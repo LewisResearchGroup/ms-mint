@@ -195,7 +195,7 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
     df = df.loc[non_zero_labels]
 
     plot_type = 'Heatmap'
-    colorscale = 'Blues'
+    colorscale = 'Bluered'
     plot_attributes = []
     
     if normed_by_cols:
@@ -236,7 +236,7 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         y = df.index.to_list()
     z = df.values
 
-    heatmap = go.Heatmap(x=x, y=y, z=z, colorscale = colorscale)
+    heatmap = go.Heatmap(x=x, y=y, z=z, colorscale=colorscale)
     
     title = f'{plot_type} of {",".join(plot_attributes)} {name}'
 

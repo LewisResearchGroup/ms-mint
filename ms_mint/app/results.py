@@ -44,8 +44,9 @@ res_layout_empty = html.Div([
 res_layout_non_empty = html.Div([
     html.Button('Delete results', id='ms-delete', style={'float': 'right'}),
     html.H3('Heatmap'),
-    html.Button('Heatmap', id='res-heatmap'),
-    dcc.Dropdown(id='res-heatmap-options', value=[],
+    html.Button('Update', id='res-heatmap'),
+    dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
+    dcc.Dropdown(id='res-heatmap-options', value=['normed_by_cols', 'clustered'],
         options=heatmap_options, multi=True),
     dcc.Loading( 
         dcc.Graph(id='res-heatmap-figure', 

@@ -4,7 +4,7 @@
     python3 -m twine upload --repository ms-mint dist/ms*mint-*
 
 ### On windows
-    pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec
+    pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec --additional-hooks-dir=hooks
 
 ### Docs
 
