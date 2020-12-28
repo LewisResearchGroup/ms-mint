@@ -51,12 +51,18 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='MINT frontend.')
 
-    parser.add_argument('--no-browser', action='store_true', default=False)
-    parser.add_argument('--version', default=False, action='store_true')
-    parser.add_argument('--data-dir', default=DATADIR)
-    parser.add_argument('--debug', default=False, action='store_true')
-    parser.add_argument('--port', type=int, default=9999)
-    parser.add_argument('--serve-path', default=None, type=str)
+    parser.add_argument('--no-browser', action='store_true', default=False, 
+        help='do not start the browser')
+    parser.add_argument('--version', default=False, action='store_true', 
+        help='print current version')
+    parser.add_argument('--data-dir', default=DATADIR, 
+        help='target directory for MINT data')
+    parser.add_argument('--debug', default=False, action='store_true', 
+        help='start MINT server in debug mode')
+    parser.add_argument('--port', type=int, default=9999, 
+        help='change the port')
+    parser.add_argument('--serve-path', default=None, type=str, 
+        help="serve app at a different path e.g. '/mint/' to serve the app at 'localhost:9999/mint/'")
 
     args = parser.parse_args()
 
@@ -92,5 +98,7 @@ if __name__ == '__main__':
 
     from ms_mint.app.app import app
 
-    #app.run_server(debug=args.debug, port=args.port)
-    serve(app.server, port=9999)
+    if args.debug:
+        app.run_server(debug=args.debug, port=args.port)
+    else:
+        serve(app.server, port=9999)
