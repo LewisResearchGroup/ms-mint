@@ -10,7 +10,7 @@ MINT can be used interactively in a `Jupyter Notebook` with a GUI that is based 
 
 ![Mint Jupyter GUI](./image/jupyter-gui.png "Mint Jupyter GUI")
 
-With the JupyterLab it is possible to customize the GUI to personal needs.
+With the JupyterLab it is possible to customize the GUI to personal needs. A demo notebook is available [here](https://github.com/soerendip/ms-mint/blob/develop/notebooks/MINT__demo.ipynb).
 
 ## Select MS-files
 

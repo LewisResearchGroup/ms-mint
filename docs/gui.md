@@ -127,7 +127,6 @@ has been exectuted. The tool allows to explore the generated data in from of hea
 The first dropdown menu allows to include certain file types e.g. biological samples rather than quality control samples.
 The second dropdown menu distinguishes the how the heatmap is generated. 
 
-
 - Normalized by biomarer:
 - Cluster: Cluster rows with hierachical clustering.  
 - Dendrogram: Plots a dendrogram instead of row labels.

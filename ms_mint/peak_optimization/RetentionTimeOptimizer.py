@@ -4,6 +4,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.signal import find_peaks, argrelmin, peak_widths
 
+
+
 class RetentionTimeOptimizer():
     def __init__(self, mint):
         self._mint = mint
@@ -27,7 +29,7 @@ class RetentionTimeOptimizer():
                     margin = 0
                 peaklist.loc[ndx, 'rt_min'] = max( 0, row['rt'] - margin)
                 peaklist.loc[ndx, 'rt_max'] = row['rt'] + margin
-            # I f rt is none set it to the mean of rt_min and rt_max
+            # If rt is none set it to the mean of rt_min and rt_max
             peaklist.loc[peaklist['rt'].isna(), 'rt'] = \
                 peaklist.loc[peaklist['rt'].isna(), ['rt_min', 'rt_max']].mean(axis=1)
         self._interim_peaklist = peaklist
@@ -51,7 +53,7 @@ class RetentionTimeOptimizer():
 
 def optimize_retention_times(results, peaklist, create_plots=False, show_plots=True, how='closest', **kwargs):
     print('Optimize RT')
-
+    if show_plots: create_plots = True
     assert how in ['closest', 'max']
 
     interim_peaklist = peaklist.set_index('peak_label').copy()
