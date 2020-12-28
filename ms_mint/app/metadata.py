@@ -16,6 +16,7 @@ columns = [{"formatter":"rowSelection", "titleFormatter":"rowSelection", "hozAli
 
 options = {"groupBy": "Label", 
            "selectable": True,
+           "headerFilterLiveFilterDelay":3000,
            }
 
 downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv"}
