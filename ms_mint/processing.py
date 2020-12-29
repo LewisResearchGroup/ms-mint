@@ -56,6 +56,7 @@ def process_ms1_file(filename, peaklist):
     results['ms_file'] = os.path.basename(filename)
     results['ms_path'] = os.path.dirname(filename)
     results['ms_file_size'] = os.path.getsize(filename) / 1024 / 1024
+    results['peak_score'] = score_peaks(results)
     return results[MINT_RESULTS_COLUMNS]
 
 
@@ -157,7 +158,8 @@ def extract_ms1_properties(array, mz_mean):
                 peak_mass_diff_50pc=peak_mass_diff_50pc, 
                 peak_mass_diff_75pc=peak_mass_diff_75pc,
                 peak_shape_rt=peak_shape_rt, 
-                peak_shape_int=peak_shape_int)
+                peak_shape_int=peak_shape_int,
+                peak_score=None)
 
 
 def slice_ms1_array(array: np.array, rt_min, rt_max, mz_mean, mz_width, 

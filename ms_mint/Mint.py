@@ -9,7 +9,7 @@ from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
-from .processing import process_ms1_files_in_parallel
+from .processing import process_ms1_files_in_parallel, score_peaks
 from .io import export_to_excel
 from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
@@ -114,7 +114,7 @@ class Mint(object):
                 self.progress = int(100 * (i / self.n_files))
             self.results = pd.concat(results)
             self.progress = 100
-            
+        
         end = time.time()
         self.runtime = ( end - start )
         self.runtime_per_file = (self.runtime / self.n_files)
@@ -367,10 +367,33 @@ class Mint(object):
             return plot_peak_shapes(self.results,  **kwargs)
 
 
-    def plot_heatmap(self, target_var='peak_max', normed_by_cols=False, transposed=False, 
+    def plot_heatmap(self, col_name='peak_max', normed_by_cols=False, transposed=False, 
             clustered=False, add_dendrogram=False, name='', correlation=False):
+        '''
+        `mint.plot_heatmap()` creates an interactive heatmap 
+        that can be used to explore the data interactively.
+        `mint.crosstab()` is called and then subjected to
+        the `mint.vis.plotly.plotly_tools.plot_heatmap()`.
+
+        Args
+        ----
+        * col_name: str, default='peak_max'
+            Name of the column in `mint.results` to be analysed.
+        * normed_by_cols: bool, default=True
+            Whether or not to normalize the columns in the crosstab.
+        * target_var: str, default='peak_area', 
+        * clustered: bool, default=False
+            Whether or not to cluster the rows. 
+        * add_dendrogram: bool, default=False
+            Whether or not to replace row labels with a dendrogram.
+        * transposed: bool, default=False
+            If True transpose matrix before plotting.
+        * correlation: bool, default=False
+            If True convert data to correlation matrix before plotting.
+
+        '''
         if len(self.results) > 0:
-            return plot_heatmap(self.crosstab(target_var), normed_by_cols=normed_by_cols, 
+            return plot_heatmap(self.crosstab(col_name), normed_by_cols=normed_by_cols, 
                 transposed=transposed, clustered=clustered, add_dendrogram=add_dendrogram, 
                 name=target_var, correlation=correlation)
 
