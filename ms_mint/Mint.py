@@ -369,26 +369,24 @@ class Mint(object):
 
     def plot_heatmap(self, col_name='peak_max', normed_by_cols=False, transposed=False, 
             clustered=False, add_dendrogram=False, name='', correlation=False):
-        '''
-        `mint.plot_heatmap()` creates an interactive heatmap 
+        '''Creates an interactive heatmap 
         that can be used to explore the data interactively.
         `mint.crosstab()` is called and then subjected to
         the `mint.vis.plotly.plotly_tools.plot_heatmap()`.
 
-        Args
-        ----
-        * col_name: str, default='peak_max'
+        Arguments
+        ---------
+        col_name: str, default='peak_max'
             Name of the column in `mint.results` to be analysed.
-        * normed_by_cols: bool, default=True
-            Whether or not to normalize the columns in the crosstab.
-        * target_var: str, default='peak_area', 
-        * clustered: bool, default=False
+        normed_by_cols: bool, default=True
+            Whether or not to normalize the columns in the crosstab.           
+        clustered: bool, default=False
             Whether or not to cluster the rows. 
-        * add_dendrogram: bool, default=False
+        add_dendrogram: bool, default=False
             Whether or not to replace row labels with a dendrogram.
-        * transposed: bool, default=False
+        transposed: bool, default=False
             If True transpose matrix before plotting.
-        * correlation: bool, default=False
+        correlation: bool, default=False
             If True convert data to correlation matrix before plotting.
 
         '''
