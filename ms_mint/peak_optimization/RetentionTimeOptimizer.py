@@ -51,8 +51,14 @@ class RetentionTimeOptimizer():
         return self._mint.peaklist
 
 
-def optimize_retention_times(results, peaklist, create_plots=False, show_plots=True, how='closest', **kwargs):
-    print('Optimize RT')
+def optimize_retention_times(results, peaklist, create_plots=False, 
+        show_plots=True, how='closest', prominence=5e4, verbose=False, 
+        **kwargs):
+
+    if verbose:
+        print('Optimize RT')
+        print('Prominence:', prominence)
+
     if show_plots: create_plots = True
     assert how in ['closest', 'max']
 
@@ -66,17 +72,13 @@ def optimize_retention_times(results, peaklist, create_plots=False, show_plots=T
         
         grp = grp[grp.peak_n_datapoints > 20]
         
-        #if len(grp) < 20:
-        #    print('Group to small')
-        #    continue
-
         df = pd.DataFrame({'rt': grp['peak_shape_rt'].apply(lambda x: x.split(',')).explode('peak_shape_rt').astype('float'),
                            'intensity': grp['peak_shape_int'].apply(lambda x: x.split(',')).explode('peak_shape_int').astype('int')})
         if len(df)<20:
-            print('Smoothed to small')
+            if verbose: print('Smoothed to small')
             continue
 
-        smoothed = df.groupby('rt').mean().rolling(8, center=True).mean().dropna().reset_index()
+        smoothed = df.groupby('rt').max().rolling(8, center=True).mean().dropna().reset_index()
 
         t_min = smoothed.rt.min()
         t_max = smoothed.rt.max()
@@ -96,7 +98,7 @@ def optimize_retention_times(results, peaklist, create_plots=False, show_plots=T
         t_span = t_max - t_min
         
         if (t_min is np.NaN) or (t_max is np.NaN):
-            print('Times are NaN', t_min, t_max)
+            if verbose: print('Times are NaN', t_min, t_max)
             continue
         
         x_to_t = lambda x: ((t_span * np.array(x) / len(interpolated)) + t_min).flatten()
@@ -107,11 +109,17 @@ def optimize_retention_times(results, peaklist, create_plots=False, show_plots=T
         t = interpolated['rt']
         x = interpolated['intensity'].values
         
-        ndx_peaks, _ = find_peaks(x, prominence=(1000, None))
+        if isinstance(prominence, float):
+            _prominence = prominence*max(x)
+        else:
+            _prominence = prominence
+
+        ndx_peaks, _ = find_peaks(x, prominence=(_prominence, None))
         
         if len(ndx_peaks) == 0:
-            print('No peaks found.')
+            if verbose: print('No peaks found.')
             continue
+
         t_peaks = t.iloc[ndx_peaks].values
         x_peaks = x[ndx_peaks]
         
@@ -135,7 +143,7 @@ def optimize_retention_times(results, peaklist, create_plots=False, show_plots=T
         t_selected_peak = t_peaks[ndx_selected_peak]
         x_selected_peak = x_peaks[ndx_selected_peak]
         
-        for t_m in t_minima:
+        for t_m, x_m in zip(t_minima, x_minima):
             if (t_0 < t_m) & (t_m < t_selected_peak):
                 t_0 = t_m
             if (t_m > t_selected_peak) & (t_m < t_1):
