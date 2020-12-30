@@ -1,5 +1,7 @@
+import numpy as np
 import ipywidgets as W
 import plotly.express as px
+
 from IPython.display import display
 
 
