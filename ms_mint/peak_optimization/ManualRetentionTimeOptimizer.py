@@ -2,6 +2,7 @@ import numpy as np
 import ipywidgets as W
 import plotly.express as px
 
+from tqdm import tqdm
 from IPython.display import display
 
 
