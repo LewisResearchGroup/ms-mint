@@ -37,6 +37,7 @@ install_requires = [
     'pyarrow',
     'flask-compress'] 
 
+
 config = {
     'name': 'ms-mint',
     'version': versioneer.get_version(),
@@ -50,7 +51,9 @@ config = {
     'scripts': ['scripts/Mint.py'],
     'packages': find_packages(),
     'data_files': [('scripts', ['scripts/Mint.py']),
-                   ('static', ['static/Standard_Peaklist.csv'])],
+                   ('static', ['static/Standard_Peaklist.csv']),
+                   ('static', ['static/ChEBI.tsv'])
+                   ],
     'classifiers': [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
