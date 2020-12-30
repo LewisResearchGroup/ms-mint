@@ -305,11 +305,11 @@ class Mint(object):
                 return None
         else:
             results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
-            if 'ms_file' in data.columns:
+            if 'ms_file' in results.columns:
                 ms_files = get_ms_files_from_results(results)
-                self.results = data
+                self.results = results
                 self.ms_files = ms_files
-            peaklist = data[[col for col in PEAKLIST_COLUMNS if col in data.columns]].drop_duplicates()
+            peaklist = results[[col for col in PEAKLIST_COLUMNS if col in results.columns]].drop_duplicates()
             self.peaklist = peaklist
 
     
@@ -393,5 +393,5 @@ class Mint(object):
         if len(self.results) > 0:
             return plot_heatmap(self.crosstab(col_name), normed_by_cols=normed_by_cols, 
                 transposed=transposed, clustered=clustered, add_dendrogram=add_dendrogram, 
-                name=target_var, correlation=correlation)
+                name=col_name, correlation=correlation)
 
