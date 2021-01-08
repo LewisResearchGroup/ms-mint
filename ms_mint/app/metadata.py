@@ -1,21 +1,20 @@
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
+from dash_extensions.javascript import Namespace
 
 from dash_tabulator import DashTabulator
+from .tools import gen_tabulator_columns
 
-columns = [{"formatter":"rowSelection", "titleFormatter":"rowSelection", "hozAlign":"center", "headerSort": False, "width":"1px"},
-           { "title": "MS-file", "field": "MS-file", "headerFilter":True, 'headerSort': True, "editor": "input", "headerFilter":True, 'width': '30px'},
-           { 'title': '', 'field': 'Color', "headerFilter":False,  "formatter":"color", 'width': '1px', "headerSort": False},
-           { 'title': 'Batch', 'field': 'Batch', "headerFilter":True},
-           { 'title': 'Label', 'field': 'Label', "headerFilter":True},
-           { 'title': 'Type', 'field': 'Type', "headerFilter":True},
-           { 'title': 'Concentration', 'field': 'concentration', "headerFilter":True}
-           ]
 
-options = {"groupBy": "Label", 
+ns = Namespace("myNamespace", "tabulator")
+
+options = {
+    #"groupBy": "Label", 
            "selectable": True,
            "headerFilterLiveFilterDelay":3000,
+           "dataSorted" : ns("dataSorted"),
+           "layout": "fitDataFill",
            }
 
 downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv"}
@@ -25,11 +24,10 @@ meta_table = html.Div(id='meta-table-container',
     style={'min-height':  100, 'margin': '0%'},
     children=[
         DashTabulator(id='meta-table',
-            columns=columns, 
+            columns=gen_tabulator_columns(), 
             options=options,
             downloadButtonType=downloadButtonType,
             clearFilterButtonType=clearFilterButtonType
-          
         )
 ])
 
@@ -66,7 +64,11 @@ meta_layout = html.Div([
     dcc.Markdown('##### Actions'),
     dbc.Row([
         dcc.Dropdown(
-            id='meta-action', options=[{'label': 'Set', 'value': 'Set'}],
+            id='meta-action', options=[
+                {'label': 'Set', 'value': 'Set'},
+                {'label': 'Create column', 'value': 'Create column'},
+                {'label': 'Delete column', 'value': 'Delete column'}
+            ],
             value='Set', style={'width': '150px'}),
         dcc.Dropdown(
             id='meta-column', options=options, 

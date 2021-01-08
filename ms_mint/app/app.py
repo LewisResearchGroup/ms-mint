@@ -46,15 +46,15 @@ import ms_mint
 
 from .tools import parse_ms_files, get_dirnames, parse_pkl_files, get_chromatogram,\
     get_metadata_fn, get_results_fn, update_peaklist, today, get_ms_fns, get_peaklist,\
-    Basename, get_metadata, get_results, get_complete_results
+    Basename, get_metadata, get_results, get_complete_results, gen_tabulator_columns
 
 from .ms_files import ms_layout
 from .workspaces import ws_layout
 from .peaklist import pkl_layout
-from .results import res_layout, res_layout_empty, res_layout_non_empty
+from .heatmap import heat_layout, heat_layout_empty, heat_layout_non_empty
 from .peak_optimization import pko_layout
 from .metadata import meta_layout
-from .quality_control import qc_layout
+from .quality_control import qc_layout, qc_layout_no_data
 
 config = {
     "DEBUG": True,          # some Flask specific configs
@@ -69,6 +69,7 @@ def get_versions():
     except:
         pass
     return string
+
 
 ISSUE_TEXT = f'''
 %0A%0A%0A%0A%0A%0A%0A%0A%0A
@@ -115,7 +116,7 @@ layout = html.Div([
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     html.Button('Run MINT', id='run-mint'),
     html.Button('Download', id='res-download'),
-    # html.Button('Delete results', id='ms-delete'),
+    html.Button('Delete results', id='ms-delete'),
     html.A(href='https://soerendip.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right'})],
          target="_blank"),
@@ -124,6 +125,7 @@ layout = html.Div([
          target="_blank"),   
     Download(id='res-download-data'),
     html.Div(id='run-mint-output'),
+    dcc.Markdown(id='res-delete-output'),
     dbc.Progress(id="progress-bar", value=100, style={'margin-bottom': '20px'}),
     html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
     html.Div(id='wdir', children=TMPDIR),
@@ -134,7 +136,7 @@ layout = html.Div([
         dcc.Tab(label='Peaklist', value='peaklist'),
         dcc.Tab(label='Peak Optimization', value='pko'),
         dcc.Tab(label='Quality Control', value='qc'),
-        dcc.Tab(label='Heatmap', value='results'),
+        dcc.Tab(label='Heatmap', value='heatmap'),
         #dcc.Tab(label='Cluster Analysis', value='clustering'),
     ]),
     html.Div(id='tab-content', style={'margin': '5%'})
@@ -143,22 +145,27 @@ layout = html.Div([
 app.layout = layout
 
 @app.callback(Output('tab-content', 'children'),
-              Input('tab', 'value'))
-def render_content(tab):
+              Input('tab', 'value'),
+              State('wdir', 'children'))
+def render_content(tab, wdir):
     if tab == 'msfiles':
         return ms_layout
     elif tab == 'workspaces':
         return ws_layout
     elif tab == 'peaklist':
         return pkl_layout
-    elif tab == 'results':
-        return res_layout
+    elif tab == 'heatmap':
+        return heat_layout
     elif tab == 'pko':
         return pko_layout
     elif tab == 'metadata':
         return meta_layout
     elif tab == 'qc':
-        return qc_layout
+        fn =  get_results_fn(wdir)
+        if os.path.isfile( fn ):
+            return qc_layout
+        else:
+            return qc_layout_no_data
 
 
 @app.callback(
@@ -266,36 +273,38 @@ def ms_delete(n_clicks, ndxs, data, wdir):
 
 @app.callback(
 Output('meta-table', 'data'),
+Output('meta-table', 'columns'),
+Output('meta-column', 'options'),
 Input('meta-upload', 'contents'),
 Input('meta-apply-output', 'children'),
 State('wdir', 'children')
 )
 def meta_upload(contents, message, wdir):
-
     target_dir = os.path.join(wdir, 'ms_files')
     ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
-
     data = pd.DataFrame([{'MS-file': Basename(fn) } for fn in ms_files])
-
     fn = get_metadata_fn(wdir)
-
     if os.path.isfile(fn):
         metadata = pd.read_csv(fn)
         metadata['MS-file'] = [Basename(fn) for fn in metadata['MS-file'] ]
         data = pd.merge(data, metadata, on='MS-file', how='left')
+    else:
+        data['Label'] = ''
+        data['Type'] = 'Biological Sample'
+        data['Run Order'] = ''
+        data['Batch'] = ''
+        data['Row'] = ''
+        data['Column'] = ''
 
+    columns = [{'label':i, 'value':i} for i in data.columns]
     data = data.reset_index()
-    
-    for col in ['Batch', 'Color', 'Label', 'Type', 'Concentration']:
-        if col not in data.columns:
-            data[col] = ''
-      
-    return data.to_dict('records')
+    return data.to_dict('records'), gen_tabulator_columns(data.columns), columns
 
 
 @app.callback(
 Output('meta-apply-output', 'children'),
 Input('meta-apply', 'n_clicks'),
+Input('meta-table', 'dataSorted'),
 State('meta-table', 'multiRowsClicked'),
 State('meta-table', 'data'),
 State('meta-table', 'dataFiltered'),
@@ -304,21 +313,24 @@ State('meta-column', 'value'),
 State('meta-input', 'value'),
 State('wdir', 'children'),
 )
-def meta_save(n_clicks, selected_rows, data, data_filtered, action, column, value, wdir):
+def meta_save(n_clicks, tmp, selected_rows, data, 
+        data_filtered, action, column, value, wdir):
     if n_clicks is None:
         raise PreventUpdate
+
     fn = get_metadata_fn( wdir )
     df = pd.DataFrame(data).set_index('index')
 
-    filtered_rows = [r for r in data_filtered['rows'] if r is not None]
-    filtered_ndx = [r['index'] for r in filtered_rows]
+    if action == 'Set':
+        filtered_rows = [r for r in data_filtered['rows'] if r is not None]
+        filtered_ndx = [r['index'] for r in filtered_rows]
+        ndxs = [r['index'] for r in selected_rows if r['index'] in filtered_ndx]
+        if len(ndxs) == 0 or column is None:
+            return 'No rows selected.'
+        df.loc[ndxs, column] = value
+    elif action == 'Create column': df[value] = ''
+    elif action == 'Delete column': del df[column]
 
-    ndxs = [r['index'] for r in selected_rows if r['index'] in filtered_ndx]
-
-    if len(ndxs) == 0:
-        return 'No rows selected.'
-
-    df.loc[ndxs, column] = value
     df.to_csv(fn, index=False)
     return 'Data saved.'
 
@@ -495,6 +507,8 @@ def pko_controls(tab, wdir):
     if tab != 'pko':
         raise PreventUpdate
     peaklist = get_peaklist( wdir )
+    if peaklist is None:
+        raise PreventUpdate
     options = [{'label':label, 'value': i} for i, label in enumerate(peaklist.index)]
     return options
 
@@ -563,7 +577,6 @@ def pko_find_closest_peak(n_clicks, wdir):
     if n_clicks is None:
         raise PreventUpdate
     fn_pkl = os.path.join( wdir, 'peaklist', 'peaklist.csv') 
-    print('Run peak optimization')
     
     def set_progress(x):
         fsc.set('progress', x)
@@ -574,7 +587,6 @@ def pko_find_closest_peak(n_clicks, wdir):
     rtopt = RTOpt(mint)
     new_peaklist = rtopt.fit_transform(margin=1, how='closest')
     new_peaklist.to_csv(fn_pkl)
-    print('Done')
 
 
 @app.callback(
@@ -729,7 +741,6 @@ def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, wdir):
 
         #if i == 3: break
 
-    print(len(figures))
     return figures
 
 
@@ -739,55 +750,48 @@ Output('file-types', 'value'),
 Input('tab', 'value'),
 State('wdir', 'children')
 )
-def qc_file_types(tab, wdir):
-    if not tab in ['qc', 'results']:
+def file_types(tab, wdir):
+    if not tab in ['qc', 'heatmap']:
         raise PreventUpdate
     meta = get_metadata( wdir )
+    if meta is None:
+        raise PreventUpdate
     file_types = meta['Type'].drop_duplicates()
     options = [{'value': i, 'label': i} for i in file_types]
     return options, file_types
 
 
-# RESULTS #############################################################################################################
+# HEATMAP #############################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 
 
 @app.callback(
-Output('res-controls', 'children'),
+Output('heatmap-controls', 'children'),
 [Input('tab', 'value'),
  Input('res-delete-output', 'children')],
 State('wdir', 'children')
 )
-def res_controls(tab, delete, wdir):
-    if tab != 'results':
+def heat_controls(tab, delete, wdir):
+    if tab != 'heatmap':
         raise PreventUpdate
     fn = get_results_fn(wdir)
     if os.path.isfile(fn):
-        return res_layout_non_empty
+        return heat_layout_non_empty
     else: 
-        return res_layout_empty
-
-@app.callback(
-Output('res-delete-output', 'children'),
-Input('res-delete', 'n_clicks'),
-State('wdir', 'children')
-)
-def res_delete(n_clicks, wdir):
-    os.remove(get_results_fn(wdir))
-    return 'Results file deleted.'
-
+        return heat_layout_empty
 
 
 @app.callback(
-Output('res-heatmap-figure', 'figure'),
-Input('res-heatmap', 'n_clicks'),
+Output('heatmap-figure', 'figure'),
+Input('heatmap-update', 'n_clicks'),
 State('file-types', 'value'),
-State('res-heatmap-options', 'value'),
+State('heatmap-ms-order', 'value'),
+State('heatmap-options', 'value'),
 State('wdir', 'children')
 )
-def res_heatmap(n_clicks, file_types, options, wdir):
+def heat_heatmap(n_clicks, file_types, ms_order, options, wdir):
     mint = Mint()
 
     df = get_complete_results(wdir)
@@ -796,10 +800,22 @@ def res_heatmap(n_clicks, file_types, options, wdir):
 
     mint.results = df
 
-    data = mint.crosstab('peak_max')
+    var_name = 'peak_max'
+    data = mint.crosstab(var_name)
     data.index = [ Basename(i) for i in data.index ]
 
+    if ms_order is not None:
+        df = df.sort_values(ms_order)
+        ms_files = df['MS-file'].drop_duplicates()
+        data = data.loc[ms_files]
+
     data.fillna(0, inplace=True)
+
+    name = var_name
+    if 'log1p' in options:
+        data = data.apply(np.log1p)
+        name = f'log( {var_name}+1 )'
+
     fig = plot_heatmap(data, 
         normed_by_cols='normed_by_cols' in options, 
         transposed='transposed' in options, 
@@ -807,9 +823,20 @@ def res_heatmap(n_clicks, file_types, options, wdir):
         add_dendrogram='add_dendrogram' in options,
         correlation='correlation' in options, 
         call_show='call_show' in options,
-        name='peak_max')
+        name=name)
 
     return fig
+
+
+
+@app.callback(
+Output('res-delete-output', 'children'),
+Input('res-delete', 'n_clicks'),
+State('wdir', 'children')
+)
+def heat_delete(n_clicks, wdir):
+    os.remove(get_results_fn(wdir))
+    return 'Results file deleted.'
 
 
 @app.callback([

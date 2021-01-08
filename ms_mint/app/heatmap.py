@@ -2,11 +2,10 @@ import dash_html_components as html
 import dash_core_components as dcc
 
 
-res_layout = html.Div([
-    dcc.Markdown(id='res-delete-output'),
+heat_layout = html.Div([
     html.Div(id='res-upload-output'),
-    html.Div(id='res-controls'),
-    html.Div(id='res-output')
+    html.Div(id='heatmap-controls'),
+    html.Div(id='heatmap-output')
 ])
 
 
@@ -16,10 +15,12 @@ heatmap_options = [
     { 'label': 'Dendrogram', 'value': 'add_dendrogram'},
     { 'label': 'Transposed', 'value': 'transposed'},
     { 'label': 'Correlation', 'value': 'correlation'},
-    { 'label': 'Show in new tab', 'value': 'call_show'}]
+    { 'label': 'Show in new tab', 'value': 'call_show'},
+    { 'label': 'log1p', 'value': 'log1p'},
+    ]
 
 
-res_layout_empty = html.Div([
+heat_layout_empty = html.Div([
     dcc.Upload(
             id='res-upload',
             children=html.Div([
@@ -41,13 +42,20 @@ res_layout_empty = html.Div([
         ),
 ])
 
-res_layout_non_empty = html.Div([
+
+heat_layout_non_empty = html.Div([
     html.H3('Heatmap'),
-    html.Button('Update', id='res-heatmap'),
+    html.Button('Update', id='heatmap-update'),
     dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
-    dcc.Dropdown(id='res-heatmap-options', value=['normed_by_cols', 'clustered'],
+    dcc.Dropdown(id='heatmap-options', value=['normed_by_cols', 'clustered'],
         options=heatmap_options, multi=True),
+    dcc.Dropdown(id='heatmap-ms-order', options=[{'value': 'MS-file', 'label': 'MS-file'},
+                                                 {'value': 'Label', 'label': 'Label'},
+                                                 {'value': 'Batch', 'label': 'Batch'},
+                                                 {'value': 'Type', 'label': 'Type'}
+                                                 ], 
+                                                 placeholder='MS-file sorting', multi=True),
     dcc.Loading( 
-        dcc.Graph(id='res-heatmap-figure', 
+        dcc.Graph(id='heatmap-figure', 
                   style={'margin-top': '50px'}) ),
 ])
