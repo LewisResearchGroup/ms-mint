@@ -90,7 +90,10 @@ def get_peaklist_fn(wdir):
 
 
 def get_peaklist(wdir):
-    return read_peaklists(get_peaklist_fn(wdir)).set_index('peak_label')
+    fn = get_peaklist_fn(wdir)
+    if os.path.isfile( fn ):
+        return read_peaklists( fn ).set_index('peak_label')
+    else: return None
 
 
 def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None):
@@ -125,7 +128,9 @@ def get_results( wdir ):
 
 def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
-    return pd.read_csv( fn )
+    if os.path.isfile(fn):
+        return pd.read_csv( fn )
+    else: return None
 
 
 def get_metadata_fn(wdir):
@@ -153,3 +158,29 @@ def get_complete_results( wdir ):
     df = pd.merge(meta, resu, on='MS-file')
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
     return df
+
+
+def gen_tabulator_columns(col_names=None):
+    if col_names is None: col_names = []
+    col_names = list(col_names)
+    if 'MS-file' in col_names: col_names.remove('MS-file')
+    if 'Color' in col_names: col_names.remove('Color')
+    if 'index' in col_names: col_names.remove('index')
+
+    columns = [
+        { "formatter":"rowSelection", "titleFormatter":"rowSelection", 
+          "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
+        { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
+          'headerSort': True, "editor": "input", "headerFilter":True, 
+          'sorter': 'string', 'frozen': True},
+        { 'title': 'Color', 'field': 'Color', "headerFilter":False,  "formatter":"color", 
+          'width': '3px', "headerSort": False},
+    ]
+    for col in col_names:
+        content = { 'title': col, 'field': col, "headerFilter":True, 'width': '12px' }
+        columns.append(content)
+
+    #columns[-1]['width'] = None
+    #columns[-1]['widthGrowth'] = 5
+
+    return columns
