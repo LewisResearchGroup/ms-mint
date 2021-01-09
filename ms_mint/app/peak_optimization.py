@@ -32,3 +32,9 @@ pko_layout = html.Div([
         html.Button('Next >>', id='pko-next')],
         style={'text-align': 'center', 'margin': 'auto'})
 ])
+
+pko_layout_no_data = html.Div([
+    dcc.Markdown('''### No peaklist found.
+    You did not generate a peaklist yet.
+    ''')
+])
