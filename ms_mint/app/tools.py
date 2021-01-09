@@ -90,7 +90,7 @@ def get_peaklist_fn(wdir):
 
 
 def get_peaklist(wdir):
-    fn = get_peaklist_fn(wdir)
+    fn = get_peaklist_fn( wdir )
     if os.path.isfile( fn ):
         return read_peaklists( fn ).set_index('peak_label')
     else: return None

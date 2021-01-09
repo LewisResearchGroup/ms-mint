@@ -52,7 +52,7 @@ from .ms_files import ms_layout
 from .workspaces import ws_layout
 from .peaklist import pkl_layout
 from .heatmap import heat_layout, heat_layout_empty, heat_layout_non_empty
-from .peak_optimization import pko_layout
+from .peak_optimization import pko_layout, pko_layout_no_data
 from .metadata import meta_layout
 from .quality_control import qc_layout, qc_layout_no_data
 
@@ -116,7 +116,7 @@ layout = html.Div([
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     html.Button('Run MINT', id='run-mint'),
     html.Button('Download', id='res-download'),
-    html.Button('Delete results', id='ms-delete'),
+    html.Button('Delete results', id='res-delete'),
     html.A(href='https://soerendip.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right'})],
          target="_blank"),
@@ -157,7 +157,10 @@ def render_content(tab, wdir):
     elif tab == 'heatmap':
         return heat_layout
     elif tab == 'pko':
-        return pko_layout
+        pkl = get_peaklist(wdir)
+        if pkl is not None and len(pkl) > 0:
+            return pko_layout
+        else: return pko_layout_no_data
     elif tab == 'metadata':
         return meta_layout
     elif tab == 'qc':
@@ -835,6 +838,8 @@ Input('res-delete', 'n_clicks'),
 State('wdir', 'children')
 )
 def heat_delete(n_clicks, wdir):
+    if n_clicks is None:
+        raise PreventUpdate
     os.remove(get_results_fn(wdir))
     return 'Results file deleted.'
 
