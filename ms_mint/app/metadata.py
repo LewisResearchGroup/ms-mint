@@ -13,7 +13,7 @@ options = {
     #"groupBy": "Label", 
            "selectable": True,
            "headerFilterLiveFilterDelay":3000,
-           "dataSorted" : ns("dataSorted"),
+#           "dataSorted" : ns("dataSorted"),
            "layout": "fitDataFill",
            }
 
