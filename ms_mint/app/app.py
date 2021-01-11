@@ -137,7 +137,7 @@ layout = html.Div([
         dcc.Tab(label='Peak Optimization', value='pko'),
         dcc.Tab(label='Quality Control', value='qc'),
         dcc.Tab(label='Heatmap', value='heatmap'),
-        #dcc.Tab(label='Cluster Analysis', value='clustering'),
+        #   dcc.Tab(label='PCA', value='pca'),
     ]),
     html.Div(id='tab-content', style={'margin': '5%'})
 ], style={'margin':'2%'})
@@ -283,9 +283,12 @@ Input('meta-apply-output', 'children'),
 State('wdir', 'children')
 )
 def meta_upload(contents, message, wdir):
+    print('METADATA')
     target_dir = os.path.join(wdir, 'ms_files')
+    print(target_dir)
     ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
     data = pd.DataFrame([{'MS-file': Basename(fn) } for fn in ms_files])
+    print(data)
     fn = get_metadata_fn(wdir)
     if os.path.isfile(fn):
         metadata = pd.read_csv(fn)
@@ -298,9 +301,10 @@ def meta_upload(contents, message, wdir):
         data['Batch'] = ''
         data['Row'] = ''
         data['Column'] = ''
-
     columns = [{'label':i, 'value':i} for i in data.columns]
     data = data.reset_index()
+    print(data)
+    print('Done')
     return data.to_dict('records'), gen_tabulator_columns(data.columns), columns
 
 
