@@ -25,6 +25,7 @@ install_requires = [
     'colorlover',
     'dash-bootstrap-components',
     'dash-extensions',
+    'dash-tabulator',
     'scikit-learn',
     'xlrd',
     'ipywidgets',
