@@ -35,7 +35,7 @@ def test__process_ms1():
 
     result = processing.process_ms1(ms_data, peaklist)
 
-    expect= pd.DataFrame({'peak_label': {0: 'A'},
+    expect = pd.DataFrame({  'peak_label': {0: 'A'},
                              'mz_mean': {0: 200},
                              'mz_width': {0: 10},
                              'intensity_threshold': {0: 0},
@@ -53,10 +53,10 @@ def test__process_ms1():
                              'peak_shape_int': {0: '3'},
                              'peak_mass_diff_25pc': {0: 0.0},
                              'peak_mass_diff_50pc': {0: 0.0},
-                             'peak_mass_diff_75pc': {0: 0.0}})
-    print(result.values)
-    print(expect.values)
-    print(result.columns.to_list())
+                             'peak_mass_diff_75pc': {0: 0.0},
+                             'peak_score': {0: None} 
+                        })
+    
     assert result.equals(expect), result
 
 
@@ -72,8 +72,7 @@ def test__process_ms1_from_df():
          'rt_min': [0],
          'rt_max': [10]})
     result = processing.process_ms1_from_df(df, peaklist)
-    expect= [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 
-                 0, '2', '3', 0.0, 0.0, 0.0]]
+    expect= [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0, None]]
     print(result)
     print(expect) 
     assert result == expect
@@ -101,8 +100,8 @@ def test__process_ms1_from_numpy():
 
     result = processing.process_ms1_from_numpy(array, peaks)
 
-    expect = [['A', 2, 1, 2, 1, 2, 2.0, 2.0, 0, '1', '2', 0.0, 0.0, 0.0],
-              ['B', 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0]]
+    expect = [['A', 2, 1, 2, 1, 2, 2.0, 2.0, 0, '1', '2', 0.0, 0.0, 0.0, None],
+              ['B', 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0, None]]
     
     print('Expected:')
     [print(i) for i in expect]

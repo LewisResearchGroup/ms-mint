@@ -55,7 +55,7 @@ class Mint(MintBase):
         self.run_button.on_click(self.run)
         self.run_button.style.button_color = 'lightgray'
 
-        self.optimize_rt_button = Button(description="Optimize RT")
+        self.optimize_rt_button = Button(description="Find closest peaks")
         self.optimize_rt_button.on_click(self.action_optimize_rt)
         
         self.download_button = Button(description="Export")

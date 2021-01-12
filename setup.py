@@ -25,6 +25,7 @@ install_requires = [
     'colorlover',
     'dash-bootstrap-components',
     'dash-extensions',
+    'dash-tabulator',
     'scikit-learn',
     'xlrd',
     'ipywidgets',
@@ -33,7 +34,10 @@ install_requires = [
     'tqdm',
     'seaborn',
     'ipyfilechooser',
-    'waitress'] 
+    'waitress',
+    'pyarrow',
+    'flask-compress'] 
+
 
 config = {
     'name': 'ms-mint',
@@ -48,13 +52,15 @@ config = {
     'scripts': ['scripts/Mint.py'],
     'packages': find_packages(),
     'data_files': [('scripts', ['scripts/Mint.py']),
-                   ('static', ['static/Standard_Peaklist.csv'])],
+                   ('static', ['static/Standard_Peaklist.csv']),
+                   ('static', ['static/ChEBI.tsv'])
+                   ],
     'classifiers': [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-   'python_requires': '>=3.5',
+   'python_requires': '>=3.7',
    'install_requires': install_requires,
 }
 
