@@ -15,7 +15,8 @@ RESULTS_COLUMNS = [
     'peak_mean', 'peak_delta_int',
     'peak_shape_rt', 'peak_shape_int', 
     'peak_mass_diff_25pc', 'peak_mass_diff_50pc', 
-    'peak_mass_diff_75pc']
+    'peak_mass_diff_75pc',
+    'peak_score']
 
 MINT_RESULTS_COLUMNS = (['ms_file']
                         + PEAKLIST_COLUMNS

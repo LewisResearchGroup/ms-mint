@@ -32,6 +32,8 @@ def read_peaklists(filenames):
             df = pd.read_csv(fn)
         elif fn.endswith('.xlsx'):
             df = pd.read_excel(fn)
+        if len(df) == 0:
+            return pd.DataFrame(columns=PEAKLIST_COLUMNS, index=[])
         df['peaklist_name'] = os.path.basename(fn)
         df = standardize_peaklist(df)
         peaklist.append(df)

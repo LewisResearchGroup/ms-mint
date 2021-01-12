@@ -188,12 +188,14 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
                  add_dendrogram=False, name='',
                  correlation=False, call_show=False, verbose=False):
 
+
+    print(df.columns)
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
     df = df.loc[non_zero_labels]
 
     plot_type = 'Heatmap'
-    colorscale = 'Blues'
+    colorscale = 'Bluered'
     plot_attributes = []
     
     if normed_by_cols:
@@ -234,7 +236,7 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         y = df.index.to_list()
     z = df.values
 
-    heatmap = go.Heatmap(x=x, y=y, z=z, colorscale = colorscale)
+    heatmap = go.Heatmap(x=x, y=y, z=z, colorscale=colorscale)
     
     title = f'{plot_type} of {",".join(plot_attributes)} {name}'
 
