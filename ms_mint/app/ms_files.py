@@ -22,7 +22,7 @@ ms_table = html.Div(id='ms-table-container',
 ms_layout = html.Div([
     html.H3('MS-file'),
     dcc.Markdown('''At the moment the upload is limited to ~10 files at a time.
-    ''''),
+    '''),
     dcc.Upload(
             id='ms-upload',
             children=html.Div([
