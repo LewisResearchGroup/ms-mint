@@ -190,10 +190,25 @@ def run_mint(n_clicks, wdir):
     mint.export( os.path.join(wdir, 'results', 'results.csv'))
 
 
+@app.callback(
+Output('peak-labels', 'options'),
+Input('tab', 'value'),
+State('wdir', 'children')
+)
+def peak_labels(tab, wdir):
+    if tab not in ['qc']:
+        raise PreventUpdate
+    peaklist = get_peaklist( wdir ).reset_index()
+    peak_labels = [{'value': i, 'label': i} for i in peaklist.peak_label]
+    return peak_labels
+
+
+
 # MS-FILES ############################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
+
 
 @app.callback(
 Output('ms-upload-output', 'children'),
@@ -686,8 +701,6 @@ def peak_preview(n_clicks, wdir):
 #######################################################################################################################
 #######################################################################################################################
 
-import gc
-
 
 @app.callback(
 Output('qc-figures', 'children'),
@@ -697,16 +710,19 @@ State('qc-groupby', 'value'),
 State('qc-graphs', 'value'),
 State('qc-select', 'value'),
 State('file-types', 'value'),
+State('peak-labels', 'value'),
 State('wdir', 'children')
 )
-def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, wdir):
+def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, peak_labels, wdir):
     if n_clicks is None:
         raise PreventUpdate
 
     df = get_complete_results( wdir )
 
-    if file_types is not None and file_types != []:
+    if file_types is not None and len(file_types) > 0:
         df = df[df.Type.isin(file_types)]
+    if peak_labels is not None and len(peak_labels) > 0:
+        df = df[df.peak_label.isin(peak_labels)]
 
     sns.set_context('paper')
     
@@ -714,6 +730,9 @@ def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, wdir):
     by_col = 'Batch'
     quant_col = 'peak_max'
     quant_col = 'log(peak_max+1)'
+
+    if by_col is not None:
+        df = df.sort_values(['peak_label', by_col])
 
     if options is None:
         options = []
@@ -725,7 +744,9 @@ def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, wdir):
         if not 'Dense' in options: figures.append(dcc.Markdown(f'#### `{peak_label}`', style={'float': 'center'}))
         fsc.set('progress', int(100*(i+1)/n_total))
 
-        df = get_complete_results( wdir )
+        if by_col is not None:
+            grp = grp.sort_values(['peak_label', by_col])
+
 
         if len(grp) < 1:
             continue
@@ -736,11 +757,19 @@ def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, wdir):
             src = fig_to_src(dpi=150)
             figures.append( html.Img(src=src, style={'width': '300px'}) )
 
-        if 'boxplot' in kinds: 
-            fig = sns.catplot(data=grp, y=quant_col, x=groupby, height=3, kind='box', aspect=1.3, color='w')
+        if 'density' in kinds:
+            fig = sns.displot(data=grp, x=quant_col, hue=groupby, kind='kde', common_norm=False, height=3,  aspect=1)
+            plt.title(peak_label)
+            src = fig_to_src(dpi=150)
+            figures.append( html.Img(src=src, style={'width': '300px'}) )
+
+        if 'boxplot' in kinds:
+            n_groups = len( grp[groupby].drop_duplicates() )
+            fig = sns.catplot(data=grp, y=quant_col, x=groupby, height=3, kind='box', aspect=n_groups/10, color='w')
             if quant_col in ['peak_max', 'peak_area']:
                 plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
             plt.title(peak_label)
+            plt.xticks(rotation=90)
             src = fig_to_src(dpi=150)
             figures.append( html.Img(src=src, style={'width': '300px'}) )
 

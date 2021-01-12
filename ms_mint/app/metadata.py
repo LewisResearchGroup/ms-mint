@@ -15,6 +15,7 @@ options = {
            "headerFilterLiveFilterDelay":3000,
 #           "dataSorted" : ns("dataSorted"),
            "layout": "fitDataFill",
+           "height": "900px",
            }
 
 downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv"}
