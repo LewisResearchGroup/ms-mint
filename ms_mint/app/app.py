@@ -771,7 +771,8 @@ def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, peak_labels, 
 
         if 'boxplot' in kinds:
             n_groups = len( grp[groupby].drop_duplicates() )
-            fig = sns.catplot(data=grp, y=quant_col, x=groupby, height=3, kind='box', aspect=n_groups/10, color='w')
+            aspect = max(1, n_groups/10)
+            fig = sns.catplot(data=grp, y=quant_col, x=groupby, height=3, kind='box', aspect=aspect, color='w')
             if quant_col in ['peak_max', 'peak_area']:
                 plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
             plt.title(peak_label)
