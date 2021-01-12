@@ -222,7 +222,6 @@ def ms_upload(list_of_contents, converted, list_of_names, list_of_dates, wdir):
     if list_of_contents is not None:
         n_total = len(list_of_contents)
         n_uploaded = 0
-
         for i, (c, n, d) in tqdm( enumerate( zip(list_of_contents, list_of_names, list_of_dates) ), total=n_total):
             fsc.set('progress', int( 100*(i+1)/n_total ))
             if n.lower().endswith('mzxml') or n.lower().endswith('mzml'):
@@ -267,10 +266,11 @@ def ms_convert(n_clicks, wdir):
         if os.path.isfile(new_fn): os.remove(fn)
     return 'Files converted to feather format.'
 
+
 @app.callback(
 Output('ms-delete-output', 'children'),
 Input('ms-delete', 'n_clicks'),
-[State('ms-table', 'derived_virtual_selected_rows'),
+[State('ms-table', 'selected_rows'),
  State('ms-table', 'data'),
  State('wdir', 'children')]
 )
@@ -278,8 +278,13 @@ def ms_delete(n_clicks, ndxs, data, wdir):
     if n_clicks is None:
         raise PreventUpdate
     target_dir = os.path.join(wdir, 'ms_files')
+    print(data)
+    print(len(data))
+    print(ndxs)
+
     for ndx in ndxs:
         fn = data[ndx]['MS-file']
+        print('Delete file', fn)
         fn = os.path.join(target_dir, fn)
         os.remove(fn)
     return 'Files deleted'
@@ -744,8 +749,9 @@ def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, peak_labels, 
         if not 'Dense' in options: figures.append(dcc.Markdown(f'#### `{peak_label}`', style={'float': 'center'}))
         fsc.set('progress', int(100*(i+1)/n_total))
 
+        # Sorting to ensure similar legends
         if by_col is not None:
-            grp = grp.sort_values(['peak_label', by_col])
+            grp = grp.sort_values(by_col).reset_index(drop=True)
 
 
         if len(grp) < 1:
