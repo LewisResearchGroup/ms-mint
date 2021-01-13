@@ -26,6 +26,7 @@ pko_layout = html.Div([
     dcc.Loading( dcc.Graph('pko-figure') ),
     dcc.Markdown(id='pko-set-rt-output'),
     html.Button('Set RT to current view', id='pko-set-rt'),
+    html.Button('Remove Peak', id='pko-remove-peak', style={'float': 'right'}),
 
     html.Div([
         html.Button('<< Previous', id='pko-prev'),

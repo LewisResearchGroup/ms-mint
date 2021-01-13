@@ -115,7 +115,7 @@ app.config['suppress_callback_exceptions'] = True
 layout = html.Div([
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     html.Button('Run MINT', id='run-mint'),
-    html.Button('Download', id='res-download'),
+    html.Button('Download results', id='res-download'),
     html.Button('Delete results', id='res-delete'),
     html.A(href='https://soerendip.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right'})],
@@ -128,7 +128,8 @@ layout = html.Div([
     dcc.Markdown(id='res-delete-output'),
     dbc.Progress(id="progress-bar", value=100, style={'margin-bottom': '20px'}),
     html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
-    html.Div(id='wdir', children=TMPDIR),
+    html.P('Current directory:  ', style={'display': 'inline-block', 'margin-right': '5px'}),
+    html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block'}),
     dcc.Tabs(id='tab', value='workspaces', children=[
         dcc.Tab(label='Workspace', value='workspaces'),
         dcc.Tab(label='MS-files', value='msfiles'),
