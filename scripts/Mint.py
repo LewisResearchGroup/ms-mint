@@ -89,7 +89,6 @@ if __name__ == '__main__':
             except OSError:
                 print('Please open a browser on: ', url)
 
-    
     if  args.data_dir is not None: 
         os.environ["MINT_DATA_DIR"] = args.data_dir
     
@@ -99,6 +98,8 @@ if __name__ == '__main__':
     from ms_mint.app.app import app
 
     if args.debug:
-        app.run_server(debug=args.debug, port=args.port)
+        app.run_server(debug=args.debug, port=args.port, 
+            dev_tools_hot_reload_interval=3000,
+            dev_tools_hot_reload_max_retry=30)
     else:
         serve(app.server, port=9999)
