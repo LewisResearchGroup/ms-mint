@@ -50,12 +50,14 @@ _layout = html.Div([
     dcc.Loading( dcc.Graph('pko-figure') ),
     dcc.Markdown(id='pko-set-rt-output'),
     html.Button('Set RT to current view', id='pko-set-rt'),
-    html.Button('Remove Peak', id='pko-remove-peak', style={'float': 'right'}),
+    html.Button('Remove Peak', id='pko-delete', style={'float': 'right'}),
 
     html.Div([
         html.Button('<< Previous', id='pko-prev'),
         html.Button('Next >>', id='pko-next')],
-        style={'text-align': 'center', 'margin': 'auto'})
+        style={'text-align': 'center', 'margin': 'auto'}),
+    
+    html.Div(id='pko-delete-output')
 ])
 
 pko_layout_no_data = html.Div([
@@ -74,9 +76,10 @@ def callbacks(app, fsc, cache):
     @app.callback(
     Output('pko-dropdown', 'options'),
     Input('tab', 'value'),
+    Input('pko-delete-output', 'children'),
     State('wdir', 'children')
     )
-    def pko_controls(tab, wdir):
+    def pko_controls(tab, peak_deleted, wdir):
         if tab != 'pko':
             raise PreventUpdate
         peaklist = T.get_peaklist( wdir )
@@ -88,19 +91,21 @@ def callbacks(app, fsc, cache):
 
     @app.callback(
     Output('pko-figure', 'figure'),
-    [Input('pko-dropdown', 'value'),
-    Input('pko-set-rt-output', 'children')],
+    Input('pko-dropdown', 'value'),
+    Input('pko-set-rt-output', 'children'),
+    Input('pko-dropdown', 'options'),
     State('wdir', 'children'),
     State('pko-figure', 'figure')
     )
-    def pko_figure(peak_label, n_clicks, wdir, fig):
-        if peak_label is None:
+    def pko_figure(peak_label_ndx, n_clicks, options_changed, wdir, fig):
+        if peak_label_ndx is None:
             raise PreventUpdate
         
         peaklist = T.get_peaklist( wdir ).reset_index()
         ms_files = T.get_ms_fns( wdir )
+        peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
-            peaklist.loc[peak_label, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
+            peaklist.loc[peak_label_ndx, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
 
         if (rt_min is None) or np.isnan(rt_min): rt_min = rt-0.2
         if (rt_max is None) or np.isnan(rt_max): rt_max = rt+0.2
@@ -120,10 +125,6 @@ def callbacks(app, fsc, cache):
             )
             fig.update_layout(title=label)
 
-        #else:
-        #    fig = go.Figure(fig)
-        #    fig['data'] = []
-
         fig.add_vline(rt)
         fig.add_vrect(x0=rt_min, x1=rt_max, line_width=0, fillcolor="green", opacity=0.1)
 
@@ -139,6 +140,7 @@ def callbacks(app, fsc, cache):
                         name=name)
             )
             fig.update_layout(showlegend=False)
+
         return fig
 
 
@@ -158,7 +160,7 @@ def callbacks(app, fsc, cache):
         mint.peaklist_files = fn_pkl
         mint.ms_files = glob( os.path.join( wdir, 'ms_files', '*.*'))
         rtopt = RTOpt(mint)
-        new_peaklist = rtopt.fit_transform(margin=1, how='closest')
+        new_peaklist = rtopt.fit_transform(margin=1, how='max')
         new_peaklist.to_csv(fn_pkl)
 
 
@@ -236,3 +238,18 @@ def callbacks(app, fsc, cache):
         images.append( dcc.Markdown('---') )
         return images
 
+
+    @app.callback(
+        Output('pko-delete-output', 'children'),
+        Input('pko-delete', 'n_clicks'),
+        State('pko-dropdown', 'value'),
+        State('wdir', 'children')
+    )
+    def plk_delete(n_clicks, peak_label, wdir):
+        if n_clicks is None:
+            raise PreventUpdate
+        fn = T.get_peaklist_fn( wdir )
+        peaklist = T.get_peaklist( wdir ).reset_index()
+        peaklist = peaklist.drop( peak_label, axis=0 )
+        peaklist.to_csv(fn, index=False)
+        return f'{peak_label} removed from peaklist.'  

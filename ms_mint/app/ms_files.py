@@ -6,28 +6,47 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.exceptions import PreventUpdate
 
-from dash_table import DataTable
 from dash.dependencies import Input, Output, State
 
 from ms_mint.io import convert_ms_file_to_feather
 
+from dash_tabulator import DashTabulator
+
 from . import tools as T
 
 
+options = {
+           "selectable": True,
+           "headerFilterLiveFilterDelay":3000,
+           "layout": "fitDataFill",
+           "height": "900px",
+           }
+
+clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
+
+
+# If color column is not present, for some strange reason, the header filter disappears.
+columns = [
+        { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
+          "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
+        { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
+          'headerSort': True, "editor": "input", "width": "100%",
+          'sorter': 'string', 'frozen': True},
+        { 'title': '', 'field': '', "headerFilter":False,  "formatter":"color", 
+          'width': '3px', "headerSort": False},
+    ]
+
+
 ms_table = html.Div(id='ms-table-container', 
-    style={'min-height':  100, 'margin': '5%'},
+    style={'min-height':  100, 'margin-top': '10%'},
     children=[
-        DataTable(id='ms-table',
-            columns=[ {"name": i, "id": i, "selectable": True, 'editable': i != 'MS-file'}  
-                                for i in ['MS-file']],
-                    data=None,
-                    row_selectable='multi',
-                    row_deletable=False,
-                    style_cell={'textAlign': 'left'},
-                    sort_action='native',
-                    filter_action='native',                
-                    )
+        DashTabulator(id='ms-table',
+            columns=columns, 
+            options=options,
+            clearFilterButtonType=clearFilterButtonType
+        )
 ])
+
 
 _layout = html.Div([
     html.H3('MS-file'),
@@ -51,6 +70,8 @@ _layout = html.Div([
             # Allow multiple files to be uploaded
             multiple=True
         ),
+    dcc.Markdown('---'),
+    dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
     dcc.Loading( html.Div(id='ms-upload-output') ),
@@ -94,27 +115,29 @@ def callbacks(app, fsc, cache):
     Input('ms-upload-output', 'children'),
     Input('wdir', 'children'), 
     Input('ms-delete-output', 'children'),
-    State('ms-table', 'derived_virtual_selected_rows'),
-    State('ms-table', 'derived_virtual_indices')
     )
-    def ms_table(value, wdir, files_deleted, ndxs_selected, ndxs_filtered):   
+    def ms_table(value, wdir, files_deleted): 
         target_dir = os.path.join(wdir, 'ms_files')
         ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
         data =  pd.DataFrame([{'MS-file': os.path.basename(fn) } for fn in ms_files])
+        print(data)
         return data.to_dict('records')
 
 
     @app.callback(
     Output('ms-convert-output', 'children'),
     Input('ms-convert', 'n_clicks'),
+    State('ms-table', 'multiRowsClicked'),
     State('wdir', 'children')
     )
-    def ms_convert(n_clicks, wdir):
+    def ms_convert(n_clicks, rows, wdir):
         target_dir = os.path.join(wdir, 'ms_files')
+        print(rows)
         if n_clicks is None:
             raise PreventUpdate
-        fns = glob(os.path.join(target_dir, '*.*'))
+        fns = [row['MS-file'] for row in rows]
         fns = [fn for fn in fns if not fn.endswith('.feather')]
+        fns = [os.path.join(target_dir, fn) for fn in fns]
         n_total = len(fns)
         for i, fn in enumerate( fns ):
             fsc.set('progress', int(100*(i+1)/n_total))
@@ -124,18 +147,17 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-    Output('ms-delete-output', 'children'),
-    Input('ms-delete', 'n_clicks'),
-    [State('ms-table', 'selected_rows'),
-    State('ms-table', 'data'),
-    State('wdir', 'children')]
+        Output('ms-delete-output', 'children'),
+        Input('ms-delete', 'n_clicks'),
+        State('ms-table', 'multiRowsClicked'),
+        State('wdir', 'children')
     )
-    def ms_delete(n_clicks, ndxs, data, wdir):
+    def ms_delete(n_clicks, rows, wdir):
         if n_clicks is None:
             raise PreventUpdate
         target_dir = os.path.join(wdir, 'ms_files')
-        for ndx in ndxs:
-            fn = data[ndx]['MS-file']
+        for row in rows:
+            fn = row['MS-file']
             fn = os.path.join(target_dir, fn)
             os.remove(fn)
-        return 'Files deleted'
+        return f'{len(rows)} files deleted'

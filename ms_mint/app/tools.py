@@ -71,12 +71,10 @@ def get_dirnames(path):
 
 
 def workspace_path(tmpdir, ws_name):
-    ws_path = os.path.join(tmpdir, 'workspaces')
     return os.path.join(tmpdir, 'workspaces', ws_name)
 
 
 def maybe_migrate_workspaces(tmpdir):
-    print('Migrating workspaces to new directory scheme.')
     dir_names = get_dirnames(tmpdir)
     ws_path = get_workspaces_path(tmpdir)
     if not os.path.isdir(ws_path) and len(dir_names)>0:
@@ -134,7 +132,7 @@ def get_workspaces_path(tmpdir):
 
 def get_workspaces(tmpdir):
     ws_path = get_workspaces_path(tmpdir)
-    return get_dirnames( os.path.join(tmpdir, 'workspaces') )
+    return get_dirnames( ws_path )
 
 
 
@@ -262,26 +260,48 @@ def get_complete_results( wdir ):
     return df
 
 
-def gen_tabulator_columns(col_names=None):
+def gen_tabulator_columns(col_names=None, add_ms_file_col=True, add_color_col=True, col_width='12px', editor='input'):
     if col_names is None: col_names = []
     col_names = list(col_names)
+    
     if 'MS-file' in col_names: col_names.remove('MS-file')
     if 'Color' in col_names: col_names.remove('Color')
     if 'index' in col_names: col_names.remove('index')
 
     columns = [
         { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
-          "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
-        { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
-          'headerSort': True, "editor": "input", "headerFilter":True, 
-          'sorter': 'string', 'frozen': True},
-        { 'title': 'Color', 'field': 'Color', "headerFilter":False,  "formatter":"color", 
-          'width': '3px', "headerSort": False},
-    ]
-    for col in col_names:
-        content = { 'title': col, 'field': col, "headerFilter":True, 'width': '12px', 'editor': 'input' }
-        columns.append(content)
+          "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
 
+    if add_ms_file_col:
+        columns.append(
+            { "title": "MS-file", 
+              "field": "MS-file", 
+              "headerFilter":True, 
+              'headerSort': True, 
+              "editor": "input", 
+              'sorter': 'string', 
+              'frozen': True
+            })
+    
+    if add_color_col:
+        columns.append(
+            { 'title': 'Color', 
+              'field': 'Color', 
+              "headerFilter":False,  
+              "formatter": "color", 
+              'width': '3px', 
+              "headerSort": False
+            })
+    
+    for col in col_names:
+        content = { 'title': col, 
+                    'field': col, 
+                    "headerFilter":True, 
+                    'width': col_width, 
+                    'editor': editor 
+                  }
+
+        columns.append(content)
     return columns
 
 
