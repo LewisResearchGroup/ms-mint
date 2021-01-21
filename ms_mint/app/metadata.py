@@ -21,7 +21,7 @@ options = {
            "headerFilterLiveFilterDelay":3000,
            #"dataSorted" : ns("dataSorted"),
            "layout": "fitDataFill",
-           "maxheight": "900px",
+           "height": "900px",
            }
 
 downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename":"Metadata"}

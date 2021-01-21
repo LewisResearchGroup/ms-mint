@@ -36,7 +36,8 @@ install_requires = [
     'ipyfilechooser',
     'waitress',
     'pyarrow',
-    'flask-compress'] 
+    'flask-compress',
+    'molmass'] 
 
 
 config = {
