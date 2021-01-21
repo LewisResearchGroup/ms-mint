@@ -23,7 +23,7 @@ options = {
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 fn_data = os.path.join(MINT_DATA_PATH, 'ChEBI.tsv')
-chcbi_data = pd.read_csv(fn_data, sep='\t', nrows=None, index_col=0)
+chcbi_data = pd.read_csv(fn_data, sep='\t', nrows=None, index_col=0, low_memory=False)
 chcbi_data = chcbi_data[chcbi_data['Charge'].isin([-1,0,1])]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass'].notna()]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']<1000]
@@ -36,7 +36,7 @@ chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Monoisotopic Mass', 'Synonyms']]
 
 
-columns = T.gen_tabulator_columns(chcbi_data.columns, add_color_col=False, add_ms_file_col=False, editor=None)
+columns = T.gen_tabulator_columns(chcbi_data.columns, add_color_col=False, add_ms_file_col=False, editor=None, col_width='auto')
 
 
 add_metab_table = html.Div(id='add-metab-table-container', 
