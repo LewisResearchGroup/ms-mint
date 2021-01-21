@@ -102,6 +102,7 @@ def callbacks(app, fsc, cache):
             peaklist.loc[row['ChEBI Name'], 'rt'] = -1
             peaklist.loc[row['ChEBI Name'], 'rt_min'] = 0
             peaklist.loc[row['ChEBI Name'], 'rt_max'] = 100
+            peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
 
         peaklist.to_csv( T.get_peaklist_fn( wdir ))
         print(peaklist)
