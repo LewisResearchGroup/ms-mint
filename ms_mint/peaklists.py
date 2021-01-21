@@ -38,6 +38,7 @@ def read_peaklists(filenames):
         df = standardize_peaklist(df)
         peaklist.append(df)
     peaklist = pd.concat(peaklist)
+    df['intensity_threshold'] = df['intensity_threshold'].fillna(0)
     return peaklist
 
 
