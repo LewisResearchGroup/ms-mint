@@ -51,6 +51,7 @@ ms_table = html.Div(id='ms-table-container',
 _layout = html.Div([
     html.H3('MS-file'),
     dcc.Markdown('''At the moment the upload is limited to ~10 files at a time.
+    Supported formats are `mzXML` and `mzML`. 
     '''),
     dcc.Upload(
             id='ms-upload',
