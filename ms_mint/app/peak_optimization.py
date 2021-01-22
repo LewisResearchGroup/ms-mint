@@ -1,4 +1,5 @@
 import os
+import random
 
 from glob import glob
 from tqdm import tqdm
@@ -103,8 +104,8 @@ def callbacks(app, fsc, cache):
         
         peaklist = T.get_peaklist( wdir ).reset_index()
         ms_files = T.get_ms_fns( wdir )
-
-        ms_files = ms_files[:100]
+        random.shuffle(ms_files)
+        ms_files = ms_files[:30]
 
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
@@ -213,7 +214,9 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate 
         sns.set_context('paper')
         ms_files = T.get_ms_fns(wdir)
-        ms_files = ms_files[:100]
+        mms_files = T.get_ms_fns( wdir )
+        random.shuffle(ms_files)
+        ms_files = ms_files[:30]
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
         images = []
