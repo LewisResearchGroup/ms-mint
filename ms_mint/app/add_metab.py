@@ -30,10 +30,10 @@ chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']<1000]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']>50]
 chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 
-#print('Available columns:')
-#for col in chcbi_data: print(col)
+print('Available columns:')
+for col in chcbi_data: print(col)
 
-chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Monoisotopic Mass', 'Synonyms']]
+chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Monoisotopic Mass', 'Synonyms', 'KEGG COMPOUND Database Links']]
 
 
 columns = T.gen_tabulator_columns(chcbi_data.columns, add_color_col=False, add_ms_file_col=False, editor=None, col_width='auto')
