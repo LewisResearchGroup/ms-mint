@@ -105,7 +105,7 @@ def callbacks(app, fsc, cache):
         peaklist = T.get_peaklist( wdir ).reset_index()
         ms_files = T.get_ms_fns( wdir )
         random.shuffle(ms_files)
-        ms_files = ms_files[:30]
+        ms_files = ms_files[:60]
 
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
@@ -216,7 +216,7 @@ def callbacks(app, fsc, cache):
         ms_files = T.get_ms_fns(wdir)
         mms_files = T.get_ms_fns( wdir )
         random.shuffle(ms_files)
-        ms_files = ms_files[:30]
+        ms_files = ms_files[:100]
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
         images = []
