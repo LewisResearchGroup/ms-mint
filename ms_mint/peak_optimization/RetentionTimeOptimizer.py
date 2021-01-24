@@ -52,7 +52,7 @@ class RetentionTimeOptimizer():
 
 
 def optimize_retention_times(results, peaklist, create_plots=False, 
-        show_plots=True, how='closest', prominence=5e4, verbose=False, 
+        show_plots=True, how='closest', prominence=10000, verbose=False, 
         **kwargs):
 
     if verbose:
@@ -78,7 +78,7 @@ def optimize_retention_times(results, peaklist, create_plots=False,
             if verbose: print('Smoothed to small')
             continue
 
-        smoothed = df.groupby('rt').max().rolling(8, center=True).mean().dropna().reset_index()
+        smoothed = df.groupby('rt').max().rolling(8, center=True).max().dropna().reset_index()
 
         t_min = smoothed.rt.min()
         t_max = smoothed.rt.max()
@@ -109,10 +109,10 @@ def optimize_retention_times(results, peaklist, create_plots=False,
         t = interpolated['rt']
         x = interpolated['intensity'].values
         
-        if isinstance(prominence, float):
-            _prominence = prominence*max(x)
-        else:
-            _prominence = prominence
+        #if isinstance(prominence, float):
+        #    _prominence = prominence*max(x)
+        #else:
+        _prominence = prominence
 
         ndx_peaks, _ = find_peaks(x, prominence=(_prominence, None))
         
