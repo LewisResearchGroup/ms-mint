@@ -28,6 +28,8 @@ chcbi_data = chcbi_data[chcbi_data['Charge'].isin([-1,0,1])]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass'].notna()]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']<1000]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']>50]
+chcbi_data = chcbi_data[~chcbi_data['SMILES'].str.contains('.')]
+
 chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 
 print('Available columns:')
