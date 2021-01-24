@@ -111,6 +111,7 @@ def callbacks(app, fsc, cache):
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
             peaklist.loc[peak_label_ndx, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
 
+        rt_min, rt_max = 0, 15
         if (rt_min is None) or np.isnan(rt_min): rt_min = rt-0.2
         if (rt_max is None) or np.isnan(rt_max): rt_max = rt+0.2
         if (rt is None) or np.isnan(rt): rt = np.mean([rt_min, rt_max])
