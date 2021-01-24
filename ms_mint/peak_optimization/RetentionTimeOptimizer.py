@@ -52,7 +52,7 @@ class RetentionTimeOptimizer():
 
 
 def optimize_retention_times(results, peaklist, create_plots=False, 
-        show_plots=True, how='closest', prominence=10000, verbose=False, 
+        show_plots=True, how='max', prominence=10000, verbose=False, 
         **kwargs):
 
     if verbose:
