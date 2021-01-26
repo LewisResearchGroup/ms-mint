@@ -328,3 +328,22 @@ def merge_metadata(old, new):
     new_columns = new.columns.to_list()
     old_columns = [col for col in old_columns if (col=='MS-file') or (col not in new_columns)]
     return pd.merge(old[old_columns], new, on='MS-file', how='left')
+
+
+def get_figure_fn(kind, wdir, label, format):
+    path = os.path.join( wdir, 'figures', kind)
+    clean_label = label
+    fn = f'{kind}__{clean_label}.{format}'
+    fn = os.path.join( path, fn)
+    return path, fn
+
+
+def savefig(kind, wdir, label, format='svg'):
+    path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
+    maybe_create(path)
+    plt.savefig(fn)
+
+
+def maybe_create(dir_name):
+    if not os.path.isdir(dir_name):
+        os.makedirs(dir_name)
