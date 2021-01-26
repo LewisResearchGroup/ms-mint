@@ -33,13 +33,29 @@ ws_table = html.Div(id='ws-table-container',
 
 _layout = html.Div([
     html.H3('Workspaces'),
-    dcc.Input(id='ws-name', placeholder='New workspace name'),
     html.Button('Create Workspace', id='ws-create'),
-    html.Button('Delete active workspace', id='ws-delete', style={'float':'right'}),
-    html.P(id='ws-create-output'),
+    html.Button('Delete Workspace', id='ws-delete', style={'float': 'right'}),
+    html.P(id='ws-created-output'),
+
     dcc.Markdown(id='ws-activate-output'),
     html.P(id='ws-delete-output'),
     ws_table,
+
+    dbc.Modal(
+        [dbc.ModalHeader("Create Workspace"),
+         dbc.ModalBody(
+             [dcc.Input(id='ws-create-input', placeholder='New workspace name'),
+              html.P(id='ws-create-output')
+             ]
+         ),
+         dbc.ModalFooter(
+            html.Div([
+                dbc.Button("Create", id="ws-create-confirmed", style={'margin-right': '10px'}),
+                dbc.Button("Cancel", id="ws-create-cancel")
+            ])
+        )], id="ws-create-popup"
+    ),
+
     dbc.Modal(
             [
                 dbc.ModalHeader("Delete Workspace"),
@@ -59,27 +75,10 @@ def layout():
     return _layout
 
 def callbacks(app, fsc, cache):
-    @app.callback(
-    Output('ws-create-output', 'children'),
-    Input('ws-create', 'n_clicks'),
-    [State('ws-name', 'value'),
-    State('tmpdir', 'children')]
-    )
-    def create_workspace(n_clicks, ws_name, tmpdir):
-        if (ws_name is None) or (ws_name == '') or (n_clicks is None):
-            raise PreventUpdate
-        if not re.match('^[\w_-]+$', ws_name):
-            return 'Name can only contain: a-z, A-Z, 0-9, -,  _'        
-        if T.workspace_exists(tmpdir, ws_name):
-            return 'Workspace already exists, please chose a different name.'
-        else:
-            T.create_workspace(tmpdir, ws_name)
-            return f'Created workspace "{ws_name}"'
-
 
     @app.callback(
     Output('ws-table', 'data'),
-    Input('ws-create-output', 'children'),
+    Input('ws-created-output', 'children'),
     Input('tab', 'value'),
     Input('ws-delete-output', 'children'),
     State('tmpdir', 'children')
@@ -144,11 +143,11 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-    Output('ws-delete-output', 'children'),
-    Input('ws-delete-confirmed', 'n_clicks'),
-    [State('ws-table', 'derived_virtual_selected_rows'),
-    State('ws-table', 'data'),
-    State('tmpdir', 'children')]
+        Output('ws-delete-output', 'children'),
+        Input('ws-delete-confirmed', 'n_clicks'),
+        State('ws-table', 'derived_virtual_selected_rows'),
+        State('ws-table', 'data'),
+        State('tmpdir', 'children')
     )
     def ws_delete_confirmed(n_clicks, ndxs, data, tmpdir):
         if n_clicks is None or len(ndxs) == 0:
@@ -160,4 +159,47 @@ def callbacks(app, fsc, cache):
         message = f'Worskpace {ws_name} deleted.'
         return message
 
-    
+
+
+    @app.callback(
+    Output("ws-create-popup", "is_open"),
+    Input("ws-create", "n_clicks"), 
+    Input("ws-create-cancel", "n_clicks"),
+    Input('ws-create-confirmed', 'n_clicks'),
+    State("ws-create-popup", "is_open")
+    )
+    def ws_create(n1, n2, n3, is_open):
+        if n1 is None:
+            raise PreventUpdate
+        if n1 or n2 or n3:
+            return not is_open
+        return is_open    
+
+
+    @app.callback(
+        Output('ws-create-output', 'children'),
+        Input('ws-create-input', 'value'),
+        State('tmpdir', 'children')
+    )
+    def ws_create_message(ws_name, tmpdir):
+        if (ws_name is None) or (ws_name == ''):
+            raise PreventUpdate
+        if not re.match('^[\w_-]+$', ws_name):
+            return 'Name can only contain: a-z, A-Z, 0-9, -,  _ and no blanks.'        
+        if T.workspace_exists(tmpdir, ws_name):
+            return 'Workspace already exists'
+        else:
+            return f'Can create workspace "{ws_name}"'
+
+
+    @app.callback(
+        Output('ws-created-output', 'children'),
+        Input('ws-create-confirmed', 'n_clicks'),
+        State('ws-create-input', 'value'),
+        State('tmpdir', 'children')
+    )
+    def ws_create_confirmed(n_clicks, ws_name, tmpdir):
+        if n_clicks is None: raise PreventUpdate
+        T.create_workspace(tmpdir, ws_name)
+        return None
+
