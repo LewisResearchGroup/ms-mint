@@ -38,7 +38,6 @@ def read_peaklists(filenames):
         df = standardize_peaklist(df)
         peaklist.append(df)
     peaklist = pd.concat(peaklist)
-    df['intensity_threshold'] = df['intensity_threshold'].fillna(0)
     return peaklist
 
 
@@ -58,7 +57,8 @@ def standardize_peaklist(peaklist):
     
     if 'peak_label' not in cols:
         peaklist['peak_label'] = [f'C_{i}' for i in range(len(peaklist)) ]        
-
+    
+    peaklist['intensity_threshold'] = peaklist['intensity_threshold'].fillna(0)
     peaklist['peak_label'] = peaklist['peak_label'].astype(str)
     peaklist.index = range(len(peaklist))
     return peaklist[PEAKLIST_COLUMNS]

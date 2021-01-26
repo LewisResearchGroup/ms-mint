@@ -135,8 +135,6 @@ def get_workspaces(tmpdir):
     return get_dirnames( ws_path )
 
 
-
-
 def create_chromatograms(ms_files, peaklist, wdir):
     for fn in tqdm(ms_files):
         fn_out = os.path.basename(fn)
@@ -269,8 +267,8 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=True, add_color_col=Tr
     if 'index' in col_names: col_names.remove('index')
 
     columns = [
-        { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
-          "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
+            { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
+            "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
 
     if add_ms_file_col:
         columns.append(
