@@ -2,7 +2,7 @@ import os
 from glob import glob 
 
 import dash_html_components as html
-import dash_core_components as dcc
+#import dash_core_components as dcc
 from dash.exceptions import PreventUpdate
 from dash_extensions.snippets import send_file
 
