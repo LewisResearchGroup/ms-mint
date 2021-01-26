@@ -1,8 +1,6 @@
 import os
 import random
-import json
 
-from glob import glob
 from tqdm import tqdm
 
 import numpy as np
@@ -15,11 +13,10 @@ import seaborn as sns
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-import dash_bootstrap_components as dbc
 
 from dash.exceptions import PreventUpdate
 
-from dash.dependencies import Input, Output, State, MATCH, ALL
+from dash.dependencies import Input, Output, State, ALL
 
 import plotly.graph_objects as go
 
@@ -300,7 +297,6 @@ def callbacks(app, fsc, cache):
         peaklist = T.get_peaklist( wdir )
         ms_files = T.get_ms_fns( wdir )
         row = peaklist.iloc[peak_label_ndx]
-        peak_label = row.index
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
         chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir).set_index('retentionTime')['intensity array'] for fn in ms_files]
         rt_min, rt_max = None, None
