@@ -10,6 +10,13 @@ from .standards import RESULTS_COLUMNS,\
     MINT_RESULTS_COLUMNS
 
 
+def extract_chromatogram_from_ms1(df, mz_mean, mz_width, unit='minutes'):
+    dmz = mz_mean*1e-6*mz_width
+    chrom = df[(df['m/z array']-mz_mean).abs()<=dmz].copy()
+    chrom['retentionTime'] = chrom['retentionTime'].round(3)
+    chrom = chrom.groupby   ('retentionTime').max()
+    return chrom['intensity array'] 
+
 
 def process_ms1_files_in_parallel(args):
     '''
