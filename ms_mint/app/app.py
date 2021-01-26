@@ -67,6 +67,8 @@ components = {
     'heatmap':      {'label': 'Heatmap',            'callbacks_func': heatmap.callbacks,            'layout_func': heatmap.layout},
 }
 
+
+
 app = dash.Dash(__name__, 
     external_stylesheets=[
         dbc.themes.BOOTSTRAP, 
@@ -109,10 +111,10 @@ app.layout = html.Div([
     dcc.Tabs(id='tab', value='workspaces', 
         children=[
             dcc.Tab(value=key, 
-                    label=components[key]['label'], 
-                    style={'min-width': '200px'})
-            for key in components.keys()]),
-        html.Div(id='tab-content', style={'margin': '5%'})
+                    label=components[key]['label'])
+            for key in components.keys()]
+    ),
+    html.Div(id='tab-content', style={'margin': '5%'})
 ], style={'margin':'2%'})
 
 
@@ -128,6 +130,7 @@ for component in components.values():
 def render_content(tab, wdir):
     return components[tab]['layout_func']()
 
+
 @app.callback(
     Output('peak-labels', 'options'),
     Input('tab', 'value'),
@@ -139,6 +142,7 @@ def peak_labels(tab, wdir):
     peaklist = T.get_peaklist( wdir ).reset_index()
     peak_labels = [{'value': i, 'label': i} for i in peaklist.peak_label]
     return peak_labels
+
 
 if __name__ == '__main__':
     app.run_server(debug=True, threaded=True, 

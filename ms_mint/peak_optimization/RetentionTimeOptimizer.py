@@ -75,6 +75,10 @@ class RetentionTimeOptimizer():
             if prop is not None: props.append( prop )
         if len(props) == 0: return (None, None)
         df = pd.DataFrame( props, columns=['rt', 'max_intensity', 'rt_min', 'rt_max'] )
+
+        rt_of_largest_peak_max = df.sort_values('max_intensity', ascending=False).iloc[0]['rt'] 
+        # Filter out far away peaks
+        df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
         rt_min = estimate_expectation_value(df.rt_min)
         rt_max = estimate_expectation_value(df.rt_max)
         if self.show_figure:

@@ -38,11 +38,15 @@ _feather_ format first.'
 _layout = html.Div([
     html.H3('Peak Optimization'),
     html.Button('Generate peak previews', id='pko-peak-preview'),
-    html.Button('Find largest peaks for all peaks', id='pko-find-closest-peak', style={'visibility': 'hidden'}),
+    html.Button('Find largest peaks for all peaks', 
+        id='pko-find-closest-peak', style={'visibility': 'hidden'}),
     dcc.Markdown('---'),
-    html.Div(id='pko-peak-preview-output', style={"maxHeight": "300px", "overflow": "scroll"}),
+    html.Div(id='pko-peak-preview-output', 
+        style={"maxHeight": "300px", "overflowY": "scroll", 'padding': 'auto'}),
+    dcc.Markdown('---'),
     dcc.Markdown(id='pko-find-closest-peak-output'),
-    dcc.Markdown(id='pko-find-largest-peak-output'),
+    dcc.Markdown(id='pko-find-largest-peak-output', 
+            style={'visibility': 'hidden'}),
 
     html.Div(id='pko-controls'),
     dcc.Dropdown(
@@ -58,9 +62,8 @@ _layout = html.Div([
     html.Button('Remove Peak', id='pko-delete', style={'float': 'right'}),
 
     html.Div([
-        html.Button('<< Previous', id='pko-prev'),
-        html.Button('Next >>', id='pko-next')],
-        style={'text-align': 'center', 'margin': 'auto'}),
+        html.Button('<< Previous', id='pko-prev'), html.Button('Next >>', id='pko-next')],
+        style={'text-align': 'center', 'margin': 'auto', 'margin-top': '10%'}),
     html.Div(id='pko-image-clicked-output'),
     html.Div(id='pko-delete-output')
 ])
@@ -126,7 +129,9 @@ def callbacks(app, fsc, cache):
             fig.layout.hovermode = 'closest'
             fig.layout.xaxis.range=[rt_min, rt_max]
 
-            fig.update_layout( 
+            fig.update_layout(
+                yaxis_title="MS-Intensity",
+                xaxis_title="Retention Time [min]",                
                 xaxis=dict( 
                     rangeslider=dict( 
                         visible=True
@@ -233,7 +238,7 @@ def callbacks(app, fsc, cache):
             if np.isnan(rt_min) or rt_min is None: rt_min = rt-0.5
             if np.isnan(rt_max) or rt_max is None: rt_max = rt+0.5
 
-            plt.figure(figsize=(3.5,2.5), dpi=50)
+            plt.figure(figsize=(4,2.5), dpi=60)
             for fn in ms_files:
                 try:        
                     fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
@@ -242,16 +247,21 @@ def callbacks(app, fsc, cache):
                     plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
                 except:
                     pass
-            plt.title(ndx)
-            plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))        
+
+            plt.gca().set_title(ndx, y=1.0, pad=15)
+            plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+            plt.xlabel('Retention Time [min]')  
+            plt.ylabel('MS-Intensity')  
+
+            T.savefig(kind='peak-preview', wdir=wdir, label=ndx)
+            
             src = T.fig_to_src()
             _id = f'{i}'
 
             images.append(
-                html.A(id={'index': _id, 'type': 'image'},children=html.Img(src=src))
+                html.A(id={'index': _id, 'type': 'image'}, children=html.Img(src=src), style={'float': 'center'})
             )
             #images.append( dbc.Tooltip(ndx, target=_id, style={'font-size=': 'large'}) )
-        images.append( dcc.Markdown('---') )
         return images
 
     @app.callback(
@@ -298,4 +308,4 @@ def callbacks(app, fsc, cache):
         peaklist = peaklist.reset_index()
         peaklist.loc[peak_label_ndx, ['rt_min', 'rt_max']] = rt_min, rt_max
         peaklist.to_csv( T.get_peaklist_fn( wdir ), index=False )   
-        return f'Test {rt_min} {rt_max}'
+        return f'Set rt_min, rt_max to {rt_min}, {rt_max} respectively.'

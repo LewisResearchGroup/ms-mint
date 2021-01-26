@@ -25,7 +25,7 @@ _layout = html.Div([
     html.H3('Quality Control'),
     html.Button('Update', id='qc-update'),
     dcc.Dropdown(id='qc-groupby', options=groupby_options, value=None, placeholder='Group by column'),
-    dcc.Dropdown(id='qc-graphs', options=graph_options, value=None, multi=True, placeholder='Kinds of graphs'),
+    dcc.Dropdown(id='qc-graphs', options=graph_options, value=['hist', 'boxplot', 'density'], multi=True, placeholder='Kinds of graphs'),
     dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
     dcc.Dropdown(id='peak-labels', options=[], placeholder='Limit to peak_labels', multi=True),
     dcc.Checklist(id='qc-select', options=[{'label': 'Dense', 'value': 'Dense'}], value=['Dense']),
@@ -92,19 +92,23 @@ def callbacks(app, fsc, cache):
             if by_col is not None:
                 grp = grp.sort_values(by_col).reset_index(drop=True)
 
-
             if len(grp) < 1:
                 continue
 
             if 'hist' in kinds: 
                 sns.displot(data=grp, x=quant_col, height=3, hue=groupby, aspect=1)
                 plt.title(peak_label)
+                fig_label = f'by-{groupby}__{quant_col}__{peak_label}'
+                T.savefig(kind='hist', wdir=wdir, label=fig_label)
                 src = T.fig_to_src(dpi=150)
                 figures.append( html.Img(src=src, style={'width': '300px'}) )
 
             if 'density' in kinds:
-                sns.displot(data=grp, x=quant_col, hue=groupby, kind='kde', common_norm=False, height=3,  aspect=1)
+                sns.displot(data=grp, x=quant_col, hue=groupby, kind='kde', 
+                            common_norm=False, height=3,  aspect=1)
                 plt.title(peak_label)
+                fig_label = f'by-{groupby}__{quant_col}__{peak_label}'
+                T.savefig(kind='density', wdir=wdir, label=fig_label)                
                 src = T.fig_to_src(dpi=150)
                 figures.append( html.Img(src=src, style={'width': '300px'}) )
 
@@ -116,6 +120,8 @@ def callbacks(app, fsc, cache):
                     plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
                 plt.title(peak_label)
                 plt.xticks(rotation=90)
+                fig_label = f'by-{groupby}__{quant_col}__{peak_label}'
+                T.savefig(kind='boxplot', wdir=wdir, label=fig_label)                   
                 src = T.fig_to_src(dpi=150)
                 figures.append( html.Img(src=src, style={'width': '300px'}) )
 
