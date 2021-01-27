@@ -244,12 +244,12 @@ def callbacks(app, fsc, cache):
             if np.isnan(rt_min) or rt_min is None: rt_min = rt-0.5
             if np.isnan(rt_max) or rt_max is None: rt_max = rt+0.5
 
-            plt.figure(figsize=(4,2.5), dpi=60)
+            plt.figure(figsize=(4,2.5), dpi=20)
             for fn in ms_files:
                 try:        
                     fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
                     fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
-                                    (fn_chro['retentionTime'] < rt_max)]
+                                      (fn_chro['retentionTime'] < rt_max)]
                     plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
                 except:
                     pass
