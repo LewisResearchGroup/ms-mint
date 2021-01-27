@@ -320,3 +320,7 @@ def callbacks(app, fsc, cache):
         peaklist.loc[peak_label_ndx, ['rt_min', 'rt_max']] = rt_min, rt_max
         peaklist.to_csv( T.get_peaklist_fn( wdir ), index=False )   
         return f'Set rt_min, rt_max to {rt_min}, {rt_max} respectively.'
+
+
+    def create_preview_peakshape():
+        pass
