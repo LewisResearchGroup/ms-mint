@@ -232,7 +232,7 @@ def callbacks(app, fsc, cache):
         sns.set_context('paper')
         ms_files = T.get_ms_fns(wdir)
         random.shuffle(ms_files)
-        ms_files = ms_files[:100]
+        ms_files = ms_files[:10]
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
         images = []
