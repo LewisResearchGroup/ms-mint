@@ -93,6 +93,7 @@ app.title = 'MINT'
 app.config['suppress_callback_exceptions'] = True
 
 app.layout = html.Div([
+    
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     html.A(href='https://soerendip.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right'})],
@@ -108,10 +109,11 @@ app.layout = html.Div([
     html.P('Current Workspace: ', style={'display': 'inline-block', 'margin-right': '5px'}),
     html.Div(id='active-workspace', style={'display': 'inline-block'}),
     html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'hidden'}),
-    dcc.Tabs(id='tab', value='workspaces', 
+    dcc.Tabs(id='tab', value='workspaces',  #vertical=True, style={'display': 'inline-block'},
         children=[
             dcc.Tab(value=key, 
-                    label=components[key]['label'])
+                    label=components[key]['label'],
+                    )
             for key in components.keys()]
     ),
     html.Div(id='pko-image-store', style={'visibility': 'hidden', 'height': '0px'}),
