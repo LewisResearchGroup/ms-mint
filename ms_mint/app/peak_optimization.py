@@ -309,6 +309,8 @@ def callbacks(app, fsc, cache):
         if peak_label_ndx is None: raise PreventUpdate
         peaklist = T.get_peaklist( wdir )
         ms_files = T.get_ms_fns( wdir )
+        random.shuffle(ms_files)
+        ms_files = ms_files[:20]
         row = peaklist.iloc[peak_label_ndx]
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
         chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir).set_index('retentionTime')['intensity array'] for fn in ms_files]
