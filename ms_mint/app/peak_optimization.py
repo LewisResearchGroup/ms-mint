@@ -200,10 +200,11 @@ def callbacks(app, fsc, cache):
     def pko_prev_next(n_prev, n_next, image_clicked, value, options):
         if n_prev is None and n_next is None and image_clicked is None:
             raise PreventUpdate
-        prop_id = dash.callback_context.triggered[0]['prop_id']
-        print(prop_id, value, image_clicked)
+        prop_id = dash.callback_context.triggered[0]['prop_id']        
         if prop_id.startswith('pko-image-clicked-output'):
-            return image_clicked
+            for entry in options:
+                if entry['label'] == image_clicked:
+                    return entry['value']
         elif value is None:
             return 0
         elif prop_id.startswith('pko-prev'):
@@ -211,13 +212,20 @@ def callbacks(app, fsc, cache):
         elif prop_id.startswith('pko-next'):
             return (value + 1) % len(options)
 
-    TIMEOUT = 60
     @app.callback(
-    Output('pko-peak-preview-output', 'children'),
+        Output('pko-peak-preview-output', 'children'),
+        Input('pko-image-store', 'children'),
+        Input('tab', 'value')
+    )
+    def pko_show_images(images, tab):
+        if tab != 'pko': raise PreventUpdate
+        return images
+
+    @app.callback(
+    Output('pko-image-store', 'children'),
     Input('pko-peak-preview', 'n_clicks'),
     State('wdir', 'children')
     )
-    @cache.memoize(timeout=TIMEOUT)
     def peak_preview(n_clicks, wdir):
         if n_clicks is None:
             raise PreventUpdate 
@@ -229,6 +237,7 @@ def callbacks(app, fsc, cache):
         n_total = len(peaklist)
         images = []
         for i, (ndx, row) in tqdm( enumerate(peaklist.iterrows()), total=n_total ):
+            peak_label = ndx
             fsc.set('progress', int(100*(i+1)/n_total))
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
 
@@ -253,10 +262,9 @@ def callbacks(app, fsc, cache):
             T.savefig(kind='peak-preview', wdir=wdir, label=ndx)
             
             src = T.fig_to_src()
-            _id = f'{i}'
 
             images.append(
-                html.A(id={'index': _id, 'type': 'image'}, children=html.Img(src=src), style={'float': 'center'})
+                html.A(id={'index': peak_label, 'type': 'image'}, children=html.Img(src=src), style={'float': 'center'})
             )
             #images.append( dbc.Tooltip(ndx, target=_id, style={'font-size=': 'large'}) )
         return images
@@ -268,7 +276,12 @@ def callbacks(app, fsc, cache):
     def pko_image_clicked(ndx):
         if ndx is None or len(ndx)==0: raise PreventUpdate
         ctx = dash.callback_context
-        return int(ctx.triggered[0]['prop_id'].split(',')[0].split('"')[3])
+        print(ctx.triggered[0]['prop_id'])
+        clicked = ctx.triggered[0]['prop_id']
+        clicked = clicked.replace('{"index":"', '')
+        clicked = clicked.split('","type":')[0].replace('\\', '')
+        print('Clicked:', clicked)
+        return clicked
 
     @app.callback(
         Output('pko-delete-output', 'children'),

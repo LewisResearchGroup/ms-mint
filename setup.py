@@ -37,7 +37,8 @@ install_requires = [
     'waitress',
     'pyarrow',
     'flask-compress',
-    'molmass'] 
+    'molmass',
+    'dash_uploader'] 
 
 
 config = {

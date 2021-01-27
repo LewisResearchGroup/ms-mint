@@ -114,6 +114,7 @@ app.layout = html.Div([
                     label=components[key]['label'])
             for key in components.keys()]
     ),
+    html.Div(id='pko-image-store', style={'visibility': 'hidden', 'height': '0px'}),
     html.Div(id='tab-content', style={'margin': '5%'})
 ], style={'margin':'2%'})
 
