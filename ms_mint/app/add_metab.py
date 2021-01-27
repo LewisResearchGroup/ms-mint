@@ -34,8 +34,8 @@ chcbi_data = chcbi_data[~chcbi_data.SMILES.str.contains('\.').fillna(False)]
 
 chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 
-print('Available columns:')
-for col in chcbi_data: print(col)
+#print('Available columns:')
+#for col in chcbi_data: print(col)
 
 chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Monoisotopic Mass', 'Synonyms', 'KEGG COMPOUND Database Links', 'SMILES']]
 
@@ -105,7 +105,7 @@ def callbacks(app, fsc, cache):
             peaklist.loc[row['ChEBI Name'], 'mz_width'] = 10
             peaklist.loc[row['ChEBI Name'], 'rt'] = -1
             peaklist.loc[row['ChEBI Name'], 'rt_min'] = 0
-            peaklist.loc[row['ChEBI Name'], 'rt_max'] = 100
+            peaklist.loc[row['ChEBI Name'], 'rt_max'] = 15
             peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
 
         peaklist.to_csv( T.get_peaklist_fn( wdir ))

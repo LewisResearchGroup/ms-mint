@@ -332,16 +332,25 @@ def merge_metadata(old, new):
 
 def get_figure_fn(kind, wdir, label, format):
     path = os.path.join( wdir, 'figures', kind)
-    clean_label = label
+    clean_label = clean_string(label)
     fn = f'{kind}__{clean_label}.{format}'
     fn = os.path.join( path, fn)
     return path, fn
 
 
+def clean_string(fn: str):
+    for x in ['"', "'", '(', ')', '[', ']', ' ']:
+        fn = fn.replace(x, '_')
+    return fn
+
+
 def savefig(kind, wdir, label, format='svg'):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
-    plt.savefig(fn)
+    try:
+        plt.savefig(fn)
+    except:
+        print(f'Could not save figure {fn}, maybe no figure was created.')
 
 
 def maybe_create(dir_name):

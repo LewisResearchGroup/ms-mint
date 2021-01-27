@@ -32,6 +32,7 @@ _layout = html.Div([
     html.Div(id='qc-figures', style={'float': 'center'})
 ])
 
+
 layout_no_data = html.Div([
     dcc.Markdown('''### No results generated yet. 
     MINT has not been run yet. The Quality Control tabs uses the processed data. 
