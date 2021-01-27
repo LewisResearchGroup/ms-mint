@@ -244,7 +244,7 @@ def callbacks(app, fsc, cache):
             if np.isnan(rt_min) or rt_min is None: rt_min = rt-0.5
             if np.isnan(rt_max) or rt_max is None: rt_max = rt+0.5
 
-            plt.figure(figsize=(4,2.5), dpi=20)
+            plt.figure(figsize=(4,2.5))
             for fn in ms_files:
                 try:        
                     fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
@@ -261,7 +261,7 @@ def callbacks(app, fsc, cache):
 
             T.savefig(kind='peak-preview', wdir=wdir, label=ndx)
             
-            src = T.fig_to_src()
+            src = T.fig_to_src(dpi=80)
 
             images.append(
                 html.A(id={'index': peak_label, 'type': 'image'}, children=html.Img(src=src), style={'float': 'center'})
