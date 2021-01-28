@@ -19,6 +19,7 @@ import ms_mint
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
+from ms_mint.tools import get_mz_mean_from_formulas
 
 from datetime import date
 
@@ -56,10 +57,12 @@ def parse_ms_files(contents, filename, date, target_dir):
     if os.path.isfile(new_fn): os.remove(fn_abs)
 
 
-def parse_pkl_files(contents, filename, date, target_dir):
+def parse_pkl_files(contents, filename, date, target_dir, ms_mode=None):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+    if ('formula' in df.columns) and (not 'mz_mean' in df.columns):
+        df['mz_mean'] = get_mz_mean_from_formulas(df['formula'], ms_mode)
     df = standardize_peaklist(df)
     df = df.drop_duplicates()
     return df

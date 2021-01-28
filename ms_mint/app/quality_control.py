@@ -18,7 +18,7 @@ groupby_options = [{'label': 'Batch', 'value': 'Batch'},
 
 graph_options = [{'label': 'Histograms', 'value': 'hist'},
                  {'label': 'Boxplots', 'value': 'boxplot'},
-                 {'label': 'Propability Density', 'value': 'density'}]
+                 {'label': 'Probability Density', 'value': 'density'}]
 
 
 _layout = html.Div([

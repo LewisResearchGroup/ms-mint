@@ -5,7 +5,8 @@ import os
 MINT_ROOT = os.path.dirname(__file__)
 
 PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
-                    'rt', 'rt_min', 'rt_max', 'intensity_threshold', 'peaklist_name']
+                    'rt', 'rt_min', 'rt_max', 'intensity_threshold', 
+                    'peaklist_name']
 
 RESULTS_COLUMNS = [
     'peak_area', 
@@ -26,6 +27,7 @@ MINT_RESULTS_COLUMNS = (['ms_file']
 
 DEPRECATED_LABELS = {'peakLabel': 'peak_label',
                      'compoundId': 'peak_label',
+                     'compound': 'peak_label',
                      'peakMz': 'mz_mean',
                      'medRt': 'rt',
                      'medMz': 'mz_mean',
@@ -33,3 +35,5 @@ DEPRECATED_LABELS = {'peakLabel': 'peak_label',
                      'rtmin': 'rt_min',
                      'rtmax': 'rt_max',
                      'peaklist': 'peaklist_name'}
+
+M_PROTON = 1.00782503223

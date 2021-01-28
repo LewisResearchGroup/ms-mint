@@ -45,6 +45,7 @@ pkl_table = DataTable(
 
 _layout = html.Div([
     html.H3('Peaklist'),
+
     dcc.Upload(
             id='pkl-upload',
             children=html.Div([
@@ -64,6 +65,9 @@ _layout = html.Div([
             # Allow multiple files to be uploaded
             multiple=True
         ),
+    dcc.Dropdown('pkl-ms-mode', options=[
+        {'value': 'positive', 'label': 'Add proton mass to formula (positive mode)'},
+        {'value': 'negative', 'label': 'Subtract proton mass from formula (negative mode)'}], value=None),
     html.Div(id='pkl-upload-output'),
     html.Div(id='pkl-save-output'),
     html.Button('Save peaklist', id='pkl-save'),
@@ -80,15 +84,16 @@ def callbacks(app, fsc=None, cache=None):
     @app.callback(
     Output('pkl-table', 'data'),
     Input('pkl-upload', 'contents'),
-    [State('pkl-upload', 'filename'),
+    Input('pkl-ms-mode', 'value'),
+    State('pkl-upload', 'filename'),
     State('pkl-upload', 'last_modified'),
-    State('wdir', 'children')]
+    State('wdir', 'children')
     )
-    def pkl_upload(list_of_contents, list_of_names, list_of_dates, wdir):
+    def pkl_upload(list_of_contents, ms_mode, list_of_names, list_of_dates, wdir):
         target_dir = os.path.join(wdir, 'peaklist')
         fn = os.path.join( target_dir, 'peaklist.csv')
         if list_of_contents is not None:
-            dfs = [T.parse_pkl_files(c, n, d, target_dir) for c, n, d in
+            dfs = [T.parse_pkl_files(c, n, d, target_dir, ms_mode=ms_mode) for c, n, d in
                 zip(list_of_contents, list_of_names, list_of_dates) ]
             data = dfs[0].to_dict('records')    
             return data
