@@ -64,18 +64,20 @@ class Mint(object):
         if peak_labels is None:
             peak_labels = self.peaklist.peak_label.values
         peaklist = self.peaklist
-        for ndx, row in peaklist.iterrows():
+        for ndx, row in tqdm( peaklist.iterrows(), total=len(peaklist) ):
             peak_label = row['peak_label']
             if peak_label not in peak_labels:
                 continue
             chromatograms = []
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
-            for fn in tqdm(ms_files):
+            for fn in ms_files:
                 df = ms_file_to_df(fn)
                 chrom = extract_chromatogram_from_ms1(df, mz_mean=mz_mean, mz_width=mz_width)
                 chromatograms.append(chrom)
             rt_min, rt_max = RetentionTimeOptimizer(**kwargs).find_largest_peak(chromatograms)
+            print(rt_min, rt_max)
             self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
+            
 
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)

@@ -36,12 +36,12 @@ _layout = html.Div([
     html.H3('Peak Optimization'),
     html.Button('Generate peak previews', id='pko-peak-preview'),
     html.Button('Find largest peaks for all peaks', 
-        id='pko-find-closest-peak', style={'visibility': 'hidden'}),
+        id='pko-find-largest-peak-for-all', style={'float': 'right'}),
     dcc.Markdown('---'),
     html.Div(id='pko-peak-preview-output', 
         style={"maxHeight": "300px", "overflowY": "scroll", 'padding': 'auto'}),
     dcc.Markdown('---'),
-    dcc.Markdown(id='pko-find-closest-peak-output'),
+    dcc.Markdown(id='pko-find-largest-peak-for-all-output'),
     dcc.Markdown(id='pko-find-largest-peak-output', 
             style={'visibility': 'hidden'}),
 
@@ -161,8 +161,8 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-    Output('pko-find-closest-peak-output', 'children'),
-    Input('pko-find-closest-peak', 'n_clicks'),
+    Output('pko-find-largest-peak-for-all-output', 'children'),
+    Input('pko-find-largest-peak-for-all', 'n_clicks'),
     State('wdir', 'children'))
     def pko_find_closest_peak(n_clicks, wdir):
         if n_clicks is None:
@@ -174,8 +174,13 @@ def callbacks(app, fsc, cache):
 
         mint = Mint(verbose=True, progress_callback=set_progress)
         mint.peaklist_files = fn_pkl
+        mint.ms_files = T.get_ms_fns( wdir )
+        mint.peaklist['rt_min'] = mint.peaklist['rt_min'].fillna(0)
+        mint.peaklist['rt_min'] = mint.peaklist['rt_max'].fillna(100)
         mint.optimize_retention_times()
         mint.peaklist.to_csv(fn_pkl)
+
+        return 'Peak optimization done.'
 
 
     @app.callback(
