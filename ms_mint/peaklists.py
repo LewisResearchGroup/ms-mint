@@ -6,9 +6,10 @@ import numpy as np
 
 from .standards import PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .helpers import dataframe_difference
+from .tools import get_mz_mean_from_formulas
 
 
-def read_peaklists(filenames):
+def read_peaklists(filenames, ms_mode='negative'):
     '''
     Extracts peak data from csv files that contain peak definitions.
     CSV files must contain columns: 
@@ -25,7 +26,6 @@ def read_peaklists(filenames):
     '''
     if isinstance(filenames, str):
         filenames = [filenames]
-
     peaklist = []
     for fn in filenames:
         if fn.endswith('.csv'):
@@ -35,6 +35,8 @@ def read_peaklists(filenames):
         if len(df) == 0:
             return pd.DataFrame(columns=PEAKLIST_COLUMNS, index=[])
         df['peaklist_name'] = os.path.basename(fn)
+        if 'formula' in df.columns:
+            df['mz_mean'] = get_mz_mean_from_formulas(df['formula'], ms_mode)
         df = standardize_peaklist(df)
         peaklist.append(df)
     peaklist = pd.concat(peaklist)
@@ -54,13 +56,14 @@ def standardize_peaklist(peaklist):
         if c not in cols:
             peaklist[c] = None
     del c
-    
     if 'peak_label' not in cols:
         peaklist['peak_label'] = [f'C_{i}' for i in range(len(peaklist)) ]        
-
+    peaklist['intensity_threshold'] = peaklist['intensity_threshold'].fillna(0)
     peaklist['peak_label'] = peaklist['peak_label'].astype(str)
     peaklist.index = range(len(peaklist))
+    peaklist = peaklist[peaklist.mz_mean.notna()]
     return peaklist[PEAKLIST_COLUMNS]
+
 
 def update_retention_time_columns(peaklist):
     for ndx, row in peaklist.iterrows():
