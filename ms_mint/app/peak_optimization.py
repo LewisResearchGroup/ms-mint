@@ -36,7 +36,7 @@ _layout = html.Div([
     html.H3('Peak Optimization'),
     html.Button('Generate peak previews', id='pko-peak-preview'),
     html.Button('Find largest peaks for all peaks', 
-        id='pko-find-largest-peak-for-all', style={'float': 'right'}),
+        id='pko-find-largest-peak-for-all', style={'float': 'right', 'visibility': 'hidden'}),
     dcc.Markdown('---'),
     html.Div(id='pko-peak-preview-output', 
         style={"maxHeight": "300px", "overflowY": "scroll", 'padding': 'auto'}),
