@@ -59,7 +59,9 @@ _layout = html.Div([
     html.Button('Remove Peak', id='pko-delete', style={'float': 'right'}),
 
     html.Div([
-        html.Button('<< Previous', id='pko-prev'), html.Button('Next >>', id='pko-next')],
+        html.Button('<< Previous', id='pko-prev'), 
+        html.Button('Shuffle', id='pko-shuffle'),
+        html.Button('Next >>', id='pko-next')],
         style={'text-align': 'center', 'margin': 'auto', 'margin-top': '10%'}),
     html.Div(id='pko-image-clicked-output'),
     html.Div(id='pko-delete-output')
@@ -100,18 +102,19 @@ def callbacks(app, fsc, cache):
     Input('pko-set-rt-output', 'children'),
     Input('pko-dropdown', 'options'),
     Input('pko-find-largest-peak-output', 'children'),
+    Input('pko-shuffle', 'n_clicks'),
     State('wdir', 'children'),
     State('pko-figure', 'figure')
     )
     def pko_figure(peak_label_ndx, n_clicks, options_changed, 
-            find_largest_peak, wdir, fig):
+            find_largest_peak, shuffle, wdir, fig):
         if peak_label_ndx is None:
             raise PreventUpdate
         
         peaklist = T.get_peaklist( wdir ).reset_index()
         ms_files = T.get_ms_fns( wdir )
         random.shuffle(ms_files)
-        ms_files = ms_files[:60]
+        ms_files = ms_files[:40]
 
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
@@ -119,7 +122,6 @@ def callbacks(app, fsc, cache):
 
         if (rt_min is None) or np.isnan(rt_min): rt_min = rt-0.2
         if (rt_max is None) or np.isnan(rt_max): rt_max = rt+0.2
-        if (rt is None) or np.isnan(rt): rt = np.mean([rt_min, rt_max])
 
         if True or fig is None:
             fig = go.Figure()
@@ -137,8 +139,11 @@ def callbacks(app, fsc, cache):
             )
             fig.update_layout(title=label)
 
-        fig.add_vline(rt)
-        fig.add_vrect(x0=rt_min, x1=rt_max, line_width=0, fillcolor="green", opacity=0.1)
+        if not np.isnan(rt):
+            fig.add_vline(rt)
+
+        if (not np.isnan(rt_min)) and (not np.isnan(rt_max)):
+            fig.add_vrect(x0=rt_min, x1=rt_max, line_width=0, fillcolor="green", opacity=0.1)
 
         n_files = len(ms_files)
         for i, fn in tqdm(enumerate(ms_files)):
@@ -241,8 +246,8 @@ def callbacks(app, fsc, cache):
             fsc.set('progress', int(100*(i+1)/n_total))
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
 
-            if np.isnan(rt_min) or rt_min is None: rt_min = rt-0.5
-            if np.isnan(rt_max) or rt_max is None: rt_max = rt+0.5
+            if np.isnan(rt_min) or rt_min is None: rt_min = 0
+            if np.isnan(rt_max) or rt_max is None: rt_max = 15
 
             plt.figure(figsize=(4,2.5))
             for fn in ms_files:
