@@ -9,8 +9,8 @@ from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
-from .processing import process_ms1_files_in_parallel, score_peaks
-from .io import export_to_excel
+from .processing import process_ms1_files_in_parallel, score_peaks, extract_chromatogram_from_ms1
+from .io import export_to_excel, ms_file_to_df
 from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
 from .peak_detection import OpenMSFFMetabo
@@ -20,6 +20,7 @@ from .vis.mpl import plot_peak_shapes, hierarchical_clustering
 from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
+from tqdm import tqdm
 
 import ms_mint
 
@@ -32,7 +33,6 @@ class Mint(object):
         if self.verbose:
             print('Mint Version:', self.version , '\n')
         self.peak_detector = OpenMSFFMetabo(progress_callback=progress_callback)
-        self._rt_optimizer = RetentionTimeOptimizer(self)
 
     @property
     def verbose(self):
@@ -57,8 +57,25 @@ class Mint(object):
         self._status = 'waiting'
         self._messages = []
 
-    def optimize_retention_times(self, peak_labels=None, **kwargs):
-        return self._rt_optimizer.fit_transform(peak_labels=peak_labels, **kwargs)
+    def optimize_retention_times(self, ms_files=None, peak_labels=None, **kwargs):
+        chromatograms = []
+        if ms_files is None:
+            ms_files = self.ms_files
+        if peak_labels is None:
+            peak_labels = self.peaklist.peak_label.values
+        peaklist = self.peaklist
+        for ndx, row in peaklist.iterrows():
+            peak_label = row['peak_label']
+            if peak_label not in peak_labels:
+                continue
+            chromatograms = []
+            mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
+            for fn in tqdm(ms_files):
+                df = ms_file_to_df(fn)
+                chrom = extract_chromatogram_from_ms1(df, mz_mean=mz_mean, mz_width=mz_width)
+                chromatograms.append(chrom)
+            rt_min, rt_max = RetentionTimeOptimizer(**kwargs).find_largest_peak(chromatograms)
+            self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
 
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
