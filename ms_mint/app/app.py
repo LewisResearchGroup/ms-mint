@@ -111,7 +111,7 @@ app.layout = html.Div([
     html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
     html.P('Current Workspace: ', style={'display': 'inline-block', 'margin-right': '5px'}),
     html.Div(id='active-workspace', style={'display': 'inline-block'}),
-    html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'hidden'}),
+    html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'visible'}),
     dcc.Tabs(id='tab', value='workspaces',  #vertical=True, style={'display': 'inline-block'},
         children=[
             dcc.Tab(value=key, 
