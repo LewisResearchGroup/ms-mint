@@ -247,6 +247,7 @@ def get_metadata_fn(wdir):
 def get_ms_dirname( wdir ):
     return os.path.join(wdir, 'ms_files')
 
+
 def get_ms_fns(wdir):
     path = get_ms_dirname( wdir )
     fns = glob(os.path.join(path, '*.feather'))
