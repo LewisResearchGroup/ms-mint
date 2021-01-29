@@ -224,7 +224,6 @@ def get_metadata(wdir):
     fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
     ms_files = [os.path.basename(fn) for fn in ms_files]
-    print(ms_files)
     df = None
     if not os.path.isdir( fn_path ):
         os.makedirs( fn_path )
@@ -234,7 +233,6 @@ def get_metadata(wdir):
             df = None
     if df is None or len(df) == 0:
         df = init_metadata( ms_files )
-    print(df)
     assert 'MS-file' in df.columns, df
     df = df.set_index('MS-file').reindex(ms_files).reset_index()
     df['MS-file'] = df['MS-file'].apply(os.path.basename)
