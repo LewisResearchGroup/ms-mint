@@ -210,17 +210,17 @@ def callbacks(app, fsc, cache):
         search_pattern = os.path.join( upload_path, '**', '*.*')
         fns = glob(search_pattern, recursive=True)
         n_total = len(fns)
+        print(fns)
         for i, fn in tqdm( enumerate(fns), total=n_total ):
             fsc.set('progress', int( 100 * (i+1) / n_total))
             if fn.lower().endswith('mzxml') or fn.lower().endswith('mzml'):
                 try:
-                    new_path = os.path.join( ms_dir, fn)
-                    if os.path.isfile( new_path ): os.remove(new_path)
                     shutil.move(fn, ms_dir)
+                    print(f'Moved {fn} to {ms_dir}')
                 except:
                     pass
         for remainings in glob(os.path.join(upload_path, '*')):
             print('Cleaning up:', remainings)
             if os.path.isfile(remainings): os.remove(remainings)
-            elif os.path.isidr(remainings): shutil.rmtree(remainings)
+            elif os.path.isdir(remainings): shutil.rmtree(remainings)
         return 'Done'
