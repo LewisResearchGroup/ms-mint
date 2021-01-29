@@ -223,21 +223,33 @@ def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
     fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
-    ms_files = pd.DataFrame([{'MS-file': Basename(fn) } for fn in ms_files])
+    print(ms_files)
+    df = None
+    if not os.path.isdir( fn_path ):
+        os.makedirs( fn_path )
     if os.path.isfile(fn):
         df = pd.read_csv( fn ).reset_index()
-    elif not os.path.isdir( fn_path ):
-        os.makedirs( fn_path )
-    else:
-        df = ms_files
-        df['Label'] = ''
-        df['Type'] = 'Biological Sample'
-        df['Run Order'] = ''
-        df['Batch'] = ''
-        df['Row'] = ''
-        df['Column'] = ''
+        if 'MS-file' not in df.columns:
+            df = None
+    if df is None or len(df) == 0:
+        df = init_metadata( ms_files )
+    print(df)
+    assert 'MS-file' in df.columns, df
+    df = df.set_index('MS-file').reindex(ms_files).reset_index()
     return df
 
+
+def init_metadata( ms_files ):
+    print('Init metadata')
+    ms_files = list(ms_files)
+    df = pd.DataFrame({'MS-file': ms_files})
+    df['Label'] = ''
+    df['Type'] = 'Biological Sample'
+    df['Run Order'] = ''
+    df['Batch'] = ''
+    df['Row'] = ''
+    df['Column'] = ''
+    return df
 
 def get_metadata_fn(wdir):
     fn = os.path.join(wdir, 'metadata', 'metadata.csv')
@@ -250,7 +262,7 @@ def get_ms_dirname( wdir ):
 
 def get_ms_fns(wdir):
     path = get_ms_dirname( wdir )
-    fns = glob(os.path.join(path, '*.feather'))
+    fns = glob(os.path.join(path, '*.*'))
     return fns
 
     
