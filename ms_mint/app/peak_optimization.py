@@ -37,9 +37,9 @@ _feather_ format first.'
 
 _layout = html.Div([
     html.H3('Peak Optimization'),
-    html.Button('Generate peak previews', id='pko-peak-preview'),
+    html.Button('Update peak previews', id='pko-peak-preview'),
     html.Button('Find largest peaks for all peaks', 
-        id='pko-find-largest-peak-for-all', style={'float': 'right', 'visibility': 'hidden'}),
+        id='pko-find-largest-peak-for-all', style={'float': 'right', 'visibility': 'visible'}),
     dcc.Markdown('---'),
     html.Div(id='pko-peak-preview-output', 
         style={"maxHeight": "300px", "overflowY": "scroll", 'padding': 'auto'}),
@@ -87,15 +87,18 @@ def callbacks(app, fsc, cache):
     Output('pko-dropdown', 'options'),
     Input('tab', 'value'),
     Input('pko-delete-output', 'children'),
-    State('wdir', 'children')
+    State('wdir', 'children'),
+    State('pko-dropdown', 'options'),
     )
-    def pko_controls(tab, peak_deleted, wdir):
+    def pko_controls(tab, peak_deleted, wdir, old_options):
         if tab != 'pko':
             raise PreventUpdate
         peaklist = T.get_peaklist( wdir )
         if peaklist is None:
             raise PreventUpdate
         options = [{'label':label, 'value': i} for i, label in enumerate(peaklist.index)]
+        if options == old_options:
+            raise PreventUpdate
         return options
 
 
@@ -110,10 +113,11 @@ def callbacks(app, fsc, cache):
     State('pko-figure', 'figure')
     )
     def pko_figure(peak_label_ndx, n_clicks, options_changed, 
-            find_largest_peak, shuffle, wdir, fig):
+                   find_largest_peak, shuffle, wdir, fig):
         if peak_label_ndx is None:
             raise PreventUpdate
-        
+        prop_id = dash.callback_context.triggered[0]['prop_id']
+
         peaklist = T.get_peaklist( wdir ).reset_index()
         ms_files = T.get_ms_fns( wdir )
         random.shuffle(ms_files)
@@ -226,22 +230,18 @@ def callbacks(app, fsc, cache):
             return (value + 1) % len(options)
 
     @app.callback(
-        Output('pko-peak-preview-output', 'children'),
-        Input('pko-image-store', 'children'),
-        Input('tab', 'value')
-    )
-    def pko_show_images(images, tab):
-        if tab != 'pko': raise PreventUpdate
-        return images
-
-    @app.callback(
-    Output('pko-image-store', 'children'),
+    Output('pko-peak-preview-output', 'children'),
     Input('pko-peak-preview', 'n_clicks'),
+    Input('pko-find-largest-peak-output', 'children'),
+    Input('pko-set-rt-output', 'children'),
     State('wdir', 'children')
     )
-    def peak_preview(n_clicks, wdir):
+    def peak_preview(n_clicks, find_largest_peak, set_rt, wdir):
         #if n_clicks is None:
-        #    raise PreventUpdate 
+        #    raise PreventUpdate
+        prop_id = dash.callback_context.triggered[0]['prop_id']
+        regenerate = prop_id.startswith('pko-peak-preview')
+        print('Regenerate previews:', regenerate)
         sns.set_context('paper')
         ms_files = T.get_ms_fns(wdir)
         random.shuffle(ms_files)
@@ -267,33 +267,36 @@ def callbacks(app, fsc, cache):
                 'rt_max': rt_max,
                 'rt': rt,
                 'image_label': image_label,
-                'wdir': wdir
+                'wdir': wdir,
+                'title': peak_label
             }
 
             _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, label=image_label, format='png')
-            print(fn)
-            if os.path.isfile( fn ):
-                print('Read image from:', fn)
+            if not os.path.isfile( fn ) or regenerate:
+                print('Gegenerate', fn)
+                create_preview_peakshape(params)
+
+            if os.path.isfile(fn):
                 src = T.png_fn_to_src(fn)
             else:
-                src = create_preview_peakshape(params)
-
+                src = None
             _id = {'index': peak_label, 'type': 'image'}
             image_id = f'image-{i}'
             images.append(
-                html.A(id=_id, children=html.Img(src=src, height=300, id=image_id))
+                html.A(id=_id, children=html.Img(src=src, height=300, id=image_id, style={'margin': '10px'}))
             )
             images.append( dbc.Tooltip(peak_label, target=image_id, style={'font-size': '50'}) )
         return images
 
+
     @app.callback(
         Output('pko-image-clicked-output', 'children'),
-        Input({'type': 'image', 'index': ALL}, 'n_clicks'),
-    )
+        [Input({'type': 'image', 'index': ALL}, 'n_clicks')],
+        prevent_initial_call=True
+        )
     def pko_image_clicked(ndx):
         if ndx is None or len(ndx)==0: raise PreventUpdate
         ctx = dash.callback_context
-        print(ctx.triggered[0]['prop_id'])
         clicked = ctx.triggered[0]['prop_id']
         clicked = clicked.replace('{"index":"', '')
         clicked = clicked.split('","type":')[0].replace('\\', '')
@@ -340,13 +343,15 @@ def callbacks(app, fsc, cache):
         return f'Set rt_min, rt_max to {rt_min}, {rt_max} respectively.'
 
 
+
 def create_preview_peakshape(args):
-    ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir = \
+    ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir, title = \
         args['ms_files'], args['mz_mean'], args['mz_width'], \
         args['rt'], args['rt_min'], args['rt_max'], args['image_label'], \
-        args['wdir']
+        args['wdir'], args['title']
 
     plt.figure(figsize=(4,2.5))
+
     for fn in ms_files:
         try:        
             fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
@@ -356,12 +361,10 @@ def create_preview_peakshape(args):
         except:
             pass
 
-    plt.gca().set_title(image_label, y=1.0, pad=15)
+    plt.gca().set_title(title, y=1.0, pad=15)
     plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     plt.xlabel('Retention Time [min]')  
     plt.ylabel('MS-Intensity')
-    T.savefig(kind='peak-preview', wdir=wdir, label=image_label)
-
-    src = T.fig_to_src(dpi=80)
-    return src
-
+    filename = T.savefig(kind='peak-preview', wdir=wdir, label=image_label)
+    plt.close()
+    return filename
