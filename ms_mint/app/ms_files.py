@@ -218,9 +218,7 @@ def callbacks(app, fsc, cache):
                     if os.path.isfile( new_path ): os.remove(new_path)
                     shutil.move(fn, ms_dir)
                 except:
-                    os.remove(fn)
-            else:
-                os.remove(fn)
+                    pass
         for remainings in glob(os.path.join(upload_path, '*')):
             print('Cleaning up:', remainings)
             shutil.rmtree(remainings)
