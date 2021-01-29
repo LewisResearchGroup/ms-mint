@@ -38,6 +38,7 @@ _feather_ format first.'
 _layout = html.Div([
     html.H3('Peak Optimization'),
     html.Button('Update peak previews', id='pko-peak-preview'),
+    html.Button('Regenerate all figures', id='pko-peak-preview-from-scratch'),
     html.Button('Find largest peaks for all peaks', 
         id='pko-find-largest-peak-for-all', style={'float': 'right', 'visibility': 'visible'}),
     dcc.Markdown('---'),
@@ -232,15 +233,17 @@ def callbacks(app, fsc, cache):
     @app.callback(
     Output('pko-peak-preview-output', 'children'),
     Input('pko-peak-preview', 'n_clicks'),
-    Input('pko-find-largest-peak-output', 'children'),
-    Input('pko-set-rt-output', 'children'),
+    Input('pko-peak-preview-from-scratch', 'n_clicks'),
+    #Input('pko-find-largest-peak-output', 'children'),
+    #Input('pko-set-rt-output', 'children'),
     State('wdir', 'children')
     )
-    def peak_preview(n_clicks, find_largest_peak, set_rt, wdir):
+    def peak_preview(n_clicks, from_scratch, wdir):
+    #def peak_preview(n_clicks, find_largest_peak, set_rt, wdir):
         #if n_clicks is None:
         #    raise PreventUpdate
         prop_id = dash.callback_context.triggered[0]['prop_id']
-        regenerate = prop_id.startswith('pko-peak-preview')
+        regenerate = prop_id.startswith('pko-peak-preview-from-scratch')
         print('Regenerate previews:', regenerate)
         sns.set_context('paper')
         ms_files = T.get_ms_fns(wdir)
