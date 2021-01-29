@@ -1,5 +1,6 @@
 import os
 import random
+import time
 
 from tqdm import tqdm
 
@@ -13,6 +14,7 @@ import seaborn as sns
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 
 from dash.exceptions import PreventUpdate
 
@@ -24,6 +26,7 @@ from ms_mint.Mint import Mint
 from ms_mint.peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer as RTOpt
 
 from . import tools as T
+
 
 info_txt = '''
 Creating chromatograms from mzXML/mzML files can last 
@@ -237,46 +240,50 @@ def callbacks(app, fsc, cache):
     State('wdir', 'children')
     )
     def peak_preview(n_clicks, wdir):
-        if n_clicks is None:
-            raise PreventUpdate 
+        #if n_clicks is None:
+        #    raise PreventUpdate 
         sns.set_context('paper')
         ms_files = T.get_ms_fns(wdir)
         random.shuffle(ms_files)
-        ms_files = ms_files[:40]
+        ms_files = ms_files[:100]
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
+
         images = []
-        for i, (ndx, row) in tqdm( enumerate(peaklist.iterrows()), total=n_total ):
-            peak_label = ndx
-            fsc.set('progress', int(100*(i+1)/n_total))
+        for i, (peak_label, row) in enumerate( peaklist.iterrows() ):
+            fsc.set('progress', int(100*(i+1) / n_total ))
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
 
             if np.isnan(rt_min) or rt_min is None: rt_min = 0
             if np.isnan(rt_max) or rt_max is None: rt_max = 15
 
-            plt.figure(figsize=(4,2.5))
-            for fn in ms_files:
-                try:        
-                    fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
-                    fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
-                                      (fn_chro['retentionTime'] < rt_max)]
-                    plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
-                except:
-                    pass
+            image_label = f'{peak_label}_{rt_min}_{rt_max}'
 
-            plt.gca().set_title(ndx, y=1.0, pad=15)
-            plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
-            plt.xlabel('Retention Time [min]')  
-            plt.ylabel('MS-Intensity')  
+            params = {
+                'ms_files': ms_files,
+                'mz_mean': mz_mean,
+                'mz_width': mz_width,
+                'rt_min': rt_min,
+                'rt_max': rt_max,
+                'rt': rt,
+                'image_label': image_label,
+                'wdir': wdir
+            }
 
-            T.savefig(kind='peak-preview', wdir=wdir, label=ndx)
-            
-            src = T.fig_to_src(dpi=80)
+            _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, label=image_label, format='png')
+            print(fn)
+            if os.path.isfile( fn ):
+                print('Read image from:', fn)
+                src = T.png_fn_to_src(fn)
+            else:
+                src = create_preview_peakshape(params)
 
+            _id = {'index': peak_label, 'type': 'image'}
+            image_id = f'image-{i}'
             images.append(
-                html.A(id={'index': peak_label, 'type': 'image'}, children=html.Img(src=src), style={'float': 'center'})
+                html.A(id=_id, children=html.Img(src=src, height=300, id=image_id))
             )
-            #images.append( dbc.Tooltip(ndx, target=_id, style={'font-size=': 'large'}) )
+            images.append( dbc.Tooltip(peak_label, target=image_id, style={'font-size': '50'}) )
         return images
 
     @app.callback(
@@ -323,7 +330,8 @@ def callbacks(app, fsc, cache):
         ms_files = ms_files[:50]
         row = peaklist.iloc[peak_label_ndx]
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
-        chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir).set_index('retentionTime')['intensity array'] for fn in ms_files]
+        chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
+            .set_index('retentionTime')['intensity array'] for fn in ms_files]
         rt_min, rt_max = None, None
         rt_min, rt_max = RTOpt().find_largest_peak(chromatograms)
         peaklist = peaklist.reset_index()
@@ -332,5 +340,28 @@ def callbacks(app, fsc, cache):
         return f'Set rt_min, rt_max to {rt_min}, {rt_max} respectively.'
 
 
-    def create_preview_peakshape():
-        pass
+def create_preview_peakshape(args):
+    ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir = \
+        args['ms_files'], args['mz_mean'], args['mz_width'], \
+        args['rt'], args['rt_min'], args['rt_max'], args['image_label'], \
+        args['wdir']
+
+    plt.figure(figsize=(4,2.5))
+    for fn in ms_files:
+        try:        
+            fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
+            fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
+                              (fn_chro['retentionTime'] < rt_max)   ]
+            plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
+        except:
+            pass
+
+    plt.gca().set_title(image_label, y=1.0, pad=15)
+    plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+    plt.xlabel('Retention Time [min]')  
+    plt.ylabel('MS-Intensity')
+    T.savefig(kind='peak-preview', wdir=wdir, label=image_label)
+
+    src = T.fig_to_src(dpi=80)
+    return src
+
