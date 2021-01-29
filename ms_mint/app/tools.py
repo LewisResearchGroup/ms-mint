@@ -223,6 +223,7 @@ def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
     fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
+    ms_files = [os.path.basename(fn) for fn in ms_files]
     print(ms_files)
     df = None
     if not os.path.isdir( fn_path ):
