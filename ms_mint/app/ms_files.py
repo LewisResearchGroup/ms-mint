@@ -1,7 +1,10 @@
 import os
 import shutil
+import time
+import uuid
 
 from glob import glob
+
 import pandas as pd
 
 import dash_html_components as html
@@ -13,6 +16,10 @@ from dash.dependencies import Input, Output, State
 from ms_mint.io import convert_ms_file_to_feather
 
 from dash_tabulator import DashTabulator
+from tqdm import tqdm
+
+import dash_uploader as du
+
 
 
 from . import tools as T
@@ -41,7 +48,7 @@ columns = [
 
 
 ms_table = html.Div(id='ms-table-container', 
-    style={'min-height':  100, 'margin-top': '10%'},
+    style={'min-height':  100, 'marginTop': '10%'},
     children=[
         DashTabulator(id='ms-table',
             columns=columns, 
@@ -52,29 +59,38 @@ ms_table = html.Div(id='ms-table-container',
 
 
 _layout = html.Div([
-    html.H3('MS-file'),
-    dcc.Markdown('''At the moment the upload is limited to ~10 files at a time.
-    Supported formats are `mzXML` and `mzML`. 
-    '''),
+    html.H3('Upload MS-files'),
     dcc.Upload(
             id='ms-upload',
             children=html.Div([
-                html.A('Drag and Drop or click to select files')
+                html.A('''Click here or drag and drop to upload mzML/mzXML files here. 
+                You can upload up to 10 files at a time.''', style={'margin': 'auto', 'padding': 'auto'})
             ]),
             style={
                 'width': '100%',
-                'height': '60px',
-                'lineHeight': '60px',
+                'height': '120px',
+                'lineHeight': '120px',
                 'borderWidth': '1px',
                 'borderStyle': 'dashed',
                 'borderRadius': '5px',
                 'textAlign': 'center',
-                'margin': '10px'
+                'margin-bottom': '15px',
             },
             # Allow multiple files to be uploaded
-            multiple=True
-        ),
-    dcc.Markdown('---'),
+            multiple=True),
+    html.Div( du.Upload(id='ms-upload-zip', filetypes=['tar', 'zip'], 
+                        upload_id=uuid.uuid1(),
+                        text='Click here to drag and drop ZIP/TAR compressed archives'),
+              style={
+                    'textAlign': 'center',
+                    'width': '100%',
+                    'padding': '0px',
+                    'display': 'inline-block',
+                }),
+    html.Div(id='ms-upload-zip-filename'),    
+    html.Div(id='ms-upload-zip-output'),
+
+    dcc.Markdown('---', style={'margin-top': '10px'}),
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
@@ -105,7 +121,7 @@ def callbacks(app, fsc, cache):
             n_uploaded = 0
             for i, (c, n, d) in enumerate( zip(list_of_contents, list_of_names, list_of_dates) ):
                 fsc.set('progress', int( 100*(i+1)/n_total ))
-                if n.lower().endswith('mzxml') or n.lower().endswith('mzml'):
+                if n.lower().endswith('mzxml') or n.lower().endswith('mzml') or n.lower().endswith('zip'):
                     try:
                         T.parse_ms_files(c, n, d, target_dir)
                         n_uploaded += 1
@@ -124,8 +140,9 @@ def callbacks(app, fsc, cache):
     Input('ms-upload-output', 'children'),
     Input('wdir', 'children'), 
     Input('ms-delete-output', 'children'),
+    Input('ms-upload-zip-output', 'children')
     )
-    def ms_table(value, wdir, files_deleted): 
+    def ms_table(value, wdir, files_deleted, zip_extracted): 
         target_dir = os.path.join(wdir, 'ms_files')
         ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
         data =  pd.DataFrame([{'MS-file': os.path.basename(fn) } for fn in ms_files])
@@ -170,3 +187,41 @@ def callbacks(app, fsc, cache):
             fn = os.path.join(target_dir, fn)
             os.remove(fn)
         return f'{len(rows)} files deleted'
+
+
+    @du.callback(
+    output=Output('ms-upload-zip-filename', 'children'),
+    id='ms-upload-zip',
+    )
+    def get_zip_filename(filenames):
+        return filenames[0]
+
+    @app.callback(
+        Output('ms-upload-zip-output', 'children'),
+        Input('ms-upload-zip-filename', 'children'),
+        State('wdir', 'children')
+    )
+    def get_a_list(fn, wdir):
+        if fn is None:
+            raise PreventUpdate
+        ms_dir = T.get_ms_dirname( wdir )
+        upload_path = os.path.dirname( fn )
+        shutil.unpack_archive(fn, extract_dir=upload_path)
+        search_pattern = os.path.join( upload_path, '**', '*.*')
+        fns = glob(search_pattern, recursive=True)
+        n_total = len(fns)
+        for i, fn in tqdm( enumerate(fns), total=n_total ):
+            fsc.set('progress', int( 100 * (i+1) / n_total))
+            if fn.lower().endswith('mzxml') or fn.lower().endswith('mzml'):
+                try:
+                    new_path = os.path.join( ms_dir, fn)
+                    if os.path.isfile( new_path ): os.remove(new_path)
+                    shutil.move(fn, ms_dir)
+                except:
+                    os.remove(fn)
+            else:
+                os.remove(fn)
+        for remainings in glob(os.path.join(upload_path, '*')):
+            print('Cleaning up:', remainings)
+            shutil.rmtree(remainings)
+        return 'Done'

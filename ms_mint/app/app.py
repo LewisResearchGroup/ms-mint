@@ -32,7 +32,8 @@ from . import heatmap
 from . import run_mint
 from . import add_metab
 
-from dash_uploader import configure_upload
+import dash_uploader as du
+from tempfile import gettempdir
 
 def make_dirs():
     tmpdir = tempfile.gettempdir()
@@ -80,8 +81,10 @@ app = dash.Dash(__name__,
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 
-UPLOAD_FOLDER_ROOT = "/tmp"
-configure_upload(app, UPLOAD_FOLDER_ROOT)
+
+UPLOAD_FOLDER_ROOT = gettempdir()
+du.configure_upload(app, UPLOAD_FOLDER_ROOT)
+
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
