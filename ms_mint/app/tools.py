@@ -321,7 +321,7 @@ def parse_table_content(content, filename):
 
 
 def fig_to_src(dpi=100):
-    out_img = io.BytesIO()   
+    out_img = io.BytesIO()
     plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
     plt.close('all')
     out_img.seek(0)  # rewind file
@@ -350,13 +350,14 @@ def clean_string(fn: str):
     return fn
 
 
-def savefig(kind, wdir, label, format='png', dpi=300):
+def savefig(kind=None, wdir=None, label=None, format='png', dpi=150):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
     try:
-        plt.savefig(fn, dpi=dpi)
+        plt.savefig(fn, dpi=dpi, bbox_inches='tight')
     except:
         print(f'Could not save figure {fn}, maybe no figure was created.')
+    return fn
 
 
 def maybe_create(dir_name):

@@ -1,4 +1,6 @@
 import os
+import shutil
+
 from glob import glob
 import pandas as pd
 
@@ -11,6 +13,7 @@ from dash.dependencies import Input, Output, State
 from ms_mint.io import convert_ms_file_to_feather
 
 from dash_tabulator import DashTabulator
+
 
 from . import tools as T
 
@@ -107,9 +110,14 @@ def callbacks(app, fsc, cache):
                         T.parse_ms_files(c, n, d, target_dir)
                         n_uploaded += 1
                     except:
-                        pass
+                        print(f'Could not parse file {n}')
+                if n.lower().endswith('zip'):
+                    print('Zip file uploaded', target_dir, n)
+                    fn = os.path.join( target_dir, n)
+                    shutil.unpack_archive(fn, target_dir)
+                    os.remove(fn)
             return html.P(f'{n_uploaded} files uploaded.')
-        
+
 
     @app.callback(
     Output('ms-table', 'data'),
