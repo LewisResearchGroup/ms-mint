@@ -59,6 +59,7 @@ ms_table = html.Div(id='ms-table-container',
 
 
 _layout = html.Div([
+    html.Img(src=app.get_asset_url('logo/logo.png')),
     html.H3('Upload MS-files'),
     dcc.Upload(
             id='ms-upload',
