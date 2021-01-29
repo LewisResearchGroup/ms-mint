@@ -237,6 +237,7 @@ def get_metadata(wdir):
     print(df)
     assert 'MS-file' in df.columns, df
     df = df.set_index('MS-file').reindex(ms_files).reset_index()
+    df['MS-file'] = df['MS-file'].apply(os.path.basename)
     return df
 
 
