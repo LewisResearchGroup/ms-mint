@@ -221,5 +221,6 @@ def callbacks(app, fsc, cache):
                     pass
         for remainings in glob(os.path.join(upload_path, '*')):
             print('Cleaning up:', remainings)
-            shutil.rmtree(remainings)
+            if os.path.isfile(remainings): os.remove(remainings)
+            elif os.path.isidr(remainings): shutil.rmtree(remainings)
         return 'Done'
