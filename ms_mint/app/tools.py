@@ -22,7 +22,7 @@ from ms_mint.io import convert_ms_file_to_feather
 from ms_mint.tools import get_mz_mean_from_formulas
 
 from datetime import date
-
+from functools import lru_cache
 
 def today():
     return date.today().strftime('%y%m%d')
@@ -149,7 +149,7 @@ def create_chromatograms(ms_files, peaklist, wdir):
             if not os.path.isfile(fn_chro):
                 create_chromatogram(fn, mz_mean, mz_width, fn_chro)
 
-
+@lru_cache(1000)
 def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
     df = ms_file_to_df(ms_file)
     dirname = os.path.dirname(fn_out)
@@ -350,11 +350,11 @@ def clean_string(fn: str):
     return fn
 
 
-def savefig(kind, wdir, label, format='svg'):
+def savefig(kind, wdir, label, format='png', dpi=300):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
     try:
-        plt.savefig(fn)
+        plt.savefig(fn, dpi=dpi)
     except:
         print(f'Could not save figure {fn}, maybe no figure was created.')
 
@@ -362,3 +362,8 @@ def savefig(kind, wdir, label, format='svg'):
 def maybe_create(dir_name):
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
+
+
+def png_fn_to_src(fn):
+    encoded_image = base64.b64encode(open(fn, 'rb').read())
+    return 'data:image/png;base64,{}'.format(encoded_image.decode())
