@@ -221,7 +221,7 @@ def get_results( wdir ):
 
 def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
-    fn_path = os.path.isdir( os.path.dirname(fn) )
+    fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
     ms_files = pd.DataFrame([{'MS-file': Basename(fn) } for fn in ms_files])
     if os.path.isfile(fn):
