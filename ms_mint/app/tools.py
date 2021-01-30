@@ -61,9 +61,7 @@ def parse_pkl_files(contents, filename, date, target_dir, ms_mode=None):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-    if ('formula' in df.columns) and (not 'mz_mean' in df.columns):
-        df['mz_mean'] = get_mz_mean_from_formulas(df['formula'], ms_mode)
-    df = standardize_peaklist(df)
+    df = standardize_peaklist(df, ms_mode=ms_mode)
     df = df.drop_duplicates()
     return df
 
@@ -149,7 +147,7 @@ def create_chromatograms(ms_files, peaklist, wdir):
             if not os.path.isfile(fn_chro):
                 create_chromatogram(fn, mz_mean, mz_width, fn_chro)
 
-@lru_cache(1000)
+
 def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
     df = ms_file_to_df(ms_file)
     dirname = os.path.dirname(fn_out)
@@ -160,7 +158,6 @@ def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
     chrom = chrom.groupby('retentionTime').max().reset_index()
     chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
     return chrom
-
 
 def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
     fn = get_chromatogram_fn(ms_file, mz_mean, mz_width, wdir)
@@ -174,7 +171,7 @@ def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
 def get_chromatogram_fn(ms_file, mz_mean, mz_width, wdir):
     ms_file = os.path.basename(ms_file)
     base, _ = os.path.splitext(ms_file)
-    fn = os.path.join(wdir, 'chromato', f'{mz_mean}-{mz_width}'.replace('.', '_'), base, '.feather')
+    fn = os.path.join(wdir, 'chromato', f'{mz_mean}-{mz_width}'.replace('.', '_'), base)+'.feather'
     return fn
 
 
@@ -223,7 +220,7 @@ def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
     fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
-    ms_files = [os.path.basename(fn) for fn in ms_files]
+    ms_files = [ os.path.basename(fn) for fn in ms_files ]
     df = None
     if not os.path.isdir( fn_path ):
         os.makedirs( fn_path )
@@ -236,6 +233,8 @@ def get_metadata(wdir):
     assert 'MS-file' in df.columns, df
     df = df.set_index('MS-file').reindex(ms_files).reset_index()
     df['MS-file'] = df['MS-file'].apply(os.path.basename)
+    if 'PeakOpt' not in df.columns:
+        df['PeakOpt'] = 0
     return df
 
 
@@ -249,14 +248,16 @@ def init_metadata( ms_files ):
     df['Batch'] = ''
     df['Row'] = ''
     df['Column'] = ''
+    df['PeakOpt'] = ''
     return df
+
 
 def get_metadata_fn(wdir):
     fn = os.path.join(wdir, 'metadata', 'metadata.csv')
     return fn
 
 
-def get_ms_dirname( wdir ):
+def get_ms_dirname( wdir):
     return os.path.join(wdir, 'ms_files')
 
 
@@ -275,23 +276,31 @@ def Basename(fn):
 def get_complete_results( wdir ):
     meta = get_metadata( wdir )
     resu = get_results( wdir )
+    assert 'MS-file' in resu.columns, resu
+    assert 'MS-file' in meta.columns, meta
+    print(len(resu), len(meta))
     resu['MS-file'] = [ Basename(fn) for fn in resu['MS-file']]
+    meta['MS-file'] = [ Basename(fn) for fn in meta['MS-file']]
     df = pd.merge(meta, resu, on='MS-file')
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
     return df
 
 
-def gen_tabulator_columns(col_names=None, add_ms_file_col=True, add_color_col=True, col_width='12px', editor='input'):
+def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=False, 
+                          add_peakopt_col=False,
+                          col_width='12px', editor='input'):
+
     if col_names is None: col_names = []
     col_names = list(col_names)
+
+    standard_columns = ['MS-file', 'Color', 'index', 'PeakOpt']
+    for col in standard_columns:
+        if col in col_names: col_names.remove(col)
     
-    if 'MS-file' in col_names: col_names.remove('MS-file')
-    if 'Color' in col_names: col_names.remove('Color')
-    if 'index' in col_names: col_names.remove('index')
 
     columns = [
             { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
-            "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
+              "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
 
     if add_ms_file_col:
         columns.append(
@@ -314,6 +323,18 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=True, add_color_col=Tr
               "headerSort": False
             })
     
+    if add_peakopt_col:
+        columns.append(
+            { 'title': 'PeakOpt', 
+              'field': 'PeakOpt', 
+              "headerFilter":False,  
+              "formatter": "tickCross", 
+              'width': '6px', 
+              "headerSort": False,
+              "hozAlign": "center",
+              "editor": True
+            })
+
     for col in col_names:
         content = { 'title': col, 
                     'field': col, 
@@ -385,3 +406,11 @@ def maybe_create(dir_name):
 def png_fn_to_src(fn):
     encoded_image = base64.b64encode(open(fn, 'rb').read())
     return 'data:image/png;base64,{}'.format(encoded_image.decode())
+
+
+def get_ms_fns_for_peakopt(wdir):
+    df = get_metadata( wdir )
+    assert 'MS-file' in df.columns, df
+    fns = df[df.PeakOpt.astype(bool)]['MS-file']
+    return [ os.path.join( get_ms_dirname(wdir), fn) for fn in fns]
+

@@ -112,6 +112,7 @@ app.layout = html.Div([
     html.P('Current Workspace: ', style={'display': 'inline-block', 'margin-right': '5px'}),
     html.Div(id='active-workspace', style={'display': 'inline-block'}),
     html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'visible', 'float': 'right'}),
+    html.Div(id='pko-creating-chromatograms'),
     dcc.Tabs(id='tab', value='workspaces',  #vertical=True, style={'display': 'inline-block'},
         children=[
             dcc.Tab(value=key, 

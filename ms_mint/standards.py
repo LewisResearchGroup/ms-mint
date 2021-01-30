@@ -26,9 +26,9 @@ MINT_RESULTS_COLUMNS = (['ms_file']
                        )
 
 DEPRECATED_LABELS = {'peakLabel': 'peak_label',
-                     'compoundId': 'peak_label',
+                  #   'compoundId': 'peak_label',
                      'compound': 'peak_label',
-                     'peakMz': 'mz_mean',
+                    # 'peakMz': 'mz_mean',
                      'medRt': 'rt',
                      'medMz': 'mz_mean',
                      'peakMzWidth[ppm]': 'mz_width',

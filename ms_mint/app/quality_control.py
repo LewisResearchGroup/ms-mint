@@ -64,8 +64,13 @@ def callbacks(app, fsc, cache):
 
         df = T.get_complete_results( wdir )
 
+        if len(df) == 0: return 'No results yet. First run MINT.'
+
+        print('Results', df)
+
         if file_types is not None and len(file_types) > 0:
             df = df[df.Type.isin(file_types)]
+
         if peak_labels is not None and len(peak_labels) > 0:
             df = df[df.peak_label.isin(peak_labels)]
 
