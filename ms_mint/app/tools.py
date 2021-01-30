@@ -136,6 +136,39 @@ def get_workspaces(tmpdir):
     return get_dirnames( ws_path )
 
 
+class Chromatograms():
+    def __init__(self, wdir, peaklist, ms_files, progress_callback=None):
+        self.wdir = wdir
+        self.peaklist = peaklist
+        self.ms_files = ms_files
+        self.n_peaks = len(peaklist)
+        self.n_files = len(ms_files)
+        print(self.n_peaks, self.n_files)
+        self.progress_callback = progress_callback
+
+    def create_all(self):
+        for fn in tqdm( self.ms_files ):
+            self.create_all_for_ms_file(fn)
+        return self
+
+    def create_all_for_ms_file(self, ms_file):
+        df = ms_file_to_df(ms_file)
+        for ndx, row in self.peaklist.iterrows():
+            mz_mean, mz_width = row[['mz_mean', 'mz_width']]
+            fn_chro = get_chromatogram_fn(fn, mz_mean, mz_width, self.wdir)
+            if os.path.isfile(fn_chro): continue
+            dirname = os.path.dirname(fn_chro)
+            if not os.path.isdir(dirname): os.makedirs(dirname)
+            dmz = mz_mean*1e-6*mz_width
+            chrom = df[(df['m/z array']-mz_mean).abs()<=dmz]
+            chrom['retentionTime'] = chrom['retentionTime'].round(3)
+            chrom = chrom.groupby('retentionTime').max().reset_index()
+            chrom[['retentionTime', 'intensity array']].to_feather(fn_chro)
+
+    def get_single(self, mz_mean, mz_width, ms_file):
+        return get_chromatogram(ms_file, mz_mean, mz_width, wdir)      
+    
+
 def create_chromatograms(ms_files, peaklist, wdir):
     for fn in tqdm(ms_files):
         fn_out = os.path.basename(fn)
@@ -158,6 +191,7 @@ def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
     chrom = chrom.groupby('retentionTime').max().reset_index()
     chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
     return chrom
+
 
 def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
     fn = get_chromatogram_fn(ms_file, mz_mean, mz_width, wdir)
@@ -234,7 +268,8 @@ def get_metadata(wdir):
     df = df.set_index('MS-file').reindex(ms_files).reset_index()
     df['MS-file'] = df['MS-file'].apply(os.path.basename)
     if 'PeakOpt' not in df.columns:
-        df['PeakOpt'] = 0
+        df['PeakOpt'] = False
+    else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
     return df
 
 
@@ -411,6 +446,7 @@ def png_fn_to_src(fn):
 def get_ms_fns_for_peakopt(wdir):
     df = get_metadata( wdir )
     assert 'MS-file' in df.columns, df
-    fns = df[df.PeakOpt.astype(bool)]['MS-file']
+    fns = df[df.PeakOpt.astype(bool) == True]['MS-file']
+    print(df.PeakOpt.sum(), len(fns))
     return [ os.path.join( get_ms_dirname(wdir), fn) for fn in fns]
 
