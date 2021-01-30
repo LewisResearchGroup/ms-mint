@@ -104,9 +104,13 @@ def callbacks(app, fsc, cache):
         mint = Mint()
 
         df = T.get_complete_results(wdir)
+        if len(df) == 0: return 'No results yet. First run MINT.'
+
         if file_types is not None and file_types != []:
             df = df[df.Type.isin(file_types)]
 
+        print(df)
+        
         mint.results = df
 
         var_name = 'peak_max'

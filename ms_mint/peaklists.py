@@ -14,10 +14,10 @@ def read_peaklists(filenames, ms_mode='negative'):
     Extracts peak data from csv files that contain peak definitions.
     CSV files must contain columns: 
         - 'peak_label': str, unique identifier
-        - 'peakMz': float, center of mass to be extracted in [Da]
-        - 'peakMzWidth[ppm]': float, with of mass window in [ppm]
-        - 'rtmin': float, minimum retention time in [min]
-        - 'rtmax': float, maximum retention time in [min]
+        - 'mz_mean': float, center of mass to be extracted in [Da]
+        - 'mz_width': float, with of mass window in [ppm]
+        - 'rt_min': float, minimum retention time in [min]
+        - 'rt_max': float, maximum retention time in [min]
     -----
     Args:
         - filenames: str or PosixPath or list of such with path to csv-file(s)
@@ -35,17 +35,18 @@ def read_peaklists(filenames, ms_mode='negative'):
         if len(df) == 0:
             return pd.DataFrame(columns=PEAKLIST_COLUMNS, index=[])
         df['peaklist_name'] = os.path.basename(fn)
-        if 'formula' in df.columns:
-            df['mz_mean'] = get_mz_mean_from_formulas(df['formula'], ms_mode)
         df = standardize_peaklist(df)
         peaklist.append(df)
     peaklist = pd.concat(peaklist)
     return peaklist
 
 
-def standardize_peaklist(peaklist):
+def standardize_peaklist(peaklist, ms_mode='neutral'):
     peaklist = peaklist.rename(columns=DEPRECATED_LABELS)
+    assert pd.value_counts(peaklist.columns).max() == 1, pd.value_counts( peaklist.columns )
     cols = peaklist.columns
+    if 'formula' in peaklist.columns and not 'mz_mean':
+        df['mz_mean'] = get_mz_mean_from_formulas(peaklist['formula'], ms_mode)    
     if 'intensity_threshold' not in cols:
         peaklist['intensity_threshold'] = 0
     if 'mz_width' not in cols:

@@ -59,7 +59,7 @@ _layout = html.Div([
     dcc.Markdown(id='pko-set-rt-output'),
     html.Button('Set RT to current view', id='pko-set-rt'),
     html.Button('Find largest peak', id='pko-find-largest-peak'),
-
+    
     html.Button('Remove Peak', id='pko-delete', style={'float': 'right'}),
 
     html.Div([
@@ -120,10 +120,7 @@ def callbacks(app, fsc, cache):
         prop_id = dash.callback_context.triggered[0]['prop_id']
 
         peaklist = T.get_peaklist( wdir ).reset_index()
-        ms_files = T.get_ms_fns( wdir )
-        random.shuffle(ms_files)
-        ms_files = ms_files[:40]
-
+        ms_files = T.get_ms_fns_for_peakopt(wdir)
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
             peaklist.loc[peak_label_ndx, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
@@ -154,7 +151,7 @@ def callbacks(app, fsc, cache):
             fig.add_vrect(x0=rt_min, x1=rt_max, line_width=0, fillcolor="green", opacity=0.1)
 
         n_files = len(ms_files)
-        for i, fn in tqdm(enumerate(ms_files)):
+        for i, fn in tqdm(enumerate(ms_files), total=n_files):
             fsc.set('progress', int(100*(i+1)/n_files))
             name = os.path.basename(fn)
             name, _ = os.path.splitext(name)
@@ -182,7 +179,7 @@ def callbacks(app, fsc, cache):
 
         mint = Mint(verbose=True, progress_callback=set_progress)
         mint.peaklist_files = fn_pkl
-        mint.ms_files = T.get_ms_fns( wdir )
+        mint.ms_files = T.get_ms_fns_for_peakopt( wdir )
         mint.peaklist['rt_min'] = mint.peaklist['rt_min'].fillna(0)
         mint.peaklist['rt_min'] = mint.peaklist['rt_max'].fillna(100)
         mint.optimize_retention_times()
@@ -230,6 +227,23 @@ def callbacks(app, fsc, cache):
         elif prop_id.startswith('pko-next'):
             return (value + 1) % len(options)
 
+    #@app.callback(
+    #    Output('pko-creating-chromatograms', 'children'),
+    #    Input('tab', 'value'),
+    #    State('wdir', 'children')
+    #)
+    def create_chromatograms(tab, wdir):
+        if tab != 'pko':
+            raise PreventUpdate
+        ms_files = T.get_ms_fns_for_peakopt(wdir)
+        peaklist = T.get_peaklist(wdir)
+        n_total = len(peaklist)
+        for peak_label, row in tqdm( peaklist.iterrows(),  total=n_total):
+            mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
+            for ms_file in ms_files:
+                T.get_chromatogram(ms_file, mz_mean, mz_width, wdir)
+
+
     @app.callback(
     Output('pko-peak-preview-output', 'children'),
     Input('pko-peak-preview', 'n_clicks'),
@@ -246,14 +260,13 @@ def callbacks(app, fsc, cache):
         regenerate = prop_id.startswith('pko-peak-preview-from-scratch')
         print('Regenerate previews:', regenerate)
         sns.set_context('paper')
-        ms_files = T.get_ms_fns(wdir)
-        random.shuffle(ms_files)
-        ms_files = ms_files[:40]
+        ms_files = T.get_ms_fns_for_peakopt(wdir)
+        if len(ms_files)==0:
+            return 'No files selected for peak optimization.'
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
-
         images = []
-        for i, (peak_label, row) in enumerate( peaklist.iterrows() ):
+        for i, (peak_label, row) in tqdm( enumerate( peaklist.iterrows() ), total=n_total):
             fsc.set('progress', int(100*(i+1) / n_total ))
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
 
@@ -262,22 +275,11 @@ def callbacks(app, fsc, cache):
 
             image_label = f'{peak_label}_{rt_min}_{rt_max}'
 
-            params = {
-                'ms_files': ms_files,
-                'mz_mean': mz_mean,
-                'mz_width': mz_width,
-                'rt_min': rt_min,
-                'rt_max': rt_max,
-                'rt': rt,
-                'image_label': image_label,
-                'wdir': wdir,
-                'title': peak_label
-            }
-
             _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, label=image_label, format='png')
             if not os.path.isfile( fn ) or regenerate:
-                print('Gegenerate', fn)
-                create_preview_peakshape(params)
+
+                create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
+                    rt_min, rt_max, image_label, wdir, title=peak_label)
 
             if os.path.isfile(fn):
                 src = T.png_fn_to_src(fn)
@@ -331,9 +333,7 @@ def callbacks(app, fsc, cache):
         if n_clicks is None: raise PreventUpdate
         if peak_label_ndx is None: raise PreventUpdate
         peaklist = T.get_peaklist( wdir )
-        ms_files = T.get_ms_fns( wdir )
-        random.shuffle(ms_files)
-        ms_files = ms_files[:50]
+        ms_files = T.get_ms_fns_for_peakopt(wdir)
         row = peaklist.iloc[peak_label_ndx]
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
         chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
@@ -347,14 +347,8 @@ def callbacks(app, fsc, cache):
 
 
 
-def create_preview_peakshape(args):
-    ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir, title = \
-        args['ms_files'], args['mz_mean'], args['mz_width'], \
-        args['rt'], args['rt_min'], args['rt_max'], args['image_label'], \
-        args['wdir'], args['title']
-
+def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir, title):
     plt.figure(figsize=(4,2.5))
-
     for fn in ms_files:
         try:        
             fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
@@ -363,7 +357,6 @@ def create_preview_peakshape(args):
             plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
         except:
             pass
-
     plt.gca().set_title(title, y=1.0, pad=15)
     plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     plt.xlabel('Retention Time [min]')  
