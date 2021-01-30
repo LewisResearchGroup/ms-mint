@@ -121,6 +121,7 @@ def callbacks(app, fsc, cache):
 
         peaklist = T.get_peaklist( wdir ).reset_index()
         ms_files = T.get_ms_fns_for_peakopt(wdir)
+        print(len(ms_files))
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
             peaklist.loc[peak_label_ndx, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
@@ -151,7 +152,7 @@ def callbacks(app, fsc, cache):
             fig.add_vrect(x0=rt_min, x1=rt_max, line_width=0, fillcolor="green", opacity=0.1)
 
         n_files = len(ms_files)
-        for i, fn in tqdm(enumerate(ms_files), total=n_files):
+        for i, fn in tqdm(enumerate(ms_files), total=n_files, desc='PKO-figure'):
             fsc.set('progress', int(100*(i+1)/n_files))
             name = os.path.basename(fn)
             name, _ = os.path.splitext(name)
@@ -237,11 +238,8 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
         ms_files = T.get_ms_fns_for_peakopt(wdir)
         peaklist = T.get_peaklist(wdir)
-        n_total = len(peaklist)
-        for peak_label, row in tqdm( peaklist.iterrows(),  total=n_total):
-            mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
-            for ms_file in ms_files:
-                T.get_chromatogram(ms_file, mz_mean, mz_width, wdir)
+        T.Chromatograms(peaklist=peaklist, ms_files=ms_files, wdir=wdir).create_all()
+
 
 
     @app.callback(
@@ -265,6 +263,7 @@ def callbacks(app, fsc, cache):
             return 'No files selected for peak optimization.'
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
+
         images = []
         for i, (peak_label, row) in tqdm( enumerate( peaklist.iterrows() ), total=n_total):
             fsc.set('progress', int(100*(i+1) / n_total ))
