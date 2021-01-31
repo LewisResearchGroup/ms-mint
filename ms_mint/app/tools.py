@@ -29,7 +29,7 @@ from functools import lru_cache
 from filelock import Timeout, FileLock
 
 def lock(fn):
-    return FileLock(f'fn.lock', timeout=1)
+    return FileLock(f'{fn}.lock', timeout=1)
 
 
 def today():
@@ -477,4 +477,4 @@ def write_peaklist(peaklist, wdir):
     if 'peak_label' in peaklist.columns:
         peaklist = peaklist.set_index('peak_label')
     with lock(fn):
-        peaklist.to_csv( fn)
+        peaklist.to_csv(fn)
