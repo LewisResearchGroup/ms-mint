@@ -9,7 +9,7 @@ from ..Resampler import Resampler
 
 class RetentionTimeOptimizer():
     def __init__(self, rt_min=None, rt_max=None, rt_expected=None, 
-                 how='largest', dt=0.01, show_figure=False):
+                 how='largest', dt=0.01, show_figure=False, precission=3):
         self.t_peaks = None
         self.x_peaks = None
         self.peak_width_bottom = None
@@ -21,6 +21,7 @@ class RetentionTimeOptimizer():
         self.dt = dt
         self.resampler = Resampler()
         self.show_figure = show_figure
+        self.precission = precission
 
     def find_peaks_and_widths(self, chrom, prominence=1000):
         x = chrom.values
@@ -80,7 +81,7 @@ class RetentionTimeOptimizer():
         rt_max = estimate_expectation_value(df.rt_max)
         if self.show_figure:
             plt.vlines([rt_min, rt_max], 0, np.max(df.max_intensity), label='Selected RT range', color='k', ls='--')
-        return rt_min, rt_max
+        return np.round(rt_min, self.precission), np.round(rt_max, self.precission)
     
     def get_peak_start_timee(self, ndx):
         return self.x_to_t(self.peak_width_bottom[2][ndx])[0]

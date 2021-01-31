@@ -22,8 +22,8 @@ from flask_caching import Cache
 
 from . import tools as T
 
-from . import ms_files
 from . import workspaces
+from . import ms_files
 from . import metadata
 from . import peaklist
 from . import peak_optimization

@@ -191,28 +191,29 @@ def callbacks(app, fsc, cache):
     @app.callback(
     Output('pko-find-largest-peak-for-all-output', 'children'),
     Input('pko-find-largest-peak-for-all', 'n_clicks'),
+    State('pko-ms-selection', 'value'),
     State('wdir', 'children'))
-    def pko_find_closest_peak(n_clicks, wdir):
+    def pko_find_closest_peak(n_clicks, ms_selection, wdir):
         if n_clicks is None:
             raise PreventUpdate
+        peaklist = T.get_peaklist( wdir )
 
-        fn_pkl = T.get_peaklist_fn(wdir)
-        def set_progress(x):
-            fsc.set('progress', x)
-
-        mint = Mint(verbose=True, progress_callback=set_progress)
-        mint.peaklist_files = fn_pkl
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt(wdir)
         elif ms_selection == 'all':
-            ms_files = T.get_ms_fns(wdir)   
+            ms_files = T.get_ms_fns(wdir)
 
-        mint.peaklist['rt_min'] = mint.peaklist['rt_min'].fillna(0)
-        mint.peaklist['rt_max'] = mint.peaklist['rt_max'].fillna(100)
-
-        mint.optimize_retention_times()
-        T.write_peaklist( mint.peaklist, fn_pkl)
-
+        n_peaks = len(peaklist)
+        for i, (peak_label, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
+            fsc.set('progress', int(100*(1+i)/n_peaks))
+            mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
+            chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
+                .set_index('retentionTime')['intensity array'] for fn in ms_files]
+            rt_min, rt_max = None, None
+            rt_min, rt_max = RTOpt().find_largest_peak(chromatograms)
+            peaklist.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
+        
+        T.write_peaklist( peaklist, wdir)
         return 'Peak optimization done.'
 
 
@@ -319,8 +320,8 @@ def callbacks(app, fsc, cache):
     def peak_preview(n_clicks, from_scratch, peak_opt, set_rt, ms_selection, wdir):
         prop_id = dash.callback_context.triggered[0]['prop_id']
         regenerate = prop_id.startswith('pko-peak-preview-from-scratch')
-        print('Regenerate previews:', regenerate)
         if regenerate:
+            print('Regenerate previews:', regenerate)
             image_path = os.path.join( wdir, 'figures', 'peak-preview')
             if os.path.isdir(image_path):
                 shutil.rmtree(image_path)
@@ -336,6 +337,7 @@ def callbacks(app, fsc, cache):
             return 'No files selected for peak optimization.'
         else:
             print(f'Using {len(ms_files)} files for peak preview. ({ms_selection})')
+
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
         
@@ -343,6 +345,7 @@ def callbacks(app, fsc, cache):
         images = []
         for i, (peak_label, row) in tqdm( enumerate( peaklist.iterrows() ), total=n_total):
             fsc.set('progress', int(100*(i+1) / n_total ))
+            print(peak_label)
             mz_mean, mz_width, rt, rt_min, rt_max = \
                 row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
 
@@ -355,7 +358,6 @@ def callbacks(app, fsc, cache):
                 label=image_label, format='png')
 
             if not os.path.isfile( fn ) or regenerate:
-
                 create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
                     rt_min, rt_max, image_label, wdir, title=peak_label)
 
@@ -363,6 +365,7 @@ def callbacks(app, fsc, cache):
                 src = T.png_fn_to_src(fn)
             else:
                 src = None
+
             _id = {'index': peak_label, 'type': 'image'}
             image_id = f'image-{i}'
             images.append(
@@ -439,19 +442,24 @@ def callbacks(app, fsc, cache):
 
 def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
         rt_min, rt_max, image_label, wdir, title):
-    plt.close()
-    plt.figure(figsize=(4,2.5))
+    print('create image')
+    #plt.close()
+    plt.figure(figsize=(4,2.5), dpi=30)
     y_max = 0 
     for fn in ms_files:
-        try:        
-            fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
-            fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
-                              (fn_chro['retentionTime'] < rt_max)   ]
-            plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
-            y_max = max(y_max, fn_chro['intensity array'].max())
-        except:
-            pass
-    if rt is not None:
+        #try:
+        fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
+        fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
+                             (fn_chro['retentionTime'] < rt_max)   ]
+        plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
+        y_max = max(y_max, fn_chro['intensity array'].max())
+        #except:
+        #    pass
+    print(rt, rt_min, rt_max)    
+    if (not np.isnan(rt)) \
+        and not (np.isnan(rt_max)) \
+        and not (np.isnan(rt_min)):
+
         x = max(min(rt, rt_max), rt_min)
         rt_mean = np.mean([rt_min, rt_max])
         color_value = np.abs(rt_mean-rt)
@@ -463,4 +471,5 @@ def create_preview_peakshape(ms_files, mz_mean, mz_width, rt,
     plt.ylabel('MS-Intensity')
     filename = T.savefig(kind='peak-preview', wdir=wdir, label=image_label)
     plt.close()
+    print('done')
     return filename 

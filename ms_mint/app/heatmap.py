@@ -58,12 +58,7 @@ _layout = html.Div([
     dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
     dcc.Dropdown(id='heatmap-options', value=['normed_by_cols', 'clustered'],
         options=heatmap_options, multi=True),
-    dcc.Dropdown(id='heatmap-ms-order', options=[{'value': 'MS-file', 'label': 'MS-file'},
-                                                 {'value': 'Label', 'label': 'Label'},
-                                                 {'value': 'Batch', 'label': 'Batch'},
-                                                 {'value': 'Type', 'label': 'Type'}
-                                                 ], 
-                                                 placeholder='MS-file sorting', multi=True),
+    dcc.Dropdown(id='heatmap-ms-order', options=[], placeholder='MS-file sorting', multi=True),
     dcc.Loading( 
         dcc.Graph(id='heatmap-figure', 
                   style={'margin-top': '50px'}) ),
@@ -137,4 +132,16 @@ def callbacks(app, fsc, cache):
             name=name)
 
         return fig
+
+    @app.callback(
+        Output('heatmap-ms-order', 'options'),
+        Input('tab', 'value'),
+        State('wdir', 'children')
+    )
+    def ms_order_options(tab, wdir):
+        if not tab == 'heatmap': raise PreventUpdate
+        cols = T.get_metadata(wdir).dropna(how='all', axis=1).columns
+        if 'index' in cols: cols.remove('index')
+        options = [{'value':i, 'label': i} for i in cols]
+        return options
 
