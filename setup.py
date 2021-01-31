@@ -38,7 +38,8 @@ install_requires = [
     'pyarrow',
     'flask-compress',
     'molmass',
-    'dash_uploader'] 
+    'dash_uploader',
+    'filelock'] 
 
 
 config = {

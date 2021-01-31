@@ -110,6 +110,7 @@ def callbacks(app, fsc=None, cache=None):
         target_dir = os.path.join(wdir, 'peaklist')
         df = pd.DataFrame(data)
         fn = os.path.join( target_dir, 'peaklist.csv')
+        df = df.sort_values('peak_label')
         df.to_csv(fn)
         return 'Peaklist saved.'
 

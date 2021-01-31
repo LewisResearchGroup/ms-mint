@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import shutil
 
 from tqdm import tqdm
 
@@ -37,6 +38,12 @@ _feather_ format first.'
 
 _layout = html.Div([
     html.H3('Peak Optimization'),
+    dcc.Dropdown(id='pko-ms-selection',
+        options=[
+            {'label': 'Use selected files from metadata table (PeakOpt)', 'value': 'peakopt'},
+            {'label': 'Use all files (may take a long time)', 'value': 'all'}], 
+        value='peakopt',
+        clearable=False),
     html.Button('Update peak previews', id='pko-peak-preview'),
     html.Button('Regenerate all figures', id='pko-peak-preview-from-scratch'),
     html.Button('Find largest peaks for all peaks', 
@@ -56,15 +63,18 @@ _layout = html.Div([
         value=None
     ),
     dcc.Loading( dcc.Graph('pko-figure') ),
+    dcc.Checklist(id='pko-figure-options', options=[{'value': 'log','label': 'Logarithmic y-scale'}], value=[]),
     dcc.Markdown(id='pko-set-rt-output'),
+    dcc.Markdown(id='pko-confirm-rt-output'),
+
     html.Button('Set RT to current view', id='pko-set-rt'),
     html.Button('Find largest peak', id='pko-find-largest-peak'),
-    
+    html.Button('Confirm retention time', id='pko-confirm-rt'),
     html.Button('Remove Peak', id='pko-delete', style={'float': 'right'}),
 
     html.Div([
         html.Button('<< Previous', id='pko-prev'), 
-        html.Button('Shuffle', id='pko-shuffle'),
+        html.Button('Suggest', id='pko-suggest-next'),
         html.Button('Next >>', id='pko-next')],
         style={'text-align': 'center', 'margin': 'auto', 'margin-top': '10%'}),
     html.Div(id='pko-image-clicked-output'),
@@ -106,22 +116,27 @@ def callbacks(app, fsc, cache):
     @app.callback(
     Output('pko-figure', 'figure'),
     Input('pko-dropdown', 'value'),
+    Input('pko-figure-options', 'value'),
     Input('pko-set-rt-output', 'children'),
     Input('pko-dropdown', 'options'),
     Input('pko-find-largest-peak-output', 'children'),
-    Input('pko-shuffle', 'n_clicks'),
+    Input('pko-confirm-rt-output', 'children'),
+    State('pko-ms-selection', 'value'),
     State('wdir', 'children'),
     State('pko-figure', 'figure')
     )
-    def pko_figure(peak_label_ndx, n_clicks, options_changed, 
-                   find_largest_peak, shuffle, wdir, fig):
+    def pko_figure(peak_label_ndx, options, n_clicks, options_changed, 
+                   find_largest_peak, rt_set, ms_selection, wdir, fig):
         if peak_label_ndx is None:
             raise PreventUpdate
         prop_id = dash.callback_context.triggered[0]['prop_id']
 
         peaklist = T.get_peaklist( wdir ).reset_index()
-        ms_files = T.get_ms_fns_for_peakopt(wdir)
-        print(len(ms_files))
+        if ms_selection == 'peakopt':
+            ms_files = T.get_ms_fns_for_peakopt(wdir)
+        elif ms_selection == 'all':
+            ms_files = T.get_ms_fns(wdir)
+
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
             peaklist.loc[peak_label_ndx, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
@@ -144,6 +159,7 @@ def callbacks(app, fsc, cache):
                 )
             )
             fig.update_layout(title=label)
+            if 'log' in options: fig.update_yaxes(type="log")
 
         if not np.isnan(rt):
             fig.add_vline(rt)
@@ -159,7 +175,7 @@ def callbacks(app, fsc, cache):
             chrom = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
             fig.add_trace(
                 go.Scatter(x=chrom['retentionTime'], 
-                        y=chrom['intensity array'], 
+                           y=chrom['intensity array'], 
                         name=name)
             )
             fig.update_layout(showlegend=False)
@@ -173,18 +189,23 @@ def callbacks(app, fsc, cache):
     def pko_find_closest_peak(n_clicks, wdir):
         if n_clicks is None:
             raise PreventUpdate
-        fn_pkl = os.path.join( wdir, 'peaklist', 'peaklist.csv') 
-        
+
+        fn_pkl = T.get_peaklist_fn(wdir)
         def set_progress(x):
             fsc.set('progress', x)
 
         mint = Mint(verbose=True, progress_callback=set_progress)
         mint.peaklist_files = fn_pkl
-        mint.ms_files = T.get_ms_fns_for_peakopt( wdir )
+        if ms_selection == 'peakopt':
+            ms_files = T.get_ms_fns_for_peakopt(wdir)
+        elif ms_selection == 'all':
+            ms_files = T.get_ms_fns(wdir)   
+
         mint.peaklist['rt_min'] = mint.peaklist['rt_min'].fillna(0)
-        mint.peaklist['rt_min'] = mint.peaklist['rt_max'].fillna(100)
+        mint.peaklist['rt_max'] = mint.peaklist['rt_max'].fillna(100)
+
         mint.optimize_retention_times()
-        mint.peaklist.to_csv(fn_pkl)
+        T.write_peaklist( mint.peaklist, fn_pkl)
 
         return 'Peak optimization done.'
 
@@ -204,19 +225,51 @@ def callbacks(app, fsc, cache):
         T.update_peaklist(wdir, peak_label, rt_min, rt_max)
         return f'Set RT span to ({rt_min},{rt_max})'
 
+    @app.callback(
+        Output('pko-confirm-rt-output', 'children'),
+        Input('pko-confirm-rt', 'n_clicks'),
+        State('pko-dropdown', 'value'),
+        State('pko-figure', 'figure'),
+        State('wdir', 'children')
+    )
+    def pko_set_rt(n_clicks, peak_label, fig, wdir):
+        if n_clicks is None:
+            raise PreventUpdate
+        rt_min, rt_max = fig['layout']['xaxis']['range']
+        rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
+        
+        image_label = f'{peak_label}_{rt_min}_{rt_max}'
+        _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, label=image_label, format='png')
+        
+        rt = np.mean([rt_min, rt_max])
+        T.update_peaklist(wdir, peak_label, rt=rt)
+        if os.path.isfile(fn): os.remove(fn)
+
+        return f'Set RT span to ({rt_min},{rt_max})'
+
+
 
     @app.callback(
         Output('pko-dropdown', 'value'),
         Input('pko-prev', 'n_clicks'),
+        Input('pko-suggest-next', 'n_clicks'),
         Input('pko-next', 'n_clicks'),
         Input('pko-image-clicked-output', 'children'),
         State('pko-dropdown', 'value'),
-        State('pko-dropdown', 'options')
+        State('pko-dropdown', 'options'),
+        State('wdir', 'children')
     )
-    def pko_prev_next(n_prev, n_next, image_clicked, value, options):
-        if n_prev is None and n_next is None and image_clicked is None:
+    def pko_prev_next_suggest(n_prev, n_suggest, n_next, image_clicked, value, options, wdir):
+        if n_prev is None and n_next is None and image_clicked is None and n_suggest is None:
             raise PreventUpdate
         prop_id = dash.callback_context.triggered[0]['prop_id']        
+
+        if prop_id.startswith('pko-suggest'):
+            peaklist = T.get_peaklist( wdir ).reset_index()
+            rt_means = peaklist[['rt_min', 'rt_max']].mean(axis=1)
+            peak_label_ndx = np.argmax( (peaklist.rt-rt_means).abs() )
+            return peak_label_ndx      
+
         if prop_id.startswith('pko-image-clicked-output'):
             for entry in options:
                 if entry['label'] == image_clicked:
@@ -246,24 +299,35 @@ def callbacks(app, fsc, cache):
     Output('pko-peak-preview-output', 'children'),
     Input('pko-peak-preview', 'n_clicks'),
     Input('pko-peak-preview-from-scratch', 'n_clicks'),
-    #Input('pko-find-largest-peak-output', 'children'),
-    #Input('pko-set-rt-output', 'children'),
+    Input('pko-find-largest-peak-output', 'children'),
+    Input('pko-set-rt-output', 'children'),
+    State('pko-ms-selection', 'value'),
     State('wdir', 'children')
     )
-    def peak_preview(n_clicks, from_scratch, wdir):
-    #def peak_preview(n_clicks, find_largest_peak, set_rt, wdir):
-        #if n_clicks is None:
-        #    raise PreventUpdate
+    def peak_preview(n_clicks, from_scratch, peak_opt, set_rt, ms_selection, wdir):
         prop_id = dash.callback_context.triggered[0]['prop_id']
         regenerate = prop_id.startswith('pko-peak-preview-from-scratch')
         print('Regenerate previews:', regenerate)
-        sns.set_context('paper')
-        ms_files = T.get_ms_fns_for_peakopt(wdir)
+        if regenerate:
+            image_path = os.path.join( wdir, 'figures', 'peak-preview')
+            if os.path.isdir(image_path):
+                shutil.rmtree(image_path)
+
+        if ms_selection == 'peakopt':
+            ms_files = T.get_ms_fns_for_peakopt(wdir)
+        elif ms_selection == 'all':
+            ms_files = T.get_ms_fns(wdir)
+        else:
+            assert False, ms_selection
+
         if len(ms_files)==0:
             return 'No files selected for peak optimization.'
+        else:
+            print(f'Using {len(ms_files)} files for peak preview. ({ms_selection})')
         peaklist = T.get_peaklist(wdir)
         n_total = len(peaklist)
-
+        
+        sns.set_context('paper')
         images = []
         for i, (peak_label, row) in tqdm( enumerate( peaklist.iterrows() ), total=n_total):
             fsc.set('progress', int(100*(i+1) / n_total ))
@@ -304,6 +368,7 @@ def callbacks(app, fsc, cache):
         clicked = ctx.triggered[0]['prop_id']
         clicked = clicked.replace('{"index":"', '')
         clicked = clicked.split('","type":')[0].replace('\\', '')
+        if len( dash.callback_context.triggered) > 1: raise PreventUpdate
         print('Clicked:', clicked)
         return clicked
 
@@ -319,20 +384,24 @@ def callbacks(app, fsc, cache):
         fn = T.get_peaklist_fn( wdir )
         peaklist = T.get_peaklist( wdir ).reset_index()
         peaklist = peaklist.drop( peak_label, axis=0 )
-        peaklist.to_csv(fn, index=False)
+        T.write_peaklist(peaklist, wdir)
         return f'{peak_label} removed from peaklist.'  
 
     @app.callback(
         Output('pko-find-largest-peak-output', 'children'),
         Input('pko-find-largest-peak', 'n_clicks'),
         State('pko-dropdown', 'value'),
+        State('pko-ms-selection', 'value'),
         State('wdir', 'children')
     )
-    def find_largest_peak(n_clicks, peak_label_ndx, wdir):
+    def find_largest_peak(n_clicks, peak_label_ndx, ms_selection, wdir):
         if n_clicks is None: raise PreventUpdate
         if peak_label_ndx is None: raise PreventUpdate
         peaklist = T.get_peaklist( wdir )
-        ms_files = T.get_ms_fns_for_peakopt(wdir)
+        if ms_selection == 'peakopt':
+            ms_files = T.get_ms_fns_for_peakopt(wdir)
+        elif ms_selection == 'all':
+            ms_files = T.get_ms_fns(wdir)           
         row = peaklist.iloc[peak_label_ndx]
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
         chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
@@ -348,18 +417,26 @@ def callbacks(app, fsc, cache):
 
 def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir, title):
     plt.figure(figsize=(4,2.5))
+    y_max = 0 
     for fn in ms_files:
         try:        
             fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
             fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
                               (fn_chro['retentionTime'] < rt_max)   ]
             plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
+            y_max = max(y_max, fn_chro['intensity array'].max())
         except:
             pass
+    if rt is not None:
+        x = max(min(rt, rt_max), rt_min)
+        rt_mean = np.mean([rt_min, rt_max])
+        color_value = np.abs(rt_mean-rt)
+        color = T.float_to_color(color_value, vmin=0, vmax=1, cmap='coolwarm')
+        plt.vlines(x, 0, y_max, lw=3, color=color)
     plt.gca().set_title(title, y=1.0, pad=15)
     plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     plt.xlabel('Retention Time [min]')  
     plt.ylabel('MS-Intensity')
     filename = T.savefig(kind='peak-preview', wdir=wdir, label=image_label)
     plt.close()
-    return filename
+    return filename 
