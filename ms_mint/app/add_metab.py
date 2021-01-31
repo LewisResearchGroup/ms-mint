@@ -108,8 +108,8 @@ def callbacks(app, fsc, cache):
             peaklist.loc[row['ChEBI Name'], 'rt_max'] = 15
             peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
 
-        peaklist.to_csv( T.get_peaklist_fn( wdir ))
-        print(peaklist)
+        T.write_peaklist( peaklist, wdir)
+        
         return 'Metabolites added.'
 
         
