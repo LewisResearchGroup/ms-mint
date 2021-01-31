@@ -156,7 +156,8 @@ def callbacks(app, fsc, cache):
                 df.loc[ndxs, column] = value
             elif action == 'Create column': df[value] = ''
             elif action == 'Delete column': del df[column]
-        df.to_csv(fn, index=False)
+        with T.lock(fn):
+            df.to_csv(fn, index=False)
         if prop_id == 'meta-table.cellEdited':
             raise PreventUpdate
         return 'Data saved.'
@@ -173,5 +174,6 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
         fn = T.get_metadata_fn( wdir )
         df = pd.DataFrame(data)
-        df.to_csv(fn, index=False)
+        with T.lock(fn):
+            df.to_csv(fn, index=False)
     
