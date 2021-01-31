@@ -416,6 +416,7 @@ def callbacks(app, fsc, cache):
 
 
 def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir, title):
+    plt.close()
     plt.figure(figsize=(4,2.5))
     y_max = 0 
     for fn in ms_files:
