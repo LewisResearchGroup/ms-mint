@@ -63,7 +63,9 @@ _layout = html.Div([
         value=None
     ),
     dcc.Loading( dcc.Graph('pko-figure') ),
-    dcc.Checklist(id='pko-figure-options', options=[{'value': 'log','label': 'Logarithmic y-scale'}], value=[]),
+    dcc.Checklist(id='pko-figure-options', 
+                  options=[{'value': 'log','label': 'Logarithmic y-scale'}], 
+                  value=[]),
     dcc.Markdown(id='pko-set-rt-output'),
     dcc.Markdown(id='pko-confirm-rt-output'),
 
@@ -76,7 +78,7 @@ _layout = html.Div([
         html.Button('<< Previous', id='pko-prev'), 
         html.Button('Suggest', id='pko-suggest-next'),
         html.Button('Next >>', id='pko-next')],
-        style={'text-align': 'center', 'margin': 'auto', 'margin-top': '10%'}),
+            style={'text-align': 'center', 'margin': 'auto', 'margin-top': '10%'}),
     html.Div(id='pko-image-clicked-output'),
     html.Div(id='pko-delete-output')
 ])
@@ -93,7 +95,8 @@ def layout():
 
 
 def callbacks(app, fsc, cache):
-        
+
+
     @app.callback(
     Output('pko-dropdown', 'options'),
     Input('tab', 'value'),
@@ -137,9 +140,12 @@ def callbacks(app, fsc, cache):
         elif ms_selection == 'all':
             ms_files = T.get_ms_fns(wdir)
 
+        cols = ['mz_mean', 'mz_width', 'rt', 
+                'rt_min', 'rt_max', 'peak_label']
+
         peak_label_ndx = peak_label_ndx % len(peaklist)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
-            peaklist.loc[peak_label_ndx, ['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max', 'peak_label']]
+            peaklist.loc[peak_label_ndx, cols]
 
         if (rt_min is None) or np.isnan(rt_min): rt_min = rt-0.2
         if (rt_max is None) or np.isnan(rt_max): rt_max = rt+0.2
@@ -239,14 +245,15 @@ def callbacks(app, fsc, cache):
         rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
         
         image_label = f'{peak_label}_{rt_min}_{rt_max}'
-        _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, label=image_label, format='png')
+
+        _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, 
+            label=image_label, format='png')
         
         rt = np.mean([rt_min, rt_max])
         T.update_peaklist(wdir, peak_label, rt=rt)
         if os.path.isfile(fn): os.remove(fn)
 
         return f'Set RT span to ({rt_min},{rt_max})'
-
 
 
     @app.callback(
@@ -259,9 +266,14 @@ def callbacks(app, fsc, cache):
         State('pko-dropdown', 'options'),
         State('wdir', 'children')
     )
-    def pko_prev_next_suggest(n_prev, n_suggest, n_next, image_clicked, value, options, wdir):
-        if n_prev is None and n_next is None and image_clicked is None and n_suggest is None:
-            raise PreventUpdate
+    def pko_prev_next_suggest(n_prev, n_suggest, n_next, image_clicked, 
+            value, options, wdir):
+        if n_prev is None\
+            and n_next is None \
+            and image_clicked is None\
+            and n_suggest is None:
+                raise PreventUpdate
+
         prop_id = dash.callback_context.triggered[0]['prop_id']        
 
         if prop_id.startswith('pko-suggest'):
@@ -281,6 +293,7 @@ def callbacks(app, fsc, cache):
         elif prop_id.startswith('pko-next'):
             return (value + 1) % len(options)
 
+
     #@app.callback(
     #    Output('pko-creating-chromatograms', 'children'),
     #    Input('tab', 'value'),
@@ -292,7 +305,6 @@ def callbacks(app, fsc, cache):
         ms_files = T.get_ms_fns_for_peakopt(wdir)
         peaklist = T.get_peaklist(wdir)
         T.Chromatograms(peaklist=peaklist, ms_files=ms_files, wdir=wdir).create_all()
-
 
 
     @app.callback(
@@ -331,14 +343,17 @@ def callbacks(app, fsc, cache):
         images = []
         for i, (peak_label, row) in tqdm( enumerate( peaklist.iterrows() ), total=n_total):
             fsc.set('progress', int(100*(i+1) / n_total ))
-            mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
+            mz_mean, mz_width, rt, rt_min, rt_max = \
+                row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
 
             if np.isnan(rt_min) or rt_min is None: rt_min = 0
             if np.isnan(rt_max) or rt_max is None: rt_max = 15
 
             image_label = f'{peak_label}_{rt_min}_{rt_max}'
 
-            _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, label=image_label, format='png')
+            _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, 
+                label=image_label, format='png')
+
             if not os.path.isfile( fn ) or regenerate:
 
                 create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
@@ -351,14 +366,19 @@ def callbacks(app, fsc, cache):
             _id = {'index': peak_label, 'type': 'image'}
             image_id = f'image-{i}'
             images.append(
-                html.A(id=_id, children=html.Img(src=src, height=300, id=image_id, style={'margin': '10px'}))
+                html.A(id=_id, 
+                children=html.Img(src=src, height=300, id=image_id, 
+                    style={'margin': '10px'}))
             )
-            images.append( dbc.Tooltip(peak_label, target=image_id, style={'font-size': '50'}) )
+            images.append( 
+                dbc.Tooltip(peak_label, target=image_id, style={'font-size': '50'})
+            )
         return images
 
 
     @app.callback(
         Output('pko-image-clicked-output', 'children'),
+        # Input needs brakets to make prevent_initital_call work
         [Input({'type': 'image', 'index': ALL}, 'n_clicks')],
         prevent_initial_call=True
         )
@@ -371,6 +391,7 @@ def callbacks(app, fsc, cache):
         if len( dash.callback_context.triggered) > 1: raise PreventUpdate
         print('Clicked:', clicked)
         return clicked
+
 
     @app.callback(
         Output('pko-delete-output', 'children'),
@@ -386,6 +407,7 @@ def callbacks(app, fsc, cache):
         peaklist = peaklist.drop( peak_label, axis=0 )
         T.write_peaklist(peaklist, wdir)
         return f'{peak_label} removed from peaklist.'  
+
 
     @app.callback(
         Output('pko-find-largest-peak-output', 'children'),
@@ -415,7 +437,8 @@ def callbacks(app, fsc, cache):
 
 
 
-def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, rt_min, rt_max, image_label, wdir, title):
+def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
+        rt_min, rt_max, image_label, wdir, title):
     plt.close()
     plt.figure(figsize=(4,2.5))
     y_max = 0 
