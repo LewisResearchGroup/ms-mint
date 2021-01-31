@@ -140,7 +140,7 @@ def callbacks(app, fsc, cache):
     )
     def ms_order_options(tab, wdir):
         if not tab == 'heatmap': raise PreventUpdate
-        cols = T.get_metadata(wdir).dropna(how='all', axis=1).columns
+        cols = T.get_metadata(wdir).dropna(how='all', axis=0).columns
         if 'index' in cols: cols.remove('index')
         options = [{'value':i, 'label': i} for i in cols]
         return options
