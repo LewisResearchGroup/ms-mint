@@ -273,7 +273,8 @@ def get_metadata(wdir):
     if not os.path.isdir( fn_path ):
         os.makedirs( fn_path )
     if os.path.isfile(fn):
-        df = pd.read_csv( fn ).reset_index()
+        with lock(fn):
+            df = pd.read_csv( fn )
         if 'MS-file' not in df.columns:
             df = None
     if df is None or len(df) == 0:
