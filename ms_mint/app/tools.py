@@ -14,6 +14,8 @@ from glob import glob
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+import matplotlib.cm as cm
 
 import ms_mint
 from ms_mint.io import ms_file_to_df
@@ -23,6 +25,12 @@ from ms_mint.tools import get_mz_mean_from_formulas
 
 from datetime import date
 from functools import lru_cache
+
+from filelock import Timeout, FileLock
+
+def lock(fn):
+    return FileLock(f'fn.lock', timeout=1)
+
 
 def today():
     return date.today().strftime('%y%m%d')
@@ -220,23 +228,29 @@ def get_peaklist(wdir):
     else: return None
 
 
-def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None):
+def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None, rt=None):
     peaklist = get_peaklist(wdir)
 
     if isinstance(peak_label, str):
-        if not np.isnan(rt_min):
+        if rt_min is not None and not np.isnan(rt_min):
             peaklist.loc[peak_label, 'rt_min'] = rt_min
-        if not np.isnan(rt_max):
+        if rt_max is not None and not np.isnan(rt_max):
             peaklist.loc[peak_label, 'rt_max'] = rt_max
+        if rt is not None and not np.isnan(rt):
+            peaklist.loc[peak_label, 'rt'] = rt
 
     if isinstance(peak_label, int):
         peaklist = peaklist.reset_index()
-        if not np.isnan(rt_min):
+        if rt_min is not None and not np.isnan(rt_min):
             peaklist.loc[peak_label, 'rt_min'] = rt_min
-        if not np.isnan(rt_max):
+        if rt_max is not None and not np.isnan(rt_max):
             peaklist.loc[peak_label, 'rt_max'] = rt_max
+        if rt is not None and not np.isnan(rt):
+            peaklist.loc[peak_label, 'rt'] = rt
         peaklist = peaklist.set_index('peak_label')
-    peaklist.to_csv(get_peaklist_fn(wdir))
+    fn = get_peaklist_fn(wdir)
+    with lock(fn):
+        peaklist.to_csv(fn)
 
 
 def get_results_fn(wdir):
@@ -365,7 +379,7 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=F
               "headerFilter":False,  
               "formatter": "tickCross", 
               'width': '6px', 
-              "headerSort": False,
+              "headerSort": True,
               "hozAlign": "center",
               "editor": True
             })
@@ -427,7 +441,8 @@ def savefig(kind=None, wdir=None, label=None, format='png', dpi=150):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
     try:
-        plt.savefig(fn, dpi=dpi, bbox_inches='tight')
+        with lock(fn):
+            plt.savefig(fn, dpi=dpi, bbox_inches='tight')
     except:
         print(f'Could not save figure {fn}, maybe no figure was created.')
     return fn
@@ -450,3 +465,16 @@ def get_ms_fns_for_peakopt(wdir):
     print(df.PeakOpt.sum(), len(fns))
     return [ os.path.join( get_ms_dirname(wdir), fn) for fn in fns]
 
+
+def float_to_color(x, vmin=0, vmax=2, cmap=None):
+    norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+    m = cm.ScalarMappable(norm=norm, cmap=cmap)
+    return m.to_rgba(x)
+
+
+def write_peaklist(peaklist, wdir):
+    fn = get_peaklist_fn( wdir )
+    if 'peak_label' in peaklist.columns:
+        peaklist = peaklist.set_index('peak_label')
+    with lock(fn):
+        peaklist.to_csv( fn)

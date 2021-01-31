@@ -64,7 +64,10 @@ class Mint(object):
         if peak_labels is None:
             peak_labels = self.peaklist.peak_label.values
         peaklist = self.peaklist
-        for ndx, row in tqdm( peaklist.iterrows(), total=len(peaklist) ):
+        n_peaks = len(peaklist)
+        for i, (ndx, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
+            progress = int(100*(i+1)/n_peaks)
+            if self.progress_callback is not None: self.progress_callback(progress)
             peak_label = row['peak_label']
             if peak_label not in peak_labels:
                 continue
@@ -75,7 +78,6 @@ class Mint(object):
                 chrom = extract_chromatogram_from_ms1(df, mz_mean=mz_mean, mz_width=mz_width)
                 chromatograms.append(chrom)
             rt_min, rt_max = RetentionTimeOptimizer(**kwargs).find_largest_peak(chromatograms)
-            print(rt_min, rt_max)
             self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
             
 

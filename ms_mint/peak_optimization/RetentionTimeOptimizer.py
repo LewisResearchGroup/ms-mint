@@ -12,7 +12,6 @@ class RetentionTimeOptimizer():
                  how='largest', dt=0.01, show_figure=False):
         self.t_peaks = None
         self.x_peaks = None
-        self.peak_width_half = None
         self.peak_width_bottom = None
         self.rt_max = rt_max
         self.rt_min = rt_min
@@ -28,11 +27,9 @@ class RetentionTimeOptimizer():
         ndx_peaks, _ = find_peaks(x, prominence=(prominence, None))
         t_peaks = chrom.iloc[ndx_peaks].index
         x_peaks = chrom.iloc[ndx_peaks].values
-        results_half  = peak_widths(x, ndx_peaks, rel_height=.5)
-        results_bottom  = peak_widths(x, ndx_peaks, rel_height=0.85)
+        results_bottom  = peak_widths(x, ndx_peaks, rel_height=0.90)
         self.t_peaks = t_peaks
         self.x_peaks = x_peaks
-        self.peak_width_half = results_half
         self.peak_width_bottom = results_bottom
         
     def ndx_largest_peak(self):
