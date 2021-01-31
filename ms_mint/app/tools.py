@@ -58,8 +58,9 @@ def parse_ms_files(contents, filename, date, target_dir):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     fn_abs = os.path.join(target_dir, filename)
-    with open(fn_abs, 'wb') as file:
-        file.write(decoded)
+    with lock(fn_abs):
+        with open(fn_abs, 'wb') as file:
+            file.write(decoded)
     new_fn = convert_ms_file_to_feather(fn_abs)
     print(f'Convert {fn_abs} to {new_fn}')
     if os.path.isfile(new_fn): os.remove(fn_abs)
@@ -189,8 +190,10 @@ def create_chromatograms(ms_files, peaklist, wdir):
                 create_chromatogram(fn, mz_mean, mz_width, fn_chro)
 
 
-def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
+def create_chromatogram(ms_file, mz_mean, mz_width, fn_out, verbose=False):
+    if verbose: print('Creating chromatogram')
     df = ms_file_to_df(ms_file)
+    if verbose: print('...file read')
     dirname = os.path.dirname(fn_out)
     if not os.path.isdir(dirname): os.makedirs(dirname)
     dmz = mz_mean*1e-6*mz_width
@@ -198,6 +201,7 @@ def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
     chrom['retentionTime'] = chrom['retentionTime'].round(3)
     chrom = chrom.groupby('retentionTime').max().reset_index()
     chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
+    if verbose:print('...done creating chromatogram.')
     return chrom
 
 
@@ -248,6 +252,7 @@ def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None, rt=None):
         if rt is not None and not np.isnan(rt):
             peaklist.loc[peak_label, 'rt'] = rt
         peaklist = peaklist.set_index('peak_label')
+
     fn = get_peaklist_fn(wdir)
     with lock(fn):
         peaklist.to_csv(fn)
@@ -273,8 +278,7 @@ def get_metadata(wdir):
     if not os.path.isdir( fn_path ):
         os.makedirs( fn_path )
     if os.path.isfile(fn):
-        with lock(fn):
-            df = pd.read_csv( fn )
+        df = pd.read_csv( fn )
         if 'MS-file' not in df.columns:
             df = None
     if df is None or len(df) == 0:
@@ -408,7 +412,7 @@ def parse_table_content(content, filename):
     return df
 
 
-def fig_to_src(dpi=100):
+def fig_to_src(dpi=30):
     out_img = io.BytesIO()
     plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
     plt.close('all')
@@ -442,8 +446,7 @@ def savefig(kind=None, wdir=None, label=None, format='png', dpi=150):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
     try:
-        with lock(fn):
-            plt.savefig(fn, dpi=dpi, bbox_inches='tight')
+        plt.savefig(fn, dpi=dpi, bbox_inches='tight')
     except:
         print(f'Could not save figure {fn}, maybe no figure was created.')
     return fn
@@ -477,5 +480,7 @@ def write_peaklist(peaklist, wdir):
     fn = get_peaklist_fn( wdir )
     if 'peak_label' in peaklist.columns:
         peaklist = peaklist.set_index('peak_label')
+    print('Write peaklist:', fn)
+    print(peaklist)
     with lock(fn):
         peaklist.to_csv(fn)
