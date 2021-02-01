@@ -46,3 +46,8 @@ def test__generate_grid_peaklist():
         [115], .1, intensity_threshold=1000
     )
     assert peaklist is not None
+
+
+def test__read_peaklist__compound_formula():
+    fn = 'tests/data/peaklists/compound,formula.csv'
+    peaklists.read_peaklists(fn)

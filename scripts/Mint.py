@@ -95,8 +95,10 @@ if __name__ == '__main__':
     if args.serve_path is not None:
         os.environ['MINT_SERVE_PATH'] = args.serve_path
 
-    from ms_mint.app.app import app
+    print('Loading app...')
 
+    from ms_mint.app.app import app
+    
     if args.debug:
         app.run_server(debug=args.debug, port=args.port, 
             dev_tools_hot_reload_interval=3000,

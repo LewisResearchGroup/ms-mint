@@ -31,7 +31,7 @@ meta_table = html.Div(id='meta-table-container',
     style={'min-height':  100, 'margin': '0%'},
     children=[
         DashTabulator(id='meta-table',
-            columns=T.gen_tabulator_columns(), 
+            columns=T.gen_tabulator_columns(add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), 
             options=options,
             downloadButtonType=downloadButtonType,
             clearFilterButtonType=clearFilterButtonType
@@ -85,6 +85,7 @@ _layout = html.Div([
     ], style={'margin-left': '5px'}),
 
     html.Div(id='meta-apply-output'),
+    html.Div(id='meta-table-saved-on-edit-output'),
     dcc.Markdown('---'),    
     dcc.Loading( meta_table ),
 ])
@@ -112,13 +113,14 @@ def callbacks(app, fsc, cache):
             metadata = T.merge_metadata(metadata, contents)
         columns = [{'label':col, 'value':col} for col in metadata.columns if col != 'index']
         if 'index' not in metadata.columns: metadata = metadata.reset_index()
-        return metadata.to_dict('records'), T.gen_tabulator_columns(metadata.columns), columns
+        return metadata.to_dict('records'), T.gen_tabulator_columns(metadata.columns,
+            add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), columns
 
 
     @app.callback(
     Output('meta-apply-output', 'children'),
     Input('meta-apply', 'n_clicks'),
-    Input('meta-table', 'cellEdited'),
+    #Input('meta-table', 'cellEdited'),
     State('meta-table', 'multiRowsClicked'),
     State('meta-table', 'data'),
     State('meta-table', 'dataFiltered'),
@@ -127,8 +129,8 @@ def callbacks(app, fsc, cache):
     State('meta-input', 'value'),
     State('wdir', 'children'),
     )
-    def meta_save(n_clicks, edited_cell, selected_rows, data, 
-                data_filtered, action, column, value, wdir):
+    def meta_save(n_clicks, selected_rows, data, 
+                  data_filtered, action, column, value, wdir):
         if data is None or len(data) == 0:
             raise PreventUpdate
         prop_id = dash.callback_context.triggered[0]['prop_id']
@@ -138,7 +140,6 @@ def callbacks(app, fsc, cache):
             df = df.set_index('index')
         else:
             df = df.reset_index()
-
         if prop_id == 'meta-apply.n_clicks':
             if action == 'Set':
                 filtered_rows = [r for r in data_filtered['rows'] if r is not None]
@@ -155,8 +156,24 @@ def callbacks(app, fsc, cache):
                 df.loc[ndxs, column] = value
             elif action == 'Create column': df[value] = ''
             elif action == 'Delete column': del df[column]
-        
-        df.to_csv(fn, index=False)
+        with T.lock(fn):
+            df.to_csv(fn, index=False)
         if prop_id == 'meta-table.cellEdited':
             raise PreventUpdate
         return 'Data saved.'
+
+    
+    @app.callback(
+        Output('meta-table-saved-on-edit-output', 'children'),
+        Input('meta-table', 'cellEdited'),
+        State('meta-table', 'data'),
+        State('wdir', 'children'),
+    )
+    def save_table_on_edit(cell_edited, data, wdir):
+        if data is None or cell_edited is None:
+            raise PreventUpdate
+        fn = T.get_metadata_fn( wdir )
+        df = pd.DataFrame(data)
+        with T.lock(fn):
+            df.to_csv(fn, index=False)
+    

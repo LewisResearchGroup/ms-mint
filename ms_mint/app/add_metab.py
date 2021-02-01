@@ -40,7 +40,7 @@ chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Monoisotopic Mass', 'Synonyms', 'KEGG COMPOUND Database Links', 'SMILES']]
 
 
-columns = T.gen_tabulator_columns(chcbi_data.columns, add_color_col=False, add_ms_file_col=False, editor=None, col_width='auto')
+columns = T.gen_tabulator_columns(chcbi_data.columns, editor=None, col_width='auto')
 
 
 add_metab_table = html.Div(id='add-metab-table-container', 
@@ -108,8 +108,8 @@ def callbacks(app, fsc, cache):
             peaklist.loc[row['ChEBI Name'], 'rt_max'] = 15
             peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
 
-        peaklist.to_csv( T.get_peaklist_fn( wdir ))
-        print(peaklist)
+        T.write_peaklist( peaklist, wdir)
+        
         return 'Metabolites added.'
 
         

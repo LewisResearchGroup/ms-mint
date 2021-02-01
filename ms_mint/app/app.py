@@ -22,8 +22,8 @@ from flask_caching import Cache
 
 from . import tools as T
 
-from . import ms_files
 from . import workspaces
+from . import ms_files
 from . import metadata
 from . import peaklist
 from . import peak_optimization
@@ -32,7 +32,8 @@ from . import heatmap
 from . import run_mint
 from . import add_metab
 
-from dash_uploader import configure_upload
+import dash_uploader as du
+from tempfile import gettempdir
 
 def make_dirs():
     tmpdir = tempfile.gettempdir()
@@ -80,8 +81,10 @@ app = dash.Dash(__name__,
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 
-UPLOAD_FOLDER_ROOT = "/tmp"
-configure_upload(app, UPLOAD_FOLDER_ROOT)
+
+UPLOAD_FOLDER_ROOT = gettempdir()
+du.configure_upload(app, UPLOAD_FOLDER_ROOT)
+
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
@@ -93,7 +96,7 @@ app.title = 'MINT'
 app.config['suppress_callback_exceptions'] = True
 
 app.layout = html.Div([
-    
+    html.Img(src=app.get_asset_url('logo.png'), style={'height': '30px'}),
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
     html.A(href='https://soerendip.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right'})],
@@ -108,7 +111,8 @@ app.layout = html.Div([
     html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
     html.P('Current Workspace: ', style={'display': 'inline-block', 'margin-right': '5px'}),
     html.Div(id='active-workspace', style={'display': 'inline-block'}),
-    html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'hidden'}),
+    html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'visible', 'float': 'right'}),
+    html.Div(id='pko-creating-chromatograms'),
     dcc.Tabs(id='tab', value='workspaces',  #vertical=True, style={'display': 'inline-block'},
         children=[
             dcc.Tab(value=key, 
