@@ -45,7 +45,8 @@ def standardize_peaklist(peaklist, ms_mode='neutral'):
     peaklist = peaklist.rename(columns=DEPRECATED_LABELS)
     assert pd.value_counts(peaklist.columns).max() == 1, pd.value_counts( peaklist.columns )
     cols = peaklist.columns
-    if 'formula' in peaklist.columns and not 'mz_mean':
+    print(peaklist)
+    if 'formula' in peaklist.columns and not 'mz_mean' in peaklist.columns:
         peaklist['mz_mean'] = get_mz_mean_from_formulas(peaklist['formula'], ms_mode)    
     if 'intensity_threshold' not in cols:
         peaklist['intensity_threshold'] = 0
