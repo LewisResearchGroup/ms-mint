@@ -1,6 +1,5 @@
 import os
 import shutil
-import time
 import uuid
 
 from glob import glob

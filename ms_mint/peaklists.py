@@ -46,7 +46,7 @@ def standardize_peaklist(peaklist, ms_mode='neutral'):
     assert pd.value_counts(peaklist.columns).max() == 1, pd.value_counts( peaklist.columns )
     cols = peaklist.columns
     if 'formula' in peaklist.columns and not 'mz_mean':
-        df['mz_mean'] = get_mz_mean_from_formulas(peaklist['formula'], ms_mode)    
+        peaklist['mz_mean'] = get_mz_mean_from_formulas(peaklist['formula'], ms_mode)    
     if 'intensity_threshold' not in cols:
         peaklist['intensity_threshold'] = 0
     if 'mz_width' not in cols:
