@@ -9,10 +9,12 @@ from ..Resampler import Resampler
 
 class RetentionTimeOptimizer():
     def __init__(self, rt_min=None, rt_max=None, rt_expected=None, 
-                 how='largest', dt=0.01, show_figure=False):
+                 how='largest', dt=0.01, show_figure=False, precission=3
+                 
+                 
+                 ):
         self.t_peaks = None
         self.x_peaks = None
-        self.peak_width_half = None
         self.peak_width_bottom = None
         self.rt_max = rt_max
         self.rt_min = rt_min
@@ -22,17 +24,16 @@ class RetentionTimeOptimizer():
         self.dt = dt
         self.resampler = Resampler()
         self.show_figure = show_figure
+        self.precission = precission
 
     def find_peaks_and_widths(self, chrom, prominence=1000):
         x = chrom.values
         ndx_peaks, _ = find_peaks(x, prominence=(prominence, None))
         t_peaks = chrom.iloc[ndx_peaks].index
         x_peaks = chrom.iloc[ndx_peaks].values
-        results_half  = peak_widths(x, ndx_peaks, rel_height=.5)
-        results_bottom  = peak_widths(x, ndx_peaks, rel_height=0.85)
+        results_bottom  = peak_widths(x, ndx_peaks, rel_height=0.90)
         self.t_peaks = t_peaks
         self.x_peaks = x_peaks
-        self.peak_width_half = results_half
         self.peak_width_bottom = results_bottom
         
     def ndx_largest_peak(self):
@@ -83,7 +84,7 @@ class RetentionTimeOptimizer():
         rt_max = estimate_expectation_value(df.rt_max)
         if self.show_figure:
             plt.vlines([rt_min, rt_max], 0, np.max(df.max_intensity), label='Selected RT range', color='k', ls='--')
-        return rt_min, rt_max
+        return np.round(rt_min, self.precission), np.round(rt_max, self.precission)
     
     def get_peak_start_timee(self, ndx):
         return self.x_to_t(self.peak_width_bottom[2][ndx])[0]

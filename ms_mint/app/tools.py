@@ -14,14 +14,20 @@ from glob import glob
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+import matplotlib.cm as cm
 
 import ms_mint
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
-from ms_mint.tools import get_mz_mean_from_formulas
 
 from datetime import date
+
+from filelock import FileLock
+
+def lock(fn):
+    return FileLock(f'{fn}.lock', timeout=1)
 
 
 def today():
@@ -50,8 +56,9 @@ def parse_ms_files(contents, filename, date, target_dir):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     fn_abs = os.path.join(target_dir, filename)
-    with open(fn_abs, 'wb') as file:
-        file.write(decoded)
+    with lock(fn_abs):
+        with open(fn_abs, 'wb') as file:
+            file.write(decoded)
     new_fn = convert_ms_file_to_feather(fn_abs)
     print(f'Convert {fn_abs} to {new_fn}')
     if os.path.isfile(new_fn): os.remove(fn_abs)
@@ -61,9 +68,7 @@ def parse_pkl_files(contents, filename, date, target_dir, ms_mode=None):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-    if ('formula' in df.columns) and (not 'mz_mean' in df.columns):
-        df['mz_mean'] = get_mz_mean_from_formulas(df['formula'], ms_mode)
-    df = standardize_peaklist(df)
+    df = standardize_peaklist(df, ms_mode=ms_mode)
     df = df.drop_duplicates()
     return df
 
@@ -138,6 +143,40 @@ def get_workspaces(tmpdir):
     return get_dirnames( ws_path )
 
 
+class Chromatograms():
+    def __init__(self, wdir, peaklist, ms_files, progress_callback=None):
+        self.wdir = wdir
+        self.peaklist = peaklist
+        self.ms_files = ms_files
+        self.n_peaks = len(peaklist)
+        self.n_files = len(ms_files)
+        print(self.n_peaks, self.n_files)
+        self.progress_callback = progress_callback
+
+    def create_all(self):
+        for fn in tqdm( self.ms_files ):
+            self.create_all_for_ms_file(fn)
+        return self
+
+    def create_all_for_ms_file(self, ms_file: str):
+        fn = ms_file
+        df = ms_file_to_df(fn)
+        for ndx, row in self.peaklist.iterrows():
+            mz_mean, mz_width = row[['mz_mean', 'mz_width']]
+            fn_chro = get_chromatogram_fn(fn, mz_mean, mz_width, self.wdir)
+            if os.path.isfile(fn_chro): continue
+            dirname = os.path.dirname(fn_chro)
+            if not os.path.isdir(dirname): os.makedirs(dirname)
+            dmz = mz_mean*1e-6*mz_width
+            chrom = df[(df['m/z array']-mz_mean).abs()<=dmz]
+            chrom['retentionTime'] = chrom['retentionTime'].round(3)
+            chrom = chrom.groupby('retentionTime').max().reset_index()
+            chrom[['retentionTime', 'intensity array']].to_feather(fn_chro)
+
+    def get_single(self, mz_mean, mz_width, ms_file):
+        return get_chromatogram(ms_file, mz_mean, mz_width, self.wdir)      
+    
+
 def create_chromatograms(ms_files, peaklist, wdir):
     for fn in tqdm(ms_files):
         fn_out = os.path.basename(fn)
@@ -150,8 +189,10 @@ def create_chromatograms(ms_files, peaklist, wdir):
                 create_chromatogram(fn, mz_mean, mz_width, fn_chro)
 
 
-def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
+def create_chromatogram(ms_file, mz_mean, mz_width, fn_out, verbose=False):
+    if verbose: print('Creating chromatogram')
     df = ms_file_to_df(ms_file)
+    if verbose: print('...file read')
     dirname = os.path.dirname(fn_out)
     if not os.path.isdir(dirname): os.makedirs(dirname)
     dmz = mz_mean*1e-6*mz_width
@@ -159,6 +200,7 @@ def create_chromatogram(ms_file, mz_mean, mz_width, fn_out):
     chrom['retentionTime'] = chrom['retentionTime'].round(3)
     chrom = chrom.groupby('retentionTime').max().reset_index()
     chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
+    if verbose:print('...done creating chromatogram.')
     return chrom
 
 
@@ -174,7 +216,7 @@ def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
 def get_chromatogram_fn(ms_file, mz_mean, mz_width, wdir):
     ms_file = os.path.basename(ms_file)
     base, _ = os.path.splitext(ms_file)
-    fn = os.path.join(wdir, 'chromato', f'{mz_mean}-{mz_width}'.replace('.', '_'), base, '.feather')
+    fn = os.path.join(wdir, 'chromato', f'{mz_mean}-{mz_width}'.replace('.', '_'), base)+'.feather'
     return fn
 
 
@@ -189,23 +231,30 @@ def get_peaklist(wdir):
     else: return None
 
 
-def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None):
+def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None, rt=None):
     peaklist = get_peaklist(wdir)
 
     if isinstance(peak_label, str):
-        if not np.isnan(rt_min):
+        if rt_min is not None and not np.isnan(rt_min):
             peaklist.loc[peak_label, 'rt_min'] = rt_min
-        if not np.isnan(rt_max):
+        if rt_max is not None and not np.isnan(rt_max):
             peaklist.loc[peak_label, 'rt_max'] = rt_max
+        if rt is not None and not np.isnan(rt):
+            peaklist.loc[peak_label, 'rt'] = rt
 
     if isinstance(peak_label, int):
         peaklist = peaklist.reset_index()
-        if not np.isnan(rt_min):
+        if rt_min is not None and not np.isnan(rt_min):
             peaklist.loc[peak_label, 'rt_min'] = rt_min
-        if not np.isnan(rt_max):
+        if rt_max is not None and not np.isnan(rt_max):
             peaklist.loc[peak_label, 'rt_max'] = rt_max
+        if rt is not None and not np.isnan(rt):
+            peaklist.loc[peak_label, 'rt'] = rt
         peaklist = peaklist.set_index('peak_label')
-    peaklist.to_csv(get_peaklist_fn(wdir))
+
+    fn = get_peaklist_fn(wdir)
+    with lock(fn):
+        peaklist.to_csv(fn)
 
 
 def get_results_fn(wdir):
@@ -221,18 +270,38 @@ def get_results( wdir ):
 
 def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
+    fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
-    ms_files = pd.DataFrame([{'MS-file': Basename(fn) } for fn in ms_files])    
+    ms_files = [ os.path.basename(fn) for fn in ms_files ]
+    df = None
+    if not os.path.isdir( fn_path ):
+        os.makedirs( fn_path )
     if os.path.isfile(fn):
-        df = pd.read_csv( fn ).reset_index()
-    else:
-        df = ms_files
-        df['Label'] = ''
-        df['Type'] = 'Biological Sample'
-        df['Run Order'] = ''
-        df['Batch'] = ''
-        df['Row'] = ''
-        df['Column'] = ''
+        df = pd.read_csv( fn )
+        if 'MS-file' not in df.columns:
+            df = None
+    if df is None or len(df) == 0:
+        df = init_metadata( ms_files )
+    assert 'MS-file' in df.columns, df
+    df = df.set_index('MS-file').reindex(ms_files).reset_index()
+    df['MS-file'] = df['MS-file'].apply(os.path.basename)
+    if 'PeakOpt' not in df.columns:
+        df['PeakOpt'] = False
+    else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
+    return df
+
+
+def init_metadata( ms_files ):
+    print('Init metadata')
+    ms_files = list(ms_files)
+    df = pd.DataFrame({'MS-file': ms_files})
+    df['Label'] = ''
+    df['Type'] = 'Biological Sample'
+    df['Run Order'] = ''
+    df['Batch'] = ''
+    df['Row'] = ''
+    df['Column'] = ''
+    df['PeakOpt'] = ''
     return df
 
 
@@ -241,8 +310,13 @@ def get_metadata_fn(wdir):
     return fn
 
 
+def get_ms_dirname( wdir):
+    return os.path.join(wdir, 'ms_files')
+
+
 def get_ms_fns(wdir):
-    fns = glob(os.path.join(wdir, 'ms_files', '*.feather'))
+    path = get_ms_dirname( wdir )
+    fns = glob(os.path.join(path, '*.*'))
     return fns
 
     
@@ -255,23 +329,31 @@ def Basename(fn):
 def get_complete_results( wdir ):
     meta = get_metadata( wdir )
     resu = get_results( wdir )
+    assert 'MS-file' in resu.columns, resu
+    assert 'MS-file' in meta.columns, meta
+    print(len(resu), len(meta))
     resu['MS-file'] = [ Basename(fn) for fn in resu['MS-file']]
+    meta['MS-file'] = [ Basename(fn) for fn in meta['MS-file']]
     df = pd.merge(meta, resu, on='MS-file')
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
     return df
 
 
-def gen_tabulator_columns(col_names=None, add_ms_file_col=True, add_color_col=True, col_width='12px', editor='input'):
+def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=False, 
+                          add_peakopt_col=False,
+                          col_width='12px', editor='input'):
+
     if col_names is None: col_names = []
     col_names = list(col_names)
+
+    standard_columns = ['MS-file', 'Color', 'index', 'PeakOpt']
+    for col in standard_columns:
+        if col in col_names: col_names.remove(col)
     
-    if 'MS-file' in col_names: col_names.remove('MS-file')
-    if 'Color' in col_names: col_names.remove('Color')
-    if 'index' in col_names: col_names.remove('index')
 
     columns = [
             { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
-            "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
+              "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
 
     if add_ms_file_col:
         columns.append(
@@ -294,6 +376,18 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=True, add_color_col=Tr
               "headerSort": False
             })
     
+    if add_peakopt_col:
+        columns.append(
+            { 'title': 'PeakOpt', 
+              'field': 'PeakOpt', 
+              "headerFilter":False,  
+              "formatter": "tickCross", 
+              'width': '6px', 
+              "headerSort": True,
+              "hozAlign": "center",
+              "editor": True
+            })
+
     for col in col_names:
         content = { 'title': col, 
                     'field': col, 
@@ -318,7 +412,7 @@ def parse_table_content(content, filename):
 
 
 def fig_to_src(dpi=100):
-    out_img = io.BytesIO()   
+    out_img = io.BytesIO()
     plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
     plt.close('all')
     out_img.seek(0)  # rewind file
@@ -347,15 +441,45 @@ def clean_string(fn: str):
     return fn
 
 
-def savefig(kind, wdir, label, format='svg'):
+def savefig(kind=None, wdir=None, label=None, format='png', dpi=150):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
     try:
-        plt.savefig(fn)
+        plt.savefig(fn, dpi=dpi, bbox_inches='tight')
     except:
         print(f'Could not save figure {fn}, maybe no figure was created.')
+    return fn
 
 
 def maybe_create(dir_name):
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
+
+
+def png_fn_to_src(fn):
+    encoded_image = base64.b64encode(open(fn, 'rb').read())
+    return 'data:image/png;base64,{}'.format(encoded_image.decode())
+
+
+def get_ms_fns_for_peakopt(wdir):
+    df = get_metadata( wdir )
+    assert 'MS-file' in df.columns, df
+    fns = df[df.PeakOpt.astype(bool) == True]['MS-file']
+    print(df.PeakOpt.sum(), len(fns))
+    return [ os.path.join( get_ms_dirname(wdir), fn) for fn in fns]
+
+
+def float_to_color(x, vmin=0, vmax=2, cmap=None):
+    norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+    m = cm.ScalarMappable(norm=norm, cmap=cmap)
+    return m.to_rgba(x)
+
+
+def write_peaklist(peaklist, wdir):
+    fn = get_peaklist_fn( wdir )
+    if 'peak_label' in peaklist.columns:
+        peaklist = peaklist.set_index('peak_label')
+    print('Write peaklist:', fn)
+    print(peaklist)
+    with lock(fn):
+        peaklist.to_csv(fn)
