@@ -9,7 +9,7 @@ from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
-from .processing import process_ms1_files_in_parallel, score_peaks, extract_chromatogram_from_ms1
+from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
 from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist

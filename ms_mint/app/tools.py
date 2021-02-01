@@ -21,12 +21,10 @@ import ms_mint
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
-from ms_mint.tools import get_mz_mean_from_formulas
 
 from datetime import date
-from functools import lru_cache
 
-from filelock import Timeout, FileLock
+from filelock import FileLock
 
 def lock(fn):
     return FileLock(f'{fn}.lock', timeout=1)
@@ -160,8 +158,9 @@ class Chromatograms():
             self.create_all_for_ms_file(fn)
         return self
 
-    def create_all_for_ms_file(self, ms_file):
-        df = ms_file_to_df(ms_file)
+    def create_all_for_ms_file(self, ms_file: str):
+        fn = ms_file
+        df = ms_file_to_df(fn)
         for ndx, row in self.peaklist.iterrows():
             mz_mean, mz_width = row[['mz_mean', 'mz_width']]
             fn_chro = get_chromatogram_fn(fn, mz_mean, mz_width, self.wdir)
@@ -175,7 +174,7 @@ class Chromatograms():
             chrom[['retentionTime', 'intensity array']].to_feather(fn_chro)
 
     def get_single(self, mz_mean, mz_width, ms_file):
-        return get_chromatogram(ms_file, mz_mean, mz_width, wdir)      
+        return get_chromatogram(ms_file, mz_mean, mz_width, self.wdir)      
     
 
 def create_chromatograms(ms_files, peaklist, wdir):

@@ -1,6 +1,4 @@
 import os
-import random
-import time
 import shutil
 
 from tqdm import tqdm
@@ -23,7 +21,6 @@ from dash.dependencies import Input, Output, State, ALL
 
 import plotly.graph_objects as go
 
-from ms_mint.Mint import Mint
 from ms_mint.peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer as RTOpt
 
 from . import tools as T
@@ -132,8 +129,6 @@ def callbacks(app, fsc, cache):
                    find_largest_peak, rt_set, ms_selection, wdir, fig):
         if peak_label_ndx is None:
             raise PreventUpdate
-        prop_id = dash.callback_context.triggered[0]['prop_id']
-
         peaklist = T.get_peaklist( wdir ).reset_index()
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt(wdir)
@@ -216,7 +211,7 @@ def callbacks(app, fsc, cache):
         T.write_peaklist( peaklist, wdir)
         return 'Peak optimization done.'
 
-
+    '''
     @app.callback(
         Output('pko-set-rt-output', 'children'),
         Input('pko-set-rt', 'n_clicks'),
@@ -231,6 +226,7 @@ def callbacks(app, fsc, cache):
         rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
         T.update_peaklist(wdir, peak_label, rt_min, rt_max)
         return f'Set RT span to ({rt_min},{rt_max})'
+    '''
 
     @app.callback(
         Output('pko-confirm-rt-output', 'children'),
@@ -405,7 +401,6 @@ def callbacks(app, fsc, cache):
     def plk_delete(n_clicks, peak_label, wdir):
         if n_clicks is None:
             raise PreventUpdate
-        fn = T.get_peaklist_fn( wdir )
         peaklist = T.get_peaklist( wdir ).reset_index()
         peaklist = peaklist.drop( peak_label, axis=0 )
         T.write_peaklist(peaklist, wdir)

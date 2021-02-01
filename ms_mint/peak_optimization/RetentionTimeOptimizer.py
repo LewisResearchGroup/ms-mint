@@ -9,7 +9,10 @@ from ..Resampler import Resampler
 
 class RetentionTimeOptimizer():
     def __init__(self, rt_min=None, rt_max=None, rt_expected=None, 
-                 how='largest', dt=0.01, show_figure=False, precission=3):
+                 how='largest', dt=0.01, show_figure=False, precission=3
+                 
+                 
+                 ):
         self.t_peaks = None
         self.x_peaks = None
         self.peak_width_bottom = None
