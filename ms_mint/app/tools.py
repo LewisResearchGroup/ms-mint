@@ -24,7 +24,7 @@ from ms_mint.io import convert_ms_file_to_feather
 
 from datetime import date
 
-from filelock import FileLock
+from .filelock import FileLock
 
 def lock(fn):
     return FileLock(f'{fn}.lock', timeout=1)

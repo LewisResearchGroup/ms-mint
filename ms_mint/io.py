@@ -27,14 +27,14 @@ def mzxml_to_pandas_df(fn):
     '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
-    file = mzxml.MzXML(fn)
-    while True:
-        try:
-            data = file.next()     
-            df = pd.DataFrame({col: np.array(data[col]) for col in cols} )
-            slices.append( df )
-        except:         
-            break  
+    with mzxml.MzXML(fn) as ms_data:
+        while True:
+            try:
+                data = ms_data.next()     
+                df = pd.DataFrame({col: np.array(data[col]) for col in cols} )
+                slices.append( df )
+            except:         
+                break
     df = pd.concat(slices)
     df['retentionTime'] =  df['retentionTime'].astype(np.float32)
     df['m/z array'] = df['m/z array'].astype(np.float32)
@@ -43,21 +43,21 @@ def mzxml_to_pandas_df(fn):
     return df
 
 
-def mzml_to_pandas_df(fn):
+def mzml_to_pandas_df_pyteomics(fn):
     '''
     Reads mzML file and returns a pandas.DataFrame.
     '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
-    file = mzml.MzML(fn)
-    while True:
-        try:
-            data = file.next()
-            data['retentionTime'] = data['scanList']['scan'][0]['scan time'] / 60
-            del data['scanList']
-            slices.append( pd.DataFrame(data) ) 
-        except:
-            break
+    with  mzml.MzML(fn) as ms_data:
+        while True:
+            try:
+                data = ms_data.next()
+                data['retentionTime'] = data['scanList']['scan'][0]['scan time'] / 60
+                del data['scanList']
+                slices.append( pd.DataFrame(data) ) 
+            except:
+                break
     df = pd.concat(slices)[cols]
     df_to_numeric(df)
     df['intensity array'] = df['intensity array'].astype(int)
@@ -66,23 +66,24 @@ def mzml_to_pandas_df(fn):
 
 
 def mzml_to_df(fn, assume_time_unit='seconds'):
-    run = pymzml.run.Reader(fn)
-    data = []
-    for spectrum in run:
-        # Try to convert time units with build-in method
-        # some files have no time unit set. Then convert 
-        # to minutes assuming the time unit is as set
-        # by assume_time_unit argument.
-        try:
-            RT = spectrum.scan_time_in_minutes()
-        except:
-            if assume_time_unit == 'seconds':
-                RT = spectrum.scan_time[0] / 60.
-            elif assume_time_unit == 'minutes':
-                RT = spectrum.scan_time[0]
-            
-        peaks = spectrum.peaks("centroided")
-        data.append((RT,peaks))
+    
+    with pymzml.run.Reader(fn) as ms_data:
+        data = []
+        for spectrum in ms_data:
+            # Try to convert time units with build-in method
+            # some files have no time unit set. Then convert 
+            # to minutes assuming the time unit is as set
+            # by assume_time_unit argument.
+            try:
+                RT = spectrum.scan_time_in_minutes()
+            except:
+                if assume_time_unit == 'seconds':
+                    RT = spectrum.scan_time[0] / 60.
+                elif assume_time_unit == 'minutes':
+                    RT = spectrum.scan_time[0]
+                
+            peaks = spectrum.peaks("centroided")
+            data.append((RT,peaks))
 
     df = pd.DataFrame(data).explode(1)
 

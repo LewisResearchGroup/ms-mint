@@ -19,7 +19,6 @@ a = Analysis(['..\\scripts\\Mint.py'],
                     ('C:\\Users\\soere\\anaconda3\\envs\\ms-mint\\lib\\site-packages\\plotly', '.\\plotly'),
                     ('C:\\Users\\soere\\anaconda3\\envs\\ms-mint\\lib\\site-packages\\pyopenms\\share', '.\\pyopenms\\share'),
                     ('C:\\Users\\soere\\anaconda3\\envs\\ms-mint\\lib\\site-packages\\pymzml', '.\\pymzml'),
-
                     ('C:\\Users\\soere\\workspace\\ms-mint\\static\\ChEBI.tsv', '.\\static'),                    
                     ],
              hiddenimports=['pkg_resources.py2_warn'],  
