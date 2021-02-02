@@ -437,20 +437,14 @@ def callbacks(app, fsc, cache):
 
 def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
         rt_min, rt_max, image_label, wdir, title):
-    print('create image')
-    #plt.close()
     plt.figure(figsize=(4,2.5), dpi=30)
     y_max = 0 
     for fn in ms_files:
-        #try:
         fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
         fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
                              (fn_chro['retentionTime'] < rt_max)   ]
         plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color='k')
         y_max = max(y_max, fn_chro['intensity array'].max())
-        #except:
-        #    pass
-    print(rt, rt_min, rt_max)    
     if (not np.isnan(rt)) \
         and not (np.isnan(rt_max)) \
         and not (np.isnan(rt_min)):
@@ -466,5 +460,4 @@ def create_preview_peakshape(ms_files, mz_mean, mz_width, rt,
     plt.ylabel('MS-Intensity')
     filename = T.savefig(kind='peak-preview', wdir=wdir, label=image_label)
     plt.close()
-    print('done')
     return filename 
