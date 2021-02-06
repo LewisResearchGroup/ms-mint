@@ -2,6 +2,12 @@ import os
 import shutil
 import uuid
 
+
+import wget
+import urllib3, ftplib
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+
 from glob import glob
 
 import pandas as pd
@@ -36,7 +42,10 @@ clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 # If color column is not present, for some strange reason, the header filter disappears.
 columns = [
-        { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
+        { "formatter": "rowSelection", "titleFormatter":"rowSelection",  
+          "titleFormatterParams": {
+             "rowRange": "active" # only toggle the values of the active filtered rows
+          },
           "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
         { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
           'headerSort': True, "editor": "input", "width": "100%",
@@ -86,17 +95,21 @@ _layout = html.Div([
                     'padding': '0px',
                     'display': 'inline-block',
                 }),
+    html.Button('Import from URL', id='ms-import-from-url'),
+    dcc.Input(id='url', placeholder='Drop URL here', style={'width': '100%'}),
     html.Div(id='ms-upload-zip-filename'),    
-    html.Div(id='ms-upload-zip-output'),
-
     dcc.Markdown('---', style={'margin-top': '10px'}),
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
+
     dcc.Loading( html.Div(id='ms-upload-output') ),
     html.Div(id='ms-convert-output'),
     html.Div(id='ms-delete-output'),
     html.Div(id='ms-save-output'),
+    html.Div(id='ms-import-from-url-output'),
+    html.Div(id='ms-upload-zip-output'),
+
     dcc.Loading( ms_table )
 ])
 
@@ -144,8 +157,8 @@ def callbacks(app, fsc, cache):
     def ms_table(value, wdir, files_deleted, zip_extracted): 
         target_dir = os.path.join(wdir, 'ms_files')
         ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
-        data =  pd.DataFrame([{'MS-file': os.path.basename(fn) } for fn in ms_files])
-        print(data)
+        data = pd.DataFrame({'MS-file':  [os.path.basename(fn) for fn in ms_files],
+                             'Size[MB]': [os.path.getsize(fn)  for fn in ms_files]})
         return data.to_dict('records')
 
 
@@ -157,7 +170,6 @@ def callbacks(app, fsc, cache):
     )
     def ms_convert(n_clicks, rows, wdir):
         target_dir = os.path.join(wdir, 'ms_files')
-        print(rows)
         if n_clicks is None:
             raise PreventUpdate
         fns = [row['MS-file'] for row in rows]
@@ -209,17 +221,70 @@ def callbacks(app, fsc, cache):
         search_pattern = os.path.join( upload_path, '**', '*.*')
         fns = glob(search_pattern, recursive=True)
         n_total = len(fns)
-        print(fns)
         for i, fn in tqdm( enumerate(fns), total=n_total ):
             fsc.set('progress', int( 100 * (i+1) / n_total))
             if fn.lower().endswith('mzxml') or fn.lower().endswith('mzml'):
                 try:
                     shutil.move(fn, ms_dir)
-                    print(f'Moved {fn} to {ms_dir}')
                 except:
                     pass
         for remainings in glob(os.path.join(upload_path, '*')):
-            print('Cleaning up:', remainings)
             if os.path.isfile(remainings): os.remove(remainings)
             elif os.path.isdir(remainings): shutil.rmtree(remainings)
         return 'Done'
+
+
+    @app.callback(
+        Output('ms-import-from-url-output', 'children'),
+        Input('ms-import-from-url', 'n_clicks'),
+        State('url', 'value'),
+        State('wdir', 'children')
+    )
+    def import_from_url(n_clicks, url, wdir):
+        if n_clicks is None or url is None:
+            raise PreventUpdate
+
+        filenames = get_filenames_from_url(url)
+        filenames = [fn for fn in filenames if is_ms_file(fn)]
+
+        if len(filenames) == 0:
+            return f'No MS files found at {url}'
+
+        ms_dir = T.get_ms_dirname( wdir )
+        fns = []
+        for fn in tqdm( filenames ):
+            _url = url+'/'+fn
+            print('Downloading', _url)
+            wget.download(_url, out=ms_dir)
+        return f'{len(fns)} files downloaded.'
+
+
+def get_filenames_from_url(url):
+    if url.startswith('ftp'):
+        return get_files_from_ftp_directory(url)
+    if '://' in url:
+            url = url.split('://')[1]    
+    with urllib3.PoolManager() as http:
+        r = http.request('GET', url)
+    soup = BeautifulSoup(r.data, 'html')
+    files = [A['href'] for A in soup.find_all('a', href=True)]
+    return files
+
+
+def get_files_from_ftp_directory(url):
+    url_parts = urlparse(url)
+    domain = url_parts.netloc
+    path = url_parts.path
+    ftp = ftplib.FTP(domain)
+    ftp.login()
+    ftp.cwd(path)
+    filenames = ftp.nlst()
+    ftp.quit()
+    return filenames
+
+
+def is_ms_file(fn: str):
+    if fn.lower().endswith('.mzxml') or fn.lower().endswith('.mzml'):
+        return True
+    return False
+

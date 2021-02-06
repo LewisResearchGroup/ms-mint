@@ -15,7 +15,7 @@ from . import tools as T
 
 ns = Namespace("myNamespace", "tabulator")
 
-options = {
+tabulator_options = {
            "groupBy": "Label", 
            "selectable": True,
            "headerFilterLiveFilterDelay":3000,
@@ -32,7 +32,7 @@ meta_table = html.Div(id='meta-table-container',
     children=[
         DashTabulator(id='meta-table',
             columns=T.gen_tabulator_columns(add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), 
-            options=options,
+            options=tabulator_options,
             downloadButtonType=downloadButtonType,
             clearFilterButtonType=clearFilterButtonType
         )
@@ -111,7 +111,8 @@ def callbacks(app, fsc, cache):
         if (contents is not None) and (len(contents) > 0):
             contents = T.parse_table_content(contents[0], filename[0])
             metadata = T.merge_metadata(metadata, contents)
-        columns = [{'label':col, 'value':col} for col in metadata.columns if col != 'index']
+        columns = metadata.columns.to_list()
+        columns = [{'label':col, 'value':col} for col in columns if col != 'index']
         if 'index' not in metadata.columns: metadata = metadata.reset_index()
         return metadata.to_dict('records'), T.gen_tabulator_columns(metadata.columns,
             add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), columns

@@ -109,9 +109,10 @@ def callbacks(app, fsc=None, cache=None):
     def plk_save(n_clicks, data, wdir):
         target_dir = os.path.join(wdir, 'peaklist')
         df = pd.DataFrame(data)
+        if len(df) == 0:
+            df = pd.DataFrame(columns=PEAKLIST_COLUMNS)
         fn = os.path.join( target_dir, 'peaklist.csv')
-        df = df.sort_values('peak_label')
-        df.to_csv(fn)
+        T.write_peaklist( df, wdir)
         return 'Peaklist saved.'
 
   

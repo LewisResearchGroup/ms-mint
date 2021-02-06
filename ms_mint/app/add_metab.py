@@ -23,21 +23,43 @@ options = {
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 fn_data = os.path.join(MINT_DATA_PATH, 'ChEBI.tsv')
-chcbi_data = pd.read_csv(fn_data, sep='\t', nrows=None, index_col=0, low_memory=False)
-chcbi_data = chcbi_data[chcbi_data['Charge'].isin([-1,0,1])]
+chcbi_data = pd.read_csv(fn_data, sep='\t', nrows=None, index_col=0, low_memory=False, dtype={'Charge': str})
+#chcbi_data = chcbi_data[chcbi_data['Charge'].isin([-1,0,1])]
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass'].notna()]
-chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']<1000]
-chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']>50]
+
+chcbi_data = chcbi_data[~chcbi_data['Formulae'].astype(str).str.contains('R')]
+
+for prefix in ['L-', 'D-', '(R)-', '(S)-']:
+    chcbi_data = chcbi_data[~chcbi_data['ChEBI Name'].str.startswith(prefix)]
+
+
+def add_sign(x):
+    x = str(x)
+    if x.startswith('-'):
+        return x
+    elif x == '0':
+        return x
+    else:
+        return f'+{x}'
+
+#chcbi_data['Charge'] = chcbi_data['Charge'].apply(add_sign)
+
+
+#chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']<1000]
+#chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']>50]
 # Remove entries with mutiple molecules
 # keep compounds without SMILES
 chcbi_data = chcbi_data[~chcbi_data.SMILES.str.contains('\.').fillna(False)]
 
 chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 
-#print('Available columns:')
-#for col in chcbi_data: print(col)
+print('Available columns:')
+for col in chcbi_data: print(col)
 
-chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Monoisotopic Mass', 'Synonyms', 'KEGG COMPOUND Database Links', 'SMILES']]
+chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Definition', 'Monoisotopic Mass', 'Synonyms', 
+'KEGG COMPOUND Database Links', 'SMILES', 'HMDB Database Links']]
+
+print(chcbi_data.dtypes)
 
 
 columns = T.gen_tabulator_columns(chcbi_data.columns, editor=None, col_width='auto')
@@ -50,11 +72,14 @@ add_metab_table = html.Div(id='add-metab-table-container',
             options=[{'label': 'Positive', 'value': 'Positive'},
                      {'label': 'Negative', 'value': 'Negative'}], 
             value='Negative'),
-        DashTabulator(id='add-metab-table',
-            columns=columns, 
-            options=options,
-            clearFilterButtonType=clearFilterButtonType,
-            data=chcbi_data.to_dict('records')
+        
+        dcc.Loading( 
+            DashTabulator(id='add-metab-table',
+                columns=columns, 
+                options=options,
+                clearFilterButtonType=clearFilterButtonType,
+                data=chcbi_data.to_dict('records')
+            ),
         ),
     html.Button('Add selected metabolites to peaklist', id='add-metab'),
     html.Div(id='add-metab-output'),
@@ -89,16 +114,15 @@ def callbacks(app, fsc, cache):
         peaklist = T.get_peaklist( wdir )
         for row in rows:
             charge = int( row['Charge'] )
-            if (ms_mode=='Negative') and (charge==1):
+            if (ms_mode=='Negative') and (charge>0):
                 continue
-            if (ms_mode=='Positive') and (charge==-1):
+            if (ms_mode=='Positive') and (charge<0):
                 continue
-            print(charge)
             if charge == 0:
                 if ms_mode == 'Negative':         
                     peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] - M_PROTON
                 elif ms_mode == 'Positive':
-                    peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] + M_PROTON
+                    peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] #+ M_PROTON
             else:
                 peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass']
 

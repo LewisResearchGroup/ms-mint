@@ -150,7 +150,6 @@ class Chromatograms():
         self.ms_files = ms_files
         self.n_peaks = len(peaklist)
         self.n_files = len(ms_files)
-        print(self.n_peaks, self.n_files)
         self.progress_callback = progress_callback
 
     def create_all(self):
@@ -199,7 +198,8 @@ def create_chromatogram(ms_file, mz_mean, mz_width, fn_out, verbose=False):
     chrom = df[(df['m/z array']-mz_mean).abs()<=dmz]
     chrom['retentionTime'] = chrom['retentionTime'].round(3)
     chrom = chrom.groupby('retentionTime').max().reset_index()
-    chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
+    with lock(fn_out):
+        chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
     if verbose:print('...done creating chromatogram.')
     return chrom
 
@@ -264,7 +264,7 @@ def get_results_fn(wdir):
 def get_results( wdir ):
     fn = get_results_fn( wdir )
     df = pd.read_csv( fn )
-    df['MS-file'] = df['ms_file']
+    df['MS-file'] = [os.path.splitext(fn)[0] for fn in df['ms_file']]
     return df
     
 
@@ -273,6 +273,7 @@ def get_metadata(wdir):
     fn_path = os.path.dirname(fn)
     ms_files = get_ms_fns( wdir )
     ms_files = [ os.path.basename(fn) for fn in ms_files ]
+    ms_files = [ os.path.splitext(fn)[0] for fn in ms_files ]
     df = None
     if not os.path.isdir( fn_path ):
         os.makedirs( fn_path )
@@ -292,7 +293,6 @@ def get_metadata(wdir):
 
 
 def init_metadata( ms_files ):
-    print('Init metadata')
     ms_files = list(ms_files)
     df = pd.DataFrame({'MS-file': ms_files})
     df['Label'] = ''
@@ -331,7 +331,6 @@ def get_complete_results( wdir ):
     resu = get_results( wdir )
     assert 'MS-file' in resu.columns, resu
     assert 'MS-file' in meta.columns, meta
-    print(len(resu), len(meta))
     resu['MS-file'] = [ Basename(fn) for fn in resu['MS-file']]
     meta['MS-file'] = [ Basename(fn) for fn in meta['MS-file']]
     df = pd.merge(meta, resu, on='MS-file')
@@ -352,7 +351,10 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=F
     
 
     columns = [
-            { "formatter": "rowSelection", "titleFormatter":"rowSelection", 
+            { "formatter": "rowSelection", "titleFormatter":"rowSelection",           
+              "titleFormatterParams": {
+                  "rowRange": "active" # only toggle the values of the active filtered rows
+              },
               "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True}]
 
     if add_ms_file_col:
@@ -371,6 +373,7 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=F
             { 'title': 'Color', 
               'field': 'Color', 
               "headerFilter":False,  
+              "editor": "input", 
               "formatter": "color", 
               'width': '3px', 
               "headerSort": False
@@ -413,7 +416,8 @@ def parse_table_content(content, filename):
 
 def fig_to_src(dpi=100):
     out_img = io.BytesIO()
-    plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
+    with lock(out_img):
+        plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
     plt.close('all')
     out_img.seek(0)  # rewind file
     encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
@@ -425,6 +429,15 @@ def merge_metadata(old, new):
     new_columns = new.columns.to_list()
     old_columns = [col for col in old_columns if (col=='MS-file') or (col not in new_columns)]
     return pd.merge(old[old_columns], new, on='MS-file', how='left')
+
+
+def file_colors( wdir ):
+    meta = get_metadata( wdir )
+    colors = {}
+    for ndx, (fn, co) in meta[['MS-file', 'Color']].iterrows():
+        if not (isinstance(co, str)): co = 'black'
+        colors[fn] = co
+    return colors
 
 
 def get_figure_fn(kind, wdir, label, format):
@@ -445,7 +458,8 @@ def savefig(kind=None, wdir=None, label=None, format='png', dpi=150):
     path, fn = get_figure_fn(kind=kind, wdir=wdir, label=label, format=format)
     maybe_create(path)
     try:
-        plt.savefig(fn, dpi=dpi, bbox_inches='tight')
+        with lock(fn):
+            plt.savefig(fn, dpi=dpi, bbox_inches='tight')
     except:
         print(f'Could not save figure {fn}, maybe no figure was created.')
     return fn
@@ -465,8 +479,10 @@ def get_ms_fns_for_peakopt(wdir):
     df = get_metadata( wdir )
     assert 'MS-file' in df.columns, df
     fns = df[df.PeakOpt.astype(bool) == True]['MS-file']
-    print(df.PeakOpt.sum(), len(fns))
-    return [ os.path.join( get_ms_dirname(wdir), fn) for fn in fns]
+    ms_files = get_ms_fns( wdir )
+    mapping = {os.path.basename( os.path.splitext(fn)[0] ): fn for fn in ms_files}
+    fns = [mapping[fn] for fn in fns]
+    return fns
 
 
 def float_to_color(x, vmin=0, vmax=2, cmap=None):
@@ -479,7 +495,5 @@ def write_peaklist(peaklist, wdir):
     fn = get_peaklist_fn( wdir )
     if 'peak_label' in peaklist.columns:
         peaklist = peaklist.set_index('peak_label')
-    print('Write peaklist:', fn)
-    print(peaklist)
     with lock(fn):
         peaklist.to_csv(fn)
