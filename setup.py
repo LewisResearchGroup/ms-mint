@@ -56,7 +56,7 @@ config = {
     'packages': find_packages(),
     'data_files': [('scripts', ['scripts/Mint.py']),
                    ('static', ['static/Standard_Peaklist.csv']),
-                   ('static', ['static/ChEBI.tsv'])
+                   #('static', ['static/ChEBI.tsv'])
                    ],
     'classifiers': [
         "Programming Language :: Python :: 3",
