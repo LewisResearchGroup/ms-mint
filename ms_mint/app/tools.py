@@ -280,7 +280,7 @@ def get_metadata(wdir):
     if os.path.isfile(fn):
         df = pd.read_csv( fn )
         if 'MS-file' not in df.columns:
-            df = None
+            df = None            
     if df is None or len(df) == 0:
         df = init_metadata( ms_files )
     assert 'MS-file' in df.columns, df
@@ -296,6 +296,7 @@ def init_metadata( ms_files ):
     ms_files = list(ms_files)
     df = pd.DataFrame({'MS-file': ms_files})
     df['Label'] = ''
+    df['Color'] = 'black'
     df['Type'] = 'Biological Sample'
     df['Run Order'] = ''
     df['Batch'] = ''
@@ -316,10 +317,19 @@ def get_ms_dirname( wdir):
 
 def get_ms_fns(wdir):
     path = get_ms_dirname( wdir )
-    fns = glob(os.path.join(path, '*.*'))
+    fns = glob(os.path.join(path, '**', '*.*'), recursive=True)
+    fns = [fn for fn in fns if is_ms_file(fn)]
     return fns
 
-    
+
+def is_ms_file(fn: str):
+    if    fn.lower().endswith('.mzxml') \
+       or fn.lower().endswith('.mzml') \
+       or fn.lower().endswith('.feather'):
+        return True
+    return False
+
+
 def Basename(fn):
     fn = os.path.basename(fn)
     fn, _ = os.path.splitext(fn)
@@ -449,7 +459,7 @@ def get_figure_fn(kind, wdir, label, format):
 
 
 def clean_string(fn: str):
-    for x in ['"', "'", '(', ')', '[', ']', ' ']:
+    for x in ['"', "'", '(', ')', '[', ']', ' ', '\\', '/', '{', '}']:
         fn = fn.replace(x, '_')
     return fn
 
@@ -461,7 +471,7 @@ def savefig(kind=None, wdir=None, label=None, format='png', dpi=150):
         with lock(fn):
             plt.savefig(fn, dpi=dpi, bbox_inches='tight')
     except:
-        print(f'Could not save figure {fn}, maybe no figure was created.')
+        print(f'Could not save figure {fn}, maybe no figure was created: {label}')
     return fn
 
 

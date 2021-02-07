@@ -23,12 +23,9 @@ import plotly.graph_objects as go
 
 from ms_mint.peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer as RTOpt
 
-
 from ..Mint import Mint
 
 from . import tools as T
-
-from ..Resampler import Resampler
 
 
 
@@ -186,7 +183,6 @@ def callbacks(app, fsc, cache):
             name = os.path.basename(fn)
             name, _ = os.path.splitext(name)
             chrom = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
-            chrom = Resampler(frequeny='1s').resample(chrom)
             fig.add_trace(
                 go.Scatter(x=chrom['retentionTime'], 
                            y=chrom['intensity array'], 
@@ -328,10 +324,23 @@ def callbacks(app, fsc, cache):
     )
     def peak_preview(n_clicks, from_scratch, #peak_opt, #set_rt,
             ms_selection, wdir):
-        if fsc.get('update') is True:
-            print('Update in progress')
+
+        # reset updating after 5 attempts
+        n_attempts = fsc.get(f'{wdir}-update-attempt')
+        if n_attempts is None:
+            n_attempts = 1
+        elif n_attempts % 5 :
+            fsc.set(f'{wdir}-updating', False)
+        
+        # increment counter of attempts
+        fsc.set(f'{wdir}-update-attempt', n_attempts + 1) 
+
+        if fsc.get(f'{wdir}-updating') is True :
+            print('Update in progress..')
             raise PreventUpdate
-        fsc.set(f'update', True)
+
+        fsc.set(f'{wdir}-updating', True)
+
         prop_id = dash.callback_context.triggered[0]['prop_id']
         regenerate = prop_id.startswith('pko-peak-preview-from-scratch')
         if regenerate:
@@ -348,7 +357,7 @@ def callbacks(app, fsc, cache):
 
         if len(ms_files)==0:
             fsc.set(f'update', False)
-            return 'No files selected for peak optimization.'
+            return 'No files selected for peak optimization in metadata tab (column PeakOpt).'
         else:
             print(f'Using {len(ms_files)} files for peak preview. ({ms_selection})')
 
@@ -392,7 +401,7 @@ def callbacks(app, fsc, cache):
             images.append( 
                 dbc.Tooltip(peak_label, target=image_id, style={'font-size': '50'})
             )
-        fsc.set(f'update', False)
+        fsc.set(f'{wdir}-updating', False)
         return images
 
 

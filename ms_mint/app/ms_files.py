@@ -156,7 +156,7 @@ def callbacks(app, fsc, cache):
     )
     def ms_table(value, wdir, files_deleted, zip_extracted): 
         target_dir = os.path.join(wdir, 'ms_files')
-        ms_files = glob(os.path.join(target_dir, '*.*'), recursive=True)
+        ms_files = T.get_ms_fns( wdir )
         data = pd.DataFrame({'MS-file':  [os.path.basename(fn) for fn in ms_files],
                              'Size[MB]': [os.path.getsize(fn)  for fn in ms_files]})
         return data.to_dict('records')
@@ -245,7 +245,7 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
 
         filenames = get_filenames_from_url(url)
-        filenames = [fn for fn in filenames if is_ms_file(fn)]
+        filenames = [fn for fn in filenames if T.is_ms_file(fn)]
 
         if len(filenames) == 0:
             return f'No MS files found at {url}'
@@ -281,10 +281,4 @@ def get_files_from_ftp_directory(url):
     filenames = ftp.nlst()
     ftp.quit()
     return filenames
-
-
-def is_ms_file(fn: str):
-    if fn.lower().endswith('.mzxml') or fn.lower().endswith('.mzml'):
-        return True
-    return False
 

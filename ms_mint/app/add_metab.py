@@ -24,40 +24,25 @@ clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 fn_data = os.path.join(MINT_DATA_PATH, 'ChEBI.tsv')
 chcbi_data = pd.read_csv(fn_data, sep='\t', nrows=None, index_col=0, low_memory=False, dtype={'Charge': str})
-#chcbi_data = chcbi_data[chcbi_data['Charge'].isin([-1,0,1])]
+
 chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass'].notna()]
-
 chcbi_data = chcbi_data[~chcbi_data['Formulae'].astype(str).str.contains('R')]
+chcbi_data = chcbi_data[~chcbi_data['Formulae'].astype(str).str.contains('\.')]
+chcbi_data = chcbi_data[~chcbi_data['SMILES'].str.contains('\.').fillna(False)]
 
-for prefix in ['L-', 'D-', '(R)-', '(S)-']:
-    chcbi_data = chcbi_data[~chcbi_data['ChEBI Name'].str.startswith(prefix)]
-
-
-def add_sign(x):
-    x = str(x)
-    if x.startswith('-'):
-        return x
-    elif x == '0':
-        return x
-    else:
-        return f'+{x}'
-
-#chcbi_data['Charge'] = chcbi_data['Charge'].apply(add_sign)
-
-
-#chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']<1000]
-#chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass']>50]
-# Remove entries with mutiple molecules
-# keep compounds without SMILES
-chcbi_data = chcbi_data[~chcbi_data.SMILES.str.contains('\.').fillna(False)]
+#for prefix in ['L-', 'D-', '(R)-', '(S)-']:
+#    chcbi_data = chcbi_data[~chcbi_data['ChEBI Name'].str.startswith(prefix)]
 
 chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
 
 print('Available columns:')
 for col in chcbi_data: print(col)
 
-chcbi_data = chcbi_data[['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 'Definition', 'Monoisotopic Mass', 'Synonyms', 
-'KEGG COMPOUND Database Links', 'SMILES', 'HMDB Database Links']]
+chcbi_data = chcbi_data[
+    ['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 
+    'Definition', 'Monoisotopic Mass', 'Synonyms', 
+    'KEGG COMPOUND Database Links', 'SMILES', 'HMDB Database Links']
+]
 
 print(chcbi_data.dtypes)
 
