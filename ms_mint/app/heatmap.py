@@ -26,7 +26,7 @@ heatmap_options = [
     { 'label': 'Correlation', 'value': 'correlation'},
     { 'label': 'Show in new tab', 'value': 'call_show'},
     { 'label': 'log1p', 'value': 'log1p'},
-    ]
+]
 
 
 heat_layout_empty = html.Div([
