@@ -121,7 +121,6 @@ def callbacks(app, fsc, cache):
     @app.callback(
     Output('meta-apply-output', 'children'),
     Input('meta-apply', 'n_clicks'),
-    #Input('meta-table', 'cellEdited'),
     State('meta-table', 'multiRowsClicked'),
     State('meta-table', 'data'),
     State('meta-table', 'dataFiltered'),
@@ -132,15 +131,16 @@ def callbacks(app, fsc, cache):
     )
     def meta_save(n_clicks, selected_rows, data, 
                   data_filtered, action, column, value, wdir):
+        print('Save metadata')
         if data is None or len(data) == 0:
             raise PreventUpdate
-        prop_id = dash.callback_context.triggered[0]['prop_id']
         fn = T.get_metadata_fn( wdir )
         df = pd.DataFrame(data)
         if 'index' in df.columns:
             df = df.set_index('index')
         else:
             df = df.reset_index()
+        prop_id = dash.callback_context.triggered[0]['prop_id']
         if prop_id == 'meta-apply.n_clicks':
             if action == 'Set':
                 filtered_rows = [r for r in data_filtered['rows'] if r is not None]
@@ -151,7 +151,6 @@ def callbacks(app, fsc, cache):
                 else:
                     # If something is selected only apply to selected rows
                     ndxs = [r['index'] for r in selected_rows if r['index'] in filtered_ndx]
-                print('ndxs:', ndxs)
                 if len(ndxs) == 0 or column is None:
                     return 'No rows selected.'
                 df.loc[ndxs, column] = value
@@ -159,9 +158,10 @@ def callbacks(app, fsc, cache):
             elif action == 'Delete column': del df[column]
         with T.lock(fn):
             df.to_csv(fn, index=False)
+            print('Metadata file written')
         if prop_id == 'meta-table.cellEdited':
             raise PreventUpdate
-        return 'Data saved.'
+        return dbc.Alert('Data saved.')
 
     
     @app.callback(

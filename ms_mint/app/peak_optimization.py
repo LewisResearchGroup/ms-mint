@@ -48,7 +48,7 @@ _layout = html.Div([
     html.Button('Regenerate all figures', id='pko-peak-preview-from-scratch'),
     html.Button('Find largest peaks for all peaks', 
         id='pko-find-largest-peak-for-all', style={'float': 'right', 'visibility': 'visible'}),
-    html.Button('Remove low intensity peaks', id='pko-remove-low-intensity'),
+    html.Button('Remove low intensity peaks', id='pko-remove-low-intensity', style={'float': 'right'}),
     html.Div(id='pko-remove-low-intensity-output'),
     dcc.Markdown('---'),
     html.Div(id='pko-peak-preview-output', 
@@ -64,8 +64,9 @@ _layout = html.Div([
         options=[],
         value=None
     ),
+    dbc.Progress(id="pko-progress-bar", value=0, 
+        style={'margin-bottom': '20px', 'width': '100%'}),
     dcc.Loading( dcc.Graph('pko-figure') ),
-    dbc.Progress(id="pko-progress-bar", value=100, style={'margin-bottom': '20px', 'width': '100%'}),
     dcc.Checklist(id='pko-figure-options', 
                   options=[{'value': 'log','label': 'Logarithmic y-scale'}], 
                   value=[]),
@@ -189,7 +190,19 @@ def callbacks(app, fsc, cache):
                         name=name)
             )
             fig.update_layout(showlegend=False)
+            fig.update_layout(hoverlabel = dict(namelength=-1))
         return fig
+
+
+    @app.callback(
+        Output('pko-progress-bar', 'value'),
+        Input('pko-dropdown', 'value'),
+        State('pko-dropdown', 'options'))
+    def set_progress(value, options):
+        if (value is None) or (options is None):
+            raise PreventUpdate
+        progress = int( 100 * (value+1) / len(options))
+        return progress
 
 
     @app.callback(
@@ -357,7 +370,7 @@ def callbacks(app, fsc, cache):
 
         if len(ms_files)==0:
             fsc.set(f'update', False)
-            return 'No files selected for peak optimization in metadata tab (column PeakOpt).'
+            return dbc.Alert('No files selected for peak optimization in Metadata tab. Please, select some files in column "PeakOpt".', color='warning')
         else:
             print(f'Using {len(ms_files)} files for peak preview. ({ms_selection})')
 
@@ -463,7 +476,6 @@ def callbacks(app, fsc, cache):
         return f'Set rt_min, rt_max to {rt_min}, {rt_max} respectively.'
 
 
-
     @app.callback(
         Output('pko-remove-low-intensity-output', 'children'),
         Input('pko-remove-low-intensity', 'n_clicks'),
@@ -474,13 +486,13 @@ def callbacks(app, fsc, cache):
         if n_clicks is None: raise PreventUpdate
         peaklist = T.get_peaklist( wdir )
         if ms_selection == 'peakopt':
-            ms_files = T.get_ms_fns_for_peakopt(wdir)
+            ms_files = T.get_ms_fns_for_peakopt( wdir )
         elif ms_selection == 'all':
-            ms_files = T.get_ms_fns(wdir)           
-        mint = Mint()
+            ms_files = T.get_ms_fns( wdir )
+        mint = Mint(verbose=True)
         mint.ms_files = ms_files
         mint.peaklist = peaklist.reset_index().copy()
-        mint.peaklist['intensity_threshold'] = 1e4
+        mint.peaklist['intensity_threshold'] = 5e4
         mint.run()
         peak_labels = mint.results.peak_label.drop_duplicates()
         print('After filtering:', peak_labels)
@@ -496,7 +508,7 @@ def create_preview_peakshape(ms_files, mz_mean, mz_width, rt,
     plt.figure(figsize=(4,2.5), dpi=30)
     y_max = 0 
     for fn in ms_files:
-        color = colors[os.path.basename( os.path.splitext(fn)[0] )]
+        color = colors[ T.filename_to_label(fn) ]
         fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
         fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
                              (fn_chro['retentionTime'] < rt_max)   ]
@@ -510,7 +522,7 @@ def create_preview_peakshape(ms_files, mz_mean, mz_width, rt,
         color_value = np.abs(rt_mean-rt)
         color = T.float_to_color(color_value, vmin=0, vmax=1, cmap='coolwarm')
         plt.vlines(x, 0, y_max, lw=3, color=color)
-    plt.gca().set_title(title, y=1.0, pad=15)
+    plt.gca().set_title(title[:30], y=1.0, pad=15)
     plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     plt.xlabel('Retention Time [min]')  
     plt.ylabel('MS-Intensity')

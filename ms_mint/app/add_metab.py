@@ -22,33 +22,16 @@ options = {
 
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
-fn_data = os.path.join(MINT_DATA_PATH, 'ChEBI.tsv')
-chcbi_data = pd.read_csv(fn_data, sep='\t', nrows=None, index_col=0, low_memory=False, dtype={'Charge': str})
+fn_data = os.path.join(MINT_DATA_PATH, 'ChEBI-Chem.parquet')
+fn_groups_data = os.path.join(MINT_DATA_PATH, 'ChEBI-Groups.parquet')
 
-chcbi_data = chcbi_data[chcbi_data['Monoisotopic Mass'].notna()]
-chcbi_data = chcbi_data[~chcbi_data['Formulae'].astype(str).str.contains('R')]
-chcbi_data = chcbi_data[~chcbi_data['Formulae'].astype(str).str.contains('\.')]
-chcbi_data = chcbi_data[~chcbi_data['SMILES'].str.contains('\.').fillna(False)]
-
-#for prefix in ['L-', 'D-', '(R)-', '(S)-']:
-#    chcbi_data = chcbi_data[~chcbi_data['ChEBI Name'].str.startswith(prefix)]
-
-chcbi_data['Monoisotopic Mass'] = chcbi_data['Monoisotopic Mass'].astype(float)
-
-print('Available columns:')
-for col in chcbi_data: print(col)
-
-chcbi_data = chcbi_data[
-    ['ChEBI ID', 'ChEBI Name', 'Formulae', 'Charge', 
-    'Definition', 'Monoisotopic Mass', 'Synonyms', 
-    'KEGG COMPOUND Database Links', 'SMILES', 'HMDB Database Links']
-]
-
-print(chcbi_data.dtypes)
+CHEBI_CHEM = pd.read_parquet(fn_data)
+CHEBI_GROUPS = pd.read_parquet(fn_groups_data)#.set_index('Group Name')
 
 
-columns = T.gen_tabulator_columns(chcbi_data.columns, editor=None, col_width='auto')
+groups_options = [{'label': 'All', 'value': 'all'}]+[{'label': x.capitalize(), 'value':x} for x in CHEBI_GROUPS.index]
 
+columns = T.gen_tabulator_columns(CHEBI_CHEM.columns, editor=None, col_width='auto')
 
 add_metab_table = html.Div(id='add-metab-table-container', 
     style={'min-height':  100, 'margin-top': '10%'},
@@ -58,17 +41,17 @@ add_metab_table = html.Div(id='add-metab-table-container',
                      {'label': 'Negative', 'value': 'Negative'}], 
             value='Negative'),
         
+        dcc.Dropdown(id='add-metab-groups', options=groups_options, multi=True),
+
         dcc.Loading( 
             DashTabulator(id='add-metab-table',
                 columns=columns, 
                 options=options,
                 clearFilterButtonType=clearFilterButtonType,
-                data=chcbi_data.to_dict('records')
             ),
         ),
     html.Button('Add selected metabolites to peaklist', id='add-metab'),
     html.Div(id='add-metab-output'),
-
 ])
 
 
@@ -77,6 +60,7 @@ _layout = html.Div([
     add_metab_table
     
 ])
+
 
 def layout():
     return _layout
@@ -116,9 +100,34 @@ def callbacks(app, fsc, cache):
             peaklist.loc[row['ChEBI Name'], 'rt_min'] = 0
             peaklist.loc[row['ChEBI Name'], 'rt_max'] = 15
             peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
-
+            
         T.write_peaklist( peaklist, wdir)
-        
         return 'Metabolites added.'
 
+
+    @app.callback(
+        Output('add-metab-table', 'data'),
+        Input('add-metab-groups', 'value'),
+        Input( 'add-metab-ms-mode', 'value'),
+    )
+    def generate_table(groups, ms_mode):
+        print('Groups to add', groups)
+
+        data = CHEBI_CHEM
+
+        if ms_mode == 'Positive':
+            data = data[data.Charge.str.startswith('+') | (data.Charge == '0')]
+        elif ms_mode == 'Negative':
+            data = data[data.Charge.str.startswith('-') | (data.Charge == '0')]
         
+        if groups is None or len(groups) == 0:
+            raise PreventUpdate
+        elif 'all' in groups:
+            return data.to_dict('records')
+
+        ids = CHEBI_GROUPS.loc[groups]\
+                .explode('ChEBI IDs')\
+                .drop_duplicates()['ChEBI IDs']\
+                .values
+        
+        return data[data['ChEBI ID'].isin(ids)].to_dict('records')

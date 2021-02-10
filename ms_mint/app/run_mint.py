@@ -2,7 +2,7 @@ import os
 from glob import glob 
 
 import dash_html_components as html
-#import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 from dash_extensions.snippets import send_file
 
@@ -25,6 +25,7 @@ def layout():
 
 
 def callbacks(app, fsc, cache):
+
     @app.callback(
         Output('res-delete-output', 'children'),
         Input('res-delete', 'n_clicks'),
@@ -34,7 +35,7 @@ def callbacks(app, fsc, cache):
         if n_clicks is None:
             raise PreventUpdate
         os.remove( T.get_results_fn(wdir) )
-        return 'Results file deleted.'
+        return dbc.Alert('Results file deleted.')
 
 
     @app.callback([
@@ -62,9 +63,9 @@ def callbacks(app, fsc, cache):
         def set_progress(x):
             fsc.set('progress', x)
 
-        mint = Mint(verbose=False, progress_callback=set_progress)
-        mint.peaklist_files = os.path.join(wdir, 'peaklist', 'peaklist.csv')
-        mint.ms_files = glob( os.path.join(wdir, 'ms_files', '*.*'))
+        mint = Mint(verbose=True, progress_callback=set_progress)
+        mint.peaklist_files = T.get_peaklist_fn( wdir )
+        mint.ms_files = T.get_ms_fns( wdir )
         mint.run()
-        mint.export( os.path.join(wdir, 'results', 'results.csv'))
-        return '''`Success`'''
+        mint.export( T.get_results_fn(wdir) )
+        return dbc.Alert('Finished running MINT')
