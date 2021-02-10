@@ -189,7 +189,6 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
                  correlation=False, call_show=False, verbose=False):
 
 
-    print(df.columns)
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
     df = df.loc[non_zero_labels]

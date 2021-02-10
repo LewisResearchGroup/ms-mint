@@ -264,16 +264,15 @@ def get_results_fn(wdir):
 def get_results( wdir ):
     fn = get_results_fn( wdir )
     df = pd.read_csv( fn )
-    df['MS-file'] = [os.path.splitext(fn)[0] for fn in df['ms_file']]
+    df['MS-file'] = [filename_to_label(fn) for fn in df['ms_file']]
     return df
     
 
 def get_metadata(wdir):
     fn = get_metadata_fn( wdir )
     fn_path = os.path.dirname(fn)
-    ms_files = get_ms_fns( wdir )
-    ms_files = [ os.path.basename(fn) for fn in ms_files ]
-    ms_files = [ os.path.splitext(fn)[0] for fn in ms_files ]
+    ms_files = get_ms_fns( wdir, abs_path=False )
+    ms_files = [filename_to_label(fn) for fn in ms_files]
     df = None
     if not os.path.isdir( fn_path ):
         os.makedirs( fn_path )
@@ -283,9 +282,9 @@ def get_metadata(wdir):
             df = None            
     if df is None or len(df) == 0:
         df = init_metadata( ms_files )
-    assert 'MS-file' in df.columns, df
+    if 'Color' not in df.columns:
+        df['Color'] = None
     df = df.set_index('MS-file').reindex(ms_files).reset_index()
-    df['MS-file'] = df['MS-file'].apply(os.path.basename)
     if 'PeakOpt' not in df.columns:
         df['PeakOpt'] = False
     else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
@@ -294,9 +293,10 @@ def get_metadata(wdir):
 
 def init_metadata( ms_files ):
     ms_files = list(ms_files)
+    ms_files = [filename_to_label(fn) for fn in ms_files]
     df = pd.DataFrame({'MS-file': ms_files})
     df['Label'] = ''
-    df['Color'] = 'black'
+    df['Color'] = None
     df['Type'] = 'Biological Sample'
     df['Run Order'] = ''
     df['Batch'] = ''
@@ -315,10 +315,12 @@ def get_ms_dirname( wdir):
     return os.path.join(wdir, 'ms_files')
 
 
-def get_ms_fns(wdir):
+def get_ms_fns(wdir, abs_path=True):
     path = get_ms_dirname( wdir )
     fns = glob(os.path.join(path, '**', '*.*'), recursive=True)
     fns = [fn for fn in fns if is_ms_file(fn)]
+    if not abs_path:
+        fns = [os.path.basename(fn) for fn in fns]
     return fns
 
 
@@ -336,14 +338,16 @@ def Basename(fn):
     return fn
 
 
-def get_complete_results( wdir ):
+def get_complete_results( wdir, include_labels=None, exclude_labels=None, file_types=None ):
     meta = get_metadata( wdir )
     resu = get_results( wdir )
-    assert 'MS-file' in resu.columns, resu
-    assert 'MS-file' in meta.columns, meta
-    resu['MS-file'] = [ Basename(fn) for fn in resu['MS-file']]
-    meta['MS-file'] = [ Basename(fn) for fn in meta['MS-file']]
-    df = pd.merge(meta, resu, on='MS-file')
+    df = pd.merge(meta, resu, on=['MS-file'])
+    if include_labels is not None and len(include_labels) > 0:
+        df = df[df.peak_label.isin(include_labels)]
+    if exclude_labels is not None and len(exclude_labels) > 0:
+        df = df[~df.peak_label.isin(exclude_labels)]
+    if file_types is not None and file_types != []:
+        df = df[df.Type.isin(file_types)]            
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
     return df
 
@@ -414,7 +418,6 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=F
 
 
 def parse_table_content(content, filename):
-    print('Decoding content from', filename)
     content_type, content_string = content.split(',')
     decoded = base64.b64decode(content_string)
     if filename.lower().endswith('.csv'):
@@ -435,17 +438,22 @@ def fig_to_src(dpi=100):
 
 
 def merge_metadata(old, new):
-    old_columns = old.columns.to_list()
-    new_columns = new.columns.to_list()
-    old_columns = [col for col in old_columns if (col=='MS-file') or (col not in new_columns)]
-    return pd.merge(old[old_columns], new, on='MS-file', how='left')
+    old = old.set_index('MS-file')
+    new = new.set_index('MS-file').replace('null', None)
+    for col in new.columns:
+        for ndx in new.index:
+            value = new.loc[ndx, col]
+            if value is None:
+                continue
+            old.loc[ndx, col] = value
+    return old.reset_index()
 
 
 def file_colors( wdir ):
     meta = get_metadata( wdir )
     colors = {}
     for ndx, (fn, co) in meta[['MS-file', 'Color']].iterrows():
-        if not (isinstance(co, str)): co = 'black'
+        if not (isinstance(co, str)): co = None
         colors[fn] = co
     return colors
 
@@ -486,11 +494,12 @@ def png_fn_to_src(fn):
 
 
 def get_ms_fns_for_peakopt(wdir):
+    '''Extract the filenames for peak optimization from
+       the metadata table and recreate the complete filename.'''
     df = get_metadata( wdir )
-    assert 'MS-file' in df.columns, df
     fns = df[df.PeakOpt.astype(bool) == True]['MS-file']
     ms_files = get_ms_fns( wdir )
-    mapping = {os.path.basename( os.path.splitext(fn)[0] ): fn for fn in ms_files}
+    mapping = {filename_to_label(fn): fn for fn in ms_files}
     fns = [mapping[fn] for fn in fns]
     return fns
 
@@ -507,3 +516,9 @@ def write_peaklist(peaklist, wdir):
         peaklist = peaklist.set_index('peak_label')
     with lock(fn):
         peaklist.to_csv(fn)
+
+
+def filename_to_label(fn: str):
+    if is_ms_file(fn):
+        fn = os.path.splitext(fn)[0]
+    return os.path.basename(fn)
