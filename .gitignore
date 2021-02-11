@@ -15,4 +15,5 @@ Untitled*.ipynb
 "nohup.out" 
 nohup.out
 InnoSetup/Output
-
+*lock
+ChEBI.tsv

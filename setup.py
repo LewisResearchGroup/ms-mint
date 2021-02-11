@@ -39,7 +39,9 @@ install_requires = [
     'flask-compress',
     'molmass',
     'dash_uploader',
-    'filelock'] 
+    'filelock',
+    'wget',
+    'bs4'] 
 
 
 config = {
@@ -56,7 +58,8 @@ config = {
     'packages': find_packages(),
     'data_files': [('scripts', ['scripts/Mint.py']),
                    ('static', ['static/Standard_Peaklist.csv']),
-                   ('static', ['static/ChEBI.tsv'])
+                   ('static', ['static/ChEBI-Chem.parquet']),
+                   ('static', ['static/ChEBI-Groups.parquet']),
                    ],
     'classifiers': [
         "Programming Language :: Python :: 3",
