@@ -99,7 +99,6 @@ def layout():
 
 
 def callbacks(app, fsc, cache):
-    fsc.set(f'update', False)
 
     @app.callback(
     Output('pko-dropdown', 'options'),
@@ -233,7 +232,7 @@ def callbacks(app, fsc, cache):
         T.write_peaklist( peaklist, wdir)
         return 'Peak optimization done.'
 
-    
+    '''
     @app.callback(
         Output('pko-set-rt-output', 'children'),
         Input('pko-set-rt', 'n_clicks'),
@@ -248,7 +247,7 @@ def callbacks(app, fsc, cache):
         rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
         T.update_peaklist(wdir, peak_label, rt_min, rt_max)
         return f'Set RT span to ({rt_min},{rt_max})'
-    
+    '''
 
     @app.callback(
         Output('pko-confirm-rt-output', 'children'),
@@ -369,7 +368,6 @@ def callbacks(app, fsc, cache):
             assert False, ms_selection
 
         if len(ms_files)==0:
-            fsc.set(f'update', False)
             return dbc.Alert('No files selected for peak optimization in Metadata tab. Please, select some files in column "PeakOpt".', color='warning')
         else:
             print(f'Using {len(ms_files)} files for peak preview. ({ms_selection})')

@@ -1,6 +1,4 @@
 
-import os 
-
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
@@ -50,7 +48,7 @@ def callbacks(app, fsc, cache):
             df = df[df['Type'].isin(file_types)]
         if groupby is not None and len(groupby) > 0:
             color_groups = df[['ms_file', groupby]].drop_duplicates().set_index('ms_file')
-            ndx_cgrp = color_groups.index.to_list()
+            #ndx_cgrp = color_groups.index.to_list()
         else:
             color_groups = None
             groupby = None
@@ -62,16 +60,16 @@ def callbacks(app, fsc, cache):
 
         ndx = mint.decomposition_results['df_projected'].index.to_list()
 
-        ndx_proj = mint.decomposition_results['df_projected'].index
+        #ndx_proj = mint.decomposition_results['df_projected'].index
 
-        fig = mint.pca_plot_cummulative_variance()
+        mint.pca_plot_cummulative_variance()
         src = T.fig_to_src()
         figures.append( html.Img(src=src) )
 
         if color_groups is not None:
             color_groups = color_groups.loc[ndx].values
 
-        fig = mint.plot_pair_plot(group_name=groupby, 
+        mint.plot_pair_plot(group_name=groupby, 
                 color_groups=color_groups)
 
         src = T.fig_to_src()

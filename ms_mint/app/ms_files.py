@@ -155,7 +155,6 @@ def callbacks(app, fsc, cache):
     Input('ms-upload-zip-output', 'children')
     )
     def ms_table(value, wdir, files_deleted, zip_extracted): 
-        target_dir = os.path.join(wdir, 'ms_files')
         ms_files = T.get_ms_fns( wdir )
         data = pd.DataFrame({'MS-file':  [os.path.basename(fn) for fn in ms_files],
                              'Size[MB]': [os.path.getsize(fn)  for fn in ms_files]})

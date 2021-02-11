@@ -8,8 +8,6 @@ import time
 from warnings import simplefilter
 from pathlib import Path as P
 
-import matplotlib
-#matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import seaborn as sns
 
@@ -428,13 +426,15 @@ class Mint(object):
 
     def pca(self, var_name='peak_max', n_vars=20, fillna=0, 
             scaler='standard'):
+
+        df = self.crosstab(var_name).fillna(fillna)
         
         if fillna == 'median':
             fillna = df.median()
         elif fillna == 'mean':
-            fillna = df.median()
-            
-        df = self.crosstab(var_name).fillna(fillna)
+            fillna = df.mean()
+
+        df = df.fillna(fillna)
 
         if scaler is not None:
             if scaler == 'standard':
