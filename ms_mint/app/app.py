@@ -96,7 +96,7 @@ app.title = 'MINT'
 app.config['suppress_callback_exceptions'] = True
 
 app.layout = html.Div([
-    html.Img(src=app.get_asset_url('logo.png'), style={'height': '30px'}),
+    #html.Img(src=app.get_asset_url('logo.png'), style={'height': '30px'}),
 
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
 
