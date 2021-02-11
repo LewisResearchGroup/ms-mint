@@ -232,7 +232,7 @@ def callbacks(app, fsc, cache):
         T.write_peaklist( peaklist, wdir)
         return 'Peak optimization done.'
 
-    '''
+    
     @app.callback(
         Output('pko-set-rt-output', 'children'),
         Input('pko-set-rt', 'n_clicks'),
@@ -240,15 +240,15 @@ def callbacks(app, fsc, cache):
         State('pko-figure', 'figure'),
         State('wdir', 'children')
     )
-    def pko_set_rt(n_clicks, peak_label, fig, wdir):
+    def pko_set_rt_min_max(n_clicks, peak_label, fig, wdir):
         if n_clicks is None:
             raise PreventUpdate
         rt_min, rt_max = fig['layout']['xaxis']['range']
         rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
         T.update_peaklist(wdir, peak_label, rt_min, rt_max)
         return f'Set RT span to ({rt_min},{rt_max})'
-    '''
-
+    
+    
     @app.callback(
         Output('pko-confirm-rt-output', 'children'),
         Input('pko-confirm-rt', 'n_clicks'),
@@ -256,7 +256,7 @@ def callbacks(app, fsc, cache):
         State('pko-figure', 'figure'),
         State('wdir', 'children')
     )
-    def pko_set_rt(n_clicks, peak_label, fig, wdir):
+    def pko_confirm_rt(n_clicks, peak_label, fig, wdir):
         if n_clicks is None:
             raise PreventUpdate
         rt_min, rt_max = fig['layout']['xaxis']['range']
@@ -272,7 +272,7 @@ def callbacks(app, fsc, cache):
         if os.path.isfile(fn): os.remove(fn)
 
         return f'Set RT span to ({rt_min},{rt_max})'
-
+    
 
     @app.callback(
         Output('pko-dropdown', 'value'),

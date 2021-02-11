@@ -5,15 +5,16 @@ import sys
 import subprocess
 import multiprocessing
 import argparse
+import wget
+import pkg_resources
+
 from waitress import serve
-
-import ms_mint
-
 from os.path import expanduser
 from pathlib import Path as P
+from collections import namedtuple
+from multiprocessing import freeze_support
 
-HOME = expanduser("~")
-DATADIR = str( P(HOME)/'MINT' )
+import ms_mint
 
 
 """
@@ -23,17 +24,7 @@ flask_compress.__version__ attribute. Known to work with dash==1.16.3 and
 PyInstaller==3.6.
 """
 
-from collections import namedtuple
 
-import pkg_resources
-
-IS_FROZEN = hasattr(sys, '_MEIPASS')
-
-# backup true function
-_true_get_distribution = pkg_resources.get_distribution
-# create small placeholder for the dash call
-# _flask_compress_version = parse_version(get_distribution("flask-compress").version)
-_Dist = namedtuple('_Dist', ['version'])
 
 def _get_distribution(dist):
     if IS_FROZEN and dist == 'flask-compress':
@@ -41,14 +32,24 @@ def _get_distribution(dist):
     else:
         return _true_get_distribution(dist)
 
-# monkey patch the function so it can work once frozen and pkg_resources is of
-# no help
-pkg_resources.get_distribution = _get_distribution
-
-
 
 if __name__ == '__main__':
-    
+    freeze_support()
+
+    HOME = expanduser("~")
+    DATADIR = str( P(HOME)/'MINT' )
+    IS_FROZEN = hasattr(sys, '_MEIPASS')
+
+    # backup true function
+    _true_get_distribution = pkg_resources.get_distribution
+    # create small placeholder for the dash call
+    # _flask_compress_version = parse_version(get_distribution("flask-compress").version)
+    _Dist = namedtuple('_Dist', ['version'])
+
+    # monkey patch the function so it can work once frozen and pkg_resources is of
+    # no help
+    pkg_resources.get_distribution = _get_distribution
+
     parser = argparse.ArgumentParser(description='MINT frontend.')
 
     parser.add_argument('--no-browser', action='store_true', default=False, 
@@ -77,12 +78,11 @@ if __name__ == '__main__':
             # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
             multiprocessing.freeze_support()
             
+        # Open the browser
         if sys.platform in ['win32', 'nt']:
             os.startfile(url)
-            
         elif sys.platform=='darwin':
             subprocess.Popen(['open', url])
-            
         else:
             try:
                 subprocess.Popen(['xdg-open', url])

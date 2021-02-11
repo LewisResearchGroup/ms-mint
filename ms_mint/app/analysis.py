@@ -11,8 +11,8 @@ from . import quality_control
 from . import tools as T
 
 components = {
-    'qc':           {'label': 'Statistics',         'callbacks_func': quality_control.callbacks,    'layout_func': quality_control.layout},
     'heatmap':      {'label': 'Heatmap',            'callbacks_func': heatmap.callbacks,            'layout_func': heatmap.layout},
+    'qc':           {'label': 'Statistics',         'callbacks_func': quality_control.callbacks,    'layout_func': quality_control.layout},
     'pca':          {'label': 'Decomposition',      'callbacks_func': pca.callbacks,                'layout_func': pca.layout}
 }
 
@@ -24,7 +24,7 @@ groupby_options = [{'label': 'Batch', 'value': 'Batch'},
 
 
 _layout = html.Div([
-    dcc.Tabs(id='secondary-tab', value='pca', vertical=False, 
+    dcc.Tabs(id='secondary-tab', value='heatmap', vertical=False, 
         children=[
             dcc.Tab(value=key, 
                     label=components[key]['label'],
