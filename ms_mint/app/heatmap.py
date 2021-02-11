@@ -26,7 +26,7 @@ heatmap_options = [
     { 'label': 'Correlation', 'value': 'correlation'},
     { 'label': 'Show in new tab', 'value': 'call_show'},
     { 'label': 'log1p', 'value': 'log1p'},
-    ]
+]
 
 
 heat_layout_empty = html.Div([
@@ -55,10 +55,8 @@ heat_layout_empty = html.Div([
 _layout = html.Div([
     html.H3('Heatmap'),
     html.Button('Update', id='heatmap-update'),
-    dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
     dcc.Dropdown(id='heatmap-options', value=['normed_by_cols', 'clustered'],
         options=heatmap_options, multi=True),
-    dcc.Dropdown(id='heatmap-ms-order', options=[], placeholder='MS-file sorting', multi=True),
     dcc.Loading( 
         dcc.Graph(id='heatmap-figure', 
                   style={'margin-top': '50px'}) ),
@@ -72,12 +70,11 @@ def layout():
 def callbacks(app, fsc, cache):
 
     @app.callback(
-    Output('heatmap-controls', 'children'),
-    [Input('tab', 'value'),
-    Input('res-delete-output', 'children')],
-    State('wdir', 'children')
+        Output('heatmap-controls', 'children'),
+        Input('secondary-tab', 'value'),
+        State('wdir', 'children')
     )
-    def heat_controls(tab, delete, wdir):
+    def heat_controls(tab, wdir):
         if tab != 'heatmap':
             raise PreventUpdate
         fn = T.get_results_fn(wdir)
@@ -91,19 +88,21 @@ def callbacks(app, fsc, cache):
     Output('heatmap-figure', 'figure'),
     Input('heatmap-update', 'n_clicks'),
     State('file-types', 'value'),
-    State('heatmap-ms-order', 'value'),
+    State('peak-labels-include', 'value'),
+    State('peak-labels-exclude', 'value'),
+    State('ms-order', 'value'),
     State('heatmap-options', 'value'),
     State('wdir', 'children')
     )
-    def heat_heatmap(n_clicks, file_types, ms_order, options, wdir):
+    def heat_heatmap(n_clicks, file_types, include_labels, exclude_labels, 
+            ms_order, options, wdir):
         mint = Mint()
 
-        df = T.get_complete_results(wdir)
+        df = T.get_complete_results( wdir, include_labels=include_labels, 
+                exclude_labels=exclude_labels, file_types=file_types )
+
         if len(df) == 0: return 'No results yet. First run MINT.'
 
-        if file_types is not None and file_types != []:
-            df = df[df.Type.isin(file_types)]
-        
         mint.results = df
 
         var_name = 'peak_max'
@@ -133,15 +132,5 @@ def callbacks(app, fsc, cache):
 
         return fig
 
-    @app.callback(
-        Output('heatmap-ms-order', 'options'),
-        Input('tab', 'value'),
-        State('wdir', 'children')
-    )
-    def ms_order_options(tab, wdir):
-        if not tab == 'heatmap': raise PreventUpdate
-        cols = T.get_metadata(wdir).dropna(how='all', axis=1).columns.to_list()
-        if 'index' in cols: cols.remove('index')
-        options = [{'value':i, 'label': i} for i in cols]
-        return options
+
 

@@ -185,11 +185,10 @@ def plot_peak_shapes_3d(mint_results, peak_label=None, legend=True,
 
 
 def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
-                 add_dendrogram=False, name='',
+                 add_dendrogram=False, name='', x_tick_colors=None,
                  correlation=False, call_show=False, verbose=False):
 
 
-    print(df.columns)
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
     df = df.loc[non_zero_labels]
@@ -249,7 +248,7 @@ def plot_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
             yaxis={'title': '', 
                    'tickmode': 'array', 
                    'automargin': True}) 
-
+    
         fig.update_layout({'height':800, 
                            'hovermode': 'closest'})
         

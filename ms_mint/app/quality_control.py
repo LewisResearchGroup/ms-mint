@@ -6,15 +6,12 @@ from matplotlib import pyplot as plt
 import seaborn as sns  
 
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 
 from . import tools as T
-
-groupby_options = [{'label': 'Batch', 'value': 'Batch'},
-                   {'label': 'Label', 'value': 'Label'},
-                   {'label': 'Type',  'value': 'Type'}]
 
 graph_options = [{'label': 'Histograms', 'value': 'hist'},
                  {'label': 'Boxplots', 'value': 'boxplot'},
@@ -24,10 +21,7 @@ graph_options = [{'label': 'Histograms', 'value': 'hist'},
 _layout = html.Div([
     html.H3('Quality Control'),
     html.Button('Update', id='qc-update'),
-    dcc.Dropdown(id='qc-groupby', options=groupby_options, value=None, placeholder='Group by column'),
     dcc.Dropdown(id='qc-graphs', options=graph_options, value=['hist', 'boxplot', 'density'], multi=True, placeholder='Kinds of graphs'),
-    dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
-    dcc.Dropdown(id='peak-labels', options=[], placeholder='Limit to peak_labels', multi=True),
     dcc.Checklist(id='qc-select', options=[{'label': 'Dense', 'value': 'Dense'}], value=['Dense']),
     html.Div(id='qc-figures', style={'float': 'center'})
 ])
@@ -55,34 +49,34 @@ def callbacks(app, fsc, cache):
     State('qc-graphs', 'value'),
     State('qc-select', 'value'),
     State('file-types', 'value'),
-    State('peak-labels', 'value'),
+    State('peak-labels-include', 'value'),
+    State('peak-labels-exclude', 'value'),
     State('wdir', 'children')
     )
-    def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, peak_labels, wdir):
+    def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, 
+            include_labels, exclude_labels, wdir):
+
         if n_clicks is None:
             raise PreventUpdate
 
-        df = T.get_complete_results( wdir )
+        df = T.get_complete_results( wdir, include_labels=include_labels, 
+                exclude_labels=exclude_labels, file_types=file_types )
 
         if len(df) == 0: return 'No results yet. First run MINT.'
 
-        print('Results', df)
-
-        if file_types is not None and len(file_types) > 0:
-            df = df[df.Type.isin(file_types)]
-
-        if peak_labels is not None and len(peak_labels) > 0:
-            df = df[df.peak_label.isin(peak_labels)]
+        if 'boxplot' in kinds:
+            if (groupby is None or len(groupby) ==0):
+                return dbc.Alert('For boxplots a "Group-by" column has to be set', color='info')
+            if len(df[groupby].drop_duplicates()) <= 1:
+                return dbc.Alert('For boxplots at least two groups have to be defined in selected "Group-by" column in metadata sheet.', color='info')
 
         sns.set_context('paper')
         
-        by_col = 'Label'
-        by_col = 'Batch'
-        quant_col = 'peak_max'
+        sort_by_col = 'Batch'
         quant_col = 'log(peak_max+1)'
 
-        if by_col is not None:
-            df = df.sort_values(['peak_label', by_col])
+        if sort_by_col is not None:
+            df = df.sort_values(['peak_label', sort_by_col])
 
         if options is None:
             options = []
@@ -95,8 +89,8 @@ def callbacks(app, fsc, cache):
             fsc.set('progress', int(100*(i+1)/n_total))
 
             # Sorting to ensure similar legends
-            if by_col is not None:
-                grp = grp.sort_values(by_col).reset_index(drop=True)
+            if sort_by_col is not None:
+                grp = grp.sort_values(sort_by_col).reset_index(drop=True)
 
             if len(grp) < 1:
                 continue
@@ -136,20 +130,3 @@ def callbacks(app, fsc, cache):
             #if i == 3: break
 
         return figures
-
-
-    @app.callback(
-    Output('file-types', 'options'),
-    Output('file-types', 'value'),
-    Input('tab', 'value'),
-    State('wdir', 'children')
-    )
-    def file_types(tab, wdir):
-        if not tab in ['qc', 'heatmap']:
-            raise PreventUpdate
-        meta = T.get_metadata( wdir )
-        if meta is None:
-            raise PreventUpdate
-        file_types = meta['Type'].drop_duplicates()
-        options = [{'value': i, 'label': i} for i in file_types]
-        return options, file_types

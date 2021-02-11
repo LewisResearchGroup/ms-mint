@@ -5,21 +5,28 @@ import numpy as np
 import pandas as pd
 import time
 
+from warnings import simplefilter
 from pathlib import Path as P
 
-from multiprocessing import Pool, Manager, cpu_count
+from matplotlib import pyplot as plt
+import seaborn as sns
 
+from multiprocessing import Pool, Manager, cpu_count
+from scipy.cluster.hierarchy import ClusterWarning
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+
+from .standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
-from ms_mint.standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
 from .peak_detection import OpenMSFFMetabo
 from .helpers import is_ms_file, get_ms_files_from_results
 from .vis.plotly.plotly_tools import plot_heatmap
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
 from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
-from warnings import simplefilter
-from scipy.cluster.hierarchy import ClusterWarning
+
 from tqdm import tqdm
 
 import ms_mint
@@ -416,3 +423,66 @@ class Mint(object):
                 transposed=transposed, clustered=clustered, add_dendrogram=add_dendrogram, 
                 name=col_name, correlation=correlation)
 
+
+    def pca(self, var_name='peak_max', n_vars=20, fillna=0, 
+            scaler='standard'):
+
+        df = self.crosstab(var_name).fillna(fillna)
+        
+        if fillna == 'median':
+            fillna = df.median()
+        elif fillna == 'mean':
+            fillna = df.mean()
+
+        df = df.fillna(fillna)
+
+        if scaler is not None:
+            if scaler == 'standard':
+                scaler = StandardScaler()
+            df = pd.DataFrame(scaler.fit_transform(df), 
+                    index=df.index, columns=df.columns)
+        min_dim = min(df.shape)
+        n_vars = min(n_vars, min_dim)
+        pca = PCA(n_vars)
+        X_projected = pca.fit_transform(df)
+        df_projected = pd.DataFrame(X_projected, 
+            index=df.index.get_level_values(0)).add_prefix('PCA-')
+
+        explained_variance = pca.explained_variance_ratio_*100
+        cumm_expl_var = np.cumsum(explained_variance)
+
+        self.decomposition_results = {
+            'df_projected': df_projected,
+            'cumm_expl_var': cumm_expl_var,
+            'n_vars': n_vars,
+            'type': 'PCA'
+        }
+
+
+    def pca_plot_cummulative_variance(self):
+        n_vars = self.decomposition_results['n_vars']
+        fig = plt.figure(figsize=(7,3))
+        cumm_expl_var = self.decomposition_results['cumm_expl_var']
+        plt.bar(np.arange(n_vars)+1, cumm_expl_var, 
+            facecolor='grey', edgecolor='none')
+        plt.xlabel('# PCA-components')
+        plt.ylabel('Explained variance')
+        plt.title('Cummulative explained variance')
+        plt.grid()
+        return fig
+
+
+    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None):
+        df = self.decomposition_results['df_projected']
+        cols = df.columns.to_list()[:n_vars]
+        df = df[cols]
+        if color_groups is not None:
+            if group_name is None: group_name = 'Group'
+            df[group_name] = color_groups
+            df[group_name] = df[group_name].astype(str)
+        fig = plt.figure()
+        g = sns.pairplot(df, plot_kws={'s': 100}, hue=group_name)
+        if color_groups is not None:
+            leg = g._legend
+            leg.set_bbox_to_anchor([1.05, 0.5])
+        return fig
