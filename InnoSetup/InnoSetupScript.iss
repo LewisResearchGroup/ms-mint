@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "MINT"
-#define MyAppVersion "0.0.50"
+#define MyAppVersion "0.0.51"
 #define MyAppPublisher "Lewis Research Group (University of Calgary)"
 #define MyAppURL "https://github.com/soerendip/ms-mint"
 #define MyAppExeName "Mint.exe"
