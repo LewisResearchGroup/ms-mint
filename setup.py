@@ -41,7 +41,8 @@ install_requires = [
     'dash_uploader',
     'filelock',
     'wget',
-    'bs4'] 
+    'bs4',
+    'pytest-cov']
 
 
 config = {
