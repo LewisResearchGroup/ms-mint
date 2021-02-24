@@ -336,7 +336,8 @@ def callbacks(app, fsc, cache):
     )
     def peak_preview(n_clicks, from_scratch, #peak_opt, #set_rt,
             ms_selection, wdir):
-
+        if n_clicks is None:
+            raise PreventUpdate
         # reset updating after 5 attempts
         n_attempts = fsc.get(f'{wdir}-update-attempt')
         if n_attempts is None:
@@ -490,7 +491,7 @@ def callbacks(app, fsc, cache):
         mint = Mint(verbose=True)
         mint.ms_files = ms_files
         mint.peaklist = peaklist.reset_index().copy()
-        mint.peaklist['intensity_threshold'] = 5e4
+        mint.peaklist['intensity_threshold'] = 1e5
         mint.run()
         peak_labels = mint.results.peak_label.drop_duplicates()
         print('After filtering:', peak_labels)
