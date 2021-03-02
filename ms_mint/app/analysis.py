@@ -31,6 +31,7 @@ _layout = html.Div([
                     )
             for key in components.keys()]
     ),
+    
     dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
     dcc.Dropdown(id='peak-labels-include', options=[], placeholder='Include peak_labels', multi=True),
     dcc.Dropdown(id='peak-labels-exclude', options=[], placeholder='Exclude peak_labels', multi=True),    

@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 import time
+import logging
 
 from warnings import simplefilter
 from pathlib import Path as P
@@ -14,7 +15,7 @@ import seaborn as sns
 from multiprocessing import Pool, Manager, cpu_count
 from scipy.cluster.hierarchy import ClusterWarning
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 
 
 from .standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
@@ -221,7 +222,7 @@ class Mint(object):
         list_of_files = [str(P(i)) for i in list_of_files if is_ms_file(i)]
         for f in list_of_files:
             if not os.path.isfile(f): 
-                print(f'W File not found ({f})')
+                logging.warning(f'File not found ({f})')
         self._files = list_of_files
         if self.verbose:
             print( 'Set files to:\n' + '\n'.join(self.ms_files) + '\n' )
@@ -258,7 +259,7 @@ class Mint(object):
             peaklist = peaklist.drop_duplicates()
             error_string = '\n'.join(errors)
             if self.verbose:
-                print(f'Errors in peaklist:\n{error_string}')
+                logging.error(f'Errors in peaklist:\n{error_string}')
             self._messages = errors
         self._peaklist = peaklist
         if self.verbose:
@@ -275,7 +276,7 @@ class Mint(object):
     @property
     def rt_projections(self):
         return DeprecationWarning('rt_projections is deprecated. Peak shapes are now '
-                                 'directly stored in the results table (mint.results).')
+                                  'directly stored in the results table (mint.results).')
         
     def crosstab(self, col_name='peak_area'):
         return pd.crosstab(self.results.ms_file, 
@@ -439,8 +440,11 @@ class Mint(object):
         if scaler is not None:
             if scaler == 'standard':
                 scaler = StandardScaler()
+            elif scaler == 'robust':
+                scaler = RobustScaler()
             df = pd.DataFrame(scaler.fit_transform(df), 
                     index=df.index, columns=df.columns)
+
         min_dim = min(df.shape)
         n_vars = min(n_vars, min_dim)
         pca = PCA(n_vars)
