@@ -142,7 +142,6 @@ def callbacks(app, fsc, cache):
         options = [{'label':label, 'value': i} for i, label in enumerate(peaklist.index)]
         if options == old_options:
             raise PreventUpdate
-        print(options)
         return options
 
 
@@ -449,7 +448,6 @@ def callbacks(app, fsc, cache):
         clicked = clicked.replace('{"index":"', '')
         clicked = clicked.split('","type":')[0].replace('\\', '')
         if len( dash.callback_context.triggered) > 1: raise PreventUpdate
-        print('Image clicked', clicked)
         return clicked
 
 
@@ -506,8 +504,8 @@ def callbacks(app, fsc, cache):
         State('wdir', 'children'),
     )
     def remove_low_intensity_peaks(n_clicks, ms_selection, threshold, wdir):
-        print('Remove low intensity peaks')
         if n_clicks is None: raise PreventUpdate
+        logging.info('Remove low intensity peaks.')
         peaklist = T.get_peaklist( wdir )
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt( wdir )

@@ -11,11 +11,7 @@ from ms_mint.vis.plotly.plotly_tools import plot_heatmap
 
 from . import tools as T
 
-heat_layout = html.Div([
-    html.Div(id='res-upload-output'),
-    html.Div(id='heatmap-controls'),
-    html.Div(id='heatmap-output')
-])
+_label = 'Heatmap'
 
 
 heatmap_options = [
@@ -28,30 +24,6 @@ heatmap_options = [
     { 'label': 'log1p', 'value': 'log1p'},
 ]
 
-
-heat_layout_empty = html.Div([
-    dcc.Upload(
-            id='res-upload',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Files')
-            ]),
-            style={
-                'width': '100%',
-                'height': '60px',
-                'lineHeight': '60px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
-            },
-            # Allow multiple files to be uploaded
-            multiple=False
-        ),
-])
-
-_label = 'Heatmap'
 
 _layout = html.Div([
     html.H3('Heatmap'),

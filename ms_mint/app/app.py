@@ -5,6 +5,8 @@ import tempfile
 
 import pandas as pd
 
+from pathlib import Path as P
+
 import matplotlib
 matplotlib.use('Agg')
 
@@ -140,13 +142,14 @@ app.layout = html.Div([
 
     html.Div(id='active-workspace', style={'display': 'inline-block'}),
 
-    html.Div(id='wdir', children=TMPDIR, style={'display': 'inline-block', 'visibility': 'visible', 'float': 'right'}),
+    html.Div(id='wdir', children='', style={'display': 'inline-block', 'visibility': 'visible', 'float': 'right'}),
 
     html.Div(id='pko-creating-chromatograms'),
 
-    dcc.Tabs(id='tab', value=_modules[0]._label,  #vertical=True, style={'display': 'inline-block'},
+    dcc.Tabs(id='tab', value=_modules[0]._label,
         children=[
-            dcc.Tab(value=key, 
+            dcc.Tab(id=modules[key]._label,
+                    value=key, 
                     label=modules[key]._label,
                     )
             for key in modules.keys()]
@@ -175,11 +178,20 @@ for module in _modules:
 )
 def render_content(tab, wdir):
     func = modules[tab].layout
+    print('Working dir:', wdir)
+    if tab != 'Workspaces' and wdir == '':
+        return dbc.Alert('Please, create and activate a workspace.', color='warning')
+    elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:
+        return dbc.Alert('Please import MS files.', color='warning')
+    elif tab in ['Processing'] and ( len(T.get_peaklist( wdir )) == 0 ):
+        return dbc.Alert('Please, define peaklist.', color='warning')
+    elif tab in ['Analysis'] and not P(T.get_results_fn( wdir )).is_file():
+        return dbc.Alert('Please, create results (Processing).', color='warning')
     if func is not None:
         return func()
     else:
         raise PreventUpdate
-    
+
 
 if __name__ == '__main__':
     app.run_server(debug=True, threaded=True, 

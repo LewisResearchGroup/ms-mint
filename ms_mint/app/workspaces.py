@@ -94,9 +94,12 @@ def callbacks(app, fsc, cache):
     def ws_table(value, tab, delete, tmpdir):
         T.maybe_migrate_workspaces(tmpdir)
         ws_names = T.get_workspaces(tmpdir)
+        ws_names.sort()
         ws_names = [{'Workspace': ws_name} for ws_name in ws_names 
                         if not ws_name.startswith('.')]
         return ws_names
+
+
 
 
     @app.callback(
@@ -105,25 +108,27 @@ def callbacks(app, fsc, cache):
     Output('active-workspace', 'children'),
     Input('ws-table', 'derived_virtual_selected_rows'),
     Input({'index': 'ws-delete-output', 'type': 'output'}, 'children'),
+    Input({'index': 'ws-created-output', 'type': 'output'}, 'children'),
     State('ws-table', 'data'),
     State('tmpdir', 'children')
     )
-    def ws_activate(ndx, deleted, data, tmpdir):
-        if tmpdir is None:
-            raise PreventUpdate
-        if ndx is None:
-            ndx = 0
-        print(ndx, deleted, data, tmpdir)
-        prop_id = dash.callback_context.triggered[0]['prop_id']
-        ws_name = T.get_actived_workspace(tmpdir)
-        if prop_id == 'ws-delete-output.children':
+    def ws_activate(ndx, deleted, created, data, tmpdir):
+        prop_id = dash.callback_context.triggered[0]['prop_id']        
+        if tmpdir is None: raise PreventUpdate
+        ws_names = T.get_workspaces( tmpdir )
+        if ws_names is None or len(ws_names)==0 : 
+            message = 'No workspace defined.'
+            return dbc.Alert(message, color='danger'), '', ''
+        if prop_id == 'ws-delete-output.children' or ndx is None:
             ndx = [0]
-        data = pd.DataFrame(data)
-        if len(ndx) > 0:
-            ndx = ndx[0]
-            ws_name = data.iloc[ndx]['Workspace']
-        if not T.workspace_exists(tmpdir, ws_name):
-            ws_name = None
+
+        data = pd.DataFrame(data) 
+        if len(ndx) == 1:
+            ws_name = data.loc[ndx[0], 'Workspace']
+        else:
+            ws_name = T.get_active_workspace( tmpdir )
+
+        if ws_name is None: raise PreventUpdate
         wdir = T.workspace_path(tmpdir, ws_name)
         if ws_name is not None: T.save_activated_workspace(tmpdir, ws_name)
         else: raise PreventUpdate
@@ -220,3 +225,24 @@ def callbacks(app, fsc, cache):
         T.create_workspace(tmpdir, ws_name)
         return dbc.Alert(f'Workspace {ws_name} created.', color='success')
 
+
+    @app.callback(
+        Output('ws-table', 'selected_rows'),
+        Input('tab', 'value'),
+        Input('ws-table', 'data'),
+        State('tmpdir', 'children')
+    )
+    def set_selected_row(tab, data, tmpdir):
+        if tab != _label: raise PreventUpdate
+        ws_names = T.get_workspaces(tmpdir)
+        if len(ws_names) == 0: raise PreventUpdate
+        data = pd.DataFrame(data)
+        active_ws = T.get_active_workspace(tmpdir)
+        if active_ws is None:
+            ndx = data.index[0]
+            active_ws = data.Workspace[0]
+        else:
+            ndx = ws_names.index(active_ws)            
+        if ndx is None:
+            ndx = 0
+        return [ndx]

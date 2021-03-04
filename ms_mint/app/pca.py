@@ -61,8 +61,6 @@ def callbacks(app, fsc, cache):
 
         ndx = mint.decomposition_results['df_projected'].index.to_list()
 
-        #ndx_proj = mint.decomposition_results['df_projected'].index
-
         mint.pca_plot_cummulative_variance()
         src = T.fig_to_src()
         figures.append( html.Img(src=src) )
