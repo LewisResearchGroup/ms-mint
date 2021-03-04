@@ -101,6 +101,7 @@ if __name__ == '__main__':
     
     if args.debug:
         app.run_server(debug=args.debug, port=args.port, 
+            dev_tools_hot_reload=False,
             dev_tools_hot_reload_interval=3000,
             dev_tools_hot_reload_max_retry=30)
     else:

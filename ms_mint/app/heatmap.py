@@ -51,15 +51,16 @@ heat_layout_empty = html.Div([
         ),
 ])
 
+_label = 'Heatmap'
 
 _layout = html.Div([
     html.H3('Heatmap'),
     html.Button('Update', id='heatmap-update'),
-    dcc.Dropdown(id='heatmap-options', value=['normed_by_cols', 'clustered'],
+    dcc.Dropdown(id='heatmap-options', value=['normed_by_cols'],
         options=heatmap_options, multi=True),
     dcc.Loading( 
         dcc.Graph(id='heatmap-figure', 
-                  style={'margin-top': '50px'}) ),
+                  style={'marginTop': '50px'}) ),
 ])
 
 
@@ -71,11 +72,11 @@ def callbacks(app, fsc, cache):
 
     @app.callback(
         Output('heatmap-controls', 'children'),
-        Input('secondary-tab', 'value'),
+        Input('ana-secondary-tab', 'value'),
         State('wdir', 'children')
     )
     def heat_controls(tab, wdir):
-        if tab != 'heatmap':
+        if tab != _label:
             raise PreventUpdate
         fn = T.get_results_fn(wdir)
         if os.path.isfile(fn):
@@ -87,10 +88,10 @@ def callbacks(app, fsc, cache):
     @app.callback(
     Output('heatmap-figure', 'figure'),
     Input('heatmap-update', 'n_clicks'),
-    State('file-types', 'value'),
-    State('peak-labels-include', 'value'),
-    State('peak-labels-exclude', 'value'),
-    State('ms-order', 'value'),
+    State('ana-file-types', 'value'),
+    State('ana-peak-labels-include', 'value'),
+    State('ana-peak-labels-exclude', 'value'),
+    State('ana-ms-order', 'value'),
     State('heatmap-options', 'value'),
     State('wdir', 'children')
     )

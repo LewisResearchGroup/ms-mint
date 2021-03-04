@@ -17,13 +17,14 @@ graph_options = [{'label': 'Histograms', 'value': 'hist'},
                  {'label': 'Boxplots', 'value': 'boxplot'},
                  {'label': 'Probability Density', 'value': 'density'}]
 
+_label = 'Distributions'
 
 _layout = html.Div([
     html.H3('Quality Control'),
-    html.Button('Update', id='qc-update'),
-    dcc.Dropdown(id='qc-graphs', options=graph_options, value=['hist', 'boxplot', 'density'], multi=True, placeholder='Kinds of graphs'),
-    dcc.Checklist(id='qc-select', options=[{'label': 'Dense', 'value': 'Dense'}], value=['Dense']),
-    html.Div(id='qc-figures', style={'float': 'center'})
+    html.Button('Update', id='dist-update'),
+    dcc.Dropdown(id='dist-graphs', options=graph_options, value=['hist', 'boxplot', 'density'], multi=True, placeholder='Kinds of graphs'),
+    dcc.Checklist(id='dist-select', options=[{'label': 'Dense', 'value': 'Dense'}], value=['Dense']),
+    html.Div(id='dist-figures', style={'float': 'center'})
 ])
 
 
@@ -35,22 +36,21 @@ layout_no_data = html.Div([
     Once results have been produced you can access the QC tools.'''),
 ])
 
-
 def layout():
     return _layout
     
 def callbacks(app, fsc, cache):
 
     @app.callback(
-    Output('qc-figures', 'children'),
-    Input('qc-update', 'n_clicks'),
+    Output('dist-figures', 'children'),
+    Input('dist-update', 'n_clicks'),
     State('tab', 'value'),
-    State('qc-groupby', 'value'),
-    State('qc-graphs', 'value'),
-    State('qc-select', 'value'),
-    State('file-types', 'value'),
-    State('peak-labels-include', 'value'),
-    State('peak-labels-exclude', 'value'),
+    State('ana-groupby', 'value'),
+    State('dist-graphs', 'value'),
+    State('dist-select', 'value'),
+    State('ana-file-types', 'value'),
+    State('ana-peak-labels-include', 'value'),
+    State('ana-peak-labels-exclude', 'value'),
     State('wdir', 'children')
     )
     def qc_figures(n_clicks, tab, groupby, kinds, options, file_types, 

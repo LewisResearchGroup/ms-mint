@@ -20,6 +20,7 @@ _layout = html.Div([
     
 ])
 
+_label = 'PCA'
 
 def layout():
     return _layout
@@ -30,10 +31,10 @@ def callbacks(app, fsc, cache):
     @app.callback(
         Output('pca-figures', 'children'),
         Input('pca-update', 'n_clicks'),
-        State('qc-groupby', 'value'),
-        State('peak-labels-include', 'value'),
-        State('peak-labels-exclude', 'value'),
-        State('file-types', 'value'),
+        State('ana-groupby', 'value'),
+        State('ana-peak-labels-include', 'value'),
+        State('ana-peak-labels-exclude', 'value'),
+        State('ana-file-types', 'value'),
         State('wdir', 'children')
     )
     def create_pca( n_clicks, groupby, include_labels, exclude_labels, 
