@@ -21,6 +21,7 @@ import ms_mint
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
+from ms_mint.standards import PEAKLIST_COLUMNS
 
 from datetime import date
 
@@ -100,7 +101,7 @@ def workspace_exists(tmpdir, ws_name):
     return os.path.isdir(path)
 
 
-def get_actived_workspace(tmpdir):
+def get_active_workspace(tmpdir):
     '''Returns name of last activated workspace,
        if workspace still exists. Otherwise,
        return None.
@@ -140,7 +141,9 @@ def get_workspaces_path(tmpdir):
 
 def get_workspaces(tmpdir):
     ws_path = get_workspaces_path(tmpdir)
-    return get_dirnames( ws_path )
+    ws_names = get_dirnames( ws_path )
+    ws_names = [ws for ws in ws_names if not ws.startswith('.')]
+    return ws_names
 
 
 class Chromatograms():
@@ -228,7 +231,8 @@ def get_peaklist(wdir):
     fn = get_peaklist_fn( wdir )
     if os.path.isfile( fn ):
         return read_peaklists( fn ).set_index('peak_label')
-    else: return None
+    else: 
+        return pd.DataFrame(columns=PEAKLIST_COLUMNS)
 
 
 def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None, rt=None):

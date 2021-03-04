@@ -8,13 +8,17 @@ from dash.exceptions import PreventUpdate
 from . import heatmap
 from . import pca
 from . import distributions
+from . import hierachical_clustering
+from . import plotting
 from . import tools as T
 
 
 _modules = [
   heatmap,
   distributions,
-  pca
+  pca,
+  hierachical_clustering,
+  plotting
 ]
 
 modules = {module._label: module for module in _modules}
