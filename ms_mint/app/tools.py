@@ -288,6 +288,10 @@ def get_metadata(wdir):
     if 'PeakOpt' not in df.columns:
         df['PeakOpt'] = False
     else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
+    
+    if 'index' in df.columns: del df['index']
+    df.reset_index(inplace=True)
+
     return df
 
 
@@ -305,6 +309,10 @@ def init_metadata( ms_files ):
     df['PeakOpt'] = ''
     return df
 
+def write_metadata( meta, wdir ):
+    fn = get_metadata_fn( wdir )
+    with lock(fn):
+        meta.to_csv( fn, index=False)
 
 def get_metadata_fn(wdir):
     fn = os.path.join(wdir, 'metadata', 'metadata.csv')

@@ -28,7 +28,7 @@ downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 meta_table = html.Div(id='meta-table-container', 
-    style={'min-height':  100, 'margin': '0%'},
+    style={'minHeight':  100, 'margin': '0%'},
     children=[
         DashTabulator(id='meta-table',
             columns=T.gen_tabulator_columns(add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), 
@@ -45,6 +45,8 @@ options = [
     {'label': 'Type', 'value': 'Type'},
     {'label': 'Concentration', 'value': 'Concentration'},
     ]
+
+_label = 'Metadata'
 
 _layout = html.Div([
     html.H3('Metadata'),
@@ -81,14 +83,25 @@ _layout = html.Div([
             id='meta-column', options=options, 
             value=None, style={'width': '150px'}),
         dcc.Input(id='meta-input'),
-        html.Button('Apply', id='meta-apply'),
-    ], style={'margin-left': '5px'}),
+        dcc.Dropdown(
+            id='meta-input-bool', options=[{'value': 'True', 'label': 'True'},
+                                           {'value': 'False', 'label': 'False'}],
+            value=None),
 
-    html.Div(id='meta-apply-output'),
+        html.Button('Apply', id='meta-apply'),
+    ], style={'marginLeft': '5px'}),
+
     html.Div(id='meta-table-saved-on-edit-output'),
     dcc.Markdown('---'),    
     dcc.Loading( meta_table ),
 ])
+
+
+_outputs = html.Div(id='meta-outputs', 
+    children=[
+        html.Div(id={'index': 'meta-apply-output', 'type': 'output'})
+    ]
+)
 
 
 def layout():
@@ -103,7 +116,7 @@ def callbacks(app, fsc, cache):
     Output('meta-column', 'options'),
     Input('meta-upload', 'contents'),
     Input('meta-upload', 'filename'),
-    Input('meta-apply-output', 'children'),
+    Input({'index': 'meta-apply-output', 'type': 'output'}, 'children'),
     State('wdir', 'children')
     )
     def meta_upload(contents, filename, message, wdir):
@@ -119,7 +132,7 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-    Output('meta-apply-output', 'children'),
+    Output({'index': 'meta-apply-output', 'type': 'output'}, 'children'),
     Input('meta-apply', 'n_clicks'),
     State('meta-table', 'multiRowsClicked'),
     State('meta-table', 'data'),
@@ -127,15 +140,21 @@ def callbacks(app, fsc, cache):
     State('meta-action', 'value'),
     State('meta-column', 'value'),
     State('meta-input', 'value'),
+    State('meta-input-bool', 'value'),
     State('wdir', 'children'),
     )
     def meta_save(n_clicks, selected_rows, data, 
-                  data_filtered, action, column, value, wdir):
-        print('Save metadata')
+                  data_filtered, action, column, value, 
+                  value_bool, wdir):
+        
+        if action == 'Set' and column == 'PeakOpt':
+            value = value_bool
+
         if data is None or len(data) == 0:
             raise PreventUpdate
-        fn = T.get_metadata_fn( wdir )
+
         df = pd.DataFrame(data)
+
         if 'index' in df.columns:
             df = df.set_index('index')
         else:
@@ -152,16 +171,16 @@ def callbacks(app, fsc, cache):
                     # If something is selected only apply to selected rows
                     ndxs = [r['index'] for r in selected_rows if r['index'] in filtered_ndx]
                 if len(ndxs) == 0 or column is None:
-                    return 'No rows selected.'
+                    return dbc.Alert('No rows selected.', color='danger')
                 df.loc[ndxs, column] = value
             elif action == 'Create column': df[value] = ''
             elif action == 'Delete column': del df[column]
-        with T.lock(fn):
-            df.to_csv(fn, index=False)
-            print('Metadata file written')
+
+        T.write_metadata(df, wdir )
+
         if prop_id == 'meta-table.cellEdited':
             raise PreventUpdate
-        return dbc.Alert('Data saved.')
+        return dbc.Alert('Metadata saved.', color='info')
 
     
     @app.callback(
@@ -173,8 +192,30 @@ def callbacks(app, fsc, cache):
     def save_table_on_edit(cell_edited, data, wdir):
         if data is None or cell_edited is None:
             raise PreventUpdate
-        fn = T.get_metadata_fn( wdir )
         df = pd.DataFrame(data)
-        with T.lock(fn):
-            df.to_csv(fn, index=False)
+        T.write_metadata( df , wdir)
     
+    
+    @app.callback(
+        Output('meta-column', 'disabled'),
+        Input('meta-action', 'value'),
+    )
+    def set_something(action):
+        if action in ['Set', 'Delete column']:
+            return False
+        return True
+    
+    
+    @app.callback(
+        Output('meta-input', 'style'),
+        Output('meta-input-bool', 'style'),
+        Input('meta-action', 'value'),
+        Input('meta-column', 'value')
+    )
+    def set_something(action, column): 
+        visible = {'visibility': 'visible', 'width': '150px', 'margin': 0}
+        hidden = {'visibility': 'hidden', 'width': '0px', 'margin':0}
+        if (action == 'Set') & (column == 'PeakOpt'):
+            return hidden, visible
+        return visible, hidden
+        

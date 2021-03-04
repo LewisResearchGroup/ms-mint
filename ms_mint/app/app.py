@@ -30,6 +30,7 @@ from . import peak_optimization
 from . import run_mint
 from . import add_metab
 from . import analysis
+from . import messages
 
 import dash_uploader as du
 from tempfile import gettempdir
@@ -55,6 +56,7 @@ config = {
 
 pd.options.display.max_colwidth = 1000
 
+'''
 components = {
     'workspaces':   {'label': 'Workspace',          'callbacks_func': workspaces.callbacks,         'layout_func': workspaces.layout},
     'msfiles':      {'label': 'MS-files',           'callbacks_func': ms_files.callbacks,           'layout_func': ms_files.layout},
@@ -63,10 +65,27 @@ components = {
     'add_metab':    {'label': 'Add Metabolites',    'callbacks_func': add_metab.callbacks,          'layout_func': add_metab.layout},
     'pko':          {'label': 'Peak Optimization',  'callbacks_func': peak_optimization.callbacks,  'layout_func': peak_optimization.layout},
     'run':          {'label': 'Run MINT',           'callbacks_func': run_mint.callbacks,           'layout_func': run_mint.layout},
-    'analysis':     {'label': 'Analysis',           'callbacks_func': analysis.callbacks,           'layout_func': analysis.layout}
+    'analysis':     {'label': 'Analysis',           'callbacks_func': analysis.callbacks,           'layout_func': analysis.layout},
 }
+'''
 
+_modules = [
+  workspaces,
+  ms_files,
+  metadata,
+  peaklist,
+  add_metab,
+  peak_optimization,
+  run_mint,
+  analysis
+]
 
+modules = {module._label: module for module in _modules}
+
+# Collect outputs:
+_outputs = html.Div(id='outputs', children=[module._outputs for module in 
+                                     _modules if module._outputs is not None], 
+             style={'visibility': 'hidden'})
 
 app = dash.Dash(__name__, 
     external_stylesheets=[
@@ -108,17 +127,16 @@ app.layout = html.Div([
          children=[html.Button('Issues', id='B_issues', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
+    dbc.Progress(id="progress-bar", value=100, style={'marginBottom': '20px', 'width': '100%'}),
+
+    messages.layout(),
+
     Download(id='res-download-data'),
 
-    dbc.Progress(id="progress-bar", value=100, style={'margin-bottom': '20px', 'width': '100%'}),
-
-    dcc.Markdown(id='res-delete-output'),
-
-    html.Div(id='run-mint-output'),
 
     html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
 
-    html.P('Current Workspace: ', style={'display': 'inline-block', 'margin-right': '5px'}),
+    html.P('Current Workspace: ', style={'display': 'inline-block', 'marginRight': '5px', 'marginTop': '5px'}),
 
     html.Div(id='active-workspace', style={'display': 'inline-block'}),
 
@@ -126,23 +144,26 @@ app.layout = html.Div([
 
     html.Div(id='pko-creating-chromatograms'),
 
-    dcc.Tabs(id='tab', value='workspaces',  #vertical=True, style={'display': 'inline-block'},
+    dcc.Tabs(id='tab', value=_modules[0]._label,  #vertical=True, style={'display': 'inline-block'},
         children=[
             dcc.Tab(value=key, 
-                    label=components[key]['label'],
+                    label=modules[key]._label,
                     )
-            for key in components.keys()]
+            for key in modules.keys()]
     ),
 
     html.Div(id='pko-image-store', style={'visibility': 'hidden', 'height': '0px'}),
 
-    html.Div(id='tab-content')
+    html.Div(id='tab-content'),
 
+    _outputs
+    
 ], style={'margin':'2%'})
 
+messages.callbacks(app=app, fsc=fsc, cache=cache)
 
-for component in components.values():
-    func = component['callbacks_func']
+for module in _modules:
+    func = module.callbacks
     if func is not None:
         func(app=app, fsc=fsc, cache=cache)
 
@@ -153,7 +174,7 @@ for component in components.values():
     State('wdir', 'children')
 )
 def render_content(tab, wdir):
-    func = components[tab]['layout_func']
+    func = modules[tab].layout
     if func is not None:
         return func()
     else:
