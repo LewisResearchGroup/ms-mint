@@ -441,8 +441,9 @@ def parse_table_content(content, filename):
 
 def fig_to_src(dpi=100):
     out_img = io.BytesIO()
-    #with lock(out_img):
+
     plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
+
     plt.close('all')
     out_img.seek(0)  # rewind file
     encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")

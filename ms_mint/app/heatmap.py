@@ -50,12 +50,8 @@ def callbacks(app, fsc, cache):
     def heat_controls(tab, wdir):
         if tab != _label:
             raise PreventUpdate
-        fn = T.get_results_fn(wdir)
-        if os.path.isfile(fn):
-            return _layout
-        else: 
-            return heat_layout_empty
-
+        return _layout
+        
 
     @app.callback(
     Output('heatmap-figure', 'figure'),

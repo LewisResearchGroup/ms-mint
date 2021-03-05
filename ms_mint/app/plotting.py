@@ -9,8 +9,10 @@ from dash.exceptions import PreventUpdate
 from ms_mint.notebook import Mint
 from ms_mint.vis.plotly.plotly_tools import plot_heatmap
 
+import matplotlib as mpl
 import seaborn as sns
 sns.set_context('paper')
+
 
 from . import tools as T
 
@@ -158,7 +160,8 @@ def callbacks(app, fsc, cache):
             plot_func = sns.catplot
             kwargs=dict(
                 sharex='share-x' in options,
-                sharey='share-y' in options
+                sharey='share-y' in options,
+                facet_kws=dict(legend_out=True)
             )
 
         g = plot_func(
@@ -200,7 +203,16 @@ def callbacks(app, fsc, cache):
 
         if title is not None: g.fig.suptitle(title)
 
-        #g.tight_layout(w_pad=0)
+
+        g.tight_layout(w_pad=0)
+   
+        print(sns.__version__)
+        print(mpl.__version__)
+        #g.add_legend()
+        try:
+            g.legend.set_bbox_to_anchor((1.2, 0.7))
+        except:
+            pass
 
         src = T.fig_to_src(dpi=300 if 'HQ' in options else None)
 
