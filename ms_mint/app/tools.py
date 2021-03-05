@@ -49,8 +49,7 @@ def get_issue_text():
     %0A%0A%0A%0A%0A%0A%0A%0A%0A
     MINT version: {ms_mint.__version__}%0A
     OS: {platform.platform()}%0A
-    Versions:
-    {get_versions()}
+    Versions: ---
     '''
 
 def parse_ms_files(contents, filename, date, target_dir):
