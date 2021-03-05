@@ -34,10 +34,6 @@ class RetentionTimeOptimizer():
             if self.rt_margin is None:
                 self.rt_margin = (self.rt_max - self.rt_min) / 2
         
-    def print_values(self):
-        for x in self.rt, self.rt_margin, self.rt_max, self.rt_min:
-            plot(x)
-        
     def find_peaks_and_widths(self, chrom, prominence=1000):
         x = chrom.values
         ndx_peaks, _ = find_peaks(x, prominence=(prominence, None))
