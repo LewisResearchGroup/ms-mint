@@ -7,15 +7,21 @@ from dash.exceptions import PreventUpdate
 
 from . import heatmap
 from . import pca
-from . import quality_control
+from . import distributions
+from . import hierachical_clustering
+from . import plotting
 from . import tools as T
 
-components = {
-    'heatmap':      {'label': 'Heatmap',            'callbacks_func': heatmap.callbacks,            'layout_func': heatmap.layout},
-    'qc':           {'label': 'Statistics',         'callbacks_func': quality_control.callbacks,    'layout_func': quality_control.layout},
-    'pca':          {'label': 'Decomposition',      'callbacks_func': pca.callbacks,                'layout_func': pca.layout}
-}
 
+_modules = [
+  heatmap,
+  distributions,
+  pca,
+  hierachical_clustering,
+  plotting
+]
+
+modules = {module._label: module for module in _modules}
 
 groupby_options = [{'label': 'Batch', 'value': 'Batch'},
                    {'label': 'Label', 'value': 'Label'},
@@ -24,21 +30,25 @@ groupby_options = [{'label': 'Batch', 'value': 'Batch'},
 
 
 _layout = html.Div([
-    dcc.Tabs(id='secondary-tab', value='heatmap', vertical=False, 
-        children=[
-            dcc.Tab(value=key, 
-                    label=components[key]['label'],
-                    )
-            for key in components.keys()]
+    dcc.Tabs(id='ana-secondary-tab', value=_modules[0]._label, vertical=False, 
+        children=[dcc.Tab(value=key, 
+                    label=modules[key]._label,
+                    ) for key in modules.keys()
+        ]
     ),
-    dcc.Dropdown(id='file-types', options=[], placeholder='Types of files to include', multi=True),
-    dcc.Dropdown(id='peak-labels-include', options=[], placeholder='Include peak_labels', multi=True),
-    dcc.Dropdown(id='peak-labels-exclude', options=[], placeholder='Exclude peak_labels', multi=True),    
-    dcc.Dropdown(id='ms-order', options=[], placeholder='MS-file sorting', multi=True),
-    dcc.Dropdown(id='qc-groupby', options=groupby_options, value=None, placeholder='Group by column'),
-    html.Div(id='secondary-tab-content')
+    
+    dcc.Dropdown(id='ana-file-types', options=[], placeholder='Types of files to include', multi=True),
+    dcc.Dropdown(id='ana-peak-labels-include', options=[], placeholder='Include peak_labels', multi=True),
+    dcc.Dropdown(id='ana-peak-labels-exclude', options=[], placeholder='Exclude peak_labels', multi=True),    
+    dcc.Dropdown(id='ana-ms-order', options=[], placeholder='MS-file sorting', multi=True),
+    dcc.Dropdown(id='ana-groupby', options=groupby_options, value=None, placeholder='Group by column'),
+    html.Div(id='ana-secondary-tab-content')
 ])
 
+
+_label = 'Analysis'
+
+_outputs = None
 
 def layout():
     return _layout
@@ -46,18 +56,18 @@ def layout():
 
 def callbacks(app, fsc, cache):
 
-    for component in components.values():
-        func = component['callbacks_func']
+    for module in _modules:
+        func = module.callbacks
         if func is not None:
             func(app=app, fsc=fsc, cache=cache)
 
     @app.callback(
-        Output('secondary-tab-content', 'children'),
-        Input('secondary-tab', 'value'),
+        Output('ana-secondary-tab-content', 'children'),
+        Input('ana-secondary-tab', 'value'),
         State('wdir', 'children')
     )
     def render_content(tab, wdir):
-        func = components[tab]['layout_func']
+        func = modules[tab].layout
         if func is not None:
             return func()
         else:
@@ -65,13 +75,13 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-    Output('file-types', 'options'),
-    Output('file-types', 'value'),
-    Input('tab', 'value'),
-    State('wdir', 'children')
+        Output('ana-file-types', 'options'),
+        Output('ana-file-types', 'value'),
+        Input('tab', 'value'),
+        State('wdir', 'children')
     )
     def file_types(tab, wdir):
-        if not tab in ['qc', 'analysis']:
+        if tab != _label:
             raise PreventUpdate
         meta = T.get_metadata( wdir )
         if meta is None:
@@ -82,26 +92,27 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-        Output('ms-order', 'options'),
-        Input('secondary-tab', 'value'),
+        Output('ana-ms-order', 'options'),
+        Output('ana-groupby', 'options'),
+        Input('ana-secondary-tab', 'value'),
         State('wdir', 'children')
     )
     def ms_order_options(tab, wdir):
-        if not tab == 'heatmap': raise PreventUpdate
         cols = T.get_metadata(wdir).dropna(how='all', axis=1).columns.to_list()
         if 'index' in cols: cols.remove('index')
+        if 'PeakOpt' in cols: cols.remove('PeakOpt')
         options = [{'value':i, 'label': i} for i in cols]
-        return options
+        return options, options
 
 
     @app.callback(
-        Output('peak-labels-include', 'options'),
-        Output('peak-labels-exclude', 'options'),
+        Output('ana-peak-labels-include', 'options'),
+        Output('ana-peak-labels-exclude', 'options'),
         Input('tab', 'value'),
         State('wdir', 'children')
     )
     def peak_labels(tab, wdir):
-        if tab not in ['analysis']:
+        if tab != _label:
             raise PreventUpdate
         peaklist = T.get_peaklist( wdir ).reset_index()
         options = [{'value': i, 'label': i} for i in peaklist.peak_label]

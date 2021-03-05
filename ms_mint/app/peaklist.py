@@ -2,6 +2,8 @@ import os
 
 import pandas as pd
 
+import dash
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
 from dash_table import DataTable
@@ -33,8 +35,8 @@ pkl_table = DataTable(
                 filter_action='native',                
                 style_table={'overflowX': 'scroll'},
                 style_as_list_view=True,
-                style_cell={'padding-left': '5px', 
-                            'padding-right': '5px'},
+                style_cell={'padding-left': '20px', 
+                            'padding-right': '20px'},
                 style_header={'backgroundColor': 'white',
                               'fontWeight': 'bold'},
                 export_format='csv',
@@ -42,6 +44,7 @@ pkl_table = DataTable(
                 merge_duplicate_headers=True
             ) 
 
+_label = 'Peaklist'
 
 _layout = html.Div([
     html.H3('Peaklist'),
@@ -68,11 +71,17 @@ _layout = html.Div([
     dcc.Dropdown('pkl-ms-mode', options=[
         {'value': 'positive', 'label': 'Add proton mass to formula (positive mode)'},
         {'value': 'negative', 'label': 'Subtract proton mass from formula (negative mode)'}], value=None),
-    html.Div(id='pkl-upload-output'),
-    html.Div(id='pkl-save-output'),
-    html.Button('Save peaklist', id='pkl-save'),
-    html.Button('Delete selected peaks', id='pkl-delete', style={'float': 'right'}),
-    pkl_table,
+
+    html.Button('Save', id='pkl-save'),
+    html.Button('Clear', id='pkl-clear', style={'float': 'right'}),
+    html.Div(id='table-container', children=pkl_table, style={'margin': '20px'})
+])
+
+
+_outputs = html.Div(id='pkl-outputs', children=[
+    html.Div(id={'index': 'pkl-upload-output', 'type': 'output'}),
+    html.Div(id={'index': 'pkl-save-output', 'type': 'output'}),
+    html.Div(id={'index': 'pkl-clear-output', 'type': 'output'}),
 ])
 
 
@@ -85,11 +94,15 @@ def callbacks(app, fsc=None, cache=None):
     Output('pkl-table', 'data'),
     Input('pkl-upload', 'contents'),
     Input('pkl-ms-mode', 'value'),
+    Input('pkl-clear', 'n_clicks'),    
     State('pkl-upload', 'filename'),
     State('pkl-upload', 'last_modified'),
     State('wdir', 'children')
     )
-    def pkl_upload(list_of_contents, ms_mode, list_of_names, list_of_dates, wdir):
+    def pkl_upload(list_of_contents, ms_mode, clear, list_of_names, list_of_dates, wdir):
+        prop_id = dash.callback_context.triggered[0]['prop_id']
+        if prop_id.startswith('pkl-clear'):
+            return pd.DataFrame(columns=PEAKLIST_COLUMNS).to_dict('records')
         target_dir = os.path.join(wdir, 'peaklist')
         fn = os.path.join( target_dir, 'peaklist.csv')
         if list_of_contents is not None:
@@ -101,7 +114,7 @@ def callbacks(app, fsc=None, cache=None):
             return read_peaklists(fn).to_dict('records')   
 
     @app.callback(
-        Output('pkl-save-output', 'children'),
+        Output({'index': 'pkl-save-output', 'type': 'output'}, 'children'),
         Input('pkl-save', 'n_clicks'),
         Input('pkl-table', 'data'),
         State('wdir', 'children')
@@ -111,7 +124,7 @@ def callbacks(app, fsc=None, cache=None):
         if len(df) == 0:
             df = pd.DataFrame(columns=PEAKLIST_COLUMNS)
         T.write_peaklist( df, wdir)
-        return 'Peaklist saved.'
+        return dbc.Alert('Peaklist saved.', color='info')
 
-  
+
 

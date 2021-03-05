@@ -5,27 +5,35 @@ from matplotlib import pyplot as plt
 from scipy.signal import find_peaks, peak_widths
 from sklearn.neighbors import KernelDensity
 
+from ..tools import gaussian
 from ..Resampler import Resampler
 
 class RetentionTimeOptimizer():
-    def __init__(self, rt_min=None, rt_max=None, rt_expected=None, 
+    def __init__(self, rt_min=None, rt_max=None, rt=None, rt_margin=None,
                  how='largest', dt=0.01, show_figure=False, precission=3
-                 
-                 
                  ):
         self.t_peaks = None
         self.x_peaks = None
         self.peak_width_bottom = None
         self.rt_max = rt_max
         self.rt_min = rt_min
-        self.rt_span = (0,0)
-        self.rt_expected = rt_expected
+        self.rt_margin = rt_margin
+        self.rt = rt
         self.how = how
         self.dt = dt
         self.resampler = Resampler()
         self.show_figure = show_figure
         self.precission = precission
+        self.update_values()
 
+
+    def update_values(self):
+        if (self.rt_min is not None) and (self.rt_max is not None):
+            if self.rt is None:
+                self.rt = np.mean([self.rt_min, self.rt_max])
+            if self.rt_margin is None:
+                self.rt_margin = (self.rt_max - self.rt_min) / 2
+        
     def find_peaks_and_widths(self, chrom, prominence=1000):
         x = chrom.values
         ndx_peaks, _ = find_peaks(x, prominence=(prominence, None))
@@ -36,6 +44,12 @@ class RetentionTimeOptimizer():
         self.x_peaks = x_peaks
         self.peak_width_bottom = results_bottom
         
+    def weighted_chrom(self, chrom):
+        mean = self.rt
+        sigma = self.rt_margin
+        weights = gaussian(chrom.index, mean, sigma)
+        return chrom*weights
+
     def ndx_largest_peak(self):
         x_peaks = self.x_peaks
         if len(x_peaks) == 0:
@@ -56,6 +70,7 @@ class RetentionTimeOptimizer():
     
     def find_largest_peak_in_chromatogram(self, chrom):
         chrom = chrom.copy()
+        chrom = self.weighted_chrom(chrom)
         if self.show_figure: chrom.plot(color='grey', alpha=0.5)
         chrom = self.resample(chrom)
         self.get_chrom_properties(chrom)        

@@ -1,7 +1,7 @@
 import os
 import shutil
 import uuid
-
+import logging
 
 import wget
 import urllib3, ftplib
@@ -12,8 +12,10 @@ from glob import glob
 
 import pandas as pd
 
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
+
 from dash.exceptions import PreventUpdate
 
 from dash.dependencies import Input, Output, State
@@ -56,7 +58,7 @@ columns = [
 
 
 ms_table = html.Div(id='ms-table-container', 
-    style={'min-height':  100, 'marginTop': '10%'},
+    style={'minHeight':  100, 'marginTop': '10%'},
     children=[
         DashTabulator(id='ms-table',
             columns=columns, 
@@ -65,6 +67,7 @@ ms_table = html.Div(id='ms-table-container',
         )
 ])
 
+_label = 'MS-Files'
 
 _layout = html.Div([
     html.H3('Upload MS-files'),
@@ -82,7 +85,7 @@ _layout = html.Div([
                 'borderStyle': 'dashed',
                 'borderRadius': '5px',
                 'textAlign': 'center',
-                'margin-bottom': '15px',
+                'marginBottom': '15px',
             },
             # Allow multiple files to be uploaded
             multiple=True),
@@ -97,21 +100,25 @@ _layout = html.Div([
                 }),
     html.Button('Import from URL', id='ms-import-from-url'),
     dcc.Input(id='url', placeholder='Drop URL here', style={'width': '100%'}),
-    html.Div(id='ms-upload-zip-filename'),    
-    dcc.Markdown('---', style={'margin-top': '10px'}),
+    dcc.Markdown('---', style={'marginTop': '10px'}),
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
-
-    dcc.Loading( html.Div(id='ms-upload-output') ),
-    html.Div(id='ms-convert-output'),
-    html.Div(id='ms-delete-output'),
-    html.Div(id='ms-save-output'),
-    html.Div(id='ms-import-from-url-output'),
-    html.Div(id='ms-upload-zip-output'),
-
-    dcc.Loading( ms_table )
+    dcc.Loading( ms_table ),
+    html.Div(id='ms-upload-zip-filename', style={'visibility': 'hidden'}),    
 ])
+
+
+_outputs = html.Div(id='ms-outputs', 
+    children=[
+        html.Div(id={'index': 'ms-upload-output', 'type': 'output'}),
+        html.Div(id={'index': 'ms-convert-output', 'type': 'output'}),
+        html.Div(id={'index': 'ms-delete-output', 'type': 'output'}),
+        html.Div(id={'index': 'ms-save-output', 'type': 'output'}),
+        html.Div(id={'index': 'ms-import-from-url-output', 'type': 'output'}),
+        html.Div(id={'index': 'ms-upload-zip-output', 'type': 'output'}),
+    ]
+)
 
 
 def layout():
@@ -119,10 +126,11 @@ def layout():
 
 
 def callbacks(app, fsc, cache):
+
     @app.callback(
-    Output('ms-upload-output', 'children'),
+    Output({'index': 'ms-upload-output', 'type': 'output'}, 'children'),
     Input('ms-upload', 'contents'),
-    Input('ms-convert-output', 'children'),
+    Input({'index':'ms-convert-output', 'type': 'output'}, 'children'),
     State('ms-upload', 'filename'),
     State('ms-upload', 'last_modified'),
     State('wdir', 'children'))
@@ -138,21 +146,21 @@ def callbacks(app, fsc, cache):
                         T.parse_ms_files(c, n, d, target_dir)
                         n_uploaded += 1
                     except:
-                        print(f'Could not parse file {n}')
+                        logging.warning(f'Could not parse file {n}')
                 if n.lower().endswith('zip'):
-                    print('Zip file uploaded', target_dir, n)
+                    logging.info(f'Zip file uploaded {target_dir}, {n}')
                     fn = os.path.join( target_dir, n)
                     shutil.unpack_archive(fn, target_dir)
                     os.remove(fn)
-            return html.P(f'{n_uploaded} files uploaded.')
+            return dbc.Alert(f'{n_uploaded} files uploaded.', color='success')
 
 
     @app.callback(
     Output('ms-table', 'data'),
-    Input('ms-upload-output', 'children'),
+    Input({'index': 'ms-upload-output', 'type': 'output'}, 'children'),
     Input('wdir', 'children'), 
-    Input('ms-delete-output', 'children'),
-    Input('ms-upload-zip-output', 'children')
+    Input({'index':'ms-delete-output', 'type': 'output'}, 'children'),
+    Input({'index':'ms-upload-zip-output', 'type': 'output'}, 'children')
     )
     def ms_table(value, wdir, files_deleted, zip_extracted): 
         ms_files = T.get_ms_fns( wdir )
@@ -162,7 +170,7 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-    Output('ms-convert-output', 'children'),
+    Output({'index': 'ms-convert-output', 'type': 'output'}, 'children'),
     Input('ms-convert', 'n_clicks'),
     State('ms-table', 'multiRowsClicked'),
     State('wdir', 'children')
@@ -179,11 +187,11 @@ def callbacks(app, fsc, cache):
             fsc.set('progress', int(100*(i+1)/n_total))
             new_fn = convert_ms_file_to_feather(fn)
             if os.path.isfile(new_fn): os.remove(fn)
-        return 'Files converted to feather format.'
+        return dbc.Alert('Files converted to feather format.', color='info')
 
 
     @app.callback(
-        Output('ms-delete-output', 'children'),
+        Output({'index': 'ms-delete-output', 'type': 'output'}, 'children'),
         Input('ms-delete', 'n_clicks'),
         State('ms-table', 'multiRowsClicked'),
         State('wdir', 'children')
@@ -196,7 +204,7 @@ def callbacks(app, fsc, cache):
             fn = row['MS-file']
             fn = os.path.join(target_dir, fn)
             os.remove(fn)
-        return f'{len(rows)} files deleted'
+        return dbc.Alert(f'{len(rows)} files deleted', color='info')
 
 
     @du.callback(
@@ -207,7 +215,7 @@ def callbacks(app, fsc, cache):
         return filenames[0]
 
     @app.callback(
-        Output('ms-upload-zip-output', 'children'),
+        Output({'index': 'ms-upload-zip-output', 'type': 'output'}, 'children'),
         Input('ms-upload-zip-filename', 'children'),
         State('wdir', 'children')
     )
@@ -230,11 +238,11 @@ def callbacks(app, fsc, cache):
         for remainings in glob(os.path.join(upload_path, '*')):
             if os.path.isfile(remainings): os.remove(remainings)
             elif os.path.isdir(remainings): shutil.rmtree(remainings)
-        return 'Done'
+        return dbc.Alert('Upload finished', color='success')
 
 
     @app.callback(
-        Output('ms-import-from-url-output', 'children'),
+        Output({'index': 'ms-import-from-url-output', 'type': 'output'}, 'children'),
         Input('ms-import-from-url', 'n_clicks'),
         State('url', 'value'),
         State('wdir', 'children')
@@ -247,15 +255,17 @@ def callbacks(app, fsc, cache):
         filenames = [fn for fn in filenames if T.is_ms_file(fn)]
 
         if len(filenames) == 0:
-            return f'No MS files found at {url}'
+            return dbc.Alert(f'No MS files found at {url}', color='warning')
 
         ms_dir = T.get_ms_dirname( wdir )
         fns = []
-        for fn in tqdm( filenames ):
+        n_files = len(filenames)
+        for i, fn in enumerate( tqdm( filenames )):
             _url = url+'/'+fn
-            print('Downloading', _url)
+            logging.info('Downloading', _url)
+            fsc.set('progress', int(100*(1+i)/n_files))
             wget.download(_url, out=ms_dir)
-        return f'{len(fns)} files downloaded.'
+        return dbc.Alert(f'{len(fns)} files downloaded.', color='success')
 
 
 def get_filenames_from_url(url):

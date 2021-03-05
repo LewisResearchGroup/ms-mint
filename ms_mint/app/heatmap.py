@@ -11,11 +11,7 @@ from ms_mint.vis.plotly.plotly_tools import plot_heatmap
 
 from . import tools as T
 
-heat_layout = html.Div([
-    html.Div(id='res-upload-output'),
-    html.Div(id='heatmap-controls'),
-    html.Div(id='heatmap-output')
-])
+_label = 'Heatmap'
 
 
 heatmap_options = [
@@ -29,37 +25,14 @@ heatmap_options = [
 ]
 
 
-heat_layout_empty = html.Div([
-    dcc.Upload(
-            id='res-upload',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Files')
-            ]),
-            style={
-                'width': '100%',
-                'height': '60px',
-                'lineHeight': '60px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
-            },
-            # Allow multiple files to be uploaded
-            multiple=False
-        ),
-])
-
-
 _layout = html.Div([
     html.H3('Heatmap'),
     html.Button('Update', id='heatmap-update'),
-    dcc.Dropdown(id='heatmap-options', value=['normed_by_cols', 'clustered'],
+    dcc.Dropdown(id='heatmap-options', value=['normed_by_cols'],
         options=heatmap_options, multi=True),
     dcc.Loading( 
         dcc.Graph(id='heatmap-figure', 
-                  style={'margin-top': '50px'}) ),
+                  style={'marginTop': '50px'}) ),
 ])
 
 
@@ -71,26 +44,22 @@ def callbacks(app, fsc, cache):
 
     @app.callback(
         Output('heatmap-controls', 'children'),
-        Input('secondary-tab', 'value'),
+        Input('ana-secondary-tab', 'value'),
         State('wdir', 'children')
     )
     def heat_controls(tab, wdir):
-        if tab != 'heatmap':
+        if tab != _label:
             raise PreventUpdate
-        fn = T.get_results_fn(wdir)
-        if os.path.isfile(fn):
-            return _layout
-        else: 
-            return heat_layout_empty
-
+        return _layout
+        
 
     @app.callback(
     Output('heatmap-figure', 'figure'),
     Input('heatmap-update', 'n_clicks'),
-    State('file-types', 'value'),
-    State('peak-labels-include', 'value'),
-    State('peak-labels-exclude', 'value'),
-    State('ms-order', 'value'),
+    State('ana-file-types', 'value'),
+    State('ana-peak-labels-include', 'value'),
+    State('ana-peak-labels-exclude', 'value'),
+    State('ana-ms-order', 'value'),
     State('heatmap-options', 'value'),
     State('wdir', 'children')
     )

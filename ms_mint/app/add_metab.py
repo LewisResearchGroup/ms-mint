@@ -1,8 +1,10 @@
 import os
 import pandas as pd
 
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
+
 from dash.dependencies import Input, Output, State
 
 from dash.exceptions import PreventUpdate
@@ -34,7 +36,7 @@ groups_options = [{'label': 'All', 'value': 'all'}]+[{'label': x.capitalize(), '
 columns = T.gen_tabulator_columns(CHEBI_CHEM.columns, editor=None, col_width='auto')
 
 add_metab_table = html.Div(id='add-metab-table-container', 
-    style={'min-height':  100, 'margin-top': '10%'},
+    style={'minHeight':  100, 'marginTop': '10%'},
     children=[
         dcc.Dropdown(id='add-metab-ms-mode', placeholder='Select ionization mode',
             options=[{'label': 'Positive', 'value': 'Positive'},
@@ -51,9 +53,9 @@ add_metab_table = html.Div(id='add-metab-table-container',
             ),
         ),
     html.Button('Add selected metabolites to peaklist', id='add-metab'),
-    html.Div(id='add-metab-output'),
 ])
 
+_label = 'Add Metabolites'
 
 _layout = html.Div([
     html.H3('Add Metabolites'),
@@ -61,6 +63,11 @@ _layout = html.Div([
     
 ])
 
+_outputs = html.Div(id='add-metab-outputs', 
+    children=[
+        html.Div(id={'index': 'add-metab-output', 'type': 'output'})
+    ]
+)
 
 def layout():
     return _layout
@@ -69,18 +76,20 @@ def layout():
 def callbacks(app, fsc, cache):
 
     @app.callback(
-        Output('add-metab-output', 'children'),
-        Input( 'add-metab', 'n_clicks'),
-        State( 'add-metab-table', 'multiRowsClicked'),
-        State( 'add-metab-ms-mode', 'value'),
-        State( 'wdir', 'children')
+        Output({'index': 'add-metab-output', 'type': 'output'}, 'children'),
+        Input('add-metab', 'n_clicks'),
+        State('add-metab-table', 'multiRowsClicked'),
+        State('add-metab-ms-mode', 'value'),
+        State('wdir', 'children')
     )
     def add_metab(n_clicks, rows, ms_mode, wdir):
         if n_clicks is None:
             raise PreventUpdate
         if ms_mode is None:
-            return 'Please select ionization mode.'
+            return dbc.Alert('Please select ionization mode.', color='warning')
+
         peaklist = T.get_peaklist( wdir )
+        
         for row in rows:
             charge = int( row['Charge'] )
             if (ms_mode=='Negative') and (charge>0):
@@ -102,13 +111,15 @@ def callbacks(app, fsc, cache):
             peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
             
         T.write_peaklist( peaklist, wdir)
-        return 'Metabolites added.'
+        n_peaks = len(peaklist)
+        n_new = len(rows)
+        return dbc.Alert(f'{n_new} peaks added, now {n_peaks} peaks defined.', color='info')
 
 
     @app.callback(
         Output('add-metab-table', 'data'),
         Input('add-metab-groups', 'value'),
-        Input( 'add-metab-ms-mode', 'value'),
+        Input('add-metab-ms-mode', 'value'),
     )
     def generate_table(groups, ms_mode):
         print('Groups to add', groups)
