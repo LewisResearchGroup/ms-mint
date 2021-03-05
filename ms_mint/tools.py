@@ -22,3 +22,7 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None, verbose=False):
         masses.append(mass)
     if verbose: print(masses)
     return masses
+
+
+def gaussian(x, mu, sig):
+    return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))

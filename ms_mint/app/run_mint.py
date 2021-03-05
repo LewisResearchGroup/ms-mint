@@ -11,12 +11,17 @@ from ms_mint.Mint import Mint
 
 from . import tools as T
 
+_label = 'Processing'
 
 _layout = html.Div([
     html.H3('Run MINT'),
     html.Button('Run MINT',         id='run-mint'),
     html.Button('Download results', id='res-download'),
     html.Button('Delete results',   id='res-delete', style={'float': 'right'}),
+])
+
+_outputs = html.Div(id='run-outputs', children=[
+    html.Div(id={'index': 'run-mint-output', 'type': 'output'}, style={'visibility': 'hidden'}),
 ])
 
 def layout():
@@ -51,7 +56,7 @@ def callbacks(app, fsc, cache):
 
 
     @app.callback(
-        Output('run-mint-output', 'children'),
+        Output({'index': 'run-mint-output', 'type': 'output'}, 'children'),
         Input('run-mint', 'n_clicks'),
         State('wdir', 'children')
     )
@@ -67,4 +72,4 @@ def callbacks(app, fsc, cache):
         mint.ms_files = T.get_ms_fns( wdir )
         mint.run()
         mint.export( T.get_results_fn(wdir) )
-        return dbc.Alert('Finished running MINT')
+        return dbc.Alert('Finished running MINT', color='success')

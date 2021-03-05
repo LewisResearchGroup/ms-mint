@@ -21,6 +21,7 @@ import ms_mint
 from ms_mint.io import ms_file_to_df
 from ms_mint.peaklists import standardize_peaklist, read_peaklists
 from ms_mint.io import convert_ms_file_to_feather
+from ms_mint.standards import PEAKLIST_COLUMNS
 
 from datetime import date
 
@@ -48,8 +49,7 @@ def get_issue_text():
     %0A%0A%0A%0A%0A%0A%0A%0A%0A
     MINT version: {ms_mint.__version__}%0A
     OS: {platform.platform()}%0A
-    Versions:
-    {get_versions()}
+    Versions: ---
     '''
 
 def parse_ms_files(contents, filename, date, target_dir):
@@ -100,7 +100,7 @@ def workspace_exists(tmpdir, ws_name):
     return os.path.isdir(path)
 
 
-def get_actived_workspace(tmpdir):
+def get_active_workspace(tmpdir):
     '''Returns name of last activated workspace,
        if workspace still exists. Otherwise,
        return None.
@@ -140,7 +140,9 @@ def get_workspaces_path(tmpdir):
 
 def get_workspaces(tmpdir):
     ws_path = get_workspaces_path(tmpdir)
-    return get_dirnames( ws_path )
+    ws_names = get_dirnames( ws_path )
+    ws_names = [ws for ws in ws_names if not ws.startswith('.')]
+    return ws_names
 
 
 class Chromatograms():
@@ -228,7 +230,8 @@ def get_peaklist(wdir):
     fn = get_peaklist_fn( wdir )
     if os.path.isfile( fn ):
         return read_peaklists( fn ).set_index('peak_label')
-    else: return None
+    else: 
+        return pd.DataFrame(columns=PEAKLIST_COLUMNS)
 
 
 def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None, rt=None):
@@ -288,6 +291,10 @@ def get_metadata(wdir):
     if 'PeakOpt' not in df.columns:
         df['PeakOpt'] = False
     else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
+    
+    if 'index' in df.columns: del df['index']
+    df.reset_index(inplace=True)
+
     return df
 
 
@@ -305,6 +312,10 @@ def init_metadata( ms_files ):
     df['PeakOpt'] = ''
     return df
 
+def write_metadata( meta, wdir ):
+    fn = get_metadata_fn( wdir )
+    with lock(fn):
+        meta.to_csv( fn, index=False)
 
 def get_metadata_fn(wdir):
     fn = os.path.join(wdir, 'metadata', 'metadata.csv')
@@ -429,8 +440,9 @@ def parse_table_content(content, filename):
 
 def fig_to_src(dpi=100):
     out_img = io.BytesIO()
-    #with lock(out_img):
+
     plt.savefig(out_img, format='jpeg', bbox_inches='tight', dpi=dpi)
+
     plt.close('all')
     out_img.seek(0)  # rewind file
     encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
