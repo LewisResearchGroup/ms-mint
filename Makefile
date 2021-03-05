@@ -7,5 +7,8 @@ publish:
 lint:
 	flake8
 
-test:
+tests:
 	pytest --cov=ms_mint --cov-report html
+
+build:
+	pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec --additional-hooks-dir=hooks
