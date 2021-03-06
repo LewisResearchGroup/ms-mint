@@ -65,7 +65,8 @@ class Mint(object):
         self._status = 'waiting'
         self._messages = []
 
-    def optimize_retention_times(self, ms_files=None, peak_labels=None, **kwargs):
+
+    def optimize_rt(self, ms_files=None, peak_labels=None, rt_margin=None, **kwargs):
         chromatograms = []
         if ms_files is None:
             ms_files = self.ms_files
@@ -85,7 +86,8 @@ class Mint(object):
                 df = ms_file_to_df(fn)
                 chrom = extract_chromatogram_from_ms1(df, mz_mean=mz_mean, mz_width=mz_width)
                 chromatograms.append(chrom)
-            rt_min, rt_max = RetentionTimeOptimizer(**kwargs).find_largest_peak(chromatograms)
+            params = dict(rt=rt, rt_min=rt_min, rt_max=rt_max, rt_margin=rt_margin)
+            rt_min, rt_max = RetentionTimeOptimizer(**params, **kwargs).find_largest_peak(chromatograms)
             self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
             
 
