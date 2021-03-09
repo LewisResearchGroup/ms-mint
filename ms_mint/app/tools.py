@@ -135,6 +135,7 @@ def create_workspace(tmpdir, ws_name):
 def get_workspaces_path(tmpdir):
     # Defines the path to the workspaces
     # relative to `tmpdir`
+    ws_names = os.path.join(tmpdir, 'workspaces')
     return os.path.join(tmpdir, 'workspaces')
 
 
@@ -142,6 +143,7 @@ def get_workspaces(tmpdir):
     ws_path = get_workspaces_path(tmpdir)
     ws_names = get_dirnames( ws_path )
     ws_names = [ws for ws in ws_names if not ws.startswith('.')]
+    ws_names.sort()
     return ws_names
 
 

@@ -38,7 +38,7 @@ class RetentionTimeOptimizer():
         ndx_peaks, _ = find_peaks(x, prominence=(prominence, None))
         t_peaks = chrom.iloc[ndx_peaks].index
         x_peaks = chrom.iloc[ndx_peaks].values
-        results_bottom  = peak_widths(x, ndx_peaks, rel_height=0.90)
+        results_bottom  = peak_widths(x, ndx_peaks, rel_height=0.80)
         self.t_peaks = t_peaks
         self.x_peaks = x_peaks
         self.peak_width_bottom = results_bottom
@@ -100,10 +100,15 @@ class RetentionTimeOptimizer():
         for chrom in chromatograms:
             prop = self.find_largest_peak_in_chromatogram(chrom)
             if prop is not None: props.append( prop )
+
         if len(props) == 0: return (None, None)
         df = pd.DataFrame( props, columns=['rt', 'max_intensity', 'rt_min', 'rt_max'] )
 
         rt_of_largest_peak_max = df.sort_values('max_intensity', ascending=False).iloc[0]['rt'] 
+        
+        print( df ) 
+        # Filter out far away peaks
+        df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
 
         rt_min = estimate_expectation_value(df.rt_min)
         rt_max = estimate_expectation_value(df.rt_max)
@@ -117,10 +122,12 @@ class RetentionTimeOptimizer():
 
 
     def get_peak_start_time(self, ndx):
-        return self.x_to_t(self.peak_width_bottom[2][ndx])[0]
+        rt_min = self.x_to_t( self.peak_width_bottom[2][ndx] )[0]
+        return rt_min
  
     def get_peak_end_time(self, ndx):
-        return self.x_to_t(self.peak_width_bottom[3][ndx])[0]
+        rt_max = self.x_to_t(self.peak_width_bottom[3][ndx])[0]
+        return rt_max
     
     def get_peak_properties(self, ndx):
         '''

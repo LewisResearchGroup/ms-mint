@@ -122,19 +122,23 @@ def callbacks(app, fsc, cache):
         if prop_id == 'ws-delete-output.children' or ndx is None:
             ndx = [0]
 
-        data = pd.DataFrame(data) 
+        data = pd.DataFrame(data)
+
         if len(ndx) == 1:
             ws_name = data.loc[ndx[0], 'Workspace']
         else:
             ws_name = T.get_active_workspace( tmpdir )
-
+        
         if ws_name is None: raise PreventUpdate
         wdir = T.workspace_path(tmpdir, ws_name)
-        if ws_name is not None: T.save_activated_workspace(tmpdir, ws_name)
-        else: raise PreventUpdate
+
+        if ws_name is not None: 
+            T.save_activated_workspace(tmpdir, ws_name)
+        else: 
+            raise PreventUpdate
         message = f'Workspace {ws_name} activated.'
         if ws_name is None: ws_name = ''
-        return dbc.Alert(message, color='success'), wdir, ws_name
+        return dbc.Alert(message, color='info'), wdir, ws_name
 
 
     @app.callback(
@@ -237,12 +241,12 @@ def callbacks(app, fsc, cache):
         ws_names = T.get_workspaces(tmpdir)
         if len(ws_names) == 0: raise PreventUpdate
         data = pd.DataFrame(data)
-        active_ws = T.get_active_workspace(tmpdir)
+        active_ws = T.get_active_workspace( tmpdir )
         if active_ws is None:
             ndx = data.index[0]
             active_ws = data.Workspace[0]
         else:
-            ndx = ws_names.index(active_ws)            
+            ndx = ws_names.index(active_ws)
         if ndx is None:
             ndx = 0
         return [ndx]
