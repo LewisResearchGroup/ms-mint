@@ -9,7 +9,7 @@ from ..tools import gaussian
 from ..Resampler import Resampler
 
 class RetentionTimeOptimizer():
-    def __init__(self, rt_min=None, rt_max=None, rt=None, rt_margin=None,
+    def __init__(self, rt_min=None, rt_max=None, rt=None, rt_margin=0.3,
                  how='largest', dt=0.01, show_figure=False, precission=3
                  ):
         self.t_peaks = None
@@ -25,7 +25,6 @@ class RetentionTimeOptimizer():
         self.show_figure = show_figure
         self.precission = precission
         self.update_values()
-
 
     def update_values(self):
         if (self.rt_min is not None) and (self.rt_max is not None):
@@ -59,6 +58,9 @@ class RetentionTimeOptimizer():
     def resample(self, chrom):
         return self.resampler.resample(chrom)
     
+    def smooth(self, chrom, n=30):
+        return chrom.rolling(n, center=True).mean()
+
     def get_chrom_properties(self, chrom):
         self.t_min = chrom.index.min()
         self.t_max = chrom.index.max()
@@ -70,18 +72,27 @@ class RetentionTimeOptimizer():
     
     def find_largest_peak_in_chromatogram(self, chrom):
         chrom = chrom.copy()
-        chrom = self.weighted_chrom(chrom)
-        if self.show_figure: chrom.plot(color='grey', alpha=0.5)
-        chrom = self.resample(chrom)
-        self.get_chrom_properties(chrom)        
-        if self.show_figure: chrom.plot(ax=plt.gca(), color='darkblue', alpha=0.5)
-        self.find_peaks_and_widths(chrom)
+        chrom_weighted = self.weighted_chrom(chrom)
+        chrom_resampled = self.resample(chrom_weighted)
+        chrom_smoothed  = self.smooth(chrom_resampled)
+
+        self.get_chrom_properties(chrom_smoothed)        
+        self.find_peaks_and_widths(chrom_smoothed)
+
         ndx = self.ndx_largest_peak()
         if ndx is None: return None
         prop = self.get_peak_properties(ndx)
+
         if self.show_figure: 
+            chrom.plot(color='grey', lw=0.5)    
+            chrom_weighted.plot(ax=plt.gca(), color='darkblue', alpha=0.8)
+            chrom_resampled.plot(ax=plt.gca(), color='cyan', lw=0.8) 
+            chrom_smoothed.plot(ax=plt.gca(), color='orange', lw=1) 
+
             plt.xlim(prop[2]-0.1, prop[3]+0.1)
             plt.hlines(-0.1, prop[2], prop[3], lw=2)
+            plt.vlines(0)
+
         return prop
     
     def find_largest_peak(self, chromatograms):
@@ -93,25 +104,32 @@ class RetentionTimeOptimizer():
         df = pd.DataFrame( props, columns=['rt', 'max_intensity', 'rt_min', 'rt_max'] )
 
         rt_of_largest_peak_max = df.sort_values('max_intensity', ascending=False).iloc[0]['rt'] 
-        # Filter out far away peaks
-        df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
+
         rt_min = estimate_expectation_value(df.rt_min)
         rt_max = estimate_expectation_value(df.rt_max)
+
         if self.show_figure:
             plt.vlines([rt_min, rt_max], 0, np.max(df.max_intensity), label='Selected RT range', color='k', ls='--')
+            margin = (rt_max - rt_min) * 0.1
+            plt.xlim(rt_min-margin, rt_max+margin)
+            plt.show()
         return np.round(rt_min, self.precission), np.round(rt_max, self.precission)
-    
-    def get_peak_start_timee(self, ndx):
+
+
+    def get_peak_start_time(self, ndx):
         return self.x_to_t(self.peak_width_bottom[2][ndx])[0]
  
-    def get_peak_end_timee(self, ndx):
+    def get_peak_end_time(self, ndx):
         return self.x_to_t(self.peak_width_bottom[3][ndx])[0]
     
     def get_peak_properties(self, ndx):
+        '''
+        Returns a touple (x_max, t_of_x_max, t_0, t_1)
+        '''
         return (self.t_peaks[ndx], 
                 self.x_peaks[ndx], 
-                self.get_peak_start_timee(ndx),
-                self.get_peak_end_timee(ndx))
+                self.get_peak_start_time(ndx),
+                self.get_peak_end_time(ndx))
 
 
 def estimate_expectation_value(values, kernel='gaussian'):

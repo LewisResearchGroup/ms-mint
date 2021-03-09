@@ -8,6 +8,7 @@ import logging
 
 from warnings import simplefilter
 from pathlib import Path as P
+from functools import lru_cache
 
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -66,13 +67,14 @@ class Mint(object):
         self._messages = []
 
 
-    def optimize_rt(self, ms_files=None, peak_labels=None, rt_margin=None, **kwargs):
+    def optimize_rt(self, ms_files=None, peak_labels=None, rt_margin=0.5, **kwargs):
         chromatograms = []
         if ms_files is None:
             ms_files = self.ms_files
         if peak_labels is None:
             peak_labels = self.peaklist.peak_label.values
-        peaklist = self.peaklist
+        peaklist = self.peaklist.copy()
+        peaklist = peaklist[peaklist.peak_label.isin(peak_labels)]
         n_peaks = len(peaklist)
         for i, (ndx, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
             progress = int(100*(i+1)/n_peaks)
@@ -83,13 +85,17 @@ class Mint(object):
             chromatograms = []
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
             for fn in ms_files:
-                df = ms_file_to_df(fn)
+                df = self.ms_file_to_df(fn)
                 chrom = extract_chromatogram_from_ms1(df, mz_mean=mz_mean, mz_width=mz_width)
                 chromatograms.append(chrom)
             params = dict(rt=rt, rt_min=rt_min, rt_max=rt_max, rt_margin=rt_margin)
-            rt_min, rt_max = RetentionTimeOptimizer(**params, **kwargs).find_largest_peak(chromatograms)
+            rtopt = RetentionTimeOptimizer(**params, **kwargs)
+            rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
             self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
             
+    @lru_cache(100)
+    def ms_file_to_df(self, fn):
+        return ms_file_to_df(fn)
 
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
