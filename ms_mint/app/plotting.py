@@ -128,6 +128,8 @@ def callbacks(app, fsc, cache):
         
         df = T.get_complete_results( wdir )
 
+        df = df.sort_values([ i for i in [col, row, hue, x, y, style, size] if i is not None])
+
         n_c, n_r = 1, 1
         if col is not None:
             n_c = len(df[col].drop_duplicates())
@@ -137,11 +139,6 @@ def callbacks(app, fsc, cache):
         if (n_c is not None) and (col_wrap is not None):
             n_c = n_c // col_wrap
             n_r = n_c % col_wrap
-        
-        if hue is not None:
-            print(hue, df[hue].value_counts(), df[hue].isna().sum())
-
-        print(n_c, n_r)
 
         if hue is not None and ((x is None) and (y is None)):
             x = hue
@@ -203,12 +200,8 @@ def callbacks(app, fsc, cache):
 
         if title is not None: g.fig.suptitle(title)
 
-
         g.tight_layout(w_pad=0)
-   
-        print(sns.__version__)
-        print(mpl.__version__)
-        #g.add_legend()
+       
         try:
             g.legend.set_bbox_to_anchor((1.2, 0.7))
         except:
@@ -216,5 +209,4 @@ def callbacks(app, fsc, cache):
 
         src = T.fig_to_src(dpi=300 if 'HQ' in options else None)
 
-        print('Figure created.')
         return html.Img(src=src, style={'maxWidth': '80%'})
