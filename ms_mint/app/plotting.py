@@ -10,7 +10,11 @@ from ms_mint.notebook import Mint
 from ms_mint.vis.plotly.plotly_tools import plot_heatmap
 
 import matplotlib as mpl
+from matplotlib import pyplot as plt
+
 import seaborn as sns
+
+plt.rcParams['figure.autolayout'] = False
 sns.set_context('paper')
 
 
@@ -31,7 +35,7 @@ options = [
     {'label': 'Logarithmic x-scale', 'value': 'log-x'},
     {'label': 'Logarithmic y-scale', 'value': 'log-y'},
     {'label': 'High Quality', 'value': 'HQ'},
-
+    {'label': 'Don\'t dodge', 'value': 'no-dodge'}
 ]
 
 _layout = html.Div([
@@ -108,11 +112,17 @@ def callbacks(app, fsc, cache):
         State('plot-style', 'value'),
         State('plot-size', 'value'),
         State('plot-title', 'value'),
+        State('ana-file-types', 'value'),
+        State('ana-peak-labels-include', 'value'),
+        State('ana-peak-labels-exclude', 'value'),
+        State('ana-ms-order', 'value'), 
         State('plot-options', 'value'),
         State('wdir', 'children')
     )
     def create_figure(n_clicks, kind, height, aspect, x, y, hue, 
-            col, row, col_wrap, style, size, title, options, wdir):
+            col, row, col_wrap, style, size, title, file_types, 
+            include_labels, exclude_labels, 
+            ms_order, options, wdir):
 
         if n_clicks is None: raise PreventUpdate
         if col_wrap == 0: col_wrap = None
@@ -121,12 +131,13 @@ def callbacks(app, fsc, cache):
         if height is None: height = 2.5
         if aspect is None: aspect = 1
 
-        height = min(float(height), 5)
+        height = min(float(height), 100)
         height = max(height, 1)
-        aspect = max(.5, float(aspect))
-        aspect = min(aspect, 10)
+        aspect = max(.01, float(aspect))
+        aspect = min(aspect, 100)
         
-        df = T.get_complete_results( wdir )
+        df = T.get_complete_results( wdir, include_labels=include_labels, 
+                    exclude_labels=exclude_labels, file_types=file_types )
 
         df = df.sort_values([ i for i in [col, row, hue, x, y, style, size] if i is not None])
 
@@ -158,6 +169,7 @@ def callbacks(app, fsc, cache):
             kwargs=dict(
                 sharex='share-x' in options,
                 sharey='share-y' in options,
+                dodge='no-dodge' not in options,
                 facet_kws=dict(legend_out=True)
             )
 
@@ -202,10 +214,10 @@ def callbacks(app, fsc, cache):
 
         g.tight_layout(w_pad=0)
        
-        try:
-            g.legend.set_bbox_to_anchor((1.2, 0.7))
-        except:
-            pass
+        #try:
+        #    g.legend.set_bbox_to_anchor((1.2, 0.7))
+        #except:
+        #    pass
 
         src = T.fig_to_src(dpi=300 if 'HQ' in options else None)
 

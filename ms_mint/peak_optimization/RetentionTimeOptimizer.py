@@ -12,6 +12,7 @@ class RetentionTimeOptimizer():
     def __init__(self, rt_min=None, rt_max=None, rt=None, rt_margin=0.3,
                  how='largest', dt=0.01, show_figure=False, precission=3
                  ):
+
         self.t_peaks = None
         self.x_peaks = None
         self.peak_width_bottom = None
@@ -24,7 +25,9 @@ class RetentionTimeOptimizer():
         self.resampler = Resampler()
         self.show_figure = show_figure
         self.precission = precission
+        print(rt, rt_min, rt_max, rt_margin)
         self.update_values()
+        print(rt, rt_min, rt_max, rt_margin)
 
     def update_values(self):
         if (self.rt_min is not None) and (self.rt_max is not None):
@@ -106,9 +109,8 @@ class RetentionTimeOptimizer():
 
         rt_of_largest_peak_max = df.sort_values('max_intensity', ascending=False).iloc[0]['rt'] 
         
-        print( df ) 
         # Filter out far away peaks
-        df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
+        #df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
 
         rt_min = estimate_expectation_value(df.rt_min)
         rt_max = estimate_expectation_value(df.rt_max)
