@@ -178,7 +178,6 @@ for module in _modules:
 )
 def render_content(tab, wdir):
     func = modules[tab].layout
-    print('Working dir:', wdir)
     if tab != 'Workspaces' and wdir == '':
         return dbc.Alert('Please, create and activate a workspace.', color='warning')
     elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:

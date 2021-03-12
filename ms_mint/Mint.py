@@ -365,6 +365,7 @@ class Mint(object):
         '''
         if len(self.results) == 0:
             return None
+
         simplefilter("ignore", ClusterWarning)
         if data is None:
             data = self.crosstab(target_var).copy()
@@ -378,7 +379,7 @@ class Mint(object):
             tmp_data = tmp_data.apply(transform_func)
 
         if transform_filenames_func == 'basename':
-            transform_filenames_func = os.path.basename
+            transform_filenames_func = lambda x: P(x).with_suffix('').name
 
         if transform_filenames_func is not None:
             tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns] 
@@ -484,7 +485,7 @@ class Mint(object):
         return fig
 
 
-    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None):
+    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None, marker=None):
         df = self.decomposition_results['df_projected']
         cols = df.columns.to_list()[:n_vars]
         df = df[cols]
@@ -493,7 +494,10 @@ class Mint(object):
             df[group_name] = color_groups
             df[group_name] = df[group_name].astype(str)
         fig = plt.figure()
-        g = sns.pairplot(df, plot_kws={'s': 100}, hue=group_name)
+
+        if marker is None and len(df) > 20:
+            marker = 'x'
+        g = sns.pairplot(df, plot_kws={'s': 100, 'marker': marker}, hue=group_name)
         if color_groups is not None:
             leg = g._legend
             leg.set_bbox_to_anchor([1.05, 0.5])

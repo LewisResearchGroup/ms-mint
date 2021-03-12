@@ -252,15 +252,15 @@ def callbacks(app, fsc, cache):
             ms_files = T.get_ms_fns_for_peakopt(wdir)
         elif ms_selection == 'all':
             ms_files = T.get_ms_fns(wdir)
-
+        print(margin)
         n_peaks = len(peaklist)
         for i, (peak_label, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
             fsc.set('progress', int(100*(1+i)/n_peaks))
             mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
             chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
                 .set_index('retentionTime')['intensity array'] for fn in ms_files]
-            rt_min, rt_max = max(0, row['rt']-margin), row['rt']+margin
-            rt_min, rt_max = RTOpt(rt_min=rt_min, rt_max=rt_max).find_largest_peak(chromatograms)
+            #rt_min, rt_max = max(0, row['rt']-(margin/2)), row['rt']+(margin/2)
+            rt_min, rt_max = RTOpt(rt=row['rt'], rt_margin=margin).find_largest_peak(chromatograms)
             peaklist.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
         
         T.write_peaklist( peaklist, wdir)

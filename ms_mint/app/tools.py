@@ -453,13 +453,20 @@ def fig_to_src(dpi=100):
 
 def merge_metadata(old, new):
     old = old.set_index('MS-file')
-    new = new.set_index('MS-file').replace('null', None)
+
+    new = new.groupby('MS-file').first().replace('null', None)
+
     for col in new.columns:
+        if col == '' or col.startswith('Unnamed'):
+            continue
+        if not col in old.columns: old[col] = None
         for ndx in new.index:
             value = new.loc[ndx, col]
             if value is None:
                 continue
-            old.loc[ndx, col] = value
+            print(ndx, col, value)
+            if ndx in old.index:
+                old.loc[ndx, col] = value
     return old.reset_index()
 
 

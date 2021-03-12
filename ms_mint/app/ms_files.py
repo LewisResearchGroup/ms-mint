@@ -5,8 +5,10 @@ import logging
 
 import wget
 import urllib3, ftplib
+
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+from pathlib import Path as P
 
 from glob import glob
 
@@ -247,47 +249,74 @@ def callbacks(app, fsc, cache):
         State('url', 'value'),
         State('wdir', 'children')
     )
-    def import_from_url(n_clicks, url, wdir):
+    def import_from_url_or_path(n_clicks, url, wdir):
         if n_clicks is None or url is None:
             raise PreventUpdate
+        
+        ms_dir = T.get_ms_dirname( wdir )
 
+        if P(url).is_dir():
+            fns = import_from_local_path(url, ms_dir)
+        else:
+            fns = import_from_url(url, ms_dir)
+
+        return dbc.Alert(f'{len(fns)} files imported.', color='success')
+
+
+    def import_from_url(url, target_dir):
         filenames = get_filenames_from_url(url)
         filenames = [fn for fn in filenames if T.is_ms_file(fn)]
 
         if len(filenames) == 0:
             return dbc.Alert(f'No MS files found at {url}', color='warning')
 
-        ms_dir = T.get_ms_dirname( wdir )
         fns = []
         n_files = len(filenames)
+        
         for i, fn in enumerate( tqdm( filenames )):
             _url = url+'/'+fn
             logging.info('Downloading', _url)
             fsc.set('progress', int(100*(1+i)/n_files))
-            wget.download(_url, out=ms_dir)
-        return dbc.Alert(f'{len(fns)} files downloaded.', color='success')
+            wget.download(_url, out=target_dir)
+
+        return fns
 
 
-def get_filenames_from_url(url):
-    if url.startswith('ftp'):
-        return get_files_from_ftp_directory(url)
-    if '://' in url:
-            url = url.split('://')[1]    
-    with urllib3.PoolManager() as http:
-        r = http.request('GET', url)
-    soup = BeautifulSoup(r.data, 'html')
-    files = [A['href'] for A in soup.find_all('a', href=True)]
-    return files
+    def get_filenames_from_url(url):
+        if url.startswith('ftp'):
+            return get_filenames_from_ftp_directory(url)
+        if '://' in url:
+                url = url.split('://')[1]    
+        with urllib3.PoolManager() as http:
+            r = http.request('GET', url)
+        soup = BeautifulSoup(r.data, 'html')
+        files = [A['href'] for A in soup.find_all('a', href=True)]
+        return files
 
 
-def get_files_from_ftp_directory(url):
-    url_parts = urlparse(url)
-    domain = url_parts.netloc
-    path = url_parts.path
-    ftp = ftplib.FTP(domain)
-    ftp.login()
-    ftp.cwd(path)
-    filenames = ftp.nlst()
-    ftp.quit()
-    return filenames
+    def get_filenames_from_ftp_directory(url):
+        url_parts = urlparse(url)
+        domain = url_parts.netloc
+        path = url_parts.path
+        ftp = ftplib.FTP(domain)
+        ftp.login()
+        ftp.cwd(path)
+        filenames = ftp.nlst()
+        ftp.quit()
+        return filenames
 
+
+    def import_from_local_path(path, target_dir):
+        fns = glob(os.path.join(path, '**', '*.*'), recursive=True)
+        fns = [fn for fn in fns if T.is_ms_file(fn)]
+        fns_out = []
+        n_files = len(fns)
+        for i, fn in enumerate( tqdm(fns) ):
+            fsc.set('progress', int(100*(1+i)/n_files))
+            fn_out = P(target_dir)/P(fn).with_suffix('.feather').name
+            if P(fn_out).is_file(): continue
+            fns_out.append(fn_out)
+            convert_ms_file_to_feather(fn, fn_out)
+        return fns_out
+        
+            
