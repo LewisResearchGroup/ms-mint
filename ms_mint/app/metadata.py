@@ -172,7 +172,6 @@ def callbacks(app, fsc, cache):
                     ndxs = [r['index'] for r in selected_rows if r['index'] in filtered_ndx]
                 if len(ndxs) == 0 or column is None:
                     return dbc.Alert('No rows selected.', color='danger')
-                print(ndxs, column, value)
                 df.loc[ndxs, column] = value
             elif action == 'Create column': df[value] = ''
             elif action == 'Delete column': del df[column]

@@ -296,7 +296,7 @@ def get_metadata(wdir):
     
     if 'index' in df.columns: del df['index']
     df.reset_index(inplace=True)
-
+    print(df)
     return df
 
 
