@@ -250,6 +250,9 @@ def callbacks(app, fsc, cache):
         State('wdir', 'children')
     )
     def import_from_url_or_path(n_clicks, url, wdir):
+
+        url = url.strip()
+
         if n_clicks is None or url is None:
             raise PreventUpdate
         
@@ -258,6 +261,7 @@ def callbacks(app, fsc, cache):
         if P(url).is_dir():
             fns = import_from_local_path(url, ms_dir)
         else:
+            logging.warning(f'Local file not found, looking for URL ({url}) [{P(url).is_dir()}, {os.path.isdir(url)}]')
             fns = import_from_url(url, ms_dir)
 
         return dbc.Alert(f'{len(fns)} files imported.', color='success')

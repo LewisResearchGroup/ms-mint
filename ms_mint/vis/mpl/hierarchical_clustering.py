@@ -12,6 +12,13 @@ def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=
     Generates a heatmap from the input matrix.
     '''
 
+    if isinstance(metric, str):
+        metric_x, metric_y = metric, metric
+    elif len(metric) == 2 and isinstance(metric[0], str) and isinstance(metric[1], str):
+        metric_x, metric_y = metric
+    elif metric is None:
+        metric_x, metric_y = None, None
+
     df = df.copy()
 
     # Subplot sizes
@@ -29,7 +36,6 @@ def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=
     top_h = 1-main_h
     top_w = main_w
     
-
     ydim, xdim = df.shape
 
     if xmaxticks is None:
@@ -38,8 +44,8 @@ def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=
         ymaxticks = int( 5*main_h*total_height )
     
     dm = df.fillna(0).values
-    D1 = squareform(pdist(dm, metric=metric))
-    D2 = squareform(pdist(dm.T, metric=metric))
+    D1 = squareform(pdist(dm, metric=metric_y))
+    D2 = squareform(pdist(dm.T, metric=metric_x))
     fig = plt.figure(figsize=figsize)
     fig.set_tight_layout(False)
 

@@ -87,7 +87,7 @@ def callbacks(app, fsc, cache):
         meta = T.get_metadata( wdir )
         if meta is None:
             raise PreventUpdate
-        file_types = meta['Type'].drop_duplicates()
+        file_types = meta['Type'].drop_duplicates().sort_values()
         options = [{'value': i, 'label': i} for i in file_types]
         return options, file_types
 
