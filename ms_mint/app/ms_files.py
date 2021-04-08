@@ -98,10 +98,12 @@ _layout = html.Div([
                     'textAlign': 'center',
                     'width': '100%',
                     'padding': '0px',
+                    'margin-bottom': '20px',
                     'display': 'inline-block',
                 }),
-    html.Button('Import from URL', id='ms-import-from-url'),
-    dcc.Input(id='url', placeholder='Drop URL here', style={'width': '100%'}),
+                
+    html.Button('Import from URL or local path', id='ms-import-from-url'),
+    dcc.Input(id='url', placeholder='Drop URL / path here', style={'width': '100%'}),
     dcc.Markdown('---', style={'marginTop': '10px'}),
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
@@ -250,12 +252,11 @@ def callbacks(app, fsc, cache):
         State('wdir', 'children')
     )
     def import_from_url_or_path(n_clicks, url, wdir):
-
-        url = url.strip()
-
         if n_clicks is None or url is None:
             raise PreventUpdate
-        
+
+        url = url.strip()
+      
         ms_dir = T.get_ms_dirname( wdir )
 
         if P(url).is_dir():
