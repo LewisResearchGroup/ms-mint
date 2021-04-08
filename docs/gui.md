@@ -83,14 +83,14 @@ Additionally, aging of the column leads to drifts in RT that have to be accounte
 The tools in the peak optimization tab can be used to quickly review all  peak definitions in 
 the presently loaded peaklist. 
 
-![Peaklist](image/mint-peakopt-previews.png "Peak preview")
+![Peaklist](image/peak-optimization.png "Peak preview")
 
 The `GENERATE PEAK PREVIEWS` generates a preview of all peak definitions and plots the
 coresponding chromatograms for all files. The peaks can be reviewed and modified one by one
 with the interactive tool. `FIND CLOSED PEAKS` iterates through all peak definitions and
 identifes the closest peak with respect to the expected RT which is displayed as black vertical line.
 
-![Peaklist](image/mint-peakopt-manual.png "Peak preview")
+![Peaklist](image/manual-peak-optimization.png "Peak preview")
 
 When a peak is selected in the drop down box the chromatograms for the particular mass windows
 using the peak width as defined in the peaklist is extracted and displayed. The current rt window
