@@ -60,7 +60,6 @@ def parse_ms_files(contents, filename, date, target_dir):
         with open(fn_abs, 'wb') as file:
             file.write(decoded)
     new_fn = convert_ms_file_to_feather(fn_abs)
-    print(f'Convert {fn_abs} to {new_fn}')
     if os.path.isfile(new_fn): os.remove(fn_abs)
 
 
@@ -296,7 +295,6 @@ def get_metadata(wdir):
     
     if 'index' in df.columns: del df['index']
     df.reset_index(inplace=True)
-    print(df)
     return df
 
 
@@ -362,6 +360,7 @@ def get_complete_results( wdir, include_labels=None, exclude_labels=None, file_t
     if file_types is not None and file_types != []:
         df = df[df.Type.isin(file_types)]            
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
+    if 'index' in df.columns: df = df.drop('index', axis=1)
     return df
 
 
@@ -464,7 +463,6 @@ def merge_metadata(old, new):
             value = new.loc[ndx, col]
             if value is None:
                 continue
-            print(ndx, col, value)
             if ndx in old.index:
                 old.loc[ndx, col] = value
     return old.reset_index()

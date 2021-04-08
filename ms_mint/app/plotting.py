@@ -131,6 +131,11 @@ def callbacks(app, fsc, cache):
         if height is None: height = 2.5
         if aspect is None: aspect = 1
 
+        # With hue both x and y have to be set.
+        if (hue is not None) and (None in [x,y]):
+            if x is None: x = hue
+            if y is None: y = hue
+
         height = min(float(height), 100)
         height = max(height, 1)
         aspect = max(.01, float(aspect))
@@ -139,7 +144,11 @@ def callbacks(app, fsc, cache):
         df = T.get_complete_results( wdir, include_labels=include_labels, 
                     exclude_labels=exclude_labels, file_types=file_types )
 
+        df = df[(df.peak_n_datapoints>0) & (df.peak_max>0)]
+
         df = df.sort_values([ i for i in [col, row, hue, x, y, style, size] if i is not None])
+
+        if hue is not None: df = df[df[hue].notna()]
 
         n_c, n_r = 1, 1
         if col is not None:
@@ -188,7 +197,7 @@ def callbacks(app, fsc, cache):
                 )
 
         g.fig.subplots_adjust(top=0.9)
-        g.set_titles(col_template="{col_name}", row_template="{row_name}")
+        g.set_titles(col_template="{col_name}", row_template="{row_name}", y=1.05)
         
         if 'log-x' in options:
             g.set(xscale="log")
@@ -210,7 +219,7 @@ def callbacks(app, fsc, cache):
         if 'rot-x-ticks' in options:
             g.set_xticklabels(rotation=90)
 
-        if title is not None: g.fig.suptitle(title)
+        if title is not None: g.fig.suptitle(title, y=1.01)
 
         g.tight_layout(w_pad=0)
        

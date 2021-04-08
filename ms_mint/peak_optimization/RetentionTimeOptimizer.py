@@ -25,9 +25,8 @@ class RetentionTimeOptimizer():
         self.resampler = Resampler()
         self.show_figure = show_figure
         self.precission = precission
-        print(rt, rt_min, rt_max, rt_margin)
         self.update_values()
-        print(rt, rt_min, rt_max, rt_margin)
+
 
     def update_values(self):
         if (self.rt_min is not None) and (self.rt_max is not None):
@@ -35,7 +34,34 @@ class RetentionTimeOptimizer():
                 self.rt = np.mean([self.rt_min, self.rt_max])
             if self.rt_margin is None:
                 self.rt_margin = (self.rt_max - self.rt_min) / 2
+
+
+    def find_largest_peak(self, chromatograms):
+        props = []
+        for chrom in chromatograms:
+            prop = self.find_largest_peak_in_chromatogram(chrom)
+            if prop is not None: props.append( prop )
+
+        if len(props) == 0: return (None, None)
+        df = pd.DataFrame( props, columns=['rt', 'max_intensity', 'rt_min', 'rt_max'] )
+
+        rt_of_largest_peak_max = df.sort_values('max_intensity', ascending=False).iloc[0]['rt'] 
         
+        # Filter out far away peaks
+        #df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
+
+        rt_min = estimate_expectation_value(df.rt_min)
+        rt_max = estimate_expectation_value(df.rt_max)
+
+        if self.show_figure:
+            plt.vlines([rt_min, rt_max], 0, np.max(df.max_intensity), label='Selected RT range', color='k', ls='--')
+            margin = (rt_max - rt_min) * 0.1
+            plt.xlim(rt_min-margin, rt_max+margin)
+            plt.show()
+        
+        return np.round(rt_min, self.precission), np.round(rt_max, self.precission)
+        
+
     def find_peaks_and_widths(self, chrom, prominence=1000):
         x = chrom.values
         ndx_peaks, _ = find_peaks(x, prominence=(prominence, None))
@@ -94,33 +120,10 @@ class RetentionTimeOptimizer():
 
             plt.xlim(prop[2]-0.1, prop[3]+0.1)
             plt.hlines(-0.1, prop[2], prop[3], lw=2)
-            plt.vlines(0)
+
 
         return prop
     
-    def find_largest_peak(self, chromatograms):
-        props = []
-        for chrom in chromatograms:
-            prop = self.find_largest_peak_in_chromatogram(chrom)
-            if prop is not None: props.append( prop )
-
-        if len(props) == 0: return (None, None)
-        df = pd.DataFrame( props, columns=['rt', 'max_intensity', 'rt_min', 'rt_max'] )
-
-        rt_of_largest_peak_max = df.sort_values('max_intensity', ascending=False).iloc[0]['rt'] 
-        
-        # Filter out far away peaks
-        #df = df[(df.rt - rt_of_largest_peak_max).abs()<0.3]
-
-        rt_min = estimate_expectation_value(df.rt_min)
-        rt_max = estimate_expectation_value(df.rt_max)
-
-        if self.show_figure:
-            plt.vlines([rt_min, rt_max], 0, np.max(df.max_intensity), label='Selected RT range', color='k', ls='--')
-            margin = (rt_max - rt_min) * 0.1
-            plt.xlim(rt_min-margin, rt_max+margin)
-            plt.show()
-        return np.round(rt_min, self.precission), np.round(rt_max, self.precission)
 
 
     def get_peak_start_time(self, ndx):
