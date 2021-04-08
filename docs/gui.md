@@ -26,7 +26,7 @@ If the browser does not open automatically open it manually and navigate to `htt
   - Add new workspaces
   - Delete workspaces
   - Activate workspace 
-  
+
 ![GUI](image/workspaces.png "The workspace tab")
 
 A workspace is a container for project files that is separated from other workspaces. Through workspaces it is possible to work on different projects simultaneously. 
@@ -125,9 +125,12 @@ to the current view and updated the peaklist accordingly.
 
 ## Processing
 
-  - Run MINT and apply the extraction protocol to all files in the workspace
+  - Run MINT (apply the extraction protocol to all files in the workspace)
   - Download results
   - Reset results and start again
+
+![Processing](image/processing.png "Processing")
+
 
 When all peaks look good the data can be processed using `RUN MINT`. This will apply
 the current peaklist to the MS-files in the workspace and extract additional properties.
