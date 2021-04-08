@@ -91,7 +91,7 @@ class Mint(MintBase):
 
     def action_optimize_rt(self, b):
         if (self.n_files > 0) and len(self.peaklist)>0:
-            self.optimize_retention_times()
+            self.optimize_rt()
         
     def message(self, text):
         self.message_box.value = f'{text}\n' + self.message_box.value
