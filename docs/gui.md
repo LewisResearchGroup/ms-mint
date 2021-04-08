@@ -22,6 +22,11 @@ If the browser does not open automatically open it manually and navigate to `htt
 
 
 ## Workspaces
+
+  - Add new workspaces
+  - Delete workspaces
+  - Activate workspace 
+  
 ![GUI](image/workspaces.png "The workspace tab")
 
 A workspace is a container for project files that is separated from other workspaces. Through workspaces it is possible to work on different projects simultaneously. 
@@ -34,6 +39,11 @@ To activate a particular workspace the workspace has to be selected in the table
 
 
 ## MS-files
+
+  - Import mass spectrometry files (MS-file) in mzXML or mzML format
+  - Convert file to feather format (other formats will be removed)
+  - Remove MS-files from workspace
+
 ![Add MS-files](image/ms-files.png "Added MS-files")
 
 Mass-Spec files (in _mzML_ or _mzXML_ format) can be added under the `MS-files` tab by drag and drop or by using the selection form. 
@@ -48,19 +58,23 @@ Note that _mzXML_ and _mzML_ files will be deleted after convertion.
 
 
 ## Metadata
-![Add Metadata](image/metadata.png "Add metadata")
-
-Metadata for the individual files can be edited in the `Metadata` tab. This data can be used to group results e.g. by batch or by label as well as types.
-You want to edit metadata table to:
-
 - Select samples used for peak optimization by setting values in the column `PeakOpt` to `True`.
 - Add batch labels to analyse for possible batch effects.
 - Add labels to analyse for differences of different groups (e.g. treatment and control)
 - Add types for different files e.g. biological sample, quality control sample, standards etc in order to include ore exclude certain types during analysis.
 - Add other types of metadata. 
 
+![Add Metadata](image/metadata.png "Add metadata")
+
+Metadata for the individual files can be edited in the `Metadata` tab. This data can be used to group results e.g. by batch or by label as well as types.
+You want to edit metadata table to:
 
 ## Peaklist
+
+- Import peaklist from CSV file or add new peaks manually
+- Rename peaks definitions or change parameters
+- Delete peak definitions
+
 ![Peaklist](image/peaklist.png "Peaklist")
 
 Peaklists are collection of peak definitions for the extraction of MS intensities beloning to individual metabolites. 
@@ -78,6 +92,9 @@ with the peak optimization tools.
 
 ## Peak Optimization
 
+ - Optimize retention times for all peaks or individual peaks
+ - Preview all peakshapes with quality indicator
+
 Retention times (RT) depend on the experiment and the specific chromatographic column used. 
 Additionally, aging of the column leads to drifts in RT that have to be accounted for. 
 The tools in the peak optimization tab can be used to quickly review all  peak definitions in 
@@ -85,10 +102,19 @@ the presently loaded peaklist.
 
 ![Peaklist](image/peak-optimization.png "Peak preview")
 
+
 The `GENERATE PEAK PREVIEWS` generates a preview of all peak definitions and plots the
 coresponding chromatograms for all files. The peaks can be reviewed and modified one by one
 with the interactive tool. `FIND CLOSED PEAKS` iterates through all peak definitions and
 identifes the closest peak with respect to the expected RT which is displayed as black vertical line.
+
+### Manual (interactive) peak optimization
+
+  - Optimize individual peaks one by one
+  - Find bad peaks
+  - Remove peaks from peaklist
+  - Set expected retention time
+
 
 ![Peaklist](image/manual-peak-optimization.png "Peak preview")
 
@@ -97,7 +123,11 @@ using the peak width as defined in the peaklist is extracted and displayed. The 
 is visualized as green box. `SET RT TO CURRENT VIEW` will set the *rt_min* and *rt_max* values 
 to the current view and updated the peaklist accordingly.
 
-## Run MINT
+## Processing
+
+  - Run MINT and apply the extraction protocol to all files in the workspace
+  - Download results
+  - Reset results and start again
 
 When all peaks look good the data can be processed using `RUN MINT`. This will apply
 the current peaklist to the MS-files in the workspace and extract additional properties.
