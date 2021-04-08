@@ -22,7 +22,7 @@ If the browser does not open automatically open it manually and navigate to `htt
 
 
 ## Workspaces
-![GUI](image/mint-workspace.png "The workspace tab")
+![GUI](image/workspaces.png "The workspace tab")
 
 A workspace is a container for project files that is separated from other workspaces. Through workspaces it is possible to work on different projects simultaneously. 
 All files relevant for one workspace are stored in a corresponding sub-folder of `--data-dir`, which by default is the folder MINT in the users home directory. 
@@ -34,7 +34,7 @@ To activate a particular workspace the workspace has to be selected in the table
 
 
 ## MS-files
-![Add MS-files](./image/mint-ms-files.png "Added MS-files")
+![Add MS-files](image/ms-files.png "Added MS-files")
 
 Mass-Spec files (in _mzML_ or _mzXML_ format) can be added under the `MS-files` tab by drag and drop or by using the selection form. 
 Due to limitations of the Plotly-Dash framework only up to 10 files can be uploaded at a time. For larger projects, the files can simply 
@@ -48,25 +48,33 @@ Note that _mzXML_ and _mzML_ files will be deleted after convertion.
 
 
 ## Metadata
-![Add Metadata](./image/mint-metadata.png "Add metadata")
+![Add Metadata](image/metadata.png "Add metadata")
 
 Metadata for the individual files can be edited in the `Metadata` tab. This data can be used to group results e.g. by batch or by label as well as types.
+You want to edit metadata table to:
 
-- Batch: The batch e.g. plate a particular sample belongs to.
-- Label: A Label such as species.
-- Type: Type of sample, e.g. biological sample, quality control sample, standards
-- Concentration: For standards a concentration value can be provided. 
-
-The metadata table can be downloaded modified e.g. with Excel and uploaded again. 
+- Select samples used for peak optimization by setting values in the column `PeakOpt` to `True`.
+- Add batch labels to analyse for possible batch effects.
+- Add labels to analyse for differences of different groups (e.g. treatment and control)
+- Add types for different files e.g. biological sample, quality control sample, standards etc in order to include ore exclude certain types during analysis.
+- Add other types of metadata. 
 
 
 ## Peaklist
-![Peaklist](./image/mint-peaklist.png "Peaklist")
+![Peaklist](image/peaklist.png "Peaklist")
 
 Peaklists are collection of peak definitions for the extraction of MS intensities beloning to individual metabolites. 
 Peaklists can be provided as Excel or CSV files. Peaklists are explained in more detail [here](peaklists.md).
 Files can be uploaded via the drag and drop area or the selection tool. The peaklist can be edited in place or
 with the peak optimization tools.
+
+## Add Metabolites
+
+- Search for metabolites from ChEBI three stars database
+- Add selected metabolites to peaklist (without RT estimation)
+
+![Peaklist](image/add-metabolites.png "Peak preview")
+
 
 ## Peak Optimization
 
@@ -75,14 +83,14 @@ Additionally, aging of the column leads to drifts in RT that have to be accounte
 The tools in the peak optimization tab can be used to quickly review all  peak definitions in 
 the presently loaded peaklist. 
 
-![Peaklist](./image/mint-peakopt-previews.png "Peak preview")
+![Peaklist](image/mint-peakopt-previews.png "Peak preview")
 
 The `GENERATE PEAK PREVIEWS` generates a preview of all peak definitions and plots the
 coresponding chromatograms for all files. The peaks can be reviewed and modified one by one
 with the interactive tool. `FIND CLOSED PEAKS` iterates through all peak definitions and
 identifes the closest peak with respect to the expected RT which is displayed as black vertical line.
 
-![Peaklist](./image/mint-peakopt-manual.png "Peak preview")
+![Peaklist](image/mint-peakopt-manual.png "Peak preview")
 
 When a peak is selected in the drop down box the chromatograms for the particular mass windows
 using the peak width as defined in the peaklist is extracted and displayed. The current rt window
@@ -118,7 +126,7 @@ visually grouped into an individual section for each metabolite.
 
 ![Quality Control](./image/mint-qc-1.png "Quality Control")
 
-## Heatmap
+## Analysis
 The interactive heatmap tool can be used to explore the results data after `RUN MINT`
 has been exectuted. The tool allows to explore the generated data in from of heatmaps.
 
@@ -135,3 +143,4 @@ The second dropdown menu distinguishes the how the heatmap is generated.
 - Show in new tab: The figure will be generated in a new independent tab. That way multiple heatmaps can be generated at the same time.
 
 ![Heatmap](./image/mint-heatmap-correlation.png "Correlation")
+

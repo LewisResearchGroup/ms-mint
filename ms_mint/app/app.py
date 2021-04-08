@@ -129,7 +129,7 @@ app.layout = html.Div([
          children=[html.Button('Issues', id='B_issues', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
-    dbc.Progress(id="progress-bar", value=100, style={'marginBottom': '20px', 'width': '100%'}),
+    dbc.Progress(id="progress-bar", value=100, style={'marginBottom': '20px', 'width': '100%', 'marginTop': '20px'}),
 
     messages.layout(),
 
