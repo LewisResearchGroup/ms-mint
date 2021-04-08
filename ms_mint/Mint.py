@@ -389,8 +389,14 @@ class Mint(object):
             ‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’, 
             ‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’, 
             ‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
-
+            More information: 
             https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
+
+        transpose: bool, default False
+            - True: transpose the figure
+        
+        
+
         '''
         if len(self.results) == 0:
             return None
