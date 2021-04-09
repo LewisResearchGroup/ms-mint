@@ -511,7 +511,7 @@ class Mint(object):
         }
 
 
-    def pca_plot_cummulative_variance(self):
+    def pca_plot_cumulative_variance(self):
         n_vars = self.decomposition_results['n_vars']
         fig = plt.figure(figsize=(7,3))
         cumm_expl_var = self.decomposition_results['cumm_expl_var']
@@ -519,7 +519,7 @@ class Mint(object):
             facecolor='grey', edgecolor='none')
         plt.xlabel('# PCA-components')
         plt.ylabel('Explained variance')
-        plt.title('Cummulative explained variance')
+        plt.title('cumulative explained variance')
         plt.grid()
         return fig
 

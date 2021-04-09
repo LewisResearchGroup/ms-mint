@@ -142,22 +142,24 @@ The generated results can be downloaded with the `DOWNLOAD` button.
 
 After running MINT the results can be downloaed or analysed using the provided tools.
 For quality control purposes histograms and boxplots can be generated in the 
-quality control tab. 
+quality control tab. The interactive heatmap tool can be used to explore the results data after `RUN MINT`
+has been exectuted. The tool allows to explore the generated data in from of heatmaps.
 
 
 ### General selection elements
-
+  - Include/exclude file types (based on `Type` column in metadata)
+  - Include/exclude peak labels for analysis
+  - Set file sorting (e.g. by name, by batch etc.)
+  - Select group-by column for coloring and statistics
 
 ### Heatmap
-The interactive heatmap tool can be used to explore the results data after `RUN MINT`
-has been exectuted. The tool allows to explore the generated data in from of heatmaps.
 
-![Heatmap](./image/mint-heatmap.png "Heatmap")
+![Heatmap](image/heatmap.png "Heatmap")
 
 The first dropdown menu allows to include certain file types e.g. biological samples rather than quality control samples.
 The second dropdown menu distinguishes the how the heatmap is generated. 
 
-- Normalized by biomarer:
+- Normalized by biomarer: devide values by column maxium.
 - Cluster: Cluster rows with hierachical clustering.  
 - Dendrogram: Plots a dendrogram instead of row labels.
 - Transpose: Switch columns and rows.
@@ -169,7 +171,11 @@ The second dropdown menu distinguishes the how the heatmap is generated.
 
 ### Distributions
 
-![Quality Control](./image/mint-qc-0.png "Quality Control")
+  - Plot histograms
+  - Density distributions
+  - Boxplots
+
+![Quality Control](image/distributions.png "Quality Control")
 
 The MS-files can be grouped based on the values in the metadata table. If nothing
 is selected the data will not be grouped in order to plot the overall distribution.
@@ -184,4 +190,21 @@ visually grouped into an individual section for each metabolite.
 
 ![Quality Control](./image/mint-qc-1.png "Quality Control")
 
-T
+
+### PCA
+ - Perform Principal Component Analysis (PCA)
+ - Plot projections to first N principal components
+ - Contributions of original variables to each component.
+
+![PCA](./image/mint-qc-1.png "Principal Components Analysis")
+
+
+### Hierarchical clustering
+
+![Clustering](image/hierarchical_clustering.png "Clustering")
+
+
+### Plotting
+
+MINT comes with a flexible and powerful plotting interface that is based on the powerful [Seaborn](http://seaborn.pydata.org/) library. 
+
