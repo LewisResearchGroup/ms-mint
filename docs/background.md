@@ -1,6 +1,7 @@
+# Background
+
 ## What is LCMS?
-A typical biological sample, such as human blood or agar with some kind of bacteria, can contain thousands of [metabolites](https://en.wikipedia.org/wiki/Metabolite) such as 
-sugars, alcohols, amino acids, nucleotides and more. To meassure the composition of such a sample [mass spectrometry](https://en.wikipedia.org/wiki/Mass_spectrometry) can be used. 
+A typical biological sample, such as human blood or agar with some kind of bacteria, can contain thousands of [metabolites](https://en.wikipedia.org/wiki/Metabolite) such as sugars, alcohols, amino acids, nucleotides and more. To meassure the composition of such a sample [mass spectrometry](https://en.wikipedia.org/wiki/Mass_spectrometry) can be used. 
 
 However, many metabolites share exact masses with other metabolites and therefore would be undistiguishable in the mass spectrometer. 
 Therefore, compounds are sorted using [column chromatography](https://en.wikipedia.org/wiki/Column_chromatography) and spread out over time.
@@ -11,14 +12,14 @@ That way various metabolites can be analysed successively over certain timeframe
 The mass spectrometer that follows the chromatographic column meassures the masses given at each point in time and returns a time dependent spectrogram.
 An example of a LSMS meassurement is visualized in the following figure:
 
-![](image/demo_Saureus_sample_raw.png)
-_**Figure 1:** A 2D-histogram of a MS1 recorded intensities taken over time span of 10 minutes. Shown are m/z values between 100 and 600 [Da/z].
+![](image/demo_Saureus_sample_raw.png)<br/>
+_**Figure 1:**_ A 2D-histogram of a MS1 recorded intensities taken over time span of 10 minutes. Shown are m/z values between 100 and 600 [Da/z].
 
 If we zoom into this figure to a very narrow band of masses the traces of individual metabolites can be observed. The
 trace of succinate (or [succinic acid](https://en.wikipedia.org/wiki/Succinic_acid)) is shown here: 
 
-![](image/demo_Saureus_sample_raw_succinate.png)
-_**Figure 2:** A zoom into the 2D histogram shown in figure 1. 
+![](image/demo_Saureus_sample_raw_succinate.png)<br/>
+_**Figure 2:**_ A zoom into the 2D histogram shown in figure 1. 
 
 This illustrates how dense and precise the information in a LCMS messurement is. For comparison the M/Z value of an electron is 5.489e-4.
 
@@ -39,20 +40,5 @@ Often the data is normalized for each metabolite to reflect the relative intensi
 The structured data can then be subjected to common data anayses such as dimensionality reduction, or clustering analysis.
 
 
-![](image/hierachical_clustering.png )
-_**Figure 3:** Clustering analysis for a small set of metabolites across 12 different samples including 3 different pathogens (EC: _E. coli_, SA: _S. aureus_, CA: _C. albicans_).
-
-## How to use MINT?
-The tool can be used for targeted analysis where the m/z-values (mass to charge ratios) and chromatographic retention times are known. 
-Alternatively, MINT can be used in an untargeted approach where new biomarkers can be explored without prior knowledge.
-
-MINT currently supports the open data formats mzML and mzXML. The main function is to extract and characterise measured 
-intensities in a given m/z and retention time (RT) window. These windows can be provided in form of a [peaklist](peaklists.md) 
-or created interactively in the [GUI](gui.md). With this setup large numbers of LCMS-files can be processed automatically, 
-standardized and perfectly reproducible.
-
-The tool can be used with a browser based graphical user interface (GUI) implemented as interactive dashboard with 
-[Plotly-Dash](https://plot.ly/dash/). Alternatively, the `ms_mint` package can be imported as python library to be 
-integrated in any regular Python code as part of a larger processing pipeline or interacively in the [Jupyter Notebook](jupyter.md).
-
-
+![](image/hierarchical_clustering.png )<br/>
+_**Figure 3:**_ Clustering analysis for a small set of metabolites across 12 different samples including 3 different pathogens (EC: _E. coli_, SA: _S. aureus_, CA: _C. albicans_).
