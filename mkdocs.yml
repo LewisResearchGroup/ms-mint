@@ -2,7 +2,7 @@ site_name: MINT
 site_url: https://github.com/soerendip/ms-mint
 site_author: Soren Wacker
 nav:
-  - MINT: 'index.md'
+  - Home: 'index.md'
   - Background: 'background.md'
   - Installation: 'install.md'
   - GUI: 'gui.md'
