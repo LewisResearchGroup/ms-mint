@@ -4,16 +4,19 @@ import io
 import shutil
 import subprocess
 import platform
+import logging
 
 import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
 from glob import glob
+from pathlib import Path as P
 
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+
 import matplotlib as mpl
 import matplotlib.cm as cm
 
@@ -541,3 +544,66 @@ def filename_to_label(fn: str):
     if is_ms_file(fn):
         fn = os.path.splitext(fn)[0]
     return os.path.basename(fn)
+
+
+    
+    def import_from_url(url, target_dir):
+        filenames = get_filenames_from_url(url)
+        filenames = [fn for fn in filenames if T.is_ms_file(fn)]
+
+        if len(filenames) == 0:
+            return dbc.Alert(f'No MS files found at {url}', color='warning')
+
+        fns = []
+        n_files = len(filenames)
+        
+        for i, fn in enumerate( tqdm( filenames )):
+            _url = url+'/'+fn
+            logging.info('Downloading', _url)
+            fsc.set('progress', int(100*(1+i)/n_files))
+            wget.download(_url, out=target_dir)
+
+        return fns
+
+
+def get_filenames_from_url(url):
+    if url.startswith('ftp'):
+        return get_filenames_from_ftp_directory(url)
+    if '://' in url:
+            url = url.split('://')[1]    
+    with urllib3.PoolManager() as http:
+        r = http.request('GET', url)
+    soup = BeautifulSoup(r.data, 'html')
+    files = [A['href'] for A in soup.find_all('a', href=True)]
+    return files
+
+
+def get_filenames_from_ftp_directory(url):
+    url_parts = urlparse(url)
+    domain = url_parts.netloc
+    path = url_parts.path
+    ftp = ftplib.FTP(domain)
+    ftp.login()
+    ftp.cwd(path)
+    filenames = ftp.nlst()
+    ftp.quit()
+    return filenames
+
+
+def import_from_local_path(path, target_dir, fsc=None):
+    fns = glob(os.path.join(path, '**', '*.*'), recursive=True)
+    fns = [fn for fn in fns if is_ms_file(fn)]
+    fns_out = []
+    n_files = len(fns)
+    for i, fn in enumerate( tqdm(fns) ):
+        if fsc is not None: fsc.set('progress', int(100*(1+i)/n_files))
+        fn_out = P(target_dir)/P(fn).with_suffix('.feather').name
+        if P(fn_out).is_file(): continue
+        fns_out.append(fn_out)
+        try:
+            convert_ms_file_to_feather(fn, fn_out)
+        except:
+            logging.warning(f'Could not convert {fn}')
+    return fns_out
+    
+            

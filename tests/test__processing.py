@@ -2,17 +2,9 @@ import os
 import pandas as pd 
 import numpy as np
 
-from ms_mint.standards import MINT_ROOT
 from ms_mint import processing
 
-
-TEST_MZXML = os.path.abspath( 
-    os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'test.mzXML'
-    )
-)
-
-assert os.path.isfile(TEST_MZXML)    
+from paths import TEST_MZXML
 
 
 def test__find_test_mzxml():

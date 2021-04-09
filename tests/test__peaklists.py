@@ -49,5 +49,5 @@ def test__generate_grid_peaklist():
 
 
 def test__read_peaklist__compound_formula():
-    fn = 'tests/data/peaklists/compound,formula.csv'
+    fn = 'tests/data/peaklists/compound-formula.csv'
     peaklists.read_peaklists(fn)
