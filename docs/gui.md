@@ -198,13 +198,23 @@ visually grouped into an individual section for each metabolite.
 
 ### Hierarchical clustering
 
-![Clustering](image/hierarchical_clustering.png "Clustering")
+![Hierarchical clustering](image/hierarchical_clustering.png "Hierarchical clustering")
 
 
 ### Plotting
 
-MINT comes with a flexible and powerful plotting interface that is based on the powerful [Seaborn](http://seaborn.pydata.org/) library. 
+MINT comes with a flexible and powerful plotting interface that is based on the powerful [Seaborn](http://seaborn.pydata.org/) library.
 
-![Plotting](image/plotting.png "Plotting")
+  - Bar plots
+  - Violin plots
+  - Boxen plot
+  - Scatter plots
+  - and more...
 
-![Plotting results](image/plotting_results.png "Plotting results")
+![Plot setting](image/plotting_settings.png "Plot settings")
+
+![Bar plot](image/plotting_results_bar.png "Bar plot")
+
+![Boxen plot](image/plotting_results_boxen.png "Boxen plot")
+
+
