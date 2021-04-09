@@ -33,7 +33,6 @@ _layout = html.Div([
                 'text-align': 'center',
                 'maxWidth': '100%',
                 'minHeight': '300px'}) )
-
 ])
 
 _ouptuts = html.Div([])
@@ -50,9 +49,15 @@ def callbacks(app, fsc, cache):
         State('hc-figsize-x', 'value'),
         State('hc-figsize-y', 'value'),
         State('hc-options', 'value'),
+        State('ana-file-types', 'value'),
+        State('ana-peak-labels-include', 'value'),
+        State('ana-peak-labels-exclude', 'value'),
+        State('ana-ms-order', 'value'),         
         State('wdir', 'children')
     )
-    def create_figure(n_clicks, fig_size_x, fig_size_y, options, wdir):
+    def create_figure(n_clicks, fig_size_x, fig_size_y, options, 
+            file_types, include_labels, exclude_labels, ms_order, wdir):
+
         if n_clicks is None: raise PreventUpdate
 
         mint = Mint()
@@ -63,9 +68,10 @@ def callbacks(app, fsc, cache):
         fig_size_x = min(float(fig_size_x), 100)
         fig_size_y = min(float(fig_size_y), 100)
 
-        print(fig_size_x, fig_size_y)
+        df = T.get_complete_results( wdir, include_labels=include_labels, 
+                    exclude_labels=exclude_labels, file_types=file_types )
 
-        mint.results = T.get_results( wdir )
+        mint.results = df
 
         mint.plot_clustering(figsize=(fig_size_x, fig_size_y), 
             transpose='Transposed' in options)

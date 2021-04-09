@@ -130,7 +130,17 @@ def extract_ms1_properties(array, mz_mean):
     intensities = array[:,2]
     peak_n_datapoints = len(array)
     if peak_n_datapoints == 0:
-        return None
+        return dict(peak_area=0, peak_max=0, 
+                peak_min=0, peak_mean=None, 
+                peak_rt_of_max=None, peak_median=None,
+                peak_delta_int=None, 
+                peak_n_datapoints=0,
+                peak_mass_diff_25pc=None, 
+                peak_mass_diff_50pc=None, 
+                peak_mass_diff_75pc=None,
+                peak_shape_rt='', 
+                peak_shape_int='',
+                peak_score=None)
 
     peak_area = intensities.sum()
     peak_mean = intensities.mean()

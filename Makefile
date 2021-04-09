@@ -12,3 +12,6 @@ tests:
 
 build:
 	pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec --additional-hooks-dir=hooks
+
+docs:
+	mkdocs build && mkdocs gh-deploy

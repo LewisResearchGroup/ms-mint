@@ -6,11 +6,13 @@ import io
 import os
 import pymzml
 
+from pathlib import Path as P
 from datetime import date
 from pyteomics import mzxml, mzml
 
 
 def ms_file_to_df(fn):
+    fn = str(fn)
     if fn.lower().endswith('.mzxml'):
         return mzxml_to_pandas_df(fn)
     elif fn.lower().endswith('.mzml'):
@@ -27,7 +29,7 @@ def mzxml_to_pandas_df(fn):
     '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
-    with mzxml.MzXML(fn) as ms_data:
+    with mzxml.MzXML( fn ) as ms_data:
         while True:
             try:
                 data = ms_data.next()     
@@ -123,8 +125,9 @@ def export_to_excel(mint, fn=None):
 
 
 def convert_ms_file_to_feather(fn, fn_out=None):
-    base, ext = os.path.splitext(fn)
+    fn = P(fn)
     if fn_out is None:
-        fn_out = base+'.feather'
-    ms_file_to_df(fn).reset_index(drop=True).to_feather(fn_out)
+        fn_out = fn.with_suffix('.feather')
+    df = ms_file_to_df(fn).reset_index(drop=True)
+    df.to_feather(fn_out)
     return fn_out

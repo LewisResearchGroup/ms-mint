@@ -1,8 +1,9 @@
-site_name: MINT Docs
+site_name: MINT
 site_url: https://github.com/soerendip/ms-mint
 site_author: Soren Wacker
 nav:
-  - Background: 'index.md'
+  - Home: 'index.md'
+  - Background: 'background.md'
   - Installation: 'install.md'
   - GUI: 'gui.md'
   - Peaklists: 'peaklists.md'

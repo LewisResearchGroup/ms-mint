@@ -4,16 +4,19 @@ import io
 import shutil
 import subprocess
 import platform
+import logging
 
 import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
 from glob import glob
+from pathlib import Path as P
 
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+
 import matplotlib as mpl
 import matplotlib.cm as cm
 
@@ -60,7 +63,6 @@ def parse_ms_files(contents, filename, date, target_dir):
         with open(fn_abs, 'wb') as file:
             file.write(decoded)
     new_fn = convert_ms_file_to_feather(fn_abs)
-    print(f'Convert {fn_abs} to {new_fn}')
     if os.path.isfile(new_fn): os.remove(fn_abs)
 
 
@@ -135,6 +137,7 @@ def create_workspace(tmpdir, ws_name):
 def get_workspaces_path(tmpdir):
     # Defines the path to the workspaces
     # relative to `tmpdir`
+    ws_names = os.path.join(tmpdir, 'workspaces')
     return os.path.join(tmpdir, 'workspaces')
 
 
@@ -142,6 +145,7 @@ def get_workspaces(tmpdir):
     ws_path = get_workspaces_path(tmpdir)
     ws_names = get_dirnames( ws_path )
     ws_names = [ws for ws in ws_names if not ws.startswith('.')]
+    ws_names.sort()
     return ws_names
 
 
@@ -294,7 +298,6 @@ def get_metadata(wdir):
     
     if 'index' in df.columns: del df['index']
     df.reset_index(inplace=True)
-
     return df
 
 
@@ -360,6 +363,7 @@ def get_complete_results( wdir, include_labels=None, exclude_labels=None, file_t
     if file_types is not None and file_types != []:
         df = df[df.Type.isin(file_types)]            
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
+    if 'index' in df.columns: df = df.drop('index', axis=1)
     return df
 
 
@@ -451,13 +455,19 @@ def fig_to_src(dpi=100):
 
 def merge_metadata(old, new):
     old = old.set_index('MS-file')
-    new = new.set_index('MS-file').replace('null', None)
+
+    new = new.groupby('MS-file').first().replace('null', None)
+
     for col in new.columns:
+        if col == '' or col.startswith('Unnamed'):
+            continue
+        if not col in old.columns: old[col] = None
         for ndx in new.index:
             value = new.loc[ndx, col]
             if value is None:
                 continue
-            old.loc[ndx, col] = value
+            if ndx in old.index:
+                old.loc[ndx, col] = value
     return old.reset_index()
 
 
@@ -534,3 +544,66 @@ def filename_to_label(fn: str):
     if is_ms_file(fn):
         fn = os.path.splitext(fn)[0]
     return os.path.basename(fn)
+
+
+    
+    def import_from_url(url, target_dir):
+        filenames = get_filenames_from_url(url)
+        filenames = [fn for fn in filenames if T.is_ms_file(fn)]
+
+        if len(filenames) == 0:
+            return dbc.Alert(f'No MS files found at {url}', color='warning')
+
+        fns = []
+        n_files = len(filenames)
+        
+        for i, fn in enumerate( tqdm( filenames )):
+            _url = url+'/'+fn
+            logging.info('Downloading', _url)
+            fsc.set('progress', int(100*(1+i)/n_files))
+            wget.download(_url, out=target_dir)
+
+        return fns
+
+
+def get_filenames_from_url(url):
+    if url.startswith('ftp'):
+        return get_filenames_from_ftp_directory(url)
+    if '://' in url:
+            url = url.split('://')[1]    
+    with urllib3.PoolManager() as http:
+        r = http.request('GET', url)
+    soup = BeautifulSoup(r.data, 'html')
+    files = [A['href'] for A in soup.find_all('a', href=True)]
+    return files
+
+
+def get_filenames_from_ftp_directory(url):
+    url_parts = urlparse(url)
+    domain = url_parts.netloc
+    path = url_parts.path
+    ftp = ftplib.FTP(domain)
+    ftp.login()
+    ftp.cwd(path)
+    filenames = ftp.nlst()
+    ftp.quit()
+    return filenames
+
+
+def import_from_local_path(path, target_dir, fsc=None):
+    fns = glob(os.path.join(path, '**', '*.*'), recursive=True)
+    fns = [fn for fn in fns if is_ms_file(fn)]
+    fns_out = []
+    n_files = len(fns)
+    for i, fn in enumerate( tqdm(fns) ):
+        if fsc is not None: fsc.set('progress', int(100*(1+i)/n_files))
+        fn_out = P(target_dir)/P(fn).with_suffix('.feather').name
+        if P(fn_out).is_file(): continue
+        fns_out.append(fn_out)
+        try:
+            convert_ms_file_to_feather(fn, fn_out)
+        except:
+            logging.warning(f'Could not convert {fn}')
+    return fns_out
+    
+            

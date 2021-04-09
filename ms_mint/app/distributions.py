@@ -80,6 +80,8 @@ def callbacks(app, fsc, cache):
 
         if options is None:
             options = []
+        
+        print(df.peak_label.value_counts())
 
         figures = []
         n_total = len(df.peak_label.drop_duplicates())
@@ -92,8 +94,8 @@ def callbacks(app, fsc, cache):
             if sort_by_col is not None:
                 grp = grp.sort_values(sort_by_col).reset_index(drop=True)
 
-            if len(grp) < 1:
-                continue
+            #if len(grp) < 1:
+            #    continue
 
             if 'hist' in kinds: 
                 sns.displot(data=grp, x=quant_col, height=3, hue=groupby, aspect=1)
