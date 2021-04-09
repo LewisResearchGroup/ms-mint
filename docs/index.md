@@ -4,7 +4,7 @@ Metabolomics is the study of all metabolites (small chemical compounds) in a bio
 The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests 
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 
-![](image/MINT-flowchart.png)
+![](image/flowchart.png)
 
 
 ## What is LCMS?
@@ -21,13 +21,13 @@ The mass spectrometer that follows the chromatographic column meassures the mass
 An example of a LSMS meassurement is visualized in the following figure:
 
 ![](image/demo_Saureus_sample_raw.png)
-_**Figure 1:** test bla bla_
+_**Figure 1:** A 2D-histogram of a MS1 recorded intensities taken over time span of 10 minutes. Shown are m/z values between 100 and 600 [Da/z].
 
 If we zoom into this figure to a very narrow band of masses the traces of individual metabolites can be observed. The
 trace of succinate (or [succinic acid](https://en.wikipedia.org/wiki/Succinic_acid)) is shown here: 
 
 ![](image/demo_Saureus_sample_raw_succinate.png)
-_**Figure 2:** test bla bla_
+_**Figure 2:** A zoom into the 2D histogram shown in figure 1. 
 
 This illustrates how dense and precise the information in a LCMS messurement is. For comparison the M/Z value of an electron is 5.489e-4.
 
@@ -48,7 +48,7 @@ Often the data is normalized for each metabolite to reflect the relative intensi
 The structured data can then be subjected to common data anayses such as dimensionality reduction, or clustering analysis.
 
 
-![](image/demo_hierachical_clustering.png )
+![](image/hierachical_clustering.png )
 _**Figure 3:** Clustering analysis for a small set of metabolites across 12 different samples including 3 different pathogens (EC: _E. coli_, SA: _S. aureus_, CA: _C. albicans_).
 
 ## How to use MINT?
