@@ -3,7 +3,6 @@
 import pandas as pd
 import numpy as np
 import io
-import os
 import pymzml
 
 from pathlib import Path as P
@@ -14,26 +13,32 @@ from pyteomics import mzxml, mzml
 def ms_file_to_df(fn):
     fn = str(fn)
     if fn.lower().endswith('.mzxml'):
-        return mzxml_to_pandas_df(fn)
+        df = mzxml_to_df(fn)
     elif fn.lower().endswith('.mzml'):
-        return mzml_to_df(fn)
+        df = mzml_to_df(fn)
     elif fn.lower().endswith('hdf'):
-        return pd.read_hdf(fn)
+        df = pd.read_hdf(fn)
     elif fn.lower().endswith('feather'):
-        return pd.read_feather(fn)
+        df = pd.read_feather(fn)
+    # Compatibility with old schema
+    df = df.rename(columns={
+            'retentionTime': 'scan_time_min', 
+            'intensity array': 'intensity', 
+            'm/z array': 'mz'})
+    return df
 
 
-def mzxml_to_pandas_df(fn):
+def mzxml_to_df(fn):
     '''
     Reads mzXML file and returns a pandas.DataFrame.
-    '''
-    cols = ['retentionTime', 'm/z array', 'intensity array']
+    '''    
     slices = []
     with mzxml.MzXML( fn ) as ms_data:
         while True:
             try:
                 data = ms_data.next()     
-                df = pd.DataFrame({col: np.array(data[col]) for col in cols} )
+                df = pd.DataFrame(data)[['num', 'msLevel', 'polarity', 
+                        'retentionTime', 'm/z array', 'intensity array']]
                 slices.append( df )
             except:         
                 break
@@ -41,7 +46,15 @@ def mzxml_to_pandas_df(fn):
     df['retentionTime'] =  df['retentionTime'].astype(np.float32)
     df['m/z array'] = df['m/z array'].astype(np.float32)
     df['intensity array'] = df['intensity array'].astype(int)
+    df = df.rename(columns={'num': 'scan_id', 
+                            'msLevel': 'ms_level', 
+                            'retentionTime': 'scan_time_min', 
+                            'm/z array': 'mz', 
+                            'intensity array': 'intensity'})
     df = df.reset_index(drop=True)
+    cols = ['scan_id', 'ms_level', 'polarity', 
+            'scan_time_min', 'mz', 'intensity']
+    df = df[cols]
     return df
 
 
@@ -67,7 +80,7 @@ def mzml_to_pandas_df_pyteomics(fn):
     return df
 
 
-def mzml_to_df(fn, assume_time_unit='seconds'):
+def mzml_to_df(fn, assume_time_unit='seconds', remove_noise=False):
     
     with pymzml.run.Reader(fn) as ms_data:
         data = []
@@ -83,16 +96,16 @@ def mzml_to_df(fn, assume_time_unit='seconds'):
                     RT = spectrum.scan_time[0] / 60.
                 elif assume_time_unit == 'minutes':
                     RT = spectrum.scan_time[0]
-                
+            if remove_noise: spectrum = spectrum.remove_noise()
             peaks = spectrum.peaks("centroided")
-            data.append((RT,peaks))
+            data.append((spectrum.index, spectrum.ms_level, '+' if spectrum["positive scan"] else '-', RT, peaks))
 
-    df = pd.DataFrame(data).explode(1)
-
-    df['m/z array'] = df[1].apply(lambda x: x[0])
-    df['intensity array'] = df[1].apply(lambda x: x[1]).astype(int)
-    df = df.rename(columns={0: 'retentionTime'})
-    del df[1]
+    ndx_explode = 4
+    df = pd.DataFrame(data).explode(ndx_explode)    
+    df['mz'] = df[ndx_explode].apply(lambda x: x[0])
+    df['intensity'] = df[ndx_explode].apply(lambda x: x[1]).astype(int)
+    del df[ndx_explode]
+    df = df.rename(columns={0: 'scan_id', 1: 'ms_level', 2: 'polarity', 3: 'scan_time_min' })
     df = df.reset_index(drop=True)
     return df
 

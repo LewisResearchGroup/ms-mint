@@ -4,7 +4,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 from dash.exceptions import PreventUpdate
-from dash.dependencies import Input, Output, State, ALL
+from dash.dependencies import Input, Output, ALL
 
 _label = None
 

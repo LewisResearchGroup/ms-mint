@@ -217,8 +217,8 @@ def callbacks(app, fsc, cache):
             name, _ = os.path.splitext(name)
             chrom = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
             fig.add_trace(
-                go.Scatter(x=chrom['retentionTime'], 
-                           y=chrom['intensity array'], 
+                go.Scatter(x=chrom['scan_time_min'], 
+                           y=chrom['intensity'], 
                         name=name)
             )
             fig.update_layout(showlegend=False)
@@ -258,7 +258,7 @@ def callbacks(app, fsc, cache):
             fsc.set('progress', int(100*(1+i)/n_peaks))
             mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
             chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
-                .set_index('retentionTime')['intensity array'] for fn in ms_files]
+                .set_index('scan_time_min')['intensity'] for fn in ms_files]
             #rt_min, rt_max = max(0, row['rt']-(margin/2)), row['rt']+(margin/2)
             rt_min, rt_max = RTOpt(rt=row['rt'], rt_margin=margin).find_largest_peak(chromatograms)
             peaklist.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
@@ -486,7 +486,7 @@ def callbacks(app, fsc, cache):
         row = peaklist.iloc[peak_label_ndx]
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
         chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
-            .set_index('retentionTime')['intensity array'] for fn in ms_files]
+            .set_index('scan_time_min')['intensity'] for fn in ms_files]
         rt_min, rt_max = RTOpt(rt=row['rt'], rt_min=row['rt_min'], rt_max=['rt_max'], rt_margin=margin)\
                             .find_largest_peak(chromatograms)
         peaklist = peaklist.reset_index()
@@ -545,10 +545,10 @@ def create_preview_peakshape(ms_files, mz_mean, mz_width, rt,
     for fn in ms_files:
         color = colors[ T.filename_to_label(fn) ]
         fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
-        fn_chro = fn_chro[(rt_min < fn_chro['retentionTime']) &
-                             (fn_chro['retentionTime'] < rt_max)   ]
-        plt.plot(fn_chro['retentionTime'], fn_chro['intensity array'], lw=1, color=color)
-        y_max = max(y_max, fn_chro['intensity array'].max())
+        fn_chro = fn_chro[(rt_min < fn_chro['scan_time_min']) &
+                             (fn_chro['scan_time_min'] < rt_max)   ]
+        plt.plot(fn_chro['scan_time_min'], fn_chro['intensity'], lw=1, color=color)
+        y_max = max(y_max, fn_chro['intensity'].max())
     if (not np.isnan(rt)) \
         and not (np.isnan(rt_max)) \
         and not (np.isnan(rt_min)):

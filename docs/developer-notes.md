@@ -9,7 +9,6 @@
 
     mkdocs build && mkdocs gh-deploy
 
-
 ## Example NGINX config
 
     location /mint/ {
@@ -26,3 +25,11 @@
     }
 
 Then start MINT with `--serve-path='\mint\'`.
+
+
+## Additional packages
+
+To run tests and code optimization you need the
+following packages:
+
+    conda install flake8 pytest mkdocs

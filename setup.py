@@ -8,6 +8,7 @@ with open("README.md", "r") as fh:
 
 
 install_requires = [
+    'numpy>=1.20'
     'pandas>=1',
     'plotly',
     'lxml',
@@ -16,7 +17,7 @@ install_requires = [
     'plotly',
     'plotly_express',
     'dash',
-    'scipy==1.4',
+    'scipy==1.6.2',  #
     'setuptools',
     'statsmodels',
     'flask',
@@ -25,9 +26,10 @@ install_requires = [
     'colorlover',
     'dash-bootstrap-components',
     'dash-extensions',
-    'dash-tabulator',
+    'dash-tabulator>=0.4.2',
     'scikit-learn',
     'xlrd',
+    'urllib3',
     'ipywidgets',
     'pyopenms',
     'pymzml',
@@ -35,7 +37,7 @@ install_requires = [
     'seaborn',
     'ipyfilechooser',
     'waitress',
-    'pyarrow',
+    'pyarrow>=3',
     'flask-compress',
     'molmass',
     'dash_uploader',
