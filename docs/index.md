@@ -5,4 +5,5 @@ The metabolites can be used to define biomarkers used in medicine to find treatm
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 
 ![](image/flowchart.png)
+_**Figure 1:** Flowchart of MINT processing workflow. 
 
