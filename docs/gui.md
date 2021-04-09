@@ -207,3 +207,4 @@ MINT comes with a flexible and powerful plotting interface that is based on the 
 
 ![Plotting](image/plotting.png "Plotting")
 
+![Plotting results](image/plotting_results.png "Plotting results")
