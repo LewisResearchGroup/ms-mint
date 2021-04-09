@@ -188,15 +188,12 @@ The checkbox can be used to create a dense view. If the box is unchecked the out
 visually grouped into an individual section for each metabolite.
 
 
-![Quality Control](./image/mint-qc-1.png "Quality Control")
-
-
 ### PCA
  - Perform Principal Component Analysis (PCA)
  - Plot projections to first N principal components
  - Contributions of original variables to each component.
 
-![PCA](./image/mint-qc-1.png "Principal Components Analysis")
+![PCA](image/pca.png "Principal Components Analysis")
 
 
 ### Hierarchical clustering
@@ -209,3 +206,4 @@ visually grouped into an individual section for each metabolite.
 MINT comes with a flexible and powerful plotting interface that is based on the powerful [Seaborn](http://seaborn.pydata.org/) library. 
 
 ![Plotting](image/plotting.png "Plotting")
+
