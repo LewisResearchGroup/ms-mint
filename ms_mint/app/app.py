@@ -29,7 +29,7 @@ from . import ms_files
 from . import metadata
 from . import peaklist
 from . import peak_optimization
-from . import run_mint
+from . import processing
 from . import add_metab
 from . import analysis
 from . import messages
@@ -58,19 +58,6 @@ config = {
 
 pd.options.display.max_colwidth = 1000
 
-'''
-components = {
-    'workspaces':   {'label': 'Workspace',          'callbacks_func': workspaces.callbacks,         'layout_func': workspaces.layout},
-    'msfiles':      {'label': 'MS-files',           'callbacks_func': ms_files.callbacks,           'layout_func': ms_files.layout},
-    'metadata':     {'label': 'Metadata',           'callbacks_func': metadata.callbacks,           'layout_func': metadata.layout},
-    'peaklist':     {'label': 'Peaklist',           'callbacks_func': peaklist.callbacks,           'layout_func': peaklist.layout},
-    'add_metab':    {'label': 'Add Metabolites',    'callbacks_func': add_metab.callbacks,          'layout_func': add_metab.layout},
-    'pko':          {'label': 'Peak Optimization',  'callbacks_func': peak_optimization.callbacks,  'layout_func': peak_optimization.layout},
-    'run':          {'label': 'Run MINT',           'callbacks_func': run_mint.callbacks,           'layout_func': run_mint.layout},
-    'analysis':     {'label': 'Analysis',           'callbacks_func': analysis.callbacks,           'layout_func': analysis.layout},
-}
-'''
-
 _modules = [
   workspaces,
   ms_files,
@@ -78,7 +65,7 @@ _modules = [
   peaklist,
   add_metab,
   peak_optimization,
-  run_mint,
+  processing,
   analysis
 ]
 
@@ -129,7 +116,7 @@ app.layout = html.Div([
          children=[html.Button('Issues', id='B_issues', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
-    dbc.Progress(id="progress-bar", value=100, style={'marginBottom': '20px', 'width': '100%'}),
+    dbc.Progress(id="progress-bar", value=100, style={'marginBottom': '20px', 'width': '100%', 'marginTop': '20px'}),
 
     messages.layout(),
 
@@ -178,7 +165,6 @@ for module in _modules:
 )
 def render_content(tab, wdir):
     func = modules[tab].layout
-    print('Working dir:', wdir)
     if tab != 'Workspaces' and wdir == '':
         return dbc.Alert('Please, create and activate a workspace.', color='warning')
     elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:

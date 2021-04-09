@@ -2,11 +2,14 @@ import os
 import shutil
 import uuid
 import logging
+import numpy as np
 
 import wget
 import urllib3, ftplib
+
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+from pathlib import Path as P
 
 from glob import glob
 
@@ -44,14 +47,18 @@ clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 # If color column is not present, for some strange reason, the header filter disappears.
 columns = [
-        { "formatter": "rowSelection", "titleFormatter":"rowSelection",  
+        { "formatter": "rowSelection", 
+          "titleFormatter":"rowSelection",  
           "titleFormatterParams": {
              "rowRange": "active" # only toggle the values of the active filtered rows
           },
           "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
         { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
-          'headerSort': True, "editor": "input", "width": "100%",
+          'headerSort': True, "editor": "input", "width": "auto",
           'sorter': 'string', 'frozen': True},
+        { "title": "Size [MB]", "field": "file_size", "headerFilter":True, 
+          'headerSort': True, "editor": "input", "width": "200px",
+          'sorter': 'string', 'frozen': True},          
         { 'title': '', 'field': '', "headerFilter":False,  "formatter":"color", 
           'width': '3px', "headerSort": False},
     ]
@@ -96,10 +103,12 @@ _layout = html.Div([
                     'textAlign': 'center',
                     'width': '100%',
                     'padding': '0px',
+                    'margin-bottom': '20px',
                     'display': 'inline-block',
                 }),
-    html.Button('Import from URL', id='ms-import-from-url'),
-    dcc.Input(id='url', placeholder='Drop URL here', style={'width': '100%'}),
+                
+    html.Button('Import from URL or local path', id='ms-import-from-url'),
+    dcc.Input(id='url', placeholder='Drop URL / path here', style={'width': '100%'}),
     dcc.Markdown('---', style={'marginTop': '10px'}),
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
@@ -164,8 +173,8 @@ def callbacks(app, fsc, cache):
     )
     def ms_table(value, wdir, files_deleted, zip_extracted): 
         ms_files = T.get_ms_fns( wdir )
-        data = pd.DataFrame({'MS-file':  [os.path.basename(fn) for fn in ms_files],
-                             'Size[MB]': [os.path.getsize(fn)  for fn in ms_files]})
+        data = pd.DataFrame({'MS-file':   [os.path.basename(fn) for fn in ms_files],
+                             'file_size': [ np.round(os.path.getsize(fn)/1024/1024, 2)  for fn in ms_files]})
         return data.to_dict('records')
 
 
@@ -200,9 +209,10 @@ def callbacks(app, fsc, cache):
         if n_clicks is None:
             raise PreventUpdate
         target_dir = os.path.join(wdir, 'ms_files')
+        print(rows)
         for row in rows:
             fn = row['MS-file']
-            fn = os.path.join(target_dir, fn)
+            fn = P(target_dir)/fn
             os.remove(fn)
         return dbc.Alert(f'{len(rows)} files deleted', color='info')
 
@@ -247,47 +257,20 @@ def callbacks(app, fsc, cache):
         State('url', 'value'),
         State('wdir', 'children')
     )
-    def import_from_url(n_clicks, url, wdir):
+    def import_from_url_or_path(n_clicks, url, wdir):
         if n_clicks is None or url is None:
             raise PreventUpdate
 
-        filenames = get_filenames_from_url(url)
-        filenames = [fn for fn in filenames if T.is_ms_file(fn)]
-
-        if len(filenames) == 0:
-            return dbc.Alert(f'No MS files found at {url}', color='warning')
-
+        url = url.strip()
+      
         ms_dir = T.get_ms_dirname( wdir )
-        fns = []
-        n_files = len(filenames)
-        for i, fn in enumerate( tqdm( filenames )):
-            _url = url+'/'+fn
-            logging.info('Downloading', _url)
-            fsc.set('progress', int(100*(1+i)/n_files))
-            wget.download(_url, out=ms_dir)
-        return dbc.Alert(f'{len(fns)} files downloaded.', color='success')
 
+        if P(url).is_dir():
+            fns = T.import_from_local_path(url, ms_dir, fsc=fsc)
+        else:
+            logging.warning(f'Local file not found, looking for URL ({url}) [{P(url).is_dir()}, {os.path.isdir(url)}]')
+            fns = T.import_from_url(url, ms_dir)
 
-def get_filenames_from_url(url):
-    if url.startswith('ftp'):
-        return get_files_from_ftp_directory(url)
-    if '://' in url:
-            url = url.split('://')[1]    
-    with urllib3.PoolManager() as http:
-        r = http.request('GET', url)
-    soup = BeautifulSoup(r.data, 'html')
-    files = [A['href'] for A in soup.find_all('a', href=True)]
-    return files
+        return dbc.Alert(f'{len(fns)} files imported.', color='success')
 
-
-def get_files_from_ftp_directory(url):
-    url_parts = urlparse(url)
-    domain = url_parts.netloc
-    path = url_parts.path
-    ftp = ftplib.FTP(domain)
-    ftp.login()
-    ftp.cwd(path)
-    filenames = ftp.nlst()
-    ftp.quit()
-    return filenames
 

@@ -15,8 +15,12 @@ _layout = html.Div([
     html.Button('Run PCA',id='pca-update'),
     dcc.Dropdown(id='dec-scaling', options=scaling_options, 
         value=['Standard'], multi=True, placeholder='Scaling used before PCA'),
+    html.Label('Number of PCA components'),
 
-    html.Div(id='pca-figures', style={'margin': 'auto', 'text-align': 'center'})
+    dcc.Slider(id='pca-nvars', value=3, min=2, max=10, marks={i: f'{i}' for i in range(2, 11)}),
+    
+
+    dcc.Loading( html.Div(id='pca-figures', style={'margin': 'auto', 'text-align': 'center'}) ) 
     
 ])
 
@@ -31,13 +35,14 @@ def callbacks(app, fsc, cache):
     @app.callback(
         Output('pca-figures', 'children'),
         Input('pca-update', 'n_clicks'),
+        State('pca-nvars', 'value'),
         State('ana-groupby', 'value'),
         State('ana-peak-labels-include', 'value'),
         State('ana-peak-labels-exclude', 'value'),
         State('ana-file-types', 'value'),
         State('wdir', 'children')
     )
-    def create_pca( n_clicks, groupby, include_labels, exclude_labels, 
+    def create_pca( n_clicks, n_vars, groupby, include_labels, exclude_labels, 
             file_types, wdir ):
         if n_clicks is None:
             raise PreventUpdate
@@ -49,7 +54,6 @@ def callbacks(app, fsc, cache):
             df = df[df['Type'].isin(file_types)]
         if groupby is not None and len(groupby) > 0:
             color_groups = df[['ms_file', groupby]].drop_duplicates().set_index('ms_file')
-            #ndx_cgrp = color_groups.index.to_list()
         else:
             color_groups = None
             groupby = None
@@ -61,15 +65,15 @@ def callbacks(app, fsc, cache):
 
         ndx = mint.decomposition_results['df_projected'].index.to_list()
 
-        mint.pca_plot_cummulative_variance()
+        mint.pca_plot_cumulative_variance()
+
         src = T.fig_to_src()
         figures.append( html.Img(src=src) )
 
         if color_groups is not None:
             color_groups = color_groups.loc[ndx].values
 
-        mint.plot_pair_plot(group_name=groupby, 
-                color_groups=color_groups)
+        mint.plot_pair_plot(group_name=groupby, color_groups=color_groups, n_vars=n_vars)
 
         src = T.fig_to_src()
         figures.append( html.Img(src=src) )

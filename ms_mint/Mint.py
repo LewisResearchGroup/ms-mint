@@ -8,6 +8,7 @@ import logging
 
 from warnings import simplefilter
 from pathlib import Path as P
+from functools import lru_cache
 
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -15,8 +16,6 @@ import seaborn as sns
 from multiprocessing import Pool, Manager, cpu_count
 from scipy.cluster.hierarchy import ClusterWarning
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, RobustScaler
-
 
 from .standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
@@ -27,6 +26,7 @@ from .helpers import is_ms_file, get_ms_files_from_results
 from .vis.plotly.plotly_tools import plot_heatmap
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
 from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
+from .tools import scale_dataframe 
 
 from tqdm import tqdm
 
@@ -65,13 +65,15 @@ class Mint(object):
         self._status = 'waiting'
         self._messages = []
 
-    def optimize_retention_times(self, ms_files=None, peak_labels=None, **kwargs):
+
+    def optimize_rt(self, ms_files=None, peak_labels=None, rt_margin=0.5, **kwargs):
         chromatograms = []
         if ms_files is None:
             ms_files = self.ms_files
         if peak_labels is None:
             peak_labels = self.peaklist.peak_label.values
-        peaklist = self.peaklist
+        peaklist = self.peaklist.copy()
+        peaklist = peaklist[peaklist.peak_label.isin(peak_labels)]
         n_peaks = len(peaklist)
         for i, (ndx, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
             progress = int(100*(i+1)/n_peaks)
@@ -82,12 +84,17 @@ class Mint(object):
             chromatograms = []
             mz_mean, mz_width, rt, rt_min, rt_max = row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
             for fn in ms_files:
-                df = ms_file_to_df(fn)
+                df = self.ms_file_to_df(fn)
                 chrom = extract_chromatogram_from_ms1(df, mz_mean=mz_mean, mz_width=mz_width)
                 chromatograms.append(chrom)
-            rt_min, rt_max = RetentionTimeOptimizer(**kwargs).find_largest_peak(chromatograms)
+            params = dict(rt=rt, rt_min=rt_min, rt_max=rt_max, rt_margin=rt_margin)
+            rtopt = RetentionTimeOptimizer(**params, **kwargs)
+            rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
             self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
             
+    @lru_cache(100)
+    def ms_file_to_df(self, fn):
+        return ms_file_to_df(fn)
 
     def clear_peaklist(self):
         self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
@@ -343,20 +350,57 @@ class Mint(object):
 
     
     def plot_clustering(self, data=None, title=None, figsize=(8,8), target_var='peak_max',
-                        vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None, transpose=False,
-                        normalize_by_row=True, transform_func='log1p', 
-                        transform_filenames_func='basename', **kwargs):
+                        vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None, 
+                        transform_func='log2p1', 
+                        scaler_ms_file=None, 
+                        scaler_peak_label='standard',
+                        metric='euclidean',                         
+                        transform_filenames_func='basename',
+                        transpose=False,
+                        **kwargs):
         '''
         Performs a cluster analysis and plots a heatmap. If no data is provided, 
         data is taken form self.crosstab(target_var).
-        First the data is transformed with the transform function (default is log(x+1)).
-        If normalize_by_row==True the (transformed) data is also row-normalized (z=(x-μ)/σ)).
-        A hierachical cluster analysis is performed with the (transformed) data.
-        The original data is then re-ordered accoring to the resulting clusters.
-        The result is stored in self.clustered.
+        The clustered non-transformed non-scaled data is stored in `self.clustered`.
+
+        -----
+        Args:
+
+        transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
+            - None: no transformation
+            - log1p: tranform data with lambda x: np.log1p(x)
+            - log2p1: transform data with lambda x: log2(x+1)
+            - log10p1: transform data with lambda x: log10(x+1)
+
+        scaler_ms_file: default None, values: [None, 'standard', 'robust']
+            - scaler used to scale along ms_file axis
+            - if None no scaling is applied
+            - if 'standard' use scikit learn StandardScaler()
+            - if 'robust' use scikit learn RobustScaler()
+
+        scaler_peak_label: default 'standard'
+            - like scaler_ms_file, but scaling along peak_label axis
+
+        metric: default 'euclidean', can be string or a list of two values:
+            if two values are provided e.g. ('cosine', 'euclidean') the first
+            will be used to cluster the x-axis and the second for the y-axis.
+
+            ‘braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’, 
+            ‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’, 
+            ‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’, 
+            ‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
+            More information: 
+            https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
+
+        transpose: bool, default False
+            - True: transpose the figure
+        
+        
+
         '''
         if len(self.results) == 0:
             return None
+
         simplefilter("ignore", ClusterWarning)
         if data is None:
             data = self.crosstab(target_var).copy()
@@ -365,29 +409,38 @@ class Mint(object):
 
         if transform_func == 'log1p':
             transform_func = np.log1p
+        if transform_func == 'log2p1':
+            transform_func = lambda x: np.log2(x+1)
+        if transform_func == 'log10p1':
+            transform_func = lambda x: np.log10(x+1)
 
         if transform_func is not None:
             tmp_data = tmp_data.apply(transform_func)
 
         if transform_filenames_func == 'basename':
-            transform_filenames_func = os.path.basename
-
-        if transform_filenames_func is not None:
+            transform_filenames_func = lambda x: P(x).with_suffix('').name
+        elif transform_filenames_func is not None:
             tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns] 
 
-        if normalize_by_row:
-            tmp_data = ((tmp_data.T - tmp_data.T.mean()) / tmp_data.T.std())
+        # Scale along ms-files
+        if scaler_ms_file is not None:
+            tmp_data = scale_dataframe(tmp_data.T, scaler_ms_file).T
+        
+        # Scale along peak_labels
+        if scaler_peak_label is not None:
+            tmp_data = scale_dataframe(tmp_data, scaler_peak_label)
 
         if transpose: tmp_data = tmp_data.T    
 
         clustered, fig, ndx_x, ndx_y = hierarchical_clustering( 
             tmp_data, vmin=vmin, vmax=vmax, figsize=figsize, 
-            xmaxticks=xmaxticks, ymaxticks=ymaxticks, **kwargs )
+            xmaxticks=xmaxticks, ymaxticks=ymaxticks, metric=metric,
+            **kwargs )
 
         if not transpose:
-            self.clustered = data.iloc[ndx_y, ndx_x]
-        else:
             self.clustered = data.iloc[ndx_x, ndx_y]
+        else:
+            self.clustered = data.iloc[ndx_y, ndx_x]
         return fig
     
 
@@ -438,12 +491,7 @@ class Mint(object):
         df = df.fillna(fillna)
 
         if scaler is not None:
-            if scaler == 'standard':
-                scaler = StandardScaler()
-            elif scaler == 'robust':
-                scaler = RobustScaler()
-            df = pd.DataFrame(scaler.fit_transform(df), 
-                    index=df.index, columns=df.columns)
+            df = scale_dataframe(df, scaler)
 
         min_dim = min(df.shape)
         n_vars = min(n_vars, min_dim)
@@ -463,7 +511,7 @@ class Mint(object):
         }
 
 
-    def pca_plot_cummulative_variance(self):
+    def pca_plot_cumulative_variance(self):
         n_vars = self.decomposition_results['n_vars']
         fig = plt.figure(figsize=(7,3))
         cumm_expl_var = self.decomposition_results['cumm_expl_var']
@@ -471,12 +519,12 @@ class Mint(object):
             facecolor='grey', edgecolor='none')
         plt.xlabel('# PCA-components')
         plt.ylabel('Explained variance')
-        plt.title('Cummulative explained variance')
+        plt.title('cumulative explained variance')
         plt.grid()
         return fig
 
 
-    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None):
+    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None, marker=None):
         df = self.decomposition_results['df_projected']
         cols = df.columns.to_list()[:n_vars]
         df = df[cols]
@@ -485,7 +533,10 @@ class Mint(object):
             df[group_name] = color_groups
             df[group_name] = df[group_name].astype(str)
         fig = plt.figure()
-        g = sns.pairplot(df, plot_kws={'s': 100}, hue=group_name)
+
+        if marker is None and len(df) > 20:
+            marker = 'x'
+        g = sns.pairplot(df, plot_kws={'s': 100, 'marker': marker}, hue=group_name)
         if color_groups is not None:
             leg = g._legend
             leg.set_bbox_to_anchor([1.05, 0.5])

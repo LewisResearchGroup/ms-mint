@@ -1,5 +1,8 @@
+import pandas as pd
 import numpy as np
 from molmass import Formula
+
+from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from .standards import M_PROTON
 
@@ -26,3 +29,13 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None, verbose=False):
 
 def gaussian(x, mu, sig):
     return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
+
+
+def scale_dataframe(df, scaler='standard'):
+    df = df.copy()
+    if scaler == 'standard':
+        scaler = StandardScaler()
+    elif scaler == 'robust':
+        scaler = RobustScaler()
+    return pd.DataFrame(scaler.fit_transform(df), 
+                        columns=df.columns, index=df.index)

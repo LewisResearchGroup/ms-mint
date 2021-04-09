@@ -1,11 +1,14 @@
 import seaborn as sns
 import pandas as pd
-
+from matplotlib import pyplot as plt
 
 
 def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, aspect=1, legend=False,
-                     n_cols=None, col_wrap=4, hue='ms_file', top=None, title=None, **kwargs):
+                     n_cols=None, col_wrap=4, hue='ms_file', top=None, title=None, dpi=None,
+                     sharex=False, sharey=False, **kwargs):
     
+    fig = plt.figure(dpi=dpi)
+
     R = mint_results.copy()
     
     if peak_labels is not None:
@@ -33,23 +36,24 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
     if n_cols is not None:
         col_wrap = n_cols
 
-    fig = sns.relplot(
+    g = sns.relplot(
         data=df,
         x="Retention Time [min]", y="MS-Intensity",
         hue=hue, col="peak_label",
         kind="line", col_wrap=col_wrap,
         height=height, aspect=aspect, 
-        facet_kws=dict(sharex=False, sharey=False),
+        facet_kws=dict(sharex=sharex, 
+                       sharey=sharey),
         legend=legend,
         **kwargs
         )
 
-    fig.set_titles(row_template = '{row_name}', col_template = '{col_name}')
+    g.set_titles(row_template = '{row_name}', col_template = '{col_name}')
     
-    for ax in fig.axes.flatten():
+    for ax in g.axes.flatten():
         ax.ticklabel_format(style='sci', scilimits=(0,0), axis='both')
         
     if title is not None:
-        fig.fig.suptitle(title, y=1.01)
+        g.fig.suptitle(title, y=1.01)
 
-    return fig
+    return g

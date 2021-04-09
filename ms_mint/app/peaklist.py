@@ -8,6 +8,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash_table import DataTable
 from dash.dependencies import Input, Output, State
+from dash_tabulator import DashTabulator
 
 from . import tools as T
 
@@ -18,31 +19,28 @@ from ms_mint.peaklists import read_peaklists
 columns = [{"name": i, "id": i, 
             "selectable": True}  for i in PEAKLIST_COLUMNS]
 
-pkl_table = DataTable(
-                id='pkl-table',
-                columns=columns,
-                data=None,
-                sort_action="native",
-                sort_mode="single",
-                row_selectable=False,
-                row_deletable=True,
-                editable=True,
-                column_selectable=False,
-                selected_rows=[],
-                page_action="native",
-                page_current= 0,
-                page_size= 30,
-                filter_action='native',                
-                style_table={'overflowX': 'scroll'},
-                style_as_list_view=True,
-                style_cell={'padding-left': '20px', 
-                            'padding-right': '20px'},
-                style_header={'backgroundColor': 'white',
-                              'fontWeight': 'bold'},
-                export_format='csv',
-                export_headers='display',
-                merge_duplicate_headers=True
-            ) 
+tabulator_options = {
+           "groupBy": "Label", 
+           "selectable": True,
+           "headerFilterLiveFilterDelay":3000,
+           "layout": "fitDataFill",
+           "height": "900px",
+           }
+
+downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename":"Metadata"}
+
+clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
+
+pkl_table = html.Div(id='pkl-table-container', 
+    style={'minHeight':  100, 'margin': '50px 50px 0px 0px'},
+    children=[
+        DashTabulator(id='pkl-table',
+            columns=T.gen_tabulator_columns(['peak_label', 'mz_mean','mz_width', 'rt', 'rt_min', 'rt_max', 'intensity_threshold', 'peaklist_name']), 
+            options=tabulator_options,
+            downloadButtonType=downloadButtonType,
+            clearFilterButtonType=clearFilterButtonType
+        )
+])
 
 _label = 'Peaklist'
 
@@ -74,7 +72,7 @@ _layout = html.Div([
 
     html.Button('Save', id='pkl-save'),
     html.Button('Clear', id='pkl-clear', style={'float': 'right'}),
-    html.Div(id='table-container', children=pkl_table, style={'margin': '20px'})
+    pkl_table
 ])
 
 

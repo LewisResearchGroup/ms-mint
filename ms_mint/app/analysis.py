@@ -39,9 +39,10 @@ _layout = html.Div([
     
     dcc.Dropdown(id='ana-file-types', options=[], placeholder='Types of files to include', multi=True),
     dcc.Dropdown(id='ana-peak-labels-include', options=[], placeholder='Include peak_labels', multi=True),
-    dcc.Dropdown(id='ana-peak-labels-exclude', options=[], placeholder='Exclude peak_labels', multi=True),    
+    dcc.Dropdown(id='ana-peak-labels-exclude', options=[], placeholder='Exclude peak_labels', multi=True),
     dcc.Dropdown(id='ana-ms-order', options=[], placeholder='MS-file sorting', multi=True),
     dcc.Dropdown(id='ana-groupby', options=groupby_options, value=None, placeholder='Group by column'),
+
     html.Div(id='ana-secondary-tab-content')
 ])
 
@@ -86,7 +87,7 @@ def callbacks(app, fsc, cache):
         meta = T.get_metadata( wdir )
         if meta is None:
             raise PreventUpdate
-        file_types = meta['Type'].drop_duplicates()
+        file_types = meta['Type'].drop_duplicates().sort_values()
         options = [{'value': i, 'label': i} for i in file_types]
         return options, file_types
 
