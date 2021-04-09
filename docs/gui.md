@@ -208,3 +208,4 @@ visually grouped into an individual section for each metabolite.
 
 MINT comes with a flexible and powerful plotting interface that is based on the powerful [Seaborn](http://seaborn.pydata.org/) library. 
 
+![Plotting](image/plotting.png "Plotting")
