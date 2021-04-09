@@ -19,12 +19,12 @@ tabulator_options = {
            "groupBy": "Label", 
            "selectable": True,
            "headerFilterLiveFilterDelay":3000,
-           #"dataSorted" : ns("dataSorted"),
            "layout": "fitDataFill",
            "height": "900px",
            }
 
 downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename":"Metadata"}
+
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 meta_table = html.Div(id='meta-table-container', 
@@ -129,6 +129,16 @@ def callbacks(app, fsc, cache):
         if 'index' not in metadata.columns: metadata = metadata.reset_index()
         return metadata.to_dict('records'), T.gen_tabulator_columns(metadata.columns,
             add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), columns
+
+    @app.callback(
+        Output('meta-table', 'downloadButtonType'),
+        Input('tab', 'value'),
+        State('active-workspace', 'children')
+    )
+    def updata_table_export_fn(tab, ws_name):
+        fn = f'{T.today()}-{ws_name}_MINT-metadata'
+        downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename": fn}
+        return downloadButtonType
 
 
     @app.callback(

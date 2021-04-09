@@ -52,7 +52,7 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
         fn = T.get_results_fn(wdir)
         workspace = os.path.basename( wdir )
-        return [send_file(fn, filename=f'{T.today()}-MINT-results_{workspace}.csv')]
+        return [send_file(fn, filename=f'{T.today()}-{workspace}_MINT-results.csv')]
 
 
     @app.callback(
