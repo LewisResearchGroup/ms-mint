@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid
 import logging
+import numpy as np
 
 import wget
 import urllib3, ftplib
@@ -46,14 +47,18 @@ clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 # If color column is not present, for some strange reason, the header filter disappears.
 columns = [
-        { "formatter": "rowSelection", "titleFormatter":"rowSelection",  
+        { "formatter": "rowSelection", 
+          "titleFormatter":"rowSelection",  
           "titleFormatterParams": {
              "rowRange": "active" # only toggle the values of the active filtered rows
           },
           "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
         { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
-          'headerSort': True, "editor": "input", "width": "100%",
+          'headerSort': True, "editor": "input", "width": "auto",
           'sorter': 'string', 'frozen': True},
+        { "title": "Size [MB]", "field": "file_size", "headerFilter":True, 
+          'headerSort': True, "editor": "input", "width": "200px",
+          'sorter': 'string', 'frozen': True},          
         { 'title': '', 'field': '', "headerFilter":False,  "formatter":"color", 
           'width': '3px', "headerSort": False},
     ]
@@ -168,8 +173,8 @@ def callbacks(app, fsc, cache):
     )
     def ms_table(value, wdir, files_deleted, zip_extracted): 
         ms_files = T.get_ms_fns( wdir )
-        data = pd.DataFrame({'MS-file':  [os.path.basename(fn) for fn in ms_files],
-                             'Size[MB]': [os.path.getsize(fn)  for fn in ms_files]})
+        data = pd.DataFrame({'MS-file':   [os.path.basename(fn) for fn in ms_files],
+                             'file_size': [ np.round(os.path.getsize(fn)/1024/1024, 2)  for fn in ms_files]})
         return data.to_dict('records')
 
 
@@ -204,9 +209,10 @@ def callbacks(app, fsc, cache):
         if n_clicks is None:
             raise PreventUpdate
         target_dir = os.path.join(wdir, 'ms_files')
+        print(rows)
         for row in rows:
             fn = row['MS-file']
-            fn = os.path.join(target_dir, fn)
+            fn = P(target_dir)/fn
             os.remove(fn)
         return dbc.Alert(f'{len(rows)} files deleted', color='info')
 
@@ -260,68 +266,11 @@ def callbacks(app, fsc, cache):
         ms_dir = T.get_ms_dirname( wdir )
 
         if P(url).is_dir():
-            fns = import_from_local_path(url, ms_dir)
+            fns = T.import_from_local_path(url, ms_dir, fsc=fsc)
         else:
             logging.warning(f'Local file not found, looking for URL ({url}) [{P(url).is_dir()}, {os.path.isdir(url)}]')
-            fns = import_from_url(url, ms_dir)
+            fns = T.import_from_url(url, ms_dir)
 
         return dbc.Alert(f'{len(fns)} files imported.', color='success')
 
 
-    def import_from_url(url, target_dir):
-        filenames = get_filenames_from_url(url)
-        filenames = [fn for fn in filenames if T.is_ms_file(fn)]
-
-        if len(filenames) == 0:
-            return dbc.Alert(f'No MS files found at {url}', color='warning')
-
-        fns = []
-        n_files = len(filenames)
-        
-        for i, fn in enumerate( tqdm( filenames )):
-            _url = url+'/'+fn
-            logging.info('Downloading', _url)
-            fsc.set('progress', int(100*(1+i)/n_files))
-            wget.download(_url, out=target_dir)
-
-        return fns
-
-
-    def get_filenames_from_url(url):
-        if url.startswith('ftp'):
-            return get_filenames_from_ftp_directory(url)
-        if '://' in url:
-                url = url.split('://')[1]    
-        with urllib3.PoolManager() as http:
-            r = http.request('GET', url)
-        soup = BeautifulSoup(r.data, 'html')
-        files = [A['href'] for A in soup.find_all('a', href=True)]
-        return files
-
-
-    def get_filenames_from_ftp_directory(url):
-        url_parts = urlparse(url)
-        domain = url_parts.netloc
-        path = url_parts.path
-        ftp = ftplib.FTP(domain)
-        ftp.login()
-        ftp.cwd(path)
-        filenames = ftp.nlst()
-        ftp.quit()
-        return filenames
-
-
-    def import_from_local_path(path, target_dir):
-        fns = glob(os.path.join(path, '**', '*.*'), recursive=True)
-        fns = [fn for fn in fns if T.is_ms_file(fn)]
-        fns_out = []
-        n_files = len(fns)
-        for i, fn in enumerate( tqdm(fns) ):
-            fsc.set('progress', int(100*(1+i)/n_files))
-            fn_out = P(target_dir)/P(fn).with_suffix('.feather').name
-            if P(fn_out).is_file(): continue
-            fns_out.append(fn_out)
-            convert_ms_file_to_feather(fn, fn_out)
-        return fns_out
-        
-            

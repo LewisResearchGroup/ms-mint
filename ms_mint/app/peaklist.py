@@ -32,7 +32,7 @@ downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 pkl_table = html.Div(id='pkl-table-container', 
-    style={'minHeight':  100, 'margin': '0%'},
+    style={'minHeight':  100, 'margin': '50px 50px 0px 0px'},
     children=[
         DashTabulator(id='pkl-table',
             columns=T.gen_tabulator_columns(['peak_label', 'mz_mean','mz_width', 'rt', 'rt_min', 'rt_max', 'intensity_threshold', 'peaklist_name']), 

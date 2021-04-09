@@ -1,0 +1,20 @@
+from os.path import basename
+
+from ms_mint.Mint import Mint
+
+from paths import TEST_MZML, TEST_MZXML, TEST_PEAKLIST_FN, TEST_MZXML_BROKEN
+
+def test__run_skips_broken_files():
+    mint = Mint(verbose=True)
+    mint.peaklist_files = TEST_PEAKLIST_FN
+    mint.files = [TEST_MZML, 
+                  TEST_MZXML_BROKEN]
+
+    mint.run()
+
+    broken_files_absent = all(mint.results.ms_file != basename(TEST_MZXML_BROKEN))
+    good_files_present = all(mint.results.ms_file == basename(TEST_MZML))
+
+    assert broken_files_absent, mint.results.ms_file
+    assert good_files_present, mint.results.ms_file
+
