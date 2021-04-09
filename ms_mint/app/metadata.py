@@ -205,16 +205,16 @@ def callbacks(app, fsc, cache):
         df = pd.DataFrame(data)
         T.write_metadata( df , wdir)
     
-    
+    '''
     @app.callback(
         Output('meta-column', 'disabled'),
         Input('meta-action', 'value'),
     )
-    def set_something(action):
+    def set_something_from_actions(action):
         if action in ['Set', 'Delete column']:
             return False
         return True
-    
+    '''
     
     @app.callback(
         Output('meta-input', 'style'),

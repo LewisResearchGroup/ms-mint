@@ -4,11 +4,6 @@ import uuid
 import logging
 import numpy as np
 
-import wget
-import urllib3, ftplib
-
-from urllib.parse import urlparse
-from bs4 import BeautifulSoup
 from pathlib import Path as P
 
 from glob import glob
@@ -29,8 +24,6 @@ from dash_tabulator import DashTabulator
 from tqdm import tqdm
 
 import dash_uploader as du
-
-
 
 from . import tools as T
 
@@ -54,10 +47,10 @@ columns = [
           },
           "hozAlign":"center", "headerSort": False, "width":"1px", 'frozen': True},
         { "title": "MS-file", "field": "MS-file", "headerFilter":True, 
-          'headerSort': True, "editor": "input", "width": "auto",
+          'headerSort': True, "editor": None, "width": "80%",
           'sorter': 'string', 'frozen': True},
         { "title": "Size [MB]", "field": "file_size", "headerFilter":True, 
-          'headerSort': True, "editor": "input", "width": "200px",
+          'headerSort': True, "editor": None, "width": "20%",
           'sorter': 'string', 'frozen': True},          
         { 'title': '', 'field': '', "headerFilter":False,  "formatter":"color", 
           'width': '3px', "headerSort": False},
@@ -269,8 +262,8 @@ def callbacks(app, fsc, cache):
             fns = T.import_from_local_path(url, ms_dir, fsc=fsc)
         else:
             logging.warning(f'Local file not found, looking for URL ({url}) [{P(url).is_dir()}, {os.path.isdir(url)}]')
-            fns = T.import_from_url(url, ms_dir)
-
+            fns = T.import_from_url(url, ms_dir, fsc=fsc)
+            if fns is None: return dbc.Alert(f'No MS files found at {url}', color='warning')
         return dbc.Alert(f'{len(fns)} files imported.', color='success')
 
 

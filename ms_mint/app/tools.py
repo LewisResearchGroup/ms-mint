@@ -13,6 +13,11 @@ from tqdm import tqdm
 from glob import glob
 from pathlib import Path as P
 
+import wget
+import urllib3, ftplib
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
@@ -137,7 +142,6 @@ def create_workspace(tmpdir, ws_name):
 def get_workspaces_path(tmpdir):
     # Defines the path to the workspaces
     # relative to `tmpdir`
-    ws_names = os.path.join(tmpdir, 'workspaces')
     return os.path.join(tmpdir, 'workspaces')
 
 
@@ -173,10 +177,10 @@ class Chromatograms():
             dirname = os.path.dirname(fn_chro)
             if not os.path.isdir(dirname): os.makedirs(dirname)
             dmz = mz_mean*1e-6*mz_width
-            chrom = df[(df['m/z array']-mz_mean).abs()<=dmz]
-            chrom['retentionTime'] = chrom['retentionTime'].round(3)
-            chrom = chrom.groupby('retentionTime').max().reset_index()
-            chrom[['retentionTime', 'intensity array']].to_feather(fn_chro)
+            chrom = df[(df['mz']-mz_mean).abs()<=dmz]
+            chrom['scan_time_min'] = chrom['scan_time_min'].round(3)
+            chrom = chrom.groupby('scan_time_min').max().reset_index()
+            chrom[['scan_time_min', 'intensity']].to_feather(fn_chro)
 
     def get_single(self, mz_mean, mz_width, ms_file):
         return get_chromatogram(ms_file, mz_mean, mz_width, self.wdir)      
@@ -201,11 +205,11 @@ def create_chromatogram(ms_file, mz_mean, mz_width, fn_out, verbose=False):
     dirname = os.path.dirname(fn_out)
     if not os.path.isdir(dirname): os.makedirs(dirname)
     dmz = mz_mean*1e-6*mz_width
-    chrom = df[(df['m/z array']-mz_mean).abs()<=dmz]
-    chrom['retentionTime'] = chrom['retentionTime'].round(3)
-    chrom = chrom.groupby('retentionTime').max().reset_index()
+    chrom = df[(df['mz']-mz_mean).abs()<=dmz]
+    chrom['scan_time_min'] = chrom['scan_time_min'].round(3)
+    chrom = chrom.groupby('scan_time_min').max().reset_index()
     with lock(fn_out):
-        chrom[['retentionTime', 'intensity array']].to_feather(fn_out)
+        chrom[['scan_time_min', 'intensity']].to_feather(fn_out)
     if verbose:print('...done creating chromatogram.')
     return chrom
 
@@ -216,6 +220,10 @@ def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
         chrom = create_chromatogram(ms_file, mz_mean, mz_width, fn)
     else:
         chrom = pd.read_feather(fn)
+    chrom = chrom.rename(columns={
+            'retentionTime': 'scan_time_min', 
+            'intensity array': 'intensity', 
+            'm/z array': 'mz'})
     return chrom
 
 
@@ -547,23 +555,19 @@ def filename_to_label(fn: str):
 
 
     
-    def import_from_url(url, target_dir):
-        filenames = get_filenames_from_url(url)
-        filenames = [fn for fn in filenames if T.is_ms_file(fn)]
-
-        if len(filenames) == 0:
-            return dbc.Alert(f'No MS files found at {url}', color='warning')
-
-        fns = []
-        n_files = len(filenames)
-        
-        for i, fn in enumerate( tqdm( filenames )):
-            _url = url+'/'+fn
-            logging.info('Downloading', _url)
-            fsc.set('progress', int(100*(1+i)/n_files))
-            wget.download(_url, out=target_dir)
-
-        return fns
+def import_from_url(url, target_dir, fsc=None):
+    filenames = get_filenames_from_url(url)
+    filenames = [fn for fn in filenames if is_ms_file(fn)]
+    if len(filenames) == 0:
+        return None
+    fns = []
+    n_files = len(filenames)
+    for i, fn in enumerate( tqdm( filenames )):
+        _url = url+'/'+fn
+        logging.info('Downloading', _url)
+        if fsc is not None: fsc.set('progress', int(100*(1+i)/n_files))
+        wget.download(_url, out=target_dir)
+    return fns
 
 
 def get_filenames_from_url(url):

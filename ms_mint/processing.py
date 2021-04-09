@@ -6,16 +6,15 @@ import numpy as np
 
 from .io import ms_file_to_df
 
-from .standards import RESULTS_COLUMNS,\
-    MINT_RESULTS_COLUMNS
+from .standards import RESULTS_COLUMNS, MINT_RESULTS_COLUMNS
 
 
 def extract_chromatogram_from_ms1(df, mz_mean, mz_width, unit='minutes'):
     dmz = mz_mean*1e-6*mz_width
-    chrom = df[(df['m/z array']-mz_mean).abs()<=dmz].copy()
-    chrom['retentionTime'] = chrom['retentionTime'].round(3)
-    chrom = chrom.groupby   ('retentionTime').max()
-    return chrom['intensity array'] 
+    chrom = df[(df['mz']-mz_mean).abs()<=dmz].copy()
+    chrom['scan_time_min'] = chrom['scan_time_min'].round(3)
+    chrom = chrom.groupby('scan_time_min').max()
+    return chrom['intensity'] 
 
 
 def process_ms1_files_in_parallel(args):
@@ -59,7 +58,7 @@ def process_ms1_file(filename, peaklist):
     '''
     df = ms_file_to_df(filename)
     results = process_ms1(df, peaklist)
-    results['total_intensity'] = df['intensity array'].sum()
+    results['total_intensity'] = df['intensity'].sum()
     results['ms_file'] = os.path.basename(filename)
     results['ms_path'] = os.path.dirname(filename)
     results['ms_file_size'] = os.path.getsize(filename) / 1024 / 1024
@@ -79,7 +78,9 @@ def process_ms1_from_df(df, peaklist):
     peak_cols = ['mz_mean', 'mz_width', 'rt_min', 'rt_max', 
                  'intensity_threshold', 'peak_label']
     array_peaks = peaklist[peak_cols].values
-    array_data = df[['retentionTime', 'm/z array', 'intensity array']].values
+    if 'ms_level' in df.columns:
+        df = df[df.ms_level == 1]
+    array_data = df[['scan_time_min', 'mz', 'intensity']].values
     result = process_ms1_from_numpy(array_data, array_peaks)
     return result
 

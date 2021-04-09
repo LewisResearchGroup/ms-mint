@@ -13,9 +13,9 @@ def test__find_test_mzxml():
 
 
 def test__process_ms1():
-    ms_data = pd.DataFrame({'retentionTime': [1, 2, 3],
-                            'm/z array': [100, 200, 300], 
-                            'intensity array': [2, 3, 7]})
+    ms_data = pd.DataFrame({'scan_time_min': [1, 2, 3],
+                            'mz': [100, 200, 300], 
+                            'intensity': [2, 3, 7]})
 
     peaklist = pd.DataFrame(
         {'peak_label': ['A'],
@@ -53,9 +53,9 @@ def test__process_ms1():
 
 
 def test__process_ms1_from_df():
-    df = pd.DataFrame({'retentionTime': [1, 2, 3],
-                       'm/z array': [100,200,300], 
-                       'intensity array': [2, 3, 7]})
+    df = pd.DataFrame({'scan_time_min': [1, 2, 3],
+                       'mz': [100,200,300], 
+                       'intensity': [2, 3, 7]})
     peaklist = pd.DataFrame(
         {'peak_label': ['A'],
          'mz_mean': [200],

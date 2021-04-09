@@ -1,7 +1,6 @@
 import pandas as pd
 
 from ms_mint.processing import process_ms1_file
-from ms_mint.peaklists import read_peaklists
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 
 from paths import TEST_MZML, TEST_MZXML
@@ -14,7 +13,7 @@ peaklist = pd.DataFrame({
     'rt_max': [15],
     'rt': [2.3],
     'intensity_threshold': [0],
-    'peak_label': ['test'],
+    'peak_label': ['Succinate-neg'],
     'peaklist_name': ['no-file']})
 
 

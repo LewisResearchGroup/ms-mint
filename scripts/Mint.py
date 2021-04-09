@@ -16,6 +16,10 @@ from multiprocessing import freeze_support
 
 import ms_mint
 
+def fake_use_wget():
+    'Need this here for pyinstaller/flake8'
+    wget
+
 
 """
 Simple module that monkey patches pkg_resources.get_distribution used by dash
