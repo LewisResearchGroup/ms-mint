@@ -4,8 +4,7 @@ Metabolomics is the study of all metabolites (small chemical compounds) in a bio
 The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests 
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 
-![Flowchart of MINT workflow](image/flowchart.png "Flowchart of MINT workflow")
-
+![Flowchart of MINT workflow](image/flowchart.png "Flowchart of MINT workflow")<br/>
 _**Figure 1:**_ Flowchart of MINT processing workflow. 
 
 

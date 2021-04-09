@@ -138,7 +138,7 @@ When the results tables are present the results can be explored with the followi
 The generated results can be downloaded with the `DOWNLOAD` button.
 
 
-## Analysis
+# Analysis
 
 After running MINT the results can be downloaed or analysed using the provided tools.
 For quality control purposes histograms and boxplots can be generated in the 
@@ -146,13 +146,17 @@ quality control tab. The interactive heatmap tool can be used to explore the res
 has been exectuted. The tool allows to explore the generated data in from of heatmaps.
 
 
-### General selection elements
+## General selection elements
+
   - Include/exclude file types (based on `Type` column in metadata)
   - Include/exclude peak labels for analysis
   - Set file sorting (e.g. by name, by batch etc.)
   - Select group-by column for coloring and statistics
 
-### Heatmap
+![Selections](image/general-selection-elements.png "Selections")
+
+
+## Heatmap
 
 ![Heatmap](image/heatmap.png "Heatmap")
 
@@ -166,10 +170,12 @@ The second dropdown menu distinguishes the how the heatmap is generated.
 - Correlation: Calculate pearson correlation between columns.
 - Show in new tab: The figure will be generated in a new independent tab. That way multiple heatmaps can be generated at the same time.
 
-![Heatmap](./image/mint-heatmap-correlation.png "Correlation")
+### Correlation of (scaled) peak_max
+
+![Heatmap](image/heatmap-correlation.png "Correlation")
 
 
-### Distributions
+## Distributions
 
   - Plot histograms
   - Density distributions
@@ -188,7 +194,8 @@ The checkbox can be used to create a dense view. If the box is unchecked the out
 visually grouped into an individual section for each metabolite.
 
 
-### PCA
+## PCA
+
  - Perform Principal Component Analysis (PCA)
  - Plot projections to first N principal components
  - Contributions of original variables to each component.
@@ -196,12 +203,12 @@ visually grouped into an individual section for each metabolite.
 ![PCA](image/pca.png "Principal Components Analysis")
 
 
-### Hierarchical clustering
+## Hierarchical clustering
 
 ![Hierarchical clustering](image/hierarchical_clustering.png "Hierarchical clustering")
 
 
-### Plotting
+## Plotting
 
 MINT comes with a flexible and powerful plotting interface that is based on the powerful [Seaborn](http://seaborn.pydata.org/) library.
 
@@ -210,6 +217,7 @@ MINT comes with a flexible and powerful plotting interface that is based on the 
   - Boxen plot
   - Scatter plots
   - and more...
+
 
 ![Plot setting](image/plotting_settings.png "Plot settings")
 
