@@ -37,6 +37,7 @@ from . import messages
 import dash_uploader as du
 from tempfile import gettempdir
 
+
 def make_dirs():
     tmpdir = tempfile.gettempdir()
     tmpdir = os.path.join(tmpdir, 'MINT')
