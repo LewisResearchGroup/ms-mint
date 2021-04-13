@@ -6,7 +6,7 @@ from ms_mint.standards import MINT_ROOT
 
 TEST_MZXML = os.path.abspath( 
     os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'ms_files', 'test.mzXML'
+       'tests' , 'data', 'ms_files', 'test.mzXML'
     )
 )
 
