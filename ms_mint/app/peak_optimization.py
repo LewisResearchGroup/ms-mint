@@ -540,10 +540,12 @@ def callbacks(app, fsc, cache):
 
 def create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
         rt_min, rt_max, image_label, wdir, title, colors):
+    '''Create peak shape previews.'''
     plt.figure(figsize=(4,2.5), dpi=30)
     y_max = 0 
     for fn in ms_files:
         color = colors[ T.filename_to_label(fn) ]
+        if color is None or color == '': color = 'grey'
         fn_chro = T.get_chromatogram(fn, mz_mean, mz_width, wdir)
         fn_chro = fn_chro[(rt_min < fn_chro['scan_time_min']) &
                              (fn_chro['scan_time_min'] < rt_max)   ]

@@ -21,6 +21,7 @@ install_requires = [
     'setuptools',
     'statsmodels',
     'flask',
+    'ftplib',
     'pyteomics',
     'openpyxl',
     'colorlover',
