@@ -10,7 +10,6 @@ TEST_MZXML = os.path.abspath(
     )
 )
 
-
 TEST_MZML = os.path.abspath( 
     os.path.join( 
         MINT_ROOT ,'..' ,'tests' , 'data', 'ms_files', 'test.mzML'
@@ -44,7 +43,7 @@ TEST_MZXML_BROKEN = os.path.abspath(
 )
 
 
-assert P( TEST_MZXML ).is_file()
-assert P( TEST_MZML ).is_file()
-assert P( TEST_MZXML_BROKEN ).is_file()
-assert P( TEST_PEAKLIST_FN ).is_file()
+assert P( TEST_MZXML ).is_file(), TEST_MZXML
+assert P( TEST_MZML ).is_file(), TEST_MZML
+assert P( TEST_MZXML_BROKEN ).is_file(), TEST_MZXML_BROKEN
+assert P( TEST_PEAKLIST_FN ).is_file(), TEST_PEAKLIST_FN
