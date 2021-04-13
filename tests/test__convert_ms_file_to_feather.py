@@ -2,7 +2,11 @@ import pandas as pd
 from pathlib import Path as P
 from ms_mint.io import convert_ms_file_to_feather, ms_file_to_df
 
+import paths
 from paths import TEST_MZML, TEST_MZXML
+
+print(paths.__file__)
+
 
 def test__read_mzXML(tmp_path):
     df = ms_file_to_df(TEST_MZXML)
