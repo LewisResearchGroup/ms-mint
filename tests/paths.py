@@ -32,14 +32,14 @@ TEST_PEAKLIST_FN_V0 = os.path.abspath(
 
 TEST_PEAK_AREA_RESULTS = os.path.abspath( 
     os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'results', 'test_peak_area_results.csv'
+        'tests' , 'data', 'results', 'test_peak_area_results.csv'
     )
 )
 
 
 TEST_MZXML_BROKEN = os.path.abspath( 
     os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'broken', 'broken.mzXML'
+        'tests' , 'data', 'broken', 'broken.mzXML'
     )
 )
 
