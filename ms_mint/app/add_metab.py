@@ -14,6 +14,13 @@ from ms_mint import MINT_DATA_PATH
 from ms_mint.standards import M_PROTON
 from . import tools as T
 
+from pkg_resources import resource_filename
+
+CHEBI_CHEM_FN = os.path.abspath(resource_filename('ms_mint.static', 'ChEBI-Chem.parquet'))
+CHEBI_GROUPS_FN = os.path.abspath(resource_filename('ms_mint.static', 'ChEBI-Groups.parquet'))
+CHEBI_CHEM = pd.read_parquet(CHEBI_CHEM_FN)
+CHEBI_GROUPS = pd.read_parquet(CHEBI_GROUPS_FN)
+
 
 options = {
            "selectable": True,
@@ -24,11 +31,6 @@ options = {
 
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
-fn_data = os.path.join(MINT_DATA_PATH, 'ChEBI-Chem.parquet')
-fn_groups_data = os.path.join(MINT_DATA_PATH, 'ChEBI-Groups.parquet')
-
-CHEBI_CHEM = pd.read_parquet(fn_data)
-CHEBI_GROUPS = pd.read_parquet(fn_groups_data)#.set_index('Group Name')
 
 
 groups_options = [{'label': 'All', 'value': 'all'}]+[{'label': x.capitalize(), 'value':x} for x in CHEBI_GROUPS.index]
