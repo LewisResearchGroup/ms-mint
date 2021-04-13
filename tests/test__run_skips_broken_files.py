@@ -2,7 +2,7 @@ from os.path import basename
 
 from ms_mint.Mint import Mint
 
-from paths import TEST_MZML, TEST_MZXML, TEST_PEAKLIST_FN, TEST_MZXML_BROKEN
+from paths import TEST_MZML, TEST_PEAKLIST_FN, TEST_MZXML_BROKEN
 
 def test__run_skips_broken_files():
     mint = Mint(verbose=True)

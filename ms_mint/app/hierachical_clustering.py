@@ -1,13 +1,9 @@
-import os
-import numpy as np
-
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
 from ms_mint.notebook import Mint
-from ms_mint.vis.plotly.plotly_tools import plot_heatmap
 
 from . import tools as T
 
