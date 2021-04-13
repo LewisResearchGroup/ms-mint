@@ -4,8 +4,6 @@ from pathlib import Path as P
 
 from ms_mint.standards import MINT_ROOT
 
-print(__file__)
-
 
 TEST_MZXML = os.path.abspath( 
     os.path.join( 
@@ -15,19 +13,19 @@ TEST_MZXML = os.path.abspath(
 
 TEST_MZML = os.path.abspath( 
     os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'ms_files', 'test.mzML'
+        'tests' , 'data', 'ms_files', 'test.mzML'
     )
 )
 
 TEST_PEAKLIST_FN = os.path.abspath( 
     os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'peaklists', 'peaklist_v1.csv'
+        'tests' , 'data', 'peaklists', 'peaklist_v1.csv'
     )
 )
 
 TEST_PEAKLIST_FN_V0 = os.path.abspath( 
     os.path.join( 
-        MINT_ROOT ,'..' ,'tests' , 'data', 'peaklists', 'peaklist_v0.csv'
+        'tests' , 'data', 'peaklists', 'peaklist_v0.csv'
     )
 )
 
