@@ -1,8 +1,8 @@
 
 import os
+from pathlib import Path as P
 
 from ms_mint.standards import MINT_ROOT
-
 
 TEST_MZXML = os.path.abspath( 
     os.path.join( 
@@ -42,3 +42,9 @@ TEST_MZXML_BROKEN = os.path.abspath(
         MINT_ROOT ,'..' ,'tests' , 'data', 'broken', 'broken.mzXML'
     )
 )
+
+
+assert P( TEST_MZXML ).is_file()
+assert P( TEST_MZML ).is_file()
+assert P( TEST_MZXML_BROKEN ).is_file()
+assert P( TEST_PEAKLIST_FN ).is_file()

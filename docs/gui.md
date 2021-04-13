@@ -1,7 +1,4 @@
-# Graphical User Interface
-
-
-# Processing workflow
+# MINT GUI
 
 ## Workspaces
 

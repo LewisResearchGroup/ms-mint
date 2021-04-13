@@ -36,12 +36,15 @@ def mzxml_to_df(fn):
     with mzxml.MzXML( fn ) as ms_data:
         while True:
             try:
-                data = ms_data.next()     
-                df = pd.DataFrame(data)[['num', 'msLevel', 'polarity', 
-                        'retentionTime', 'm/z array', 'intensity array']]
+                data = ms_data.next()
+                df = pd.DataFrame(data)
+                # Fix byteorder issue
+                df.loc[:,:] = df.values.byteswap().newbyteorder()
+                df = df[['num', 'msLevel', 'polarity', 'retentionTime', 'm/z array', 'intensity array']]
                 slices.append( df )
-            except:         
+            except StopIteration as e:
                 break
+            
     df = pd.concat(slices)
     df['retentionTime'] =  df['retentionTime'].astype(np.float32)
     df['m/z array'] = df['m/z array'].astype(np.float32)
