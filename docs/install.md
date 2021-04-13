@@ -54,7 +54,7 @@ The following command can be used to pull the latest image from docker hub.
 
 The image can be started with:
 
-    docker run -p 9999:9999 -it msmint/msmint:latest
+    docker run -p 9999:9999 -it msmint/msmint:latest  -v /data/:/data/
 
 Then the tool is available in the browser at http://localhost:9999.
 

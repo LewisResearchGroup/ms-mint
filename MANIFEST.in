@@ -1,3 +1,5 @@
 include setup.cfg
 include versioneer.py
 include ms_mint/_version.py
+include static/ChEBI-Chem.parquet
+include static/ChEBI-Groups.parquet
