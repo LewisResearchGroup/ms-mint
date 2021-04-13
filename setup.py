@@ -59,11 +59,11 @@ config = {
     'author_email': 'swacker@ucalgary.ca',
     'scripts': ['scripts/Mint.py'],
     'packages': find_packages(),
-    'data_files': [('scripts', ['scripts/Mint.py']),
-                   ('static', ['static/Standard_Peaklist.csv']),
-                   ('static', ['static/ChEBI-Chem.parquet']),
-                   ('static', ['static/ChEBI-Groups.parquet']),
-                   ],
+    'data_files': [('scripts', ['scripts/Mint.py'])],
+ #                  ('static', ['static/Standard_Peaklist.csv',
+ #                               'static/ChEBI-Chem.parquet',
+ #                               'static/ChEBI-Groups.parquet']),
+ #                  ],
     'classifiers': [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -71,7 +71,12 @@ config = {
     ],
    'python_requires': '>=3.7',
    'install_requires': install_requires,
-   'include_package_data': True
+   'include_package_data': True,
+   'package_data': {'ms_mint.static': [
+                        'Standard_Peaklist.csv',
+                        'ChEBI-Chem.parquet',
+                        'ChEBI-Groups.parquet']
+                    }
 }
 
 setup(**config)
