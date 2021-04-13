@@ -1,13 +1,13 @@
 import seaborn as sns
 import pandas as pd
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 
 def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, aspect=1, legend=False,
                      n_cols=None, col_wrap=4, hue='ms_file', top=None, title=None, dpi=None,
                      sharex=False, sharey=False, **kwargs):
     
-    fig = plt.figure(dpi=dpi)
+    #fig = plt.figure(dpi=dpi)
 
     R = mint_results.copy()
     

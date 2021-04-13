@@ -1,15 +1,8 @@
-import os
-import numpy as np
-
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
-from ms_mint.notebook import Mint
-from ms_mint.vis.plotly.plotly_tools import plot_heatmap
-
-import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 import seaborn as sns
@@ -126,7 +119,6 @@ def callbacks(app, fsc, cache):
 
         if n_clicks is None: raise PreventUpdate
         if col_wrap == 0: col_wrap = None
-        mint = Mint()
         if col is None and row is None: col_wrap=None
         if height is None: height = 2.5
         if aspect is None: aspect = 1

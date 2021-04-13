@@ -1,11 +1,9 @@
 import pandas as pd
 
-from sklearn.metrics import r2_score
-
 from ms_mint.Mint import Mint
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 
-from paths import TEST_MZML, TEST_MZXML, TEST_PEAKLIST_FN, TEST_PEAKLIST_FN_V0, TEST_PEAK_AREA_RESULTS
+from paths import TEST_MZML, TEST_MZXML, TEST_PEAKLIST_FN, TEST_PEAKLIST_FN_V0
 
 mint = Mint(verbose=True)
 mint_b = Mint(verbose=True)

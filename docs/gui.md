@@ -1,25 +1,4 @@
-# Graphical User Interface
-
-After [installation](install.md) MINT can be started by running `Mint.py`.
-
-```console
-Mint.py --help
-usage: Mint.py [-h] [--no-browser] [--version] [--data-dir DATA_DIR] [--debug] [--port PORT] [--serve-path SERVE_PATH]
-
-MINT frontend.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --no-browser          do not start the browser
-  --version             print current version
-  --data-dir            target directory for MINT data
-  --debug               start MINT server in debug mode
-  --port                change the port
-  --serve-path          serve app at a different path e.g. '/mint/' to serve the app at 'localhost:9999/mint/'
-```
-
-If the browser does not open automatically open it manually and navigate to `http://localhost:9999`. The app's frontend is build using [Plotly-Dash](https://plot.ly/dash/) and runs locally in a browser. Thought, the Python functions provided can be imported and used in any Python project independently. The GUI is under active development and may be optimized in the future.
-
+# MINT GUI
 
 ## Workspaces
 
