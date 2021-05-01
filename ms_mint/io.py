@@ -28,32 +28,32 @@ def ms_file_to_df(fn):
     return df
 
 
+
+
 def mzxml_to_df(fn):
     '''
     Reads mzXML file and returns a pandas.DataFrame.
     '''    
     slices = []
+    
     with mzxml.MzXML( fn ) as ms_data:
-        while True:
-            try:
-                data = ms_data.next()
-                df = pd.DataFrame(data)
-                # Fix byteorder issue
-                df.loc[:,:] = df.values.byteswap().newbyteorder()
-                df = df[['num', 'msLevel', 'polarity', 'retentionTime', 'm/z array', 'intensity array']]
-                slices.append( df )
-            except StopIteration as e:
-                break
-            
-    df = pd.concat(slices)
-    df['retentionTime'] =  df['retentionTime'].astype(np.float32)
-    df['m/z array'] = df['m/z array'].astype(np.float32)
+        data = [x for x in ms_data]
+    data = list( extract_mzxml(data) )
+                
+    df = pd.DataFrame.from_dict( data )\
+           .set_index('retentionTime')\
+           .apply(pd.Series.explode).reset_index()
+
+    df['retentionTime'] =  df['retentionTime'].astype(np.float64)
+    df['m/z array'] = df['m/z array'].astype(np.float64)
     df['intensity array'] = df['intensity array'].astype(int)
+
     df = df.rename(columns={'num': 'scan_id', 
                             'msLevel': 'ms_level', 
                             'retentionTime': 'scan_time_min', 
                             'm/z array': 'mz', 
                             'intensity array': 'intensity'})
+    
     df = df.reset_index(drop=True)
     cols = ['scan_id', 'ms_level', 'polarity', 
             'scan_time_min', 'mz', 'intensity']
@@ -61,9 +61,18 @@ def mzxml_to_df(fn):
     return df
 
 
+def _extract_mzxml(data):
+    cols = ['num', 'msLevel', 'polarity', 
+            'retentionTime', 'm/z array', 
+            'intensity array']
+    return {c: data[c] for c in cols}
+
+extract_mzxml = np.vectorize( _extract_mzxml )
+
+
 def mzml_to_pandas_df_pyteomics(fn):
     '''
-    Reads mzML file and returns a pandas.DataFrame.
+    Reads mzML file and returns a pandas.DataFrame. (deprecated)
     '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
@@ -83,34 +92,40 @@ def mzml_to_pandas_df_pyteomics(fn):
     return df
 
 
-def mzml_to_df(fn, assume_time_unit='seconds', remove_noise=False):
+def mzml_to_df(fn, assume_time_unit='seconds'):
     
     with pymzml.run.Reader(fn) as ms_data:
-        data = []
-        for spectrum in ms_data:
-            # Try to convert time units with build-in method
-            # some files have no time unit set. Then convert 
-            # to minutes assuming the time unit is as set
-            # by assume_time_unit argument.
-            try:
-                RT = spectrum.scan_time_in_minutes()
-            except:
-                if assume_time_unit == 'seconds':
-                    RT = spectrum.scan_time[0] / 60.
-                elif assume_time_unit == 'minutes':
-                    RT = spectrum.scan_time[0]
-            if remove_noise: spectrum = spectrum.remove_noise()
-            peaks = spectrum.peaks("centroided")
-            data.append((spectrum.index, spectrum.ms_level, '+' if spectrum["positive scan"] else '-', RT, peaks))
-
-    ndx_explode = 4
-    df = pd.DataFrame(data).explode(ndx_explode)    
-    df['mz'] = df[ndx_explode].apply(lambda x: x[0])
-    df['intensity'] = df[ndx_explode].apply(lambda x: x[1]).astype(int)
-    del df[ndx_explode]
-    df = df.rename(columns={0: 'scan_id', 1: 'ms_level', 2: 'polarity', 3: 'scan_time_min' })
-    df = df.reset_index(drop=True)
+        data = [x for x in ms_data]
+        
+    data = list( extract_mzml(data, assume_time_unit=assume_time_unit) )
+    
+    df = pd.DataFrame.from_dict( data )\
+           .set_index(['scan_id', 'ms_level', 'polarity', 'scan_time_min'])\
+           .apply(pd.Series.explode)\
+           .reset_index()
+    df['mz'] = df['mz'].astype('float64')
+    df['intensity'] = df['intensity'].astype('int64')
     return df
+
+
+def _extract_mzml(data, assume_time_unit):
+    try:
+        RT = data.scan_time_in_minutes()
+    except:
+        if assume_time_unit == 'seconds':
+            RT = data.scan_time[0] / 60.
+        elif assume_time_unit == 'minutes':
+            RT = data.scan_time[0]
+    peaks = data.peaks("centroided")
+        
+    return {'scan_id': data.index, 
+            'ms_level': data.ms_level, 
+            'polarity': '+' if data["positive scan"] else '-', 
+            'scan_time_min': RT, 
+            'mz': peaks[:,0].astype('float64'),
+            'intensity': peaks[:,1].astype('int64')}
+
+extract_mzml = np.vectorize( _extract_mzml )
 
 
 def df_to_numeric(df):
