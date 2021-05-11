@@ -478,7 +478,7 @@ class Mint(object):
                 name=col_name, correlation=correlation)
 
 
-    def pca(self, var_name='peak_max', n_vars=20, fillna=0, 
+    def pca(self, var_name='peak_max', n_vars=20, fillna='median', 
             scaler='standard'):
 
         df = self.crosstab(var_name).fillna(fillna)
@@ -493,6 +493,8 @@ class Mint(object):
         if scaler is not None:
             df = scale_dataframe(df, scaler)
 
+        print(df.shape)
+
         min_dim = min(df.shape)
         n_vars = min(n_vars, min_dim)
         pca = PCA(n_vars)
@@ -501,11 +503,13 @@ class Mint(object):
             index=df.index.get_level_values(0)).add_prefix('PCA-')
 
         explained_variance = pca.explained_variance_ratio_*100
-        cumm_expl_var = np.cumsum(explained_variance)
+        cum_expl_var = np.cumsum(explained_variance)
 
+        print(df_projected.shape)
+        
         self.decomposition_results = {
             'df_projected': df_projected,
-            'cumm_expl_var': cumm_expl_var,
+            'cum_expl_var': cum_expl_var,
             'n_vars': n_vars,
             'type': 'PCA'
         }
@@ -514,30 +518,37 @@ class Mint(object):
     def pca_plot_cumulative_variance(self):
         n_vars = self.decomposition_results['n_vars']
         fig = plt.figure(figsize=(7,3))
-        cumm_expl_var = self.decomposition_results['cumm_expl_var']
-        plt.bar(np.arange(n_vars)+1, cumm_expl_var, 
+        cum_expl_var = self.decomposition_results['cum_expl_var']
+        plt.bar(np.arange(n_vars)+1, cum_expl_var, 
             facecolor='grey', edgecolor='none')
         plt.xlabel('# PCA-components')
         plt.ylabel('Explained variance')
-        plt.title('cumulative explained variance')
+        plt.title('Cumulative explained variance')
         plt.grid()
         return fig
 
 
-    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None, marker=None):
+    def plot_pair_plot(self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs):
         df = self.decomposition_results['df_projected']
         cols = df.columns.to_list()[:n_vars]
         df = df[cols]
+
         if color_groups is not None:
             if group_name is None: group_name = 'Group'
             df[group_name] = color_groups
             df[group_name] = df[group_name].astype(str)
+
         fig = plt.figure()
 
         if marker is None and len(df) > 20:
-            marker = 'x'
-        g = sns.pairplot(df, plot_kws={'s': 100, 'marker': marker}, hue=group_name)
+            marker = '+'
+
+        print('Pairplot shape', df.shape, df)
+
+        g = sns.pairplot(df, plot_kws={'s': 50, 'marker': marker}, hue=group_name, **kwargs)
+
         if color_groups is not None:
             leg = g._legend
             leg.set_bbox_to_anchor([1.05, 0.5])
+
         return fig
