@@ -3,34 +3,46 @@
 import pandas as pd
 import numpy as np
 import io
+import logging
 import pymzml
 
 from pathlib import Path as P
 from datetime import date
 from pyteomics import mzxml, mzml
 
+try:
+    from pyteomics import mzmlb
+except:
+    logging.warning('Cound not import pyteomics.mzmlb')
 
-def ms_file_to_df(fn):
+
+MS_FILE_COLUMNS = ['scan_id', 'ms_level', 'polarity', 'scan_time_min', 'mz', 'intensity']
+
+
+def ms_file_to_df(fn, read_only:bool=False):
     fn = str(fn)
     if fn.lower().endswith('.mzxml'):
-        df = mzxml_to_df(fn)
+        df = mzxml_to_df(fn, read_only=read_only)
     elif fn.lower().endswith('.mzml'):
-        df = mzml_to_df(fn)
+        df = mzml_to_df(fn, read_only=read_only)
     elif fn.lower().endswith('hdf'):
         df = pd.read_hdf(fn)
-    elif fn.lower().endswith('feather'):
+    elif fn.lower().endswith('.feather'):
         df = pd.read_feather(fn)
-    # Compatibility with old schema
-    df = df.rename(columns={
+    elif fn.lower().endswith('.parquet'):
+        df = thermo_raw_file_reader_parquet(fn, read_only=read_only)
+    elif fn.lower().endswith('.mzmlb'):
+        df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
+    # Compatibility with old 
+    if not read_only:
+        df = df.rename(columns={
             'retentionTime': 'scan_time_min', 
             'intensity array': 'intensity', 
             'm/z array': 'mz'})
     return df
 
 
-
-
-def mzxml_to_df(fn):
+def mzxml_to_df(fn, read_only=False):
     '''
     Reads mzXML file and returns a pandas.DataFrame.
     '''    
@@ -38,8 +50,11 @@ def mzxml_to_df(fn):
     
     with mzxml.MzXML( fn ) as ms_data:
         data = [x for x in ms_data]
+    
+    if read_only: return None
+    
     data = list( extract_mzxml(data) )
-                
+
     df = pd.DataFrame.from_dict( data )\
            .set_index('retentionTime')\
            .apply(pd.Series.explode).reset_index()
@@ -57,7 +72,7 @@ def mzxml_to_df(fn):
     df = df.reset_index(drop=True)
     cols = ['scan_id', 'ms_level', 'polarity', 
             'scan_time_min', 'mz', 'intensity']
-    df = df[cols]
+    df = df[MS_FILE_COLUMNS]
     return df
 
 
@@ -69,11 +84,11 @@ def _extract_mzxml(data):
 
 extract_mzxml = np.vectorize( _extract_mzxml )
 
-
-def mzml_to_pandas_df_pyteomics(fn):
-    '''
+'''
+def mzml_to_pandas_df_pyteomics(fn, read_only=False):
+    \'''
     Reads mzML file and returns a pandas.DataFrame. (deprecated)
-    '''
+    \'''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
     with  mzml.MzML(fn) as ms_data:
@@ -89,22 +104,26 @@ def mzml_to_pandas_df_pyteomics(fn):
     df_to_numeric(df)
     df['intensity array'] = df['intensity array'].astype(int)
     df = df.reset_index(drop=True)
+    df = df[MS_FILE_COLUMNS]
     return df
+'''
 
-
-def mzml_to_df(fn, assume_time_unit='seconds'):
+def mzml_to_df(fn, assume_time_unit='seconds', read_only=False):
     
     with pymzml.run.Reader(fn) as ms_data:
         data = [x for x in ms_data]
-        
+
+    if read_only: return None
+
     data = list( extract_mzml(data, assume_time_unit=assume_time_unit) )
     
     df = pd.DataFrame.from_dict( data )\
            .set_index(['scan_id', 'ms_level', 'polarity', 'scan_time_min'])\
            .apply(pd.Series.explode)\
            .reset_index()
+
     df['mz'] = df['mz'].astype('float64')
-    df['intensity'] = df['intensity'].astype('int64')
+    df['intensity'] = df['intensity'].astype('float64')
     return df
 
 
@@ -123,9 +142,61 @@ def _extract_mzml(data, assume_time_unit):
             'polarity': '+' if data["positive scan"] else '-', 
             'scan_time_min': RT, 
             'mz': peaks[:,0].astype('float64'),
-            'intensity': peaks[:,1].astype('int64')}
+            'intensity': peaks[:,1].astype('float64')}
 
 extract_mzml = np.vectorize( _extract_mzml )
+
+
+def thermo_raw_file_reader_parquet(fn, read_only=False):
+
+    df = pd.read_parquet(fn)
+    
+    if read_only: return None
+
+    df = df[['ScanNumber', 'MsOrder', 'RetentionTime', 'Intensities', 'Masses']]\
+           .set_index(['ScanNumber', 'MsOrder', 'RetentionTime', ])\
+           .apply(pd.Series.explode)\
+           .reset_index()\
+           .rename(columns={'ScanNumber': 'scan_id', 
+                            'MsOrder': 'ms_level', 
+                            'RetentionTime': 'scan_time_min', 
+                            'Masses': 'mz', 
+                            'Intensities': 'intensity'})
+    df['polarity'] = None
+    df['intensity'] = df.intensity.astype(np.float64)
+    df = df[MS_FILE_COLUMNS]
+    return df
+
+
+def mzmlb_to_df__pyteomics(fn, read_only=False):
+    with  mzmlb.MzMLb(fn) as ms_data:
+        data = [x for x in ms_data]
+    
+    if read_only: return None
+
+    data = list(extract_mzmlb(data))
+
+    df = pd.DataFrame.from_dict( data )\
+           .set_index('retentionTime')\
+           .apply(pd.Series.explode)\
+           .reset_index()\
+           .rename(columns={'index': 'scan_id',
+                    'retentionTime': 'scan_time_min',
+                    'm/z array': 'mz',
+                    'ms level': 'ms_level',
+                    'intensity array': 'intensity'})
+    
+    df['polarity'] = None
+    df = df[MS_FILE_COLUMNS]
+    return df
+
+
+def _extract_mzmlb(data):
+    cols = ['index', 'ms level', 'retentionTime', 'm/z array', 'intensity array']
+    data['retentionTime'] = data['scanList']['scan'][0]['scan start time'] / 60
+    return {c:data[c] for c in cols}
+
+extract_mzmlb = np.vectorize(_extract_mzmlb)
 
 
 def df_to_numeric(df):

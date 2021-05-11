@@ -305,6 +305,7 @@ def get_metadata(wdir):
     else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
     
     if 'index' in df.columns: del df['index']
+    df['Column'] = df['Column'].apply(format_columns)
     df.reset_index(inplace=True)
     return df
 
@@ -358,6 +359,11 @@ def Basename(fn):
     fn = os.path.basename(fn)
     fn, _ = os.path.splitext(fn)
     return fn
+
+
+def format_columns(x):
+    if x is None or np.isnan(x): return None
+    return f'{int(x):02.0f}'
 
 
 def get_complete_results( wdir, include_labels=None, exclude_labels=None, file_types=None ):

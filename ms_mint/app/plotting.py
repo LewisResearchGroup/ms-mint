@@ -18,7 +18,11 @@ _label='Plotting'
 
 _kinds = ['bar', 'violin', 'box', 'count', 'boxen', 'scatter', 'line', 'strip', 'swarm', 'point']
 
+_palettes = ['Accent', 'Accent_r', 'Blues', 'Blues_r', 'BrBG', 'BrBG_r', 'BuGn', 'BuGn_r', 'BuPu', 'BuPu_r', 'CMRmap', 'CMRmap_r', 'Dark2', 'Dark2_r', 'GnBu', 'GnBu_r',  'Greens', 'Greens_r', 'Greys', 'Greys_r', 'OrRd', 'OrRd_r', 'Oranges', 'Oranges_r',  'PRGn', 'PRGn_r', 'Paired', 'Paired_r', 'Pastel1', 'Pastel1_r', 'Pastel2',  'Pastel2_r', 'PiYG', 'PiYG_r', 'PuBu', 'PuBuGn', 'PuBuGn_r', 'PuBu_r', 'PuOr', 'PuOr_r', 'PuRd', 'PuRd_r', 'Purples', 'Purples_r', 'RdBu', 'RdBu_r', 'RdGy', 'RdGy_r', 'RdPu', 'RdPu_r', 'RdYlBu', 'RdYlBu_r', 'RdYlGn', 'RdYlGn_r', 'Reds', 'Reds_r', 'Set1', 'Set1_r', 'Set2', 'Set2_r', 'Set3', 'Set3_r', 'Spectral', 'Spectral_r', 'Wistia', 'Wistia_r', 'YlGn', 'YlGnBu', 'YlGnBu_r', 'YlGn_r', 'YlOrBr', 'YlOrBr_r', 'YlOrRd', 'YlOrRd_r', 'afmhot', 'afmhot_r', 'autumn', 'autumn_r', 'binary', 'binary_r',  'bone', 'bone_r', 'brg', 'brg_r', 'bwr', 'bwr_r', 'cividis', 'cividis_r', 'cool', 'cool_r',  'coolwarm', 'coolwarm_r', 'copper', 'copper_r', 'cubehelix', 'cubehelix_r', 'flag', 'flag_r',  'gist_earth', 'gist_earth_r', 'gist_gray', 'gist_gray_r', 'gist_heat', 'gist_heat_r', 'gist_ncar',  'gist_ncar_r', 'gist_rainbow', 'gist_rainbow_r', 'gist_stern', 'gist_stern_r', 'gist_yarg',  'gist_yarg_r', 'gnuplot', 'gnuplot2', 'gnuplot2_r', 'gnuplot_r', 'gray', 'gray_r', 'hot', 'hot_r',  'hsv', 'hsv_r', 'icefire', 'icefire_r', 'inferno', 'inferno_r', 'jet', 'jet_r', 'magma', 'magma_r',  'mako', 'mako_r', 'nipy_spectral', 'nipy_spectral_r', 'ocean', 'ocean_r', 'pink', 'pink_r',  'plasma', 'plasma_r', 'prism', 'prism_r', 'rainbow', 'rainbow_r', 'rocket', 'rocket_r',  'seismic', 'seismic_r', 'spring', 'spring_r', 'summer', 'summer_r', 'tab10', 'tab10_r','tab20', 'tab20_r', 'tab20b', 'tab20b_r', 'tab20c', 'tab20c_r', 'terrain', 'terrain_r', 'turbo',  'turbo_r', 'twilight', 'twilight_r', 'twilight_shifted', 'twilight_shifted_r', 'viridis',  'viridis_r', 'vlag', 'vlag_r', 'winter', 'winter_r']
+
 kind_options = [{'value': x, 'label': x.capitalize()} for x in _kinds]
+
+palette_options = [{'value': x, 'label': x} for x in _palettes]
 
 options = [
     {'label': 'Rotate x-ticks', 'value': 'rot-x-ticks'},
@@ -37,6 +41,7 @@ _layout = html.Div([
     dcc.Input(id='plot-fig-height', placeholder='Figure facet height x', value=2.5, type="number"),
     dcc.Input(id='plot-fig-aspect', placeholder='Figure aspect ratio', value=1, type="number"),
     dcc.Input(id='plot-title', placeholder='Title', value=None),
+
     dcc.Dropdown(id='plot-kind', options=kind_options, value='bar'),
 
     dcc.Dropdown(id='plot-x', options=[], value=None, placeholder='X'),
@@ -46,6 +51,8 @@ _layout = html.Div([
     dcc.Dropdown(id='plot-row', options=[], value=None, placeholder='Rows'),
     dcc.Dropdown(id='plot-style', options=[], value=None, placeholder='Style'),
     dcc.Dropdown(id='plot-size', options=[], value=None, placeholder='Size'),
+    dcc.Dropdown(id='plot-palette', options=palette_options, value=None, 
+                    placeholder='Palette (Colors)'),
 
     html.Label('Column wrap:'),
     dcc.Slider(id='plot-col-wrap', step=1, min=0, max=30, value=0),
@@ -109,13 +116,13 @@ def callbacks(app, fsc, cache):
         State('ana-peak-labels-include', 'value'),
         State('ana-peak-labels-exclude', 'value'),
         State('ana-ms-order', 'value'), 
+        State('plot-palette', 'value'),
         State('plot-options', 'value'),
         State('wdir', 'children')
     )
     def create_figure(n_clicks, kind, height, aspect, x, y, hue, 
             col, row, col_wrap, style, size, title, file_types, 
-            include_labels, exclude_labels, 
-            ms_order, options, wdir):
+            include_labels, exclude_labels, ms_order, palette, options, wdir):
 
         if n_clicks is None: raise PreventUpdate
         if col_wrap == 0: col_wrap = None
@@ -138,7 +145,10 @@ def callbacks(app, fsc, cache):
 
         df = df[(df.peak_n_datapoints>0) & (df.peak_max>0)]
 
-        df = df.sort_values([ i for i in [col, row, hue, x, y, style, size] if i is not None])
+        if ms_order is None or len(ms_order) == 0:
+            df = df.sort_values([ i for i in [col, row, hue, x, y, style, size] if i is not None])
+        else:
+            df = df.sort_values(ms_order)
 
         if hue is not None: df = df[df[hue].notna()]
 
@@ -185,6 +195,7 @@ def callbacks(app, fsc, cache):
                 kind=kind,
                 height=height, 
                 aspect=aspect,
+                palette=palette,
                 **kwargs
                 )
 
