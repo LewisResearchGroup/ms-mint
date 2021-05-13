@@ -219,7 +219,11 @@ def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
     if not os.path.isfile(fn):
         chrom = create_chromatogram(ms_file, mz_mean, mz_width, fn)
     else:
-        chrom = pd.read_feather(fn)
+        try:
+            chrom = pd.read_feather(fn)
+        except:
+            os.remove(fn)
+
     chrom = chrom.rename(columns={
             'retentionTime': 'scan_time_min', 
             'intensity array': 'intensity', 
