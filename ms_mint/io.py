@@ -151,7 +151,7 @@ extract_mzml = np.vectorize( _extract_mzml )
 def read_parquet(fn, read_only=False):
     df = pd.read_parquet(fn)
 
-    if read_only or all(df.columns == MS_FILE_COLUMNS):
+    if read_only or (len(df.columns) == len(MS_FILE_COLUMNS) and all(df.columns == MS_FILE_COLUMNS)):
         return df
     else:
         format_thermo_raw_file_reader_parquet(df)
