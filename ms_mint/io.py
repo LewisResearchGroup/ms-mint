@@ -9,6 +9,7 @@ import pymzml
 from pathlib import Path as P
 from datetime import date
 from pyteomics import mzxml, mzml
+from functools import lru_cache
 
 try:
     from pyteomics import mzmlb
@@ -18,7 +19,7 @@ except:
 
 MS_FILE_COLUMNS = ['scan_id', 'ms_level', 'polarity', 'scan_time_min', 'mz', 'intensity']
 
-
+@lru_cache(500)
 def ms_file_to_df(fn, read_only:bool=False):
     fn = str(fn)
     if fn.lower().endswith('.mzxml'):

@@ -223,11 +223,14 @@ def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
             chrom = pd.read_feather(fn)
         except:
             os.remove(fn)
+            logging.warning(f'Cound not read {fn}.')
+            return None
 
     chrom = chrom.rename(columns={
             'retentionTime': 'scan_time_min', 
             'intensity array': 'intensity', 
             'm/z array': 'mz'})
+
     return chrom
 
 
@@ -366,7 +369,12 @@ def Basename(fn):
 
 
 def format_columns(x):
-    if x is None or np.isnan(x): return None
+    try:
+        if (x is None) or (x == '') or np.isnan(x): return None
+    except:
+        print(type(x))
+        print(x)
+        assert False
     return f'{int(x):02.0f}'
 
 
