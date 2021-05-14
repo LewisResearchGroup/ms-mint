@@ -62,7 +62,7 @@ def mzxml_to_df(fn, read_only=False):
 
     df['retentionTime'] =  df['retentionTime'].astype(np.float64)
     df['m/z array'] = df['m/z array'].astype(np.float64)
-    df['intensity array'] = df['intensity array'].astype(int)
+    df['intensity array'] = df['intensity array'].astype(np.float64)
 
     df = df.rename(columns={'num': 'scan_id', 
                             'msLevel': 'ms_level', 
