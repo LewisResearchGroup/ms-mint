@@ -11,3 +11,4 @@ nav:
   #- Python: 'python.md'
   - Jupyter: 'jupyter.md'
   - Developer Notes: 'developer-notes.md'
+  - Gallery: gallery.md

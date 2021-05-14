@@ -28,6 +28,9 @@ groupby_options = [{'label': 'Batch', 'value': 'Batch'},
                    {'label': 'Type',  'value': 'Type'},
                    {'label': 'Color', 'value': 'Color'}]
 
+ana_normalization_cols = [{'label': 'Batch', 'value': 'Batch'},
+                          {'label': 'peak_label', 'value': 'peak_label'},
+                          {'label': 'ms_file', 'value': 'ms_file'}]
 
 _layout = html.Div([
     dcc.Tabs(id='ana-secondary-tab', value=_modules[0]._label, vertical=False, 
@@ -42,7 +45,7 @@ _layout = html.Div([
     dcc.Dropdown(id='ana-peak-labels-exclude', options=[], placeholder='Exclude peak_labels', multi=True),
     dcc.Dropdown(id='ana-ms-order', options=[], placeholder='MS-file sorting', multi=True),
     dcc.Dropdown(id='ana-groupby', options=groupby_options, value=None, placeholder='Group by column'),
-
+    dcc.Dropdown(id='ana-normalization-cols', options=ana_normalization_cols, value=None, placeholder='Normalize by', multi=True),
     html.Div(id='ana-secondary-tab-content')
 ])
 

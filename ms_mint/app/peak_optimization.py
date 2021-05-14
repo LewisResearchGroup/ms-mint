@@ -413,6 +413,7 @@ def callbacks(app, fsc, cache):
                 label=image_label, format='png')
 
             if not os.path.isfile( fn ) or regenerate:
+                logging.info(f'Regenerating figure for {peak_label}')
                 create_preview_peakshape(ms_files, mz_mean, mz_width, rt, 
                     rt_min, rt_max, image_label, wdir, title=peak_label, colors=file_colors)
 
@@ -507,6 +508,7 @@ def callbacks(app, fsc, cache):
         if n_clicks is None: raise PreventUpdate
         logging.info('Remove low intensity peaks.')
         peaklist = T.get_peaklist( wdir )
+
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt( wdir )
         elif ms_selection == 'all':
@@ -521,12 +523,11 @@ def callbacks(app, fsc, cache):
 
         tmp_peaklist['rt_min'] = tmp_peaklist.rt_min.fillna(0)
         tmp_peaklist['rt_max'] = tmp_peaklist.rt_max.fillna(100)
-        tmp_peaklist['intensity_threshold'] = float(threshold)
 
         mint.ms_files = ms_files
         mint.peaklist = tmp_peaklist
         mint.run()
-        peak_labels = mint.results.peak_label.drop_duplicates()
+        peak_labels = mint.results[mint.results.peak_max>float(threshold)].peak_label.drop_duplicates()
         peaklist = peaklist[peaklist.index.isin(peak_labels)]
         T.write_peaklist(peaklist, wdir)
         return dbc.Alert('Low intensity peaks removed.', color='info')
