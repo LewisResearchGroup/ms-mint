@@ -26,7 +26,7 @@ tabulator_options = {
            "height": "900px",
            }
 
-downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename":"Metadata"}
+downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename":"Peaklist"}
 
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
@@ -34,7 +34,8 @@ pkl_table = html.Div(id='pkl-table-container',
     style={'minHeight':  100, 'margin': '50px 50px 0px 0px'},
     children=[
         DashTabulator(id='pkl-table',
-            columns=T.gen_tabulator_columns(['peak_label', 'mz_mean','mz_width', 'rt', 'rt_min', 'rt_max', 'intensity_threshold', 'peaklist_name']), 
+            columns=T.gen_tabulator_columns(['peak_label', 'mz_mean','mz_width', 'rt', 'rt_min', 
+                                             'rt_max', 'intensity_threshold', 'peaklist_name']), 
             options=tabulator_options,
             downloadButtonType=downloadButtonType,
             clearFilterButtonType=clearFilterButtonType
@@ -124,4 +125,12 @@ def callbacks(app, fsc=None, cache=None):
         return dbc.Alert('Peaklist saved.', color='info')
 
 
-
+    @app.callback(
+        Output('pkl-table', 'downloadButtonType'),
+        Input('tab', 'value'),
+        State('active-workspace', 'children')
+    )
+    def updata_table_export_fn(tab, ws_name):
+        fn = f'{T.today()}-{ws_name}_MINT-peaklist'
+        downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename": fn}
+        return downloadButtonType
