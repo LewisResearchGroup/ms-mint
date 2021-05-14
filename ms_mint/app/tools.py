@@ -219,11 +219,18 @@ def get_chromatogram(ms_file, mz_mean, mz_width, wdir):
     if not os.path.isfile(fn):
         chrom = create_chromatogram(ms_file, mz_mean, mz_width, fn)
     else:
-        chrom = pd.read_feather(fn)
+        try:
+            chrom = pd.read_feather(fn)
+        except:
+            os.remove(fn)
+            logging.warning(f'Cound not read {fn}.')
+            return None
+
     chrom = chrom.rename(columns={
             'retentionTime': 'scan_time_min', 
             'intensity array': 'intensity', 
             'm/z array': 'mz'})
+
     return chrom
 
 
@@ -305,6 +312,7 @@ def get_metadata(wdir):
     else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
     
     if 'index' in df.columns: del df['index']
+    df['Column'] = df['Column'].apply(format_columns)
     df.reset_index(inplace=True)
     return df
 
@@ -358,6 +366,16 @@ def Basename(fn):
     fn = os.path.basename(fn)
     fn, _ = os.path.splitext(fn)
     return fn
+
+
+def format_columns(x):
+    try:
+        if (x is None) or (x == '') or np.isnan(x): return None
+    except:
+        print(type(x))
+        print(x)
+        assert False
+    return f'{int(x):02.0f}'
 
 
 def get_complete_results( wdir, include_labels=None, exclude_labels=None, file_types=None ):

@@ -67,6 +67,7 @@ def callbacks(app, fsc, cache):
         df = T.get_complete_results( wdir, include_labels=include_labels, 
                     exclude_labels=exclude_labels, file_types=file_types )
 
+        df['ms_file'] = df['MS-file']
         mint.results = df
 
         mint.plot_clustering(figsize=(fig_size_x, fig_size_y), 
