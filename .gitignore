@@ -17,3 +17,4 @@ nohup.out
 InnoSetup/Output
 *lock
 ChEBI.tsv
+data.sqlite
