@@ -19,7 +19,7 @@ except:
 
 MS_FILE_COLUMNS = ['scan_id', 'ms_level', 'polarity', 'scan_time_min', 'mz', 'intensity']
 
-@lru_cache(500)
+@lru_cache(100)
 def ms_file_to_df(fn, read_only:bool=False):
     fn = str(fn)
     if fn.lower().endswith('.mzxml'):
@@ -31,7 +31,7 @@ def ms_file_to_df(fn, read_only:bool=False):
     elif fn.lower().endswith('.feather'):
         df = pd.read_feather(fn)
     elif fn.lower().endswith('.parquet'):
-        df = thermo_raw_file_reader_parquet(fn, read_only=read_only)
+        df = read_parquet(fn, read_only=read_only)
     elif fn.lower().endswith('.mzmlb'):
         df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
     # Compatibility with old 
@@ -148,11 +148,16 @@ def _extract_mzml(data, assume_time_unit):
 extract_mzml = np.vectorize( _extract_mzml )
 
 
-def thermo_raw_file_reader_parquet(fn, read_only=False):
-
+def read_parquet(fn, read_only=False):
     df = pd.read_parquet(fn)
-    
-    if read_only: return None
+
+    if read_only or (len(df.columns) == len(MS_FILE_COLUMNS) and all(df.columns == MS_FILE_COLUMNS)):
+        return df
+    else:
+        format_thermo_raw_file_reader_parquet(df)
+
+
+def format_thermo_raw_file_reader_parquet(df):
 
     df = df[['ScanNumber', 'MsOrder', 'RetentionTime', 'Intensities', 'Masses']]\
            .set_index(['ScanNumber', 'MsOrder', 'RetentionTime', ])\
@@ -167,6 +172,8 @@ def thermo_raw_file_reader_parquet(fn, read_only=False):
     df['intensity'] = df.intensity.astype(np.float64)
     df = df[MS_FILE_COLUMNS]
     return df
+
+
 
 
 def mzmlb_to_df__pyteomics(fn, read_only=False):
@@ -233,4 +240,13 @@ def convert_ms_file_to_feather(fn, fn_out=None):
         fn_out = fn.with_suffix('.feather')
     df = ms_file_to_df(fn).reset_index(drop=True)
     df.to_feather(fn_out)
+    return fn_out
+
+
+def convert_ms_file_to_parquet(fn, fn_out=None):
+    fn = P(fn)
+    if fn_out is None:
+        fn_out = fn.with_suffix('.feather')
+    df = ms_file_to_df(fn).reset_index(drop=True)
+    df.to_parquet(fn_out)
     return fn_out

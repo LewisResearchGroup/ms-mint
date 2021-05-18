@@ -1,4 +1,4 @@
-
+import numpy as np
 import dash_html_components as html
 #import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -91,7 +91,8 @@ def callbacks(app, fsc, cache):
         if meta is None:
             raise PreventUpdate
         file_types = meta['Type'].drop_duplicates().sort_values()
-        options = [{'value': i, 'label': i} for i in file_types]
+        options = [{'value': str(i), 'label': str(i)} for i in file_types]
+        print(file_types, options)
         return options, file_types
 
 
