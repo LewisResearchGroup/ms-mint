@@ -22,7 +22,7 @@ _label = 'Distributions'
 _layout = html.Div([
     html.H3('Quality Control'),
     html.Button('Update', id='dist-update'),
-    dcc.Dropdown(id='dist-graphs', options=graph_options, value=['hist', 'boxplot', 'density'], multi=True, placeholder='Kinds of graphs'),
+    dcc.Dropdown(id='dist-graphs', options=graph_options, value=['hist'], multi=True, placeholder='Kinds of graphs'),
     dcc.Checklist(id='dist-select', options=[{'label': 'Dense', 'value': 'Dense'}], value=['Dense']),
     html.Div(id='dist-figures', style={'float': 'center'})
 ])

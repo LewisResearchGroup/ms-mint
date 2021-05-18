@@ -301,19 +301,33 @@ def get_metadata(wdir):
     if os.path.isfile(fn):
         df = pd.read_csv( fn )
         if 'MS-file' not in df.columns:
-            df = None            
+            df = None
+
     if df is None or len(df) == 0:
         df = init_metadata( ms_files )
+
     if 'Color' not in df.columns:
         df['Color'] = None
     df = df.set_index('MS-file').reindex(ms_files).reset_index()
+
     if 'PeakOpt' not in df.columns:
         df['PeakOpt'] = False
+
     else: df['PeakOpt'] = df['PeakOpt'].astype(bool)
-    
+
+    if 'InAnalysis' not in df.columns:
+        df['InAnalysis'] = True
+    else: 
+        df['InAnalysis'] = df['InAnalysis'].astype(bool)
+
     if 'index' in df.columns: del df['index']
+
     df['Column'] = df['Column'].apply(format_columns)
+
+    df['Type'] = df['Type'].fillna('Not set')
+
     df.reset_index(inplace=True)
+
     return df
 
 
@@ -321,20 +335,23 @@ def init_metadata( ms_files ):
     ms_files = list(ms_files)
     ms_files = [filename_to_label(fn) for fn in ms_files]
     df = pd.DataFrame({'MS-file': ms_files})
+    df['InAnalysis'] = True
     df['Label'] = ''
     df['Color'] = None
     df['Type'] = 'Biological Sample'
-    df['Run Order'] = ''
+    df['RunOrder'] = ''
     df['Batch'] = ''
     df['Row'] = ''
     df['Column'] = ''
     df['PeakOpt'] = ''
     return df
 
+
 def write_metadata( meta, wdir ):
     fn = get_metadata_fn( wdir )
     with lock(fn):
         meta.to_csv( fn, index=False)
+
 
 def get_metadata_fn(wdir):
     fn = os.path.join(wdir, 'metadata', 'metadata.csv')
@@ -378,29 +395,33 @@ def format_columns(x):
     return f'{int(x):02.0f}'
 
 
-def get_complete_results( wdir, include_labels=None, exclude_labels=None, file_types=None ):
+def get_complete_results( wdir, include_labels=None, exclude_labels=None, 
+        file_types=None, include_excluded=False ):
     meta = get_metadata( wdir )
     resu = get_results( wdir )
+
+    if not include_excluded: meta = meta[meta['InAnalysis']]
     df = pd.merge(meta, resu, on=['MS-file'])
     if include_labels is not None and len(include_labels) > 0:
         df = df[df.peak_label.isin(include_labels)]
     if exclude_labels is not None and len(exclude_labels) > 0:
         df = df[~df.peak_label.isin(exclude_labels)]
     if file_types is not None and file_types != []:
-        df = df[df.Type.isin(file_types)]            
+        df = df[df.Type.isin(file_types)]
     df['log(peak_max+1)'] = df.peak_max.apply(np.log1p)
     if 'index' in df.columns: df = df.drop('index', axis=1)
     return df
 
 
 def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=False, 
-                          add_peakopt_col=False,
+                          add_peakopt_col=False, add_ms_file_active_col=False,
                           col_width='12px', editor='input'):
 
     if col_names is None: col_names = []
     col_names = list(col_names)
 
-    standard_columns = ['MS-file', 'Color', 'index', 'PeakOpt']
+    standard_columns = ['MS-file', 'InAnalysis', 'Color', 'index', 'PeakOpt', ]
+
     for col in standard_columns:
         if col in col_names: col_names.remove(col)
     
@@ -439,6 +460,18 @@ def gen_tabulator_columns(col_names=None, add_ms_file_col=False, add_color_col=F
             { 'title': 'PeakOpt', 
               'field': 'PeakOpt', 
               "headerFilter":False,  
+              "formatter": "tickCross", 
+              'width': '6px', 
+              "headerSort": True,
+              "hozAlign": "center",
+              "editor": True
+            })
+
+    if add_ms_file_active_col:
+        columns.append(
+            { 'title': 'InAnalysis', 
+              'field': 'InAnalysis', 
+              "headerFilter":True,  
               "formatter": "tickCross", 
               'width': '6px', 
               "headerSort": True,
