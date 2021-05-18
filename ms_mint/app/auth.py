@@ -141,7 +141,7 @@ def callbacks(app, fsc=None, cache=None):
                 return failed
         elif pathname =='/data':
             if current_user.is_authenticated:
-                return data
+                return None
         elif pathname == '/logout':
             if current_user.is_authenticated:
                 logout_user()
