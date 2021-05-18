@@ -31,7 +31,10 @@ meta_table = html.Div(id='meta-table-container',
     style={'minHeight':  100, 'margin': '0%'},
     children=[
         DashTabulator(id='meta-table',
-            columns=T.gen_tabulator_columns(add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), 
+            columns=T.gen_tabulator_columns(
+                        add_ms_file_col=True, add_color_col=True, 
+                        add_peakopt_col=True, add_ms_file_active_col=True
+            ), 
             options=tabulator_options,
             downloadButtonType=downloadButtonType,
             clearFilterButtonType=clearFilterButtonType
@@ -75,8 +78,9 @@ _layout = html.Div([
         dcc.Dropdown(
             id='meta-action', options=[
                 {'label': 'Set', 'value': 'Set'},
-                {'label': 'Create column', 'value': 'Create column'},
-                {'label': 'Delete column', 'value': 'Delete column'}
+                {'label': 'Create column', 'value': 'create_column'},
+                {'label': 'Delete column', 'value': 'delete_column'},
+                #{'label': 'Delete selected files', 'value': 'delete_ms_files'},
             ],
             value='Set', style={'width': '150px'}),
         dcc.Dropdown(
@@ -127,25 +131,34 @@ def callbacks(app, fsc, cache):
         columns = metadata.columns.to_list()
         columns = [{'label':col, 'value':col} for col in columns if col != 'index']
         if 'index' not in metadata.columns: metadata = metadata.reset_index()
-        return metadata.to_dict('records'), T.gen_tabulator_columns(metadata.columns,
-            add_ms_file_col=True, add_color_col=True, add_peakopt_col=True), columns
+        return (metadata.to_dict('records'), 
+                T.gen_tabulator_columns(metadata.columns,
+                    add_ms_file_col=True, 
+                    add_color_col=True, 
+                    add_peakopt_col=True, 
+                    add_ms_file_active_col=True), 
+                columns)
 
     @app.callback(
         Output('meta-table', 'downloadButtonType'),
         Input('tab', 'value'),
         State('active-workspace', 'children')
     )
-    def updata_table_export_fn(tab, ws_name):
+    def update_table_export_fn(tab, ws_name):
         fn = f'{T.today()}-{ws_name}_MINT-metadata'
-        downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"csv", "filename": fn}
+        downloadButtonType = {
+            "css": "btn btn-primary", 
+            "text":"Export", 
+            "type":"csv", 
+            "filename": fn }
         return downloadButtonType
 
 
     @app.callback(
     Output({'index': 'meta-apply-output', 'type': 'output'}, 'children'),
     Input('meta-apply', 'n_clicks'),
-    State('meta-table', 'multiRowsClicked'),
     State('meta-table', 'data'),
+    State('meta-table', 'multiRowsClicked'),
     State('meta-table', 'dataFiltered'),
     State('meta-action', 'value'),
     State('meta-column', 'value'),
@@ -153,7 +166,7 @@ def callbacks(app, fsc, cache):
     State('meta-input-bool', 'value'),
     State('wdir', 'children'),
     )
-    def meta_save(n_clicks, selected_rows, data, 
+    def meta_save(n_clicks, data, selected_rows,
                   data_filtered, action, column, value, 
                   value_bool, wdir):
         
@@ -169,6 +182,7 @@ def callbacks(app, fsc, cache):
             df = df.set_index('index')
         else:
             df = df.reset_index()
+
         prop_id = dash.callback_context.triggered[0]['prop_id']
         if prop_id == 'meta-apply.n_clicks':
             if action == 'Set':
@@ -183,8 +197,8 @@ def callbacks(app, fsc, cache):
                 if len(ndxs) == 0 or column is None:
                     return dbc.Alert('No rows selected.', color='danger')
                 df.loc[ndxs, column] = value
-            elif action == 'Create column': df[value] = ''
-            elif action == 'Delete column': del df[column]
+            elif action == 'create_column': df[value] = ''
+            elif action == 'delete_column': del df[column]
 
         T.write_metadata(df, wdir )
 
@@ -204,17 +218,7 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
         df = pd.DataFrame(data)
         T.write_metadata( df , wdir)
-    
-    '''
-    @app.callback(
-        Output('meta-column', 'disabled'),
-        Input('meta-action', 'value'),
-    )
-    def set_something_from_actions(action):
-        if action in ['Set', 'Delete column']:
-            return False
-        return True
-    '''
+
     
     @app.callback(
         Output('meta-input', 'style'),
