@@ -19,7 +19,7 @@ except:
 
 MS_FILE_COLUMNS = ['scan_id', 'ms_level', 'polarity', 'scan_time_min', 'mz', 'intensity']
 
-@lru_cache(500)
+@lru_cache(100)
 def ms_file_to_df(fn, read_only:bool=False):
     fn = str(fn)
     if fn.lower().endswith('.mzxml'):
