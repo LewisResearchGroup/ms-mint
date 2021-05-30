@@ -478,8 +478,7 @@ class Mint(object):
                 name=col_name, correlation=correlation)
 
 
-    def pca(self, var_name='peak_max', n_vars=20, fillna='median', 
-            scaler='standard'):
+    def pca(self, var_name='peak_max', n_vars=20, fillna='median', scaler='standard'):
 
         df = self.crosstab(var_name).fillna(fillna)
         
@@ -487,13 +486,11 @@ class Mint(object):
             fillna = df.median()
         elif fillna == 'mean':
             fillna = df.mean()
-
+        
         df = df.fillna(fillna)
 
         if scaler is not None:
             df = scale_dataframe(df, scaler)
-
-        print(df.shape)
 
         min_dim = min(df.shape)
         n_vars = min(n_vars, min_dim)
@@ -504,8 +501,6 @@ class Mint(object):
 
         explained_variance = pca.explained_variance_ratio_*100
         cum_expl_var = np.cumsum(explained_variance)
-
-        print(df_projected.shape)
         
         self.decomposition_results = {
             'df_projected': df_projected,
