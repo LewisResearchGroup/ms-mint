@@ -1,14 +1,11 @@
 import os
-import configparser
-import sqlite3
+#import configparser
 
 from pathlib import Path as P
 from flask_login.mixins import UserMixin
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Table, create_engine
-from sqlalchemy.sql import select
-
+from sqlalchemy import create_engine
 
 
 db = SQLAlchemy()
@@ -26,7 +23,7 @@ class ConnectDB():
 
         self.db = db
 
-        config = configparser.ConfigParser()
+        # config = configparser.ConfigParser()
         
         server.config.update(
             SECRET_KEY=os.urandom(12),

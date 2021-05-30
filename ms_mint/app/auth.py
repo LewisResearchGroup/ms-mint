@@ -1,14 +1,9 @@
 
-import os
-
-from pathlib import Path as P
-
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, current_user, LoginManager, UserMixin
+from flask_login import login_user, logout_user, current_user
 
 import dash_core_components as dcc
 import dash_html_components as html
-import dash
 from dash.dependencies import Input, Output, State
 
 from sqlalchemy import Table
@@ -107,23 +102,6 @@ def callbacks(app, fsc=None, cache=None):
     def logout_dashboard(n_clicks):
         if n_clicks > 0:
             return '/'
-
-
-    @app.callback(
-        Output('url_login_df', 'pathname')
-        , [Input('back-button', 'n_clicks')])
-    def logout_dashboard(n_clicks):
-        if n_clicks > 0:
-            return '/'
-
-
-    # Create callbacks
-    @app.callback(
-        Output('url_logout', 'pathname')
-        , [Input('back-button', 'n_clicks')])
-    def logout_dashboard(n_clicks):
-        if n_clicks > 0:
-            return '/'            
 
 
     @app.callback(

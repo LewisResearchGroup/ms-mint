@@ -10,7 +10,6 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_tabulator import DashTabulator
 
-from ms_mint import MINT_DATA_PATH
 from ms_mint.standards import M_PROTON
 from . import tools as T
 
