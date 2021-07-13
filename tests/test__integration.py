@@ -86,4 +86,3 @@ class TestClass():
         mint.reset()
         mint.peaklist_files = TEST_PEAKLIST_FN
         assert mint.run() is None
-

@@ -14,6 +14,7 @@ from pathlib import Path as P
 from collections import namedtuple
 from multiprocessing import freeze_support
 
+from scipy.spatial.transform import _rotation_groups
 import ms_mint
 
 def fake_use_wget():
