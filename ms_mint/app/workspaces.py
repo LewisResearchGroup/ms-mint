@@ -125,6 +125,8 @@ def callbacks(app, fsc, cache):
         data = pd.DataFrame(data)
 
         if len(ndx) == 1:
+            if ndx[0] not in data.index:
+                raise PreventUpdate
             ws_name = data.loc[ndx[0], 'Workspace']
         else:
             ws_name = T.get_active_workspace( tmpdir )

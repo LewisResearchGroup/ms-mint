@@ -17,7 +17,8 @@ RESULTS_COLUMNS = [
     'peak_shape_rt', 'peak_shape_int', 
     'peak_mass_diff_25pc', 'peak_mass_diff_50pc', 
     'peak_mass_diff_75pc',
-    'peak_score']
+    'peak_score'
+]
 
 MINT_RESULTS_COLUMNS = (['ms_file']
                         + PEAKLIST_COLUMNS
@@ -26,7 +27,6 @@ MINT_RESULTS_COLUMNS = (['ms_file']
                        )
 
 DEPRECATED_LABELS = {'peakLabel': 'peak_label',
-                  #   'compoundId': 'peak_label',
                      'compound': 'peak_label',
                      'peakMz': 'mz_mean',
                      'medRt': 'rt',

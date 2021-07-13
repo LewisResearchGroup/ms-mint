@@ -308,7 +308,10 @@ def get_metadata(wdir):
 
     if 'Color' not in df.columns:
         df['Color'] = None
-    df = df.set_index('MS-file').reindex(ms_files).reset_index()
+    
+    df = df[df['MS-file'] != '']
+
+    df = df.groupby('MS-file').first().reindex(ms_files).reset_index()
 
     if 'PeakOpt' not in df.columns:
         df['PeakOpt'] = False
