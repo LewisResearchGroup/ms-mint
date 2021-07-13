@@ -45,9 +45,9 @@ def ms_file_to_df(fn, read_only:bool=False):
 
 def mzxml_to_df(fn, read_only=False):
     '''
-    Reads mzXML file and returns a pandas.DataFrame.
+    Reads mzXML file and returns a pandas.DataFrame
+    using pyteomics library.
     '''    
-    slices = []
     
     with mzxml.MzXML( fn ) as ms_data:
         data = [x for x in ms_data]
@@ -60,8 +60,8 @@ def mzxml_to_df(fn, read_only=False):
            .set_index('retentionTime')\
            .apply(pd.Series.explode).reset_index()
 
-    df['retentionTime'] =  df['retentionTime'].astype(np.float64)
-    df['m/z array'] = df['m/z array'].astype(np.float64)
+    df['retentionTime']   = df['retentionTime'].astype(np.float64)
+    df['m/z array']       = df['m/z array'].astype(np.float64)
     df['intensity array'] = df['intensity array'].astype(np.float64)
 
     df = df.rename(columns={'num': 'scan_id', 
@@ -71,8 +71,6 @@ def mzxml_to_df(fn, read_only=False):
                             'intensity array': 'intensity'})
     
     df = df.reset_index(drop=True)
-    cols = ['scan_id', 'ms_level', 'polarity', 
-            'scan_time_min', 'mz', 'intensity']
     df = df[MS_FILE_COLUMNS]
     return df
 
@@ -85,11 +83,12 @@ def _extract_mzxml(data):
 
 extract_mzxml = np.vectorize( _extract_mzxml )
 
-'''
+
 def mzml_to_pandas_df_pyteomics(fn, read_only=False):
-    \'''
-    Reads mzML file and returns a pandas.DataFrame. (deprecated)
-    \'''
+    '''
+    Reads mzML file and returns a pandas.DataFrame
+    using the pyteomics library. Needs refactoring.
+    '''
     cols = ['retentionTime', 'm/z array', 'intensity array']
     slices = []
     with  mzml.MzML(fn) as ms_data:
@@ -107,7 +106,7 @@ def mzml_to_pandas_df_pyteomics(fn, read_only=False):
     df = df.reset_index(drop=True)
     df = df[MS_FILE_COLUMNS]
     return df
-'''
+
 
 def mzml_to_df(fn, assume_time_unit='seconds', read_only=False):
     

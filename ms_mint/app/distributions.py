@@ -81,8 +81,6 @@ def callbacks(app, fsc, cache):
         if options is None:
             options = []
         
-        print(df.peak_label.value_counts())
-
         figures = []
         n_total = len(df.peak_label.drop_duplicates())
         for i, (peak_label, grp) in tqdm( enumerate(df.groupby('peak_label')), total=n_total ):
