@@ -9,6 +9,18 @@ More information on how to install and run the program can be found in the [Docu
 
 ![](./docs/image/distributions.png)
 
+## Python API for metabolomics
+
+    from ms_mint.notebook import Mint
+    mint.ms_files = glob('/path/to/files/*mzML')
+    mint.peaklist_files = '/path/to/peaklist/file/peaklist.csv'
+    mint.run()
+    mint.results
+
+![Mint Jupyter Results](./docs/image/jupyter_results.png "Mint Jupyter Results")
+
+More information in the documentation.
+
 # Errors, Feedback, Feature Requests
 If you encounter an error, if you have a request for a new feature, or for general feedback, please open a new ticket at the [issue tracker](https://github.com/soerendip/ms-mint/issues).
 
