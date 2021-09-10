@@ -19,4 +19,8 @@ In general I will ask you to followowing steps:
 1. add corresponding tests
 1. submit a pull request
 
+## Code standards
+Before submitting a pull request please run `flake8`.
+
+## Badges
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
