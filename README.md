@@ -1,4 +1,5 @@
 # MINT (Metabolomics Integrator)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 
 The Metabolomics Integrator (MINT)) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
 Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
@@ -24,6 +25,3 @@ In general I will ask you to followowing steps:
 
 ## Code standards
 Before submitting a pull request please run `flake8`.
-
-## Badges
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
