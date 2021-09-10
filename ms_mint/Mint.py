@@ -32,6 +32,9 @@ from tqdm import tqdm
 
 import ms_mint
 
+from . import static
+
+
 class Mint(object):
     def __init__(self, verbose:bool=False, progress_callback=None):
         self._verbose = verbose
