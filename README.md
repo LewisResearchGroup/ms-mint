@@ -1,4 +1,5 @@
 # MINT (Metabolomics Integrator)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 
 The Metabolomics Integrator (MINT)) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
 Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
@@ -7,6 +8,18 @@ or for the identification of pathogens such as methicillin resistant _Staphyloco
 More information on how to install and run the program can be found in the [Documentation](https://soerendip.github.io/ms-mint/).
 
 ![](./docs/image/distributions.png)
+
+## Python API for metabolomics
+
+    from ms_mint.notebook import Mint
+    mint.ms_files = glob('/path/to/files/*mzML')
+    mint.peaklist_files = '/path/to/peaklist/file/peaklist.csv'
+    mint.run()
+    mint.results
+
+![Mint Jupyter Results](./docs/image/jupyter_results.png "Mint Jupyter Results")
+
+More information in the documentation.
 
 # Errors, Feedback, Feature Requests
 If you encounter an error, if you have a request for a new feature, or for general feedback, please open a new ticket at the [issue tracker](https://github.com/soerendip/ms-mint/issues).
@@ -24,6 +37,3 @@ In general I will ask you to followowing steps:
 
 ## Code standards
 Before submitting a pull request please run `flake8`.
-
-## Badges
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
