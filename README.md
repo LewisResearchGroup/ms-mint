@@ -6,6 +6,8 @@ The metabolites can be used to define biomarkers used in medicine to find treatm
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 More information on how to install and run the program can be found in the [Documentation](https://soerendip.github.io/ms-mint/).
 
+![](./docs/images/distributions.png)
+
 # Errors, Feedback, Feature Requests
 If you encounter an error, if you have a request for a new feature, or for general feedback, please open a new ticket at the [issue tracker](https://github.com/soerendip/ms-mint/issues).
 
