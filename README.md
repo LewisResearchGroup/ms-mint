@@ -17,7 +17,8 @@ In general I will ask you to followowing steps:
 1. fork the repository
 1. implement the new feature or bug-fix
 1. add corresponding tests
-1. submit a pull request
+2. run `flake8`
+3. submit a pull request
 
 ## Code standards
 Before submitting a pull request please run `flake8`.
