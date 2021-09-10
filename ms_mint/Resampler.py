@@ -7,9 +7,12 @@ class Resampler():
     
     def resample_unit_minutes(self, chrom):
         chrom = chrom.sort_index()
-        chrom.index = pd.to_timedelta(chrom.index, unit='minute')
+        chrom.index = pd.to_timedelta(chrom.index, unit=self._unit)
         chrom = chrom.resample(self._tau).nearest()
-        chrom.index = (chrom.index.seconds + chrom.index.microseconds / 1000000) / 60
+        if self._unit == 'second':
+            chrom.index = (chrom.index.seconds + chrom.index.microseconds / 1000000)
+        if self._unit == 'minute':
+            chrom.index = (chrom.index.seconds + chrom.index.microseconds / 1000000) / 60
         chrom = chrom.rolling(20, center=True).mean()
         chrom = chrom.rolling(5, center=True).mean()
         return chrom

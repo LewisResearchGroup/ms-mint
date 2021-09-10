@@ -51,7 +51,7 @@ def plot_peak_shapes(mint_results, ms_files=None, peak_labels=None, height=4, as
     g.set_titles(row_template = '{row_name}', col_template = '{col_name}')
     
     for ax in g.axes.flatten():
-        ax.ticklabel_format(style='sci', scilimits=(0,0), axis='both')
+        ax.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
         
     if title is not None:
         g.fig.suptitle(title, y=1.01)
