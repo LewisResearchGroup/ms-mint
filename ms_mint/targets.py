@@ -42,8 +42,8 @@ def read_targets(filenames, ms_mode='negative'):
         if len(df) == 0:
             print('Got nothing')
             return pd.DataFrame(columns=TARGETS_COLUMNS, index=[])
-        df['target_filename'] = P(fn).name
         df = standardize_targets(df)
+        df['target_filename'] = P(fn).name
         targets.append(df)
 
     targets = pd.concat(targets)
