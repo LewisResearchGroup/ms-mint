@@ -103,8 +103,8 @@ _layout = html.Div([
 ])
 
 pko_layout_no_data = html.Div([
-    dcc.Markdown('''### No peaklist found.
-    You did not generate a peaklist yet.
+    dcc.Markdown('''### No targets found.
+    You did not generate a targets yet.
     ''')
 ])
 
@@ -135,11 +135,11 @@ def callbacks(app, fsc, cache):
     def pko_controls(tab, peak_deleted, wdir, old_options):
         if tab != _label:
             raise PreventUpdate
-        peaklist = T.get_peaklist( wdir )
-        if peaklist is None:
+        targets = T.get_targets( wdir )
+        if targets is None:
             logging.warning('Peaklist is None')
             raise PreventUpdate
-        options = [{'label':label, 'value': i} for i, label in enumerate(peaklist.index)]
+        options = [{'label':label, 'value': i} for i, label in enumerate(targets.index)]
         if options == old_options:
             raise PreventUpdate
         return options
@@ -166,7 +166,7 @@ def callbacks(app, fsc, cache):
         fig = None
         if peak_label_ndx is None:
             raise PreventUpdate
-        peaklist = T.get_peaklist( wdir ).reset_index()
+        targets = T.get_targets( wdir ).reset_index()
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt(wdir)
         elif ms_selection == 'all':
@@ -175,9 +175,9 @@ def callbacks(app, fsc, cache):
         cols = ['mz_mean', 'mz_width', 'rt', 
                 'rt_min', 'rt_max', 'peak_label']
 
-        peak_label_ndx = peak_label_ndx % len(peaklist)
+        peak_label_ndx = peak_label_ndx % len(targets)
         mz_mean, mz_width, rt, rt_min, rt_max, label = \
-            peaklist.loc[peak_label_ndx, cols]
+            targets.loc[peak_label_ndx, cols]
 
         if rt is np.isnan(rt):
             if (not np.isnan(rt_min)) and (not np.isnan(rt_max)):
@@ -246,24 +246,24 @@ def callbacks(app, fsc, cache):
     def pko_find_largest_peak(n_clicks, ms_selection, margin, wdir):
         if n_clicks is None:
             raise PreventUpdate
-        peaklist = T.get_peaklist( wdir )
+        targets = T.get_targets( wdir )
 
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt(wdir)
         elif ms_selection == 'all':
             ms_files = T.get_ms_fns(wdir)
         print(margin)
-        n_peaks = len(peaklist)
-        for i, (peak_label, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
+        n_peaks = len(targets)
+        for i, (peak_label, row) in tqdm( enumerate(targets.iterrows()), total=n_peaks ):
             fsc.set('progress', int(100*(1+i)/n_peaks))
             mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
             chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
                 .set_index('scan_time_min')['intensity'] for fn in ms_files]
             #rt_min, rt_max = max(0, row['rt']-(margin/2)), row['rt']+(margin/2)
             rt_min, rt_max = RTOpt(rt=row['rt'], rt_margin=margin).find_largest_peak(chromatograms)
-            peaklist.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
+            targets.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
         
-        T.write_peaklist( peaklist, wdir)
+        T.write_targets( targets, wdir)
         return dbc.Alert('Peak optimization done.', color='info')
 
     
@@ -279,7 +279,7 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
         rt_min, rt_max = fig['layout']['xaxis']['range']
         rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
-        T.update_peaklist(wdir, peak_label, rt_min, rt_max)
+        T.update_targets(wdir, peak_label, rt_min, rt_max)
         return dbc.Alert(f'Set RT span to ({rt_min},{rt_max})', color='info')
     
     
@@ -302,7 +302,7 @@ def callbacks(app, fsc, cache):
             label=image_label, format='png')
         
         rt = np.mean([rt_min, rt_max])
-        T.update_peaklist(wdir, peak_label, rt=rt)
+        T.update_targets(wdir, peak_label, rt=rt)
         if os.path.isfile(fn): os.remove(fn)
 
         return dbc.Alert(f'Set RT span to ({rt_min},{rt_max})', color='info')
@@ -329,9 +329,9 @@ def callbacks(app, fsc, cache):
         prop_id = dash.callback_context.triggered[0]['prop_id']        
 
         if prop_id.startswith('pko-suggest'):
-            peaklist = T.get_peaklist( wdir ).reset_index()
-            rt_means = peaklist[['rt_min', 'rt_max']].mean(axis=1)
-            peak_label_ndx = np.argmax( (peaklist.rt-rt_means).abs() )
+            targets = T.get_targets( wdir ).reset_index()
+            rt_means = targets[['rt_min', 'rt_max']].mean(axis=1)
+            peak_label_ndx = np.argmax( (targets.rt-rt_means).abs() )
             return peak_label_ndx      
 
         if prop_id.startswith('pko-image-clicked'):
@@ -391,15 +391,15 @@ def callbacks(app, fsc, cache):
         else:
             logging.info(f'Using {len(ms_files)} files for peak preview. ({ms_selection})')
 
-        peaklist = T.get_peaklist(wdir)
+        targets = T.get_targets(wdir)
 
         file_colors = T.file_colors( wdir )
 
-        n_total = len(peaklist)
+        n_total = len(targets)
         
         sns.set_context('paper')
         images = []
-        for i, (peak_label, row) in tqdm( enumerate( peaklist.iterrows() ), total=n_total):
+        for i, (peak_label, row) in tqdm( enumerate( targets.iterrows() ), total=n_total):
             fsc.set('progress', int(100*(i+1) / n_total ))
             mz_mean, mz_width, rt, rt_min, rt_max = \
                 row[['mz_mean', 'mz_width', 'rt', 'rt_min', 'rt_max']]
@@ -461,11 +461,11 @@ def callbacks(app, fsc, cache):
     def plk_delete(n_clicks, peak_ndx, wdir):
         if n_clicks is None:
             raise PreventUpdate
-        peaklist = T.get_peaklist( wdir ).reset_index()
-        peak_label = peaklist.loc[peak_ndx, 'peak_label']
-        peaklist = peaklist.drop( peak_ndx, axis=0 )
-        T.write_peaklist(peaklist, wdir)
-        return dbc.Alert(f'{peak_label} removed from peaklist.', color='info')
+        targets = T.get_targets( wdir ).reset_index()
+        peak_label = targets.loc[peak_ndx, 'peak_label']
+        targets = targets.drop( peak_ndx, axis=0 )
+        T.write_targets(targets, wdir)
+        return dbc.Alert(f'{peak_label} removed from targets.', color='info')
 
 
     @app.callback(
@@ -479,21 +479,21 @@ def callbacks(app, fsc, cache):
     def find_largest_peak(n_clicks, peak_label_ndx, ms_selection, margin, wdir):
         if n_clicks is None: raise PreventUpdate
         if peak_label_ndx is None: raise PreventUpdate
-        peaklist = T.get_peaklist( wdir )
+        targets = T.get_targets( wdir )
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt(wdir)
         elif ms_selection == 'all':
             ms_files = T.get_ms_fns(wdir)           
-        row = peaklist.iloc[peak_label_ndx]
+        row = targets.iloc[peak_label_ndx]
         mz_mean, mz_width = row.loc[['mz_mean', 'mz_width']]
         chromatograms = [T.get_chromatogram(fn, mz_mean, mz_width, wdir)\
             .set_index('scan_time_min')['intensity'] for fn in ms_files]
         rt_min, rt_max = RTOpt(rt=row['rt'], rt_min=row['rt_min'], rt_max=['rt_max'], rt_margin=margin)\
                             .find_largest_peak(chromatograms)
-        peaklist = peaklist.reset_index()
-        peaklist.loc[peak_label_ndx, ['rt_min', 'rt_max']] = rt_min, rt_max
-        peak_label = peaklist.loc[peak_label_ndx, 'peak_label']
-        peaklist.to_csv( T.get_peaklist_fn( wdir ), index=False )   
+        targets = targets.reset_index()
+        targets.loc[peak_label_ndx, ['rt_min', 'rt_max']] = rt_min, rt_max
+        peak_label = targets.loc[peak_label_ndx, 'peak_label']
+        targets.to_csv( T.get_targets_fn( wdir ), index=False )   
         return dbc.Alert(f'Set rt_min, rt_max for {peak_label}: {rt_min}, {rt_max}.', color='info')
 
 
@@ -507,7 +507,7 @@ def callbacks(app, fsc, cache):
     def remove_low_intensity_peaks(n_clicks, ms_selection, threshold, wdir):
         if n_clicks is None: raise PreventUpdate
         logging.info('Remove low intensity peaks.')
-        peaklist = T.get_peaklist( wdir )
+        targets = T.get_targets( wdir )
 
         if ms_selection == 'peakopt':
             ms_files = T.get_ms_fns_for_peakopt( wdir )
@@ -519,17 +519,17 @@ def callbacks(app, fsc, cache):
 
         mint = Mint(verbose=True, progress_callback=set_progress)
 
-        tmp_peaklist = peaklist.reset_index().copy()
+        tmp_targets = targets.reset_index().copy()
 
-        tmp_peaklist['rt_min'] = tmp_peaklist.rt_min.fillna(0)
-        tmp_peaklist['rt_max'] = tmp_peaklist.rt_max.fillna(100)
+        tmp_targets['rt_min'] = tmp_targets.rt_min.fillna(0)
+        tmp_targets['rt_max'] = tmp_targets.rt_max.fillna(100)
 
         mint.ms_files = ms_files
-        mint.peaklist = tmp_peaklist
+        mint.targets = tmp_targets
         mint.run()
         peak_labels = mint.results[mint.results.peak_max>float(threshold)].peak_label.drop_duplicates()
-        peaklist = peaklist[peaklist.index.isin(peak_labels)]
-        T.write_peaklist(peaklist, wdir)
+        targets = targets[targets.index.isin(peak_labels)]
+        T.write_targets(targets, wdir)
         return dbc.Alert('Low intensity peaks removed.', color='info')
 
     @app.callback(

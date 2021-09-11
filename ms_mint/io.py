@@ -222,7 +222,7 @@ def export_to_excel(mint, fn=None):
     else:
         writer = pd.ExcelWriter(fn)
     # Write into file
-    mint.peaklist.to_excel(writer, 'Peaklist', index=False)
+    mint.targets.to_excel(writer, 'Targets', index=False)
     mint.results.to_excel(writer, 'Results', index=False)
     meta = pd.DataFrame({'MINT_version': [mint.version], 
                          'Date': [date_string]}).T[0]

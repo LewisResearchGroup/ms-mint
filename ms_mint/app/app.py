@@ -27,7 +27,7 @@ from . import tools as T
 from . import workspaces
 from . import ms_files
 from . import metadata
-from . import peaklist
+from . import targets
 from . import peak_optimization
 from . import processing
 from . import add_metab
@@ -63,7 +63,7 @@ _modules = [
   workspaces,
   ms_files,
   metadata,
-  peaklist,
+  targets,
   add_metab,
   peak_optimization,
   processing,
@@ -170,8 +170,8 @@ def render_content(tab, wdir):
         return dbc.Alert('Please, create and activate a workspace.', color='warning')
     elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:
         return dbc.Alert('Please import MS files.', color='warning')
-    elif tab in ['Processing'] and ( len(T.get_peaklist( wdir )) == 0 ):
-        return dbc.Alert('Please, define peaklist.', color='warning')
+    elif tab in ['Processing'] and ( len(T.get_targets( wdir )) == 0 ):
+        return dbc.Alert('Please, define targets.', color='warning')
     elif tab in ['Analysis'] and not P(T.get_results_fn( wdir )).is_file():
         return dbc.Alert('Please, create results (Processing).', color='warning')
     if func is not None:

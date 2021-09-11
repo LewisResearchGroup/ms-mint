@@ -23,7 +23,7 @@ def process_ms1_files_in_parallel(args):
     Expects a dictionary with keys:
         Mandatory:
         - 'filename': 'path to file to be processed',
-        - 'peaklist': 'dataframe containing the peaklist' 
+        - 'targets': 'dataframe containing the targets' 
         - 'mode': 'express' or 'standard'
             * 'express' omits calculcation of rt projections
         Optional:
@@ -35,29 +35,29 @@ def process_ms1_files_in_parallel(args):
     '''
 
     filename = args['filename']
-    peaklist = args['peaklist']
+    targets = args['targets']
     
     if 'queue' in args.keys():
         q = args['queue']
         q.put('filename')
     try:
-        return process_ms1_file(filename=filename, peaklist=peaklist)
+        return process_ms1_file(filename=filename, targets=targets)
     except:
         return pd.DataFrame()
 
 
-def process_ms1_file(filename, peaklist):
+def process_ms1_file(filename, targets):
     '''
     Peak integration using a filename as input.
     -----
     Args:
         - filename: str or PosixPath, path to mzxml or mzml filename
-        - peaklist: pandas.DataFrame(), DataFrame in peaklist format
+        - targets: pandas.DataFrame(), DataFrame in targets format
     Returns:
         pandas.DataFrame(), DataFrame with processd peak intensities
     '''
     df = ms_file_to_df(filename)
-    results = process_ms1(df, peaklist)
+    results = process_ms1(df, targets)
     results['total_intensity'] = df['intensity'].sum()
     results['ms_file'] = os.path.basename(filename)
     results['ms_path'] = os.path.dirname(filename)
@@ -66,18 +66,21 @@ def process_ms1_file(filename, peaklist):
     return results[MINT_RESULTS_COLUMNS]
 
 
-def process_ms1(df, peaklist):
-    results = process_ms1_from_df(df, peaklist)
+def process_ms1(df, targets):
+    results = process_ms1_from_df(df, targets)
     results = pd.DataFrame(results, columns=['peak_label']+RESULTS_COLUMNS)
-    results = pd.merge(peaklist, results, on=['peak_label'])
+    results = pd.merge(targets, results, on=['peak_label'])
     results = results.reset_index(drop=True)
     return results
 
 
-def process_ms1_from_df(df, peaklist):
+def process_ms1_from_df(df, targets):
+    '''
+    Processes multiple targets returns numpy array.
+    '''
     peak_cols = ['mz_mean', 'mz_width', 'rt_min', 'rt_max', 
                  'intensity_threshold', 'peak_label']
-    array_peaks = peaklist[peak_cols].values
+    array_peaks = targets[peak_cols].values
     if 'ms_level' in df.columns:
         df = df[df.ms_level == 1]
     array_data = df[['scan_time_min', 'mz', 'intensity']].values

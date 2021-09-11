@@ -3,7 +3,7 @@ import pandas as pd
 from ms_mint.Mint import Mint
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 
-from paths import TEST_MZML, TEST_MZXML, TEST_PEAKLIST_FN, TEST_PEAKLIST_FN_V0
+from paths import TEST_MZML, TEST_MZXML, TEST_TARGETS_FN, TEST_TARGETS_FN_V0
 
 mint = Mint(verbose=True)
 mint_b = Mint(verbose=True)
@@ -20,10 +20,10 @@ class TestClass():
         assert mint.n_files == 1, mint.n_files
         assert mint.files == [TEST_MZXML]
 
-    def test__add_peaklist(self):
-        assert mint.n_peaklist_files == 0, mint.n_peaklist_files
-        mint.peaklist_files = TEST_PEAKLIST_FN
-        assert mint.n_peaklist_files == 1, mint.n_peaklist_files
+    def test__add_target(self):
+        assert mint.n_targets_files == 0, mint.n_targets_files
+        mint.targets_files = TEST_TARGETS_FN
+        assert mint.n_targets_files == 1, mint.n_targets_files
                 
     def test__mint_run_standard(self):
         mint.run()
@@ -34,7 +34,7 @@ class TestClass():
     
     def test__results_lenght(self):
         actual = len(mint.results)
-        expected = len(mint.peaklist) * len(mint.files)
+        expected = len(mint.targets) * len(mint.files)
         assert  expected == actual, f'Length of results ({actual}) does not equal expected length ({expected})'
     
     def test__results_columns(self):
@@ -48,13 +48,13 @@ class TestClass():
 
     def test__mint_run_parallel(self):
         mint.files = [TEST_MZML, TEST_MZXML]
-        mint.peaklist_files = TEST_PEAKLIST_FN
+        mint.targets_files = TEST_TARGETS_FN
         mint.run(nthreads=2)   
       
     def test__mzxml_equals_mzml(self):
         mint.reset()
         mint.files = [TEST_MZML, TEST_MZXML]
-        mint.peaklist_files = TEST_PEAKLIST_FN
+        mint.targets_files = TEST_TARGETS_FN
         mint.run()
         results = []
         for _, grp in mint.results.groupby('ms_file'):
@@ -63,26 +63,26 @@ class TestClass():
         print(results)
         assert (results[0] == results[1]).all(), results[0]-results[1]
 
-    def test__peaklist_v0_equals_v1(self):
+    def test__target_v0_equals_v1(self):
         mint.reset()
         mint.files = [TEST_MZXML]
-        mint.peaklist_files = [TEST_PEAKLIST_FN_V0,
-                               TEST_PEAKLIST_FN]
+        mint.targets_files = [TEST_TARGETS_FN_V0,
+                               TEST_TARGETS_FN]
         mint.run()
         results = []
-        for _, grp in mint.results.groupby('peaklist_name'):
+        for _, grp in mint.results.groupby('target_filename'):
             results.append(grp.peak_area.values)
         assert (results[0] == results[1]).all(), results
     
     def test__status(self):
         mint.status == 'waiting'
     
-    def test__run_returns_none_without_peaklist(self):
+    def test__run_returns_none_without_target(self):
         mint.reset()
         mint.files = [TEST_MZXML]
         assert mint.run() is None
     
     def test__run_returns_none_without_ms_files(self):
         mint.reset()
-        mint.peaklist_files = TEST_PEAKLIST_FN
+        mint.targets_files = TEST_TARGETS_FN
         assert mint.run() is None

@@ -17,10 +17,10 @@ from multiprocessing import Pool, Manager, cpu_count
 from scipy.cluster.hierarchy import ClusterWarning
 from sklearn.decomposition import PCA
 
-from .standards import MINT_RESULTS_COLUMNS, PEAKLIST_COLUMNS, DEPRECATED_LABELS
+from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
-from .peaklists import read_peaklists, check_peaklist, standardize_peaklist
+from .targets import read_targets, check_targets, standardize_targets
 from .peak_detection import OpenMSFFMetabo
 from .helpers import is_ms_file, get_ms_files_from_results
 from .vis.plotly.plotly_tools import plot_heatmap
@@ -59,8 +59,8 @@ class Mint(object):
     
     def reset(self):
         self._files = []
-        self._peaklist_files = []
-        self._peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
+        self._targets_files = []
+        self._targets = pd.DataFrame(columns=TARGETS_COLUMNS)
         self._results = pd.DataFrame({i: [] for i in MINT_RESULTS_COLUMNS})
         self._all_df = None
         self._progress = 0
@@ -74,11 +74,11 @@ class Mint(object):
         if ms_files is None:
             ms_files = self.ms_files
         if peak_labels is None:
-            peak_labels = self.peaklist.peak_label.values
-        peaklist = self.peaklist.copy()
-        peaklist = peaklist[peaklist.peak_label.isin(peak_labels)]
-        n_peaks = len(peaklist)
-        for i, (ndx, row) in tqdm( enumerate(peaklist.iterrows()), total=n_peaks ):
+            peak_labels = self.targets.peak_label.values
+        targets = self.targets.copy()
+        targets = targets[targets.peak_label.isin(peak_labels)]
+        n_peaks = len(targets)
+        for i, (ndx, row) in tqdm( enumerate(targets.iterrows()), total=n_peaks ):
             progress = int(100*(i+1)/n_peaks)
             if self.progress_callback is not None: self.progress_callback(progress)
             peak_label = row['peak_label']
@@ -93,14 +93,14 @@ class Mint(object):
             params = dict(rt=rt, rt_min=rt_min, rt_max=rt_max, rt_margin=rt_margin)
             rtopt = RetentionTimeOptimizer(**params, **kwargs)
             rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
-            self.peaklist.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
+            self.targets.loc[ndx, ['rt_min', 'rt_max']] =  rt_min, rt_max
             
     @lru_cache(100)
     def ms_file_to_df(self, fn):
         return ms_file_to_df(fn)
 
-    def clear_peaklist(self):
-        self.peaklist = pd.DataFrame(columns=PEAKLIST_COLUMNS)
+    def clear_targets(self):
+        self.targets = pd.DataFrame(columns=TARGETS_COLUMNS)
 
     def clear_results(self):
         self.results = pd.DataFrame(columns=MINT_RESULTS_COLUMNS)
@@ -110,7 +110,7 @@ class Mint(object):
 
     def run(self, nthreads=None, rt_margin=.5, mode='standard'):
         '''
-        Run MINT with set up peaklist and ms-files.
+        Run MINT with set up targets and ms-files.
         ----
         Args
             - nthreads: int or None, default = None
@@ -123,15 +123,15 @@ class Mint(object):
         '''
         self._status = 'running'
             
-        if (self.n_files == 0) or ( len(self.peaklist) == 0):
+        if (self.n_files == 0) or ( len(self.targets) == 0):
             return None
 
-        peaklist = self.peaklist
-        if 'rt' in peaklist.columns:
-            ndx = ((peaklist.rt_min.isna()) & (~peaklist.rt.isna()))
-            peaklist.loc[ndx, 'rt_min'] = peaklist.loc[ndx, 'rt'] - rt_margin
-            ndx = ((peaklist.rt_max.isna()) & (~peaklist.rt.isna()))
-            peaklist.loc[ndx, 'rt_max'] = peaklist.loc[ndx, 'rt'] + rt_margin
+        targets = self.targets
+        if 'rt' in targets.columns:
+            ndx = ((targets.rt_min.isna()) & (~targets.rt.isna()))
+            targets.loc[ndx, 'rt_min'] = targets.loc[ndx, 'rt'] - rt_margin
+            ndx = ((targets.rt_max.isna()) & (~targets.rt.isna()))
+            targets.loc[ndx, 'rt_max'] = targets.loc[ndx, 'rt'] + rt_margin
             del ndx
 
         if nthreads is None:
@@ -146,7 +146,7 @@ class Mint(object):
             results = []
             for i, filename in enumerate(self.ms_files):
                 args = {'filename': filename,
-                        'peaklist': self.peaklist,
+                        'targets': self.targets,
                         'q': None, 
                         'mode': mode}
                 results.append(process_ms1_files_in_parallel(args))
@@ -157,19 +157,19 @@ class Mint(object):
         end = time.time()
         self.runtime = ( end - start )
         self.runtime_per_file = (self.runtime / self.n_files)
-        self.runtime_per_peak = (self.runtime / self.n_files / len(self.peaklist))
+        self.runtime_per_peak = (self.runtime / self.n_files / len(self.targets))
         
         if self.verbose: 
             print(f'Total runtime: {self.runtime:.2f}s')
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
-            print(f'Runtime per peak ({len(self.peaklist)}): {self.runtime_per_peak:.2f}s\n')
+            print(f'Runtime per peak ({len(self.targets)}): {self.runtime_per_peak:.2f}s\n')
             print('Results:', self.results )
         self._status = 'done'
 
     def detect_peaks(self, **kwargs):
         detected = self.peak_detector.fit_transform(self.ms_files, **kwargs)
         if detected is not None:
-            self.peaklist = pd.concat([self.peaklist, detected])
+            self.targets = pd.concat([self.targets, detected])
 
     def run_parallel(self, nthreads=1, mode='standard'):
         pool = Pool(processes=nthreads)
@@ -178,7 +178,7 @@ class Mint(object):
         args = []
         for i, filename in enumerate(self.ms_files):
             args.append({'filename': filename,
-                         'peaklist': self.peaklist,
+                         'targets': self.targets,
                          'queue': q,
                          'mode': mode})
                    
@@ -238,42 +238,42 @@ class Mint(object):
             print( 'Set files to:\n' + '\n'.join(self.ms_files) + '\n' )
 
     @property
-    def peaklist_files(self):
-        return self._peaklist_files
+    def targets_files(self):
+        return self._targets_files
 
-    @peaklist_files.setter
-    def peaklist_files(self, list_of_files):
+    @targets_files.setter
+    def targets_files(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
             raise ValueError('Input should be a list of files.')
         for f in list_of_files:
             assert os.path.isfile(f), f'File not found ({f})' 
-        self._peaklist_files = list_of_files
-        if self.verbose: print( 'Set peaklist files to:\n'.join(self.peaklist_files) + '\n')
-        self.peaklist = read_peaklists(list_of_files)
+        self._targets_files = list_of_files
+        if self.verbose: print( 'Set targets files to:\n'.join(self.targets_files) + '\n')
+        self.targets = read_targets(list_of_files)
 
     @property
-    def n_peaklist_files(self):
-        return len(self.peaklist_files)
+    def n_targets_files(self):
+        return len(self.targets_files)
     
     @property
-    def peaklist(self):
-        return self._peaklist
+    def targets(self):
+        return self._targets
 
-    @peaklist.setter
-    def peaklist(self, peaklist):
-        peaklist = standardize_peaklist(peaklist)
-        errors = check_peaklist(peaklist)
+    @targets.setter
+    def targets(self, targets):
+        targets = standardize_targets(targets)
+        errors = check_targets(targets)
         if len(errors) != 0:
-            peaklist = peaklist.drop_duplicates()
+            targets = targets.drop_duplicates()
             error_string = '\n'.join(errors)
             if self.verbose:
-                logging.error(f'Errors in peaklist:\n{error_string}')
+                logging.error(f'Errors in targets:\n{error_string}')
             self._messages = errors
-        self._peaklist = peaklist
+        self._targets = targets
         if self.verbose:
-            print('Set peaklists to:\n', self.peaklist.to_string(), '\n')
+            print('Set targets to:\n', self.targets.to_string(), '\n')
 
     @property
     def results(self):
@@ -329,18 +329,18 @@ class Mint(object):
             if fn.endswith('xlsx'):
                 results = pd.read_excel(fn, sheet_name='Results').rename(columns=DEPRECATED_LABELS)
                 self.results = results
-                self.peaklist = pd.read_excel(fn, sheet_name='Peaklist')
+                self.targets = pd.read_excel(fn, sheet_name='Peaklist')
                 self.ms_files = get_ms_files_from_results(results)
 
             elif fn.endswith('.csv'):
                 results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
                 ms_files = get_ms_files_from_results(results)
-                peaklist = results[
-                        [col for col in PEAKLIST_COLUMNS if col in results.columns]
+                targets = results[
+                        [col for col in TARGETS_COLUMNS if col in results.columns]
                     ].drop_duplicates()
                 self.results = results
                 self.ms_files = ms_files
-                self.peaklist = peaklist
+                self.targets = targets
                 return None
         else:
             results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
@@ -348,11 +348,11 @@ class Mint(object):
                 ms_files = get_ms_files_from_results(results)
                 self.results = results
                 self.ms_files = ms_files
-            peaklist = results[[col for col in PEAKLIST_COLUMNS if col in results.columns]].drop_duplicates()
-            self.peaklist = peaklist
+            targets = results[[col for col in TARGETS_COLUMNS if col in results.columns]].drop_duplicates()
+            self.targets = targets
 
     
-    def plot_clustering(self, data=None, title=None, figsize=(8,8), target_var='peak_max',
+    def plot_clustering(self, data=None, title=None, figsize=(8,8), targets_var='peak_max',
                         vmin=-3, vmax=3, xmaxticks=None, ymaxticks=None, 
                         transform_func='log2p1', 
                         scaler_ms_file=None, 
@@ -363,7 +363,7 @@ class Mint(object):
                         **kwargs):
         '''
         Performs a cluster analysis and plots a heatmap. If no data is provided, 
-        data is taken form self.crosstab(target_var).
+        data is taken form self.crosstab(targets_var).
         The clustered non-transformed non-scaled data is stored in `self.clustered`.
 
         -----
@@ -406,7 +406,7 @@ class Mint(object):
 
         simplefilter("ignore", ClusterWarning)
         if data is None:
-            data = self.crosstab(target_var).copy()
+            data = self.crosstab(targets_var).copy()
 
         tmp_data = data.copy()
 

@@ -45,7 +45,8 @@ install_requires = [
     'wget',
     'bs4',
     'pytest-cov',
-    'jsbeautifier']
+    'jsbeautifier',
+    'six']
 
 
 config = {

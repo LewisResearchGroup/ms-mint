@@ -2,6 +2,7 @@ import re
 import shutil
 
 import pandas as pd
+from pandas.core.indexing import maybe_convert_ix
 
 import dash
 import dash_html_components as html
@@ -140,6 +141,9 @@ def callbacks(app, fsc, cache):
             raise PreventUpdate
         message = f'Workspace {ws_name} activated.'
         if ws_name is None: ws_name = ''
+
+        T.maybe_update_workpace_scheme( wdir )
+
         return dbc.Alert(message, color='info'), wdir, ws_name
 
 

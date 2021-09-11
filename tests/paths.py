@@ -17,15 +17,15 @@ TEST_MZML = os.path.abspath(
     )
 )
 
-TEST_PEAKLIST_FN = os.path.abspath( 
+TEST_TARGETS_FN = os.path.abspath( 
     os.path.join( 
-        'tests' , 'data', 'peaklists', 'peaklist_v1.csv'
+        'tests' , 'data', 'targets', 'targets_v1.csv'
     )
 )
 
-TEST_PEAKLIST_FN_V0 = os.path.abspath( 
+TEST_TARGETS_FN_V0 = os.path.abspath( 
     os.path.join( 
-        'tests' , 'data', 'peaklists', 'peaklist_v0.csv'
+        'tests' , 'data', 'targets', 'targets_v0.csv'
     )
 )
 
@@ -47,4 +47,4 @@ TEST_MZXML_BROKEN = os.path.abspath(
 assert P( TEST_MZXML ).is_file(), TEST_MZXML
 assert P( TEST_MZML ).is_file(), TEST_MZML
 assert P( TEST_MZXML_BROKEN ).is_file(), TEST_MZXML_BROKEN
-assert P( TEST_PEAKLIST_FN ).is_file(), TEST_PEAKLIST_FN
+assert P( TEST_TARGETS_FN ).is_file(), TEST_TARGETS_FN
