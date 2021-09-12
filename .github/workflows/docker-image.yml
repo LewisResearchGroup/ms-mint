@@ -16,10 +16,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: docker login
       env: 
-        USER = ${{secrets.DOCKER_USER}}
-        PASSWORD = ${{secrets.DOCKER_PASSWORD}}
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: | 
-        docker login -u $USER -p $PASSWORD
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build image
       run: docker build . --file Dockerfile --tag msmint/msmint:$(date +%s)
     - name: Docker push
