@@ -7,7 +7,7 @@ import numpy as np
 from pathlib import Path as P
 
 from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
-from .helpers import dataframe_difference
+from .helpers import df_diff
 from .tools import get_mz_mean_from_formulas
 
 
@@ -30,26 +30,18 @@ def read_targets(filenames, ms_mode='negative'):
         filenames = [filenames]
     targets = []
 
-    print('Read targets from:', filenames)
-
     for fn in filenames:
         if fn.endswith('.csv'):
-            print('csv')
             df = pd.read_csv(fn)
         elif fn.endswith('.xlsx'):
-            print('xlsx')
             df = pd.read_excel(fn)
-        if len(df) == 0:
-            print('Got nothing')
-            return pd.DataFrame(columns=TARGETS_COLUMNS, index=[])
+        #if len(df) == 0:
+        #    return pd.DataFrame(columns=TARGETS_COLUMNS, index=[])
         df = standardize_targets(df)
         df['target_filename'] = P(fn).name
         targets.append(df)
 
     targets = pd.concat(targets)
-
-    print('Got targets:', targets)
-
     return targets
 
 
@@ -138,6 +130,6 @@ def gen_target_grid(masses, dt, rt_max=10,
 
 
 def diff_targets(old_pklist, new_pklist):
-    df = dataframe_difference(old_pklist, new_pklist)
+    df = df_diff(old_pklist, new_pklist)
     df = df[df['_merge'] == 'right_only']
     return df.drop('_merge', axis=1)

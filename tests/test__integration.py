@@ -5,6 +5,7 @@ from ms_mint.standards import MINT_RESULTS_COLUMNS
 
 from paths import TEST_MZML, TEST_MZXML, TEST_TARGETS_FN, TEST_TARGETS_FN_V0
 
+
 mint = Mint(verbose=True)
 mint_b = Mint(verbose=True)
 
@@ -86,3 +87,4 @@ class TestClass():
         mint.reset()
         mint.targets_files = TEST_TARGETS_FN
         assert mint.run() is None
+
