@@ -19,7 +19,7 @@ jobs:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: | 
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
     - name: Build image
       run: docker build . --file Dockerfile --tag msmint/msmint:$(date +%s)
     - name: Docker push
