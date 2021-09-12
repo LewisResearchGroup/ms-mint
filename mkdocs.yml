@@ -1,6 +1,6 @@
 site_name: MINT
-site_url: https://github.com/soerendip/ms-mint
-site_author: Soren Wacker
+site_url: https://github.com/sorenwacker/ms-mint
+site_author: Soren Wacker 
 nav:
   - Home: 'index.md'
   - Background: 'background.md'
