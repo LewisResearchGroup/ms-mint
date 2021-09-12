@@ -4,13 +4,14 @@ import os
 
 MINT_ROOT = os.path.dirname(__file__)
 
-PEAKLIST_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
-                    'rt', 'rt_min', 'rt_max', 'intensity_threshold', 
-                    'peaklist_name']
+TARGETS_COLUMNS = ['peak_label', 'mz_mean', 'mz_width', 
+                    'rt', 'rt_min', 'rt_max', 'intensity_threshold',
+                    'target_filename']
 
 RESULTS_COLUMNS = [
     'peak_area', 
-    'peak_n_datapoints', 'peak_max', 
+    'peak_n_datapoints', 
+    'peak_max', 
     'peak_rt_of_max',
     'peak_min', 'peak_median',
     'peak_mean', 'peak_delta_int',
@@ -21,7 +22,7 @@ RESULTS_COLUMNS = [
 ]
 
 MINT_RESULTS_COLUMNS = (['ms_file']
-                        + PEAKLIST_COLUMNS
+                        + TARGETS_COLUMNS
                         + RESULTS_COLUMNS
                         + ['total_intensity', 'ms_path', 'ms_file_size']
                        )
@@ -34,6 +35,7 @@ DEPRECATED_LABELS = {'peakLabel': 'peak_label',
                      'peakMzWidth[ppm]': 'mz_width',
                      'rtmin': 'rt_min',
                      'rtmax': 'rt_max',
-                     'peaklist': 'peaklist_name'}
+                     'peaklist': 'target_filename',
+                     'peaklist_name': 'target_filename'}
 
 M_PROTON = 1.00782503223

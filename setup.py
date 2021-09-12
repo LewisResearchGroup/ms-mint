@@ -45,7 +45,9 @@ install_requires = [
     'wget',
     'bs4',
     'pytest-cov',
-    'jsbeautifier']
+    'jsbeautifier',
+    'six',
+    'tables']
 
 
 config = {
@@ -56,7 +58,7 @@ config = {
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
     'author': 'Soren Wacker',
-    'url': 'https://github.com/soerendip/ms-mint',
+    'url': 'https://github.com/sorenwacker/ms-mint',
     'author_email': 'swacker@ucalgary.ca',
     'scripts': ['scripts/Mint.py'],
     'packages': find_packages(),

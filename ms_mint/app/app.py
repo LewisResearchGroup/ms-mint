@@ -27,7 +27,7 @@ from . import tools as T
 from . import workspaces
 from . import ms_files
 from . import metadata
-from . import peaklist
+from . import targets
 from . import peak_optimization
 from . import processing
 from . import add_metab
@@ -63,7 +63,7 @@ _modules = [
   workspaces,
   ms_files,
   metadata,
-  peaklist,
+  targets,
   add_metab,
   peak_optimization,
   processing,
@@ -109,11 +109,11 @@ app.layout = html.Div([
 
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
 
-    html.A(href='https://soerendip.github.io/ms-mint/gui/', 
+    html.A(href='https://sorenwacker.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
-    html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={T.get_issue_text()}', 
+    html.A(href=f'https://github.com/sorenwacker/ms-mint/issues/new?body={T.get_issue_text()}', 
          children=[html.Button('Issues', id='B_issues', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
@@ -170,8 +170,8 @@ def render_content(tab, wdir):
         return dbc.Alert('Please, create and activate a workspace.', color='warning')
     elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:
         return dbc.Alert('Please import MS files.', color='warning')
-    elif tab in ['Processing'] and ( len(T.get_peaklist( wdir )) == 0 ):
-        return dbc.Alert('Please, define peaklist.', color='warning')
+    elif tab in ['Processing'] and ( len(T.get_targets( wdir )) == 0 ):
+        return dbc.Alert('Please, define targets.', color='warning')
     elif tab in ['Analysis'] and not P(T.get_results_fn( wdir )).is_file():
         return dbc.Alert('Please, create results (Processing).', color='warning')
     if func is not None:

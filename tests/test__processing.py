@@ -17,15 +17,16 @@ def test__process_ms1():
                             'mz': [100, 200, 300], 
                             'intensity': [2, 3, 7]})
 
-    peaklist = pd.DataFrame(
+    targets = pd.DataFrame(
         {'peak_label': ['A'],
          'mz_mean': [200],
          'mz_width': [10],
          'intensity_threshold': [0],
          'rt_min': [0],
-         'rt_max': [10]})
+         'rt_max': [10],
+         'targets_filename': ['unknown']})
 
-    result = processing.process_ms1(ms_data, peaklist)
+    result = processing.process_ms1(ms_data, targets)
 
     expect = pd.DataFrame({  'peak_label': {0: 'A'},
                              'mz_mean': {0: 200},
@@ -33,6 +34,7 @@ def test__process_ms1():
                              'intensity_threshold': {0: 0},
                              'rt_min': {0: 0},
                              'rt_max': {0: 10},
+                             'targets_filename': {0: 'unknown'},
                              'peak_area': {0: 3},
                              'peak_n_datapoints': {0: 1},
                              'peak_max': {0: 3},
@@ -49,6 +51,8 @@ def test__process_ms1():
                              'peak_score': {0: None} 
                         })
     
+    print(result)
+
     assert result.equals(expect), result
 
 

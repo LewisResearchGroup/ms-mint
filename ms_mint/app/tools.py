@@ -1,4 +1,5 @@
 import base64
+from functools import lru_cache
 import os
 import io
 import shutil
@@ -27,13 +28,14 @@ import matplotlib.cm as cm
 
 import ms_mint
 from ms_mint.io import ms_file_to_df
-from ms_mint.peaklists import standardize_peaklist, read_peaklists
+from ms_mint.targets import standardize_targets, read_targets
 from ms_mint.io import convert_ms_file_to_feather
-from ms_mint.standards import PEAKLIST_COLUMNS
+from ms_mint.standards import TARGETS_COLUMNS
 
 from datetime import date
 
 from .filelock import FileLock
+
 
 def lock(fn):
     return FileLock(f'{fn}.lock', timeout=1)
@@ -75,7 +77,7 @@ def parse_pkl_files(contents, filename, date, target_dir, ms_mode=None):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-    df = standardize_peaklist(df, ms_mode=ms_mode)
+    df = standardize_targets(df, ms_mode=ms_mode)
     df = df.drop_duplicates()
     return df
 
@@ -100,6 +102,20 @@ def maybe_migrate_workspaces(tmpdir):
             new_dir = workspace_path(tmpdir, dir_name)
             shutil.move(old_dir, new_dir)
             print('Moving', old_dir, 'to', new_dir)
+
+
+def maybe_update_workpace_scheme( wdir ):
+
+    old_pkl_fn = P( wdir )/'peaklist'/'peaklist.csv'
+    new_pkl_fn = P( get_targets_fn( wdir ))
+    new_path = new_pkl_fn.parent
+    old_path = old_pkl_fn.parent
+    if old_pkl_fn.is_file():
+        print(f'Moving targets file to new default location ({new_pkl_fn}).')
+        if not new_path.is_dir(): 
+            os.makedirs(new_path)
+        os.rename(old_pkl_fn, new_pkl_fn)
+        shutil.rmtree(old_path)
 
 
 def workspace_exists(tmpdir, ws_name):
@@ -134,7 +150,7 @@ def create_workspace(tmpdir, ws_name):
     assert not os.path.isdir(path)
     os.makedirs(path)
     os.makedirs(os.path.join(path, 'ms_files'))
-    os.makedirs(os.path.join(path, 'peaklist'))
+    os.makedirs(os.path.join(path, 'targets'))
     os.makedirs(os.path.join(path, 'results'))
     os.makedirs(os.path.join(path, 'figures'))
     os.makedirs(os.path.join(path, 'chromato'))
@@ -154,11 +170,11 @@ def get_workspaces(tmpdir):
 
 
 class Chromatograms():
-    def __init__(self, wdir, peaklist, ms_files, progress_callback=None):
+    def __init__(self, wdir, targets, ms_files, progress_callback=None):
         self.wdir = wdir
-        self.peaklist = peaklist
+        self.targets = targets
         self.ms_files = ms_files
-        self.n_peaks = len(peaklist)
+        self.n_peaks = len(targets)
         self.n_files = len(ms_files)
         self.progress_callback = progress_callback
 
@@ -170,7 +186,7 @@ class Chromatograms():
     def create_all_for_ms_file(self, ms_file: str):
         fn = ms_file
         df = ms_file_to_df(fn)
-        for ndx, row in self.peaklist.iterrows():
+        for ndx, row in self.targets.iterrows():
             mz_mean, mz_width = row[['mz_mean', 'mz_width']]
             fn_chro = get_chromatogram_fn(fn, mz_mean, mz_width, self.wdir)
             if os.path.isfile(fn_chro): continue
@@ -186,12 +202,12 @@ class Chromatograms():
         return get_chromatogram(ms_file, mz_mean, mz_width, self.wdir)      
     
 
-def create_chromatograms(ms_files, peaklist, wdir):
+def create_chromatograms(ms_files, targets, wdir):
     for fn in tqdm(ms_files):
         fn_out = os.path.basename(fn)
         fn_out, _ = os.path.splitext(fn_out) 
         fn_out += '.feather'
-        for ndx, row in peaklist.iterrows():
+        for ndx, row in targets.iterrows():
             mz_mean, mz_width = row[['mz_mean', 'mz_width']]
             fn_chro = get_chromatogram_fn(fn, mz_mean, mz_width, wdir)
             if not os.path.isfile(fn_chro):
@@ -241,42 +257,44 @@ def get_chromatogram_fn(ms_file, mz_mean, mz_width, wdir):
     return fn
 
 
-def get_peaklist_fn(wdir):
-    return os.path.join(wdir, 'peaklist', 'peaklist.csv')
+def get_targets_fn(wdir):
+    return os.path.join(wdir, 'targets', 'targets.csv')
 
 
-def get_peaklist(wdir):
-    fn = get_peaklist_fn( wdir )
+def get_targets(wdir):
+    fn = get_targets_fn( wdir )
     if os.path.isfile( fn ):
-        return read_peaklists( fn ).set_index('peak_label')
+        targets = read_targets( fn ).set_index('peak_label')
     else: 
-        return pd.DataFrame(columns=PEAKLIST_COLUMNS)
+        targets = pd.DataFrame(columns=TARGETS_COLUMNS)
+    print('Read targets:', targets)
+    return targets
 
 
-def update_peaklist(wdir, peak_label, rt_min=None, rt_max=None, rt=None):
-    peaklist = get_peaklist(wdir)
+def update_targets(wdir, peak_label, rt_min=None, rt_max=None, rt=None):
+    targets = get_targets(wdir)
 
     if isinstance(peak_label, str):
         if rt_min is not None and not np.isnan(rt_min):
-            peaklist.loc[peak_label, 'rt_min'] = rt_min
+            targets.loc[peak_label, 'rt_min'] = rt_min
         if rt_max is not None and not np.isnan(rt_max):
-            peaklist.loc[peak_label, 'rt_max'] = rt_max
+            targets.loc[peak_label, 'rt_max'] = rt_max
         if rt is not None and not np.isnan(rt):
-            peaklist.loc[peak_label, 'rt'] = rt
+            targets.loc[peak_label, 'rt'] = rt
 
     if isinstance(peak_label, int):
-        peaklist = peaklist.reset_index()
+        targets = targets.reset_index()
         if rt_min is not None and not np.isnan(rt_min):
-            peaklist.loc[peak_label, 'rt_min'] = rt_min
+            targets.loc[peak_label, 'rt_min'] = rt_min
         if rt_max is not None and not np.isnan(rt_max):
-            peaklist.loc[peak_label, 'rt_max'] = rt_max
+            targets.loc[peak_label, 'rt_max'] = rt_max
         if rt is not None and not np.isnan(rt):
-            peaklist.loc[peak_label, 'rt'] = rt
-        peaklist = peaklist.set_index('peak_label')
+            targets.loc[peak_label, 'rt'] = rt
+        targets = targets.set_index('peak_label')
 
-    fn = get_peaklist_fn(wdir)
+    fn = get_targets_fn(wdir)
     with lock(fn):
-        peaklist.to_csv(fn)
+        targets.to_csv(fn)
 
 
 def get_results_fn(wdir):
@@ -594,12 +612,12 @@ def float_to_color(x, vmin=0, vmax=2, cmap=None):
     return m.to_rgba(x)
 
 
-def write_peaklist(peaklist, wdir):
-    fn = get_peaklist_fn( wdir )
-    if 'peak_label' in peaklist.columns:
-        peaklist = peaklist.set_index('peak_label')
+def write_targets(targets, wdir):
+    fn = get_targets_fn( wdir )
+    if 'peak_label' in targets.columns:
+        targets = targets.set_index('peak_label')
     with lock(fn):
-        peaklist.to_csv(fn)
+        targets.to_csv(fn)
 
 
 def filename_to_label(fn: str):
@@ -608,7 +626,7 @@ def filename_to_label(fn: str):
     return os.path.basename(fn)
 
 
-    
+
 def import_from_url(url, target_dir, fsc=None):
     filenames = get_filenames_from_url(url)
     filenames = [fn for fn in filenames if is_ms_file(fn)]
