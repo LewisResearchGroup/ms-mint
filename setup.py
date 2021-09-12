@@ -46,7 +46,8 @@ install_requires = [
     'bs4',
     'pytest-cov',
     'jsbeautifier',
-    'six']
+    'six',
+    'tables']
 
 
 config = {
