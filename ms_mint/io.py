@@ -13,8 +13,10 @@ from functools import lru_cache
 
 try:
     from pyteomics import mzmlb
+    MZMLB_AVAILABLE = True
 except:
     logging.warning('Cound not import pyteomics.mzmlb')
+    MZMLB_AVAILABLE = False
 
 
 MS_FILE_COLUMNS = ['scan_id', 'ms_level', 'polarity', 'scan_time_min', 'mz', 'intensity']

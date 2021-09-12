@@ -7,7 +7,6 @@ from ms_mint.Mint import Mint
 
 from pathlib import Path as P
 
-
 from ms_mint.io import \
     ms_file_to_df, \
     mzml_to_pandas_df_pyteomics, \
@@ -18,7 +17,8 @@ from ms_mint.io import \
     df_to_numeric, \
     export_to_excel, \
     convert_ms_file_to_feather, \
-    convert_ms_file_to_parquet
+    convert_ms_file_to_parquet, \
+    MZMLB_AVAILABLE
 
 from paths import TEST_MZML, TEST_MZXML, TEST_PARQUET, TEST_MZMLB_POS, \
         TEST_FEATHER, TEST_MZML_POS, TEST_MZML_NEG
@@ -79,6 +79,8 @@ def test__write_read_hdf(tmpdir):
 
 
 def test__read_mzMLb(tmpdir):
+    if not MZMLB_AVAILABLE:
+        return None
     result = ms_file_to_df(TEST_MZMLB_POS)
     expected_cols = ['scan_id', 'ms_level', 'polarity',  'scan_time_min', 'mz', 'intensity']
     assert isinstance(result, pd.DataFrame), f'{type(result)} is not a dataframe'
