@@ -17,6 +17,38 @@ TEST_MZML = os.path.abspath(
     )
 )
 
+
+TEST_MZML_POS = os.path.abspath( 
+    os.path.join( 
+        'tests' , 'data', 'ms_files', 'example-pos.mzML'
+    )
+)
+
+TEST_MZML_NEG = os.path.abspath( 
+    os.path.join( 
+        'tests' , 'data', 'ms_files', 'example-neg.mzML'
+    )
+)
+
+TEST_FEATHER = os.path.abspath( 
+    os.path.join( 
+        'tests' , 'data', 'ms_files', 'test.feather'
+    )
+)
+
+TEST_PARQUET = os.path.abspath( 
+    os.path.join( 
+        'tests' , 'data', 'ms_files', 'thermo-parser-pos-ion-example.parquet'
+    )
+)
+
+TEST_MZMLB_POS = os.path.abspath( 
+    os.path.join( 
+        'tests' , 'data', 'ms_files', 'test-pos.mzMLb'
+    )
+)
+
+
 TEST_TARGETS_FN = os.path.abspath( 
     os.path.join( 
         'tests' , 'data', 'targets', 'targets_v1.csv'
