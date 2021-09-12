@@ -17,6 +17,7 @@ _layout = html.Div([
     html.H3('Run MINT'),
     html.Button('Run MINT',         id='run-mint'),
     html.Button('Download results', id='res-download'),
+    html.Button('Download dense peak_max', id='res-download'),
     html.Button('Delete results',   id='res-delete', style={'float': 'right'}),
 ])
 
@@ -68,7 +69,7 @@ def callbacks(app, fsc, cache):
             fsc.set('progress', x)
 
         mint = Mint(verbose=True, progress_callback=set_progress)
-        mint.peaklist_files = T.get_peaklist_fn( wdir )
+        mint.targets_files = T.get_targets_fn( wdir )
         mint.ms_files = T.get_ms_fns( wdir )
         mint.run()
         mint.export( T.get_results_fn(wdir) )

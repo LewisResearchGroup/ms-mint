@@ -53,7 +53,7 @@ add_metab_table = html.Div(id='add-metab-table-container',
                 clearFilterButtonType=clearFilterButtonType,
             ),
         ),
-    html.Button('Add selected metabolites to peaklist', id='add-metab'),
+    html.Button('Add selected metabolites to targets', id='add-metab'),
 ])
 
 _label = 'Add Metabolites'
@@ -89,7 +89,7 @@ def callbacks(app, fsc, cache):
         if ms_mode is None:
             return dbc.Alert('Please select ionization mode.', color='warning')
 
-        peaklist = T.get_peaklist( wdir )
+        targets = T.get_targets( wdir )
         
         for row in rows:
             charge = int( row['Charge'] )
@@ -99,20 +99,20 @@ def callbacks(app, fsc, cache):
                 continue
             if charge == 0:
                 if ms_mode == 'Negative':         
-                    peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] - M_PROTON
+                    targets.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] - M_PROTON
                 elif ms_mode == 'Positive':
-                    peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] #+ M_PROTON
+                    targets.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass'] #+ M_PROTON
             else:
-                peaklist.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass']
+                targets.loc[row['ChEBI Name'], 'mz_mean'] = row['Monoisotopic Mass']
 
-            peaklist.loc[row['ChEBI Name'], 'mz_width'] = 10
-            peaklist.loc[row['ChEBI Name'], 'rt'] = -1
-            peaklist.loc[row['ChEBI Name'], 'rt_min'] = 0
-            peaklist.loc[row['ChEBI Name'], 'rt_max'] = 15
-            peaklist.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
+            targets.loc[row['ChEBI Name'], 'mz_width'] = 10
+            targets.loc[row['ChEBI Name'], 'rt'] = -1
+            targets.loc[row['ChEBI Name'], 'rt_min'] = 0
+            targets.loc[row['ChEBI Name'], 'rt_max'] = 15
+            targets.loc[row['ChEBI Name'], 'intensity_threshold'] = 0
             
-        T.write_peaklist( peaklist, wdir)
-        n_peaks = len(peaklist)
+        T.write_targets( targets, wdir)
+        n_peaks = len(targets)
         n_new = len(rows)
         return dbc.Alert(f'{n_new} peaks added, now {n_peaks} peaks defined.', color='info')
 

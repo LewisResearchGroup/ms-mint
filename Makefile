@@ -7,7 +7,7 @@ publish:
 lint:
 	flake8
 
-tests:
+test:
 	pytest --cov=ms_mint --cov-report html
 
 build:

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "MINT"
-#define MyAppVersion "0.0.53"
+#define MyAppVersion "0.0.54"
 #define MyAppPublisher "Lewis Research Group (University of Calgary)"
 #define MyAppURL "https://github.com/soerendip/ms-mint"
 #define MyAppExeName "Mint.exe"
@@ -25,7 +25,7 @@ InfoBeforeFile=C:\Users\soere\workspace\ms-mint\README.md
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputBaseFilename=mysetup
-SetupIconFile=C:\Users\soere\workspace\ms-mint\static\logo\logo.ico
+SetupIconFile=C:\Users\soere\workspace\ms-mint\ms_mint\static\logo\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
