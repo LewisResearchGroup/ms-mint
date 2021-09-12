@@ -109,11 +109,11 @@ app.layout = html.Div([
 
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
 
-    html.A(href='https://soerendip.github.io/ms-mint/gui/', 
+    html.A(href='https://sorenwacker.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
-    html.A(href=f'https://github.com/soerendip/ms-mint/issues/new?body={T.get_issue_text()}', 
+    html.A(href=f'https://github.com/sorenwacker/ms-mint/issues/new?body={T.get_issue_text()}', 
          children=[html.Button('Issues', id='B_issues', style={'float': 'right', 'color': 'info'})],
          target="_blank"),
 
