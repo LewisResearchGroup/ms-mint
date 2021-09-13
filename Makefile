@@ -9,6 +9,7 @@ lint:
 
 test:
 	pytest --cov=ms_mint --cov-report html
+	coverage-badge -o images/coverage.svg
 
 build:
 	pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec --additional-hooks-dir=hooks
