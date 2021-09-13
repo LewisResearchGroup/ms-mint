@@ -1,6 +1,7 @@
 # MINT (Metabolomics Integrator)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 ![](images/coverage.svg)
+[![Github All Releases](https://img.shields.io/github/downloads/atom/atom/total.svg)]()
 
 
 The Metabolomics Integrator (MINT)) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
