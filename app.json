@@ -14,7 +14,7 @@
         "generator": "secret"
       },
       "FLASK_APP": {
-        "description": "entrypoint.sh",
+        "description": "app/entrypoint.sh",
         "value": "dashapp"
       }
     },
