@@ -18,3 +18,4 @@ InnoSetup/Output
 *lock
 ChEBI.tsv
 data.sqlite
+app.db
