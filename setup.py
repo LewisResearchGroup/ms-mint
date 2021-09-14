@@ -31,7 +31,6 @@ install_requires = [
     'xlrd',
     'urllib3',
     'ipywidgets',
-    'pyopenms',
     'pymzml',
     'tqdm',
     'seaborn',
@@ -47,7 +46,8 @@ install_requires = [
     'pytest-cov',
     'jsbeautifier',
     'six',
-    'tables']
+    'tables',
+    ]
 
 
 config = {
