@@ -10,18 +10,12 @@ from pathlib import Path as P
 from ms_mint.io import \
     ms_file_to_df, \
     mzml_to_pandas_df_pyteomics, \
-    read_parquet, \
-    format_thermo_raw_file_reader_parquet, \
-    mzmlb_to_df__pyteomics, \
-    _extract_mzmlb, \
-    df_to_numeric, \
-    export_to_excel, \
     convert_ms_file_to_feather, \
     convert_ms_file_to_parquet, \
     MZMLB_AVAILABLE
 
 from paths import TEST_MZML, TEST_MZXML, TEST_PARQUET, TEST_MZMLB_POS, \
-        TEST_FEATHER, TEST_MZML_POS, TEST_MZML_NEG
+        TEST_MZML_POS, TEST_MZML_NEG
 
 
 def test__ms_file_to_df__mzML():

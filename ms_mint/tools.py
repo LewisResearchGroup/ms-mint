@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from molmass import Formula
 
@@ -28,14 +27,17 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None, verbose=False):
 
 
 def gaussian(x, mu, sig):
+    x = np.array(x)
     return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
 
 
-def scale_dataframe(df, scaler='standard'):
+def scale_dataframe(df, scaler='standard', **kwargs):
     df = df.copy()
     if scaler == 'standard':
-        scaler = StandardScaler()
+        scaler = StandardScaler(**kwargs)
     elif scaler == 'robust':
-        scaler = RobustScaler()
-    return pd.DataFrame(scaler.fit_transform(df), 
-                        columns=df.columns, index=df.index)
+        scaler = RobustScaler(**kwargs)
+    df.loc[:, :] = scaler.fit_transform(df)
+    return df
+
+                    
