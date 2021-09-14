@@ -1,1 +1,4 @@
 .
+flask-wtf
+flask-migrate
+flask-login
