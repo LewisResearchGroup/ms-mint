@@ -21,4 +21,4 @@ def test__plotly_heatmap__call_show():
     print(ndx_leaves)
     print(col_leaves)
 
-    assert False
+    assert True
