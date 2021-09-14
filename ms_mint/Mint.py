@@ -21,7 +21,6 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
 from .targets import read_targets, check_targets, standardize_targets
-from .peak_detection import OpenMSFFMetabo
 from .helpers import is_ms_file, get_ms_files_from_results
 from .vis.plotly import plotly_heatmap, plotly_peak_shapes
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
@@ -42,7 +41,6 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print('Mint Version:', self.version , '\n')
-        self.peak_detector = OpenMSFFMetabo(progress_callback=progress_callback)
 
     @property
     def verbose(self):
@@ -165,10 +163,6 @@ class Mint(object):
             print('Results:', self.results )
         self._status = 'done'
 
-    def detect_peaks(self, **kwargs):
-        detected = self.peak_detector.fit_transform(self.ms_files, **kwargs)
-        if detected is not None:
-            self.targets = pd.concat([self.targets, detected])
 
     def run_parallel(self, nthreads=1, mode='standard'):
         pool = Pool(processes=nthreads)
