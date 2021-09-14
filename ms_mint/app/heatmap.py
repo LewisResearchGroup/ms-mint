@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
 from ms_mint.Mint import Mint
-from ms_mint.vis.plotly.plotly_tools import plot_heatmap
+from ms_mint.vis.plotly import plotly_heatmap
 
 from . import tools as T
 
@@ -89,7 +89,7 @@ def callbacks(app, fsc, cache):
             data = data.apply(np.log1p)
             name = f'log( {var_name}+1 )'
 
-        fig = plot_heatmap(data, 
+        fig = plotly_heatmap(data, 
             normed_by_cols='normed_by_cols' in options, 
             transposed='transposed' in options, 
             clustered='clustered' in options,

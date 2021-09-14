@@ -79,7 +79,6 @@ _outputs = html.Div(id='outputs', children=[module._outputs for module in
 
 app = dash.Dash(__name__, 
     external_stylesheets=[
-        #dbc.themes.BOOTSTRAP,
         dbc.themes.MINTY,
         "https://codepen.io/chriddyp/pen/bWLwgP.css"
         ],
@@ -151,36 +150,43 @@ app.layout = html.Div([
     
 ], style={'margin':'2%'})
 
-messages.callbacks(app=app, fsc=fsc, cache=cache)
 
-for module in _modules:
-    func = module.callbacks
-    if func is not None:
-        func(app=app, fsc=fsc, cache=cache)
+def register_callbacks(app):
+        
+    messages.callbacks(app=app, fsc=fsc, cache=cache)
+
+    for module in _modules:
+        func = module.callbacks
+        if func is not None:
+            print('Register callbacks for', module)
+            func(app=app, fsc=fsc, cache=cache)
 
 
-@app.callback(
-    Output('tab-content', 'children'),
-    Input('tab', 'value'),
-    State('wdir', 'children')
-)
-def render_content(tab, wdir):
-    func = modules[tab].layout
-    if tab != 'Workspaces' and wdir == '':
-        return dbc.Alert('Please, create and activate a workspace.', color='warning')
-    elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:
-        return dbc.Alert('Please import MS files.', color='warning')
-    elif tab in ['Processing'] and ( len(T.get_targets( wdir )) == 0 ):
-        return dbc.Alert('Please, define targets.', color='warning')
-    elif tab in ['Analysis'] and not P(T.get_results_fn( wdir )).is_file():
-        return dbc.Alert('Please, create results (Processing).', color='warning')
-    if func is not None:
-        return func()
-    else:
-        raise PreventUpdate
+    @app.callback(
+        Output('tab-content', 'children'),
+        Input('tab', 'value'),
+        State('wdir', 'children')
+    )
+    def render_content(tab, wdir):
+        func = modules[tab].layout
+        if tab != 'Workspaces' and wdir == '':
+            return dbc.Alert('Please, create and activate a workspace.', color='warning')
+        elif tab in ['Metadata', 'Peak Optimization', 'Processing'] and len(T.get_ms_fns( wdir )) == 0:
+            return dbc.Alert('Please import MS files.', color='warning')
+        elif tab in ['Processing'] and ( len(T.get_targets( wdir )) == 0 ):
+            return dbc.Alert('Please, define targets.', color='warning')
+        elif tab in ['Analysis'] and not P(T.get_results_fn( wdir )).is_file():
+            return dbc.Alert('Please, create results (Processing).', color='warning')
+        if func is not None:
+            return func()
+        else:
+            raise PreventUpdate
+
+
 
 
 if __name__ == '__main__':
+    register_callbacks(app)
     app.run_server(debug=True, threaded=True, 
         dev_tools_hot_reload_interval=5000,
         dev_tools_hot_reload_max_retry=30)
