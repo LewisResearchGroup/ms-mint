@@ -104,3 +104,12 @@ def test__process_ms1_from_numpy():
     print('Actual')
     [print(i) for i in result]
     assert result == expect
+
+
+def test__extract_chromatogram_from_ms1():
+    df = pd.DataFrame({'scan_time_min': [1, 2, 3],
+                       'mz': [100, 200, 300], 
+                       'intensity': [2, 3, 7]})
+    result = processing.extract_chromatogram_from_ms1(df, 200, 10, 'minutes')
+    expected = pd.Series([3], index=[2] )    
+    assert result.equals(expected)

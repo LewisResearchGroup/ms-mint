@@ -1,8 +1,7 @@
-import base64
-from functools import lru_cache
 import os
 import io
 import shutil
+import base64
 import subprocess
 import platform
 import logging
@@ -19,11 +18,10 @@ import urllib3, ftplib
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-
 import matplotlib as mpl
+mpl.use('Agg')
+
+from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 
 import ms_mint

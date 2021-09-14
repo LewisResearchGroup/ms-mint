@@ -23,7 +23,7 @@ from .io import export_to_excel, ms_file_to_df
 from .targets import read_targets, check_targets, standardize_targets
 from .peak_detection import OpenMSFFMetabo
 from .helpers import is_ms_file, get_ms_files_from_results
-from .vis.plotly.plotly_tools import plot_heatmap
+from .vis.plotly import plotly_heatmap, plotly_peak_shapes
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
 from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 from .tools import scale_dataframe 
@@ -31,8 +31,6 @@ from .tools import scale_dataframe
 from tqdm import tqdm
 
 import ms_mint
-
-from . import static
 
 
 
@@ -398,10 +396,8 @@ class Mint(object):
 
         transpose: bool, default False
             - True: transpose the figure
-        
-        
-
         '''
+
         if len(self.results) == 0:
             return None
 
@@ -453,7 +449,7 @@ class Mint(object):
             return plot_peak_shapes(self.results,  **kwargs)
 
 
-    def plot_heatmap(self, col_name='peak_max', normed_by_cols=False, transposed=False, 
+    def plotly_heatmap(self, col_name='peak_max', normed_by_cols=False, transposed=False, 
             clustered=False, add_dendrogram=False, name='', correlation=False):
         '''Creates an interactive heatmap 
         that can be used to explore the data interactively.
@@ -477,7 +473,7 @@ class Mint(object):
 
         '''
         if len(self.results) > 0:
-            return plot_heatmap(self.crosstab(col_name), normed_by_cols=normed_by_cols, 
+            return plotly_heatmap(self.crosstab(col_name), normed_by_cols=normed_by_cols, 
                 transposed=transposed, clustered=clustered, add_dendrogram=add_dendrogram, 
                 name=col_name, correlation=correlation)
 
@@ -541,8 +537,6 @@ class Mint(object):
 
         if marker is None and len(df) > 20:
             marker = '+'
-
-        print('Pairplot shape', df.shape, df)
 
         g = sns.pairplot(df, plot_kws={'s': 50, 'marker': marker}, hue=group_name, **kwargs)
 
