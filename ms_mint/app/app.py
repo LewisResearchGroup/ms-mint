@@ -104,8 +104,14 @@ app.title = 'MINT'
 
 app.config['suppress_callback_exceptions'] = True
 
+
+logout_button = dbc.Button("Logout", id="logout-button", style={'marginRight': '10px'}),
+logout_button = html.A(href='/logout', children=logout_button)
+
 app.layout = html.Div([
     #html.Img(src=app.get_asset_url('logo.png'), style={'height': '30px'}),
+
+    html.Div(logout_button),
 
     dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
 
@@ -184,14 +190,15 @@ def register_callbacks(app):
 
     @app.callback(
         Output('tmpdir', 'children'),
+        Output('logout-button', 'style__visibility'),
         Input('progress-interval', 'value')
     )
     def upate_tmpdir(x):
         if current_user is not None:
             username = current_user.username
             print('User:', username)
-            return str(P(TMPDIR)/username)
-        return str(TMPDIR)
+            return str(P(TMPDIR)/username), 'visible'
+        return str(TMPDIR), 'hidden'
 
 
 if __name__ == '__main__':
