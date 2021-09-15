@@ -132,6 +132,7 @@ def callbacks(app, fsc, cache):
             ws_name = T.get_active_workspace( tmpdir )
         
         if ws_name is None: raise PreventUpdate
+        
         wdir = T.workspace_path(tmpdir, ws_name)
 
         if ws_name is not None: 
