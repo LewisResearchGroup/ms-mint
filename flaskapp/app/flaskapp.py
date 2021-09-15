@@ -2,6 +2,7 @@ import dash
 from flask import Flask
 from flask.helpers import get_root_path
 from flask_login import login_required
+
 import dash_bootstrap_components as dbc
 
 from config import BaseConfig
@@ -46,8 +47,6 @@ def register_dashapps(app):
 
 def _protect_dashviews(dashapp):
     for view_func in dashapp.server.view_functions:
-        print('View function:', view_func)
-        print('URL BASE PATH:', dashapp.config.url_base_pathname)
         if view_func.startswith(dashapp.config.url_base_pathname):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])

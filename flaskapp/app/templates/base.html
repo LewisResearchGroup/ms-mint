@@ -1,12 +1,41 @@
+<head>
+ <link rel="stylesheet" href="https://codepen.io/chriddyp/pen/bWLwgP.css"> 
+</head>
+</body>
+
 <div>
-    Test:
-    <a href="{{ url_for('main.index') }}">Home</a>
-    {% if current_user.is_anonymous %}
-    <a href="{{ url_for('main.login') }}">Login</a>
-    {% else %}
-    <a href="{{ url_for('main.logout') }}">Logout</a>
-    {% endif %}
-  
-    {% block content %}
-    {% endblock %}
+  <a href="{{ url_for('main.index') }}"><button>Home</button></a>
+  {% if current_user.is_anonymous %}
+  <a href="{{ url_for('main.login') }}"><button>Login</button></a>
+  {% else %}
+  <a href="{{ url_for('main.logout') }}"><button>Logout</button></a>
+  {% endif %}
+</div> 
+
+<div class='container'>
+    <div class='vertical-center'>
+
+      {% block content %}
+      {% endblock %}
+
+    </div>
+
   </div>
+</body>
+
+<style>
+  .container {
+    height: 100vh;
+    width: 400px;
+    position: relative;
+  }
+  
+  .vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+</style>
