@@ -56,6 +56,19 @@ def callbacks(app, fsc, cache):
         return [send_file(fn, filename=f'{T.today()}-{workspace}_MINT-results.csv')]
 
 
+    @app.callback([
+        Output('res-download-data', 'data'),
+        Input('res-download', 'n_clicks'),
+        State('wdir', 'children')
+    ])
+    def download_results(n_clicks, wdir):
+        if n_clicks is None:
+            raise PreventUpdate
+        fn = T.get_results_fn(wdir)
+        workspace = os.path.basename( wdir )
+        return [send_file(fn, filename=f'{T.today()}-{workspace}_MINT-results.csv')]
+
+
     @app.callback(
         Output({'index': 'run-mint-output', 'type': 'output'}, 'children'),
         Input('run-mint', 'n_clicks'),
