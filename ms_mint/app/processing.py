@@ -17,7 +17,7 @@ _layout = html.Div([
     html.H3('Run MINT'),
     html.Button('Run MINT',         id='run-mint'),
     html.Button('Download results', id='res-download'),
-    html.Button('Download dense peak_max', id='res-download'),
+    html.Button('Download dense peak_max', id='res-download-dense'),
     html.Button('Delete results',   id='res-delete', style={'float': 'right'}),
 ])
 
@@ -48,7 +48,7 @@ def callbacks(app, fsc, cache):
         Input('res-download', 'n_clicks'),
         State('wdir', 'children')
     ])
-    def update_link(n_clicks, wdir):
+    def download_results(n_clicks, wdir):
         if n_clicks is None:
             raise PreventUpdate
         fn = T.get_results_fn(wdir)

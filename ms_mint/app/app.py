@@ -1,6 +1,7 @@
 
 import os
-
+import tempfile
+import logging
 import tempfile
 
 import pandas as pd
@@ -37,7 +38,6 @@ from . import analysis
 from . import messages
 
 import dash_uploader as du
-from tempfile import gettempdir
 
 
 def make_dirs():
@@ -91,7 +91,8 @@ app = dash.Dash(__name__,
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 
-UPLOAD_FOLDER_ROOT = gettempdir()
+UPLOAD_FOLDER_ROOT = str( P( tempfile.gettempdir() )/'MINT-uploads' )
+print('Upload directory:', UPLOAD_FOLDER_ROOT)
 du.configure_upload(app, UPLOAD_FOLDER_ROOT)
 
 
@@ -105,7 +106,7 @@ app.title = 'MINT'
 app.config['suppress_callback_exceptions'] = True
 
 
-logout_button = dbc.Button("Logout", id="logout-button", style={'marginRight': '10px'}),
+logout_button = dbc.Button("Logout", id="logout-button", style={'marginRight': '10px', 'visibility': 'hidden'}),
 logout_button = html.A(href='/logout', children=logout_button)
 
 app.layout = html.Div([
@@ -152,6 +153,8 @@ app.layout = html.Div([
 
     html.Div(id='tab-content'),
 
+    html.Div(id='viewport-container', style={'visibility': 'hidden'}),
+
     _outputs
     
 ], style={'margin':'2%'})
@@ -160,13 +163,25 @@ app.layout = html.Div([
 def register_callbacks(app):
         
     messages.callbacks(app=app, fsc=fsc, cache=cache)
+    logging.info('Register callbacks')
 
     for module in _modules:
         func = module.callbacks
         if func is not None:
-            print('Register callbacks for', module)
             func(app=app, fsc=fsc, cache=cache)
 
+
+    app.clientside_callback(
+        """
+        function(href) {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            return `${w},${h}` ;
+        }
+        """,
+        Output('viewport-container', 'children'),
+        Input('progress-interval', 'n_intervals')
+    )
 
     @app.callback(
         Output('tab-content', 'children'),
@@ -190,19 +205,22 @@ def register_callbacks(app):
 
     @app.callback(
         Output('tmpdir', 'children'),
-        Output('logout-button', 'style__visibility'),
-        Input('progress-interval', 'value')
+        Output('logout-button', 'style'),
+        Input('progress-interval', 'n_intervals')
     )
     def upate_tmpdir(x):
-        if current_user is not None:
+        if hasattr(app.server, 'login_manager'):
             username = current_user.username
-            print('User:', username)
-            return str(P(TMPDIR)/username), 'visible'
-        return str(TMPDIR), 'hidden'
+            logging.info('User: {username}')
+            return str(P(TMPDIR)/username), {'visibility': 'visible'}
+        logging.info('Hide login button')
+        return str(TMPDIR), {'visibility': 'hidden'}
+
+
+register_callbacks(app)
 
 
 if __name__ == '__main__':
-    register_callbacks(app)
     app.run_server(debug=True, threaded=True, 
         dev_tools_hot_reload_interval=5000,
         dev_tools_hot_reload_max_retry=30)
