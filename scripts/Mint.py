@@ -122,9 +122,13 @@ if __name__ == '__main__':
 
     print('Loading app...')
 
-    from ms_mint.app.app import app
+    from ms_mint.app.app import app, register_callbacks
     
+    #register_callbacks(app)
+
     if args.debug:
+        app.css.config.serve_locally = True
+        #app.scripts.config.serve_locally = True 
         app.run_server(debug=args.debug, port=args.port, 
             dev_tools_hot_reload=False,
             dev_tools_hot_reload_interval=3000,

@@ -9,7 +9,7 @@ from config import BaseConfig
 
 
 def create_app():
-    server = Flask(__name__)
+    server = Flask(__name__, static_url_path='/static')
     server.config.from_object(BaseConfig)
     
     register_dashapps(server)

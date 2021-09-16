@@ -8,8 +8,8 @@ with open("README.md", "r") as fh:
 
 
 install_requires = [
-    'numpy>=1.20'
-    'pandas>=1',
+    'numpy',
+    'pandas',
     'plotly',
     'lxml',
     'matplotlib',
@@ -26,7 +26,7 @@ install_requires = [
     'colorlover',
     'dash-bootstrap-components',
     'dash-extensions',
-    'dash-tabulator>=0.4.2',
+    'dash-tabulator',
     'scikit-learn',
     'xlrd',
     'urllib3',
@@ -47,7 +47,7 @@ install_requires = [
     'jsbeautifier',
     'six',
     'tables',
-    ]
+    'flask-login']
 
 
 config = {

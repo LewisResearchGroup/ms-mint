@@ -6,7 +6,7 @@ import plotly.figure_factory as ff
 
 
 def plotly_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
-                   add_dendrogram=False, name='', x_tick_colors=None,
+                   add_dendrogram=False, name='', x_tick_colors=None, height=None, width=None,
                    correlation=False, call_show=False, verbose=False):
 
 
@@ -74,7 +74,8 @@ def plotly_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
                    'tickmode': 'array', 
                    'automargin': True}) 
     
-        fig.update_layout({'height':800, 
+        fig.update_layout({'height': height,
+                           'width': width,  
                            'hovermode': 'closest'})
         
     else:  # Figure with side-dendrogram
@@ -92,7 +93,8 @@ def plotly_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         fig.add_trace(heatmap)     
 
         fig.update_layout(
-                {'height': 800,
+                {'height': height,
+                 'width': width,
                  'showlegend':False,
                  'hovermode': 'closest',
                  'paper_bgcolor': 'white',
@@ -132,9 +134,13 @@ def plotly_heatmap(df, normed_by_cols=False, transposed=False, clustered=False,
         fig['layout']['yaxis']['tickvals'] = np.asarray(dendro_side['layout']['yaxis']['tickvals'])
 
     fig.update_layout(
-        margin=dict( l=50, r=10, b=200, t=50, pad=0 ),
+        #margin=dict( l=50, r=10, b=200, t=50, pad=0 ),
+        autosize=True,
         hovermode='closest')
-
+    
+    fig.update_yaxes(automargin=True)
+    fig.update_xaxes(automargin=True)
+    
     if call_show: 
         fig.show(config={'displaylogo': False})
     else:

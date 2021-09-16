@@ -3,6 +3,7 @@ import shutil
 import uuid
 import logging
 import numpy as np
+import tempfile
 
 from pathlib import Path as P
 
@@ -26,6 +27,9 @@ from tqdm import tqdm
 import dash_uploader as du
 
 from . import tools as T
+
+
+UPLOAD_FOLDER_ROOT = P( tempfile.gettempdir() )/'MINT-uploads'
 
 
 options = {
@@ -71,27 +75,11 @@ _label = 'MS-Files'
 
 _layout = html.Div([
     html.H3('Upload MS-files'),
-    dcc.Upload(
-            id='ms-upload',
-            children=html.Div([
-                html.A('''Click here or drag and drop to upload mzML/mzXML files here. 
-                You can upload up to 10 files at a time.''', style={'margin': 'auto', 'padding': 'auto'})
-            ]),
-            style={
-                'width': '100%',
-                'height': '120px',
-                'lineHeight': '120px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'marginBottom': '15px',
-            },
-            # Allow multiple files to be uploaded
-            multiple=True),
-    html.Div( du.Upload(id='ms-upload-zip', filetypes=['tar', 'zip'], 
+    html.Div( du.Upload(id='ms-uploader', 
+                        filetypes=['tar', 'zip', 'mzxml', 'mzml'], 
                         upload_id=uuid.uuid1(),
-                        text='Click here to drag and drop ZIP/TAR compressed archives'),
+                        max_files=10000,
+                        text='Upload mzXML/mzML or zip/tar archives here.'),
               style={
                     'textAlign': 'center',
                     'width': '100%',
@@ -99,7 +87,6 @@ _layout = html.Div([
                     'margin-bottom': '20px',
                     'display': 'inline-block',
                 }),
-                
     html.Button('Import from URL or local path', id='ms-import-from-url'),
     dcc.Input(id='url', placeholder='Drop URL / path here', style={'width': '100%'}),
     dcc.Markdown('---', style={'marginTop': '10px'}),
@@ -107,18 +94,17 @@ _layout = html.Div([
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
     dcc.Loading( ms_table ),
-    html.Div(id='ms-upload-zip-filename', style={'visibility': 'hidden'}),    
+    html.Div(id='ms-uploader-fns', style={'visibility': 'hidden'}),    
 ])
 
 
 _outputs = html.Div(id='ms-outputs', 
     children=[
-        html.Div(id={'index': 'ms-upload-output', 'type': 'output'}),
         html.Div(id={'index': 'ms-convert-output', 'type': 'output'}),
         html.Div(id={'index': 'ms-delete-output', 'type': 'output'}),
         html.Div(id={'index': 'ms-save-output', 'type': 'output'}),
         html.Div(id={'index': 'ms-import-from-url-output', 'type': 'output'}),
-        html.Div(id={'index': 'ms-upload-zip-output', 'type': 'output'}),
+        html.Div(id={'index': 'ms-uploader-output', 'type': 'output'}),
     ]
 )
 
@@ -130,41 +116,13 @@ def layout():
 def callbacks(app, fsc, cache):
 
     @app.callback(
-    Output({'index': 'ms-upload-output', 'type': 'output'}, 'children'),
-    Input('ms-upload', 'contents'),
-    Input({'index':'ms-convert-output', 'type': 'output'}, 'children'),
-    State('ms-upload', 'filename'),
-    State('ms-upload', 'last_modified'),
-    State('wdir', 'children'))
-    def ms_upload(list_of_contents, converted, list_of_names, list_of_dates, wdir):
-        target_dir = os.path.join(wdir, 'ms_files')
-        if list_of_contents is not None:
-            n_total = len(list_of_contents)
-            n_uploaded = 0
-            for i, (c, n, d) in enumerate( zip(list_of_contents, list_of_names, list_of_dates) ):
-                fsc.set('progress', int( 100*(i+1)/n_total ))
-                if n.lower().endswith('mzxml') or n.lower().endswith('mzml') or n.lower().endswith('zip'):
-                    try:
-                        T.parse_ms_files(c, n, d, target_dir)
-                        n_uploaded += 1
-                    except:
-                        logging.warning(f'Could not parse file {n}')
-                if n.lower().endswith('zip'):
-                    logging.info(f'Zip file uploaded {target_dir}, {n}')
-                    fn = os.path.join( target_dir, n)
-                    shutil.unpack_archive(fn, target_dir)
-                    os.remove(fn)
-            return dbc.Alert(f'{n_uploaded} files uploaded.', color='success')
-
-
-    @app.callback(
     Output('ms-table', 'data'),
-    Input({'index': 'ms-upload-output', 'type': 'output'}, 'children'),
+    Input({'index': 'ms-uploader-output', 'type': 'output'}, 'children'),
     Input('wdir', 'children'), 
     Input({'index':'ms-delete-output', 'type': 'output'}, 'children'),
-    Input({'index':'ms-upload-zip-output', 'type': 'output'}, 'children')
+    Input({'index': 'ms-convert-output', 'type': 'output'}, 'children'),
     )
-    def ms_table(value, wdir, files_deleted, zip_extracted): 
+    def ms_table(value, wdir, files_deleted, files_converted): 
         ms_files = T.get_ms_fns( wdir )
         data = pd.DataFrame({'MS-file':   [os.path.basename(fn) for fn in ms_files],
                              'file_size': [ np.round(os.path.getsize(fn)/1024/1024, 2)  for fn in ms_files]})
@@ -202,7 +160,6 @@ def callbacks(app, fsc, cache):
         if n_clicks is None:
             raise PreventUpdate
         target_dir = os.path.join(wdir, 'ms_files')
-        print(rows)
         for row in rows:
             fn = row['MS-file']
             fn = P(target_dir)/fn
@@ -210,24 +167,64 @@ def callbacks(app, fsc, cache):
         return dbc.Alert(f'{len(rows)} files deleted', color='info')
 
 
-    @du.callback(
-    output=Output('ms-upload-zip-filename', 'children'),
-    id='ms-upload-zip',
+    @app.callback(
+        Output("ms-uploader-fns", "children"),
+        [Input("ms-uploader", "uploadedFiles")],
+        [
+            State("ms-uploader", "fileNames"),
+            State("ms-uploader", "upload_id"),
+            State("ms-uploader", "isCompleted"),
+            State("ms-uploader", "newestUploadedFileName"),
+        ],
     )
-    def get_zip_filename(filenames):
-        return filenames[0]
+    def callback_on_completion(n_files, filenames, upload_id, iscompleted, latest_file):
+
+        if n_files == 0:
+            return  # no files uploaded yet.
+
+        print(n_files, filenames, upload_id, iscompleted, latest_file)
+
+        out = []
+        if filenames is not None:
+            if upload_id:
+                root_folder = P(UPLOAD_FOLDER_ROOT) / upload_id
+            else:
+                root_folder = P(UPLOAD_FOLDER_ROOT)
+
+            for filename in filenames:
+                file = root_folder / filename
+                out.append(file)
+                print(file)
+            
+            return str(file)
+        return []
+
+
+
 
     @app.callback(
-        Output({'index': 'ms-upload-zip-output', 'type': 'output'}, 'children'),
-        Input('ms-upload-zip-filename', 'children'),
+        Output({'index': 'ms-uploader-output', 'type': 'output'}, 'children'),
+        Input('ms-uploader-fns', 'children'),
         State('wdir', 'children')
     )
     def get_a_list(fn, wdir):
         if fn is None:
             raise PreventUpdate
+
         ms_dir = T.get_ms_dirname( wdir )
-        upload_path = os.path.dirname( fn )
-        shutil.unpack_archive(fn, extract_dir=upload_path)
+
+        print(fn)
+
+        fn_new = P(ms_dir)/P(fn).name
+
+        shutil.move(fn, fn_new)
+
+        print(f'Move {fn} to {fn_new}')
+
+        #if fn_new.endswith('.zip'):
+        #    shutil.unpack_archive(fn_new, extract_dir=upload_path)
+        
+        '''    
         search_pattern = os.path.join( upload_path, '**', '*.*')
         fns = glob(search_pattern, recursive=True)
         n_total = len(fns)
@@ -241,6 +238,7 @@ def callbacks(app, fsc, cache):
         for remainings in glob(os.path.join(upload_path, '*')):
             if os.path.isfile(remainings): os.remove(remainings)
             elif os.path.isdir(remainings): shutil.rmtree(remainings)
+        '''
         return dbc.Alert('Upload finished', color='success')
 
 

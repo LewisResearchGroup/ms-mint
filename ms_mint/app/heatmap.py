@@ -1,6 +1,6 @@
 import numpy as np
 
-import dash_html_components as html
+from dash import html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -29,9 +29,12 @@ _layout = html.Div([
     html.Button('Update', id='heatmap-update'),
     dcc.Dropdown(id='heatmap-options', value=['normed_by_cols'],
         options=heatmap_options, multi=True),
-    dcc.Loading( 
-        dcc.Graph(id='heatmap-figure', 
-                  style={'marginTop': '50px'}) ),
+    dcc.Loading(
+        html.Div([
+                dcc.Graph(id='heatmap-figure')
+            ], style={'height': '100vh', 
+                      'marginTop': '50px'} ),
+    )
 ])
 
 
@@ -60,11 +63,16 @@ def callbacks(app, fsc, cache):
     State('ana-peak-labels-exclude', 'value'),
     State('ana-ms-order', 'value'),
     State('heatmap-options', 'value'),
+    State('viewport-container', 'children'),
     State('wdir', 'children')
     )
     def heat_heatmap(n_clicks, file_types, include_labels, exclude_labels, 
-            ms_order, options, wdir):
+            ms_order, options, viewport, wdir):
         mint = Mint()
+
+        print('Viewport:', viewport)
+
+        width, height = [int(e) for e in viewport.split(',')]
 
         df = T.get_complete_results( wdir, include_labels=include_labels, 
                 exclude_labels=exclude_labels, file_types=file_types )
@@ -89,7 +97,9 @@ def callbacks(app, fsc, cache):
             data = data.apply(np.log1p)
             name = f'log( {var_name}+1 )'
 
-        fig = plotly_heatmap(data, 
+        fig = plotly_heatmap(data,
+            height=height,
+            width=width,
             normed_by_cols='normed_by_cols' in options, 
             transposed='transposed' in options, 
             clustered='clustered' in options,
@@ -97,6 +107,7 @@ def callbacks(app, fsc, cache):
             correlation='correlation' in options, 
             call_show='call_show' in options,
             name=name)
+        
 
         return fig
 
