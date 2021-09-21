@@ -1,8 +1,7 @@
 import pandas as pd
 
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dash_extensions.javascript import Namespace
 from dash.dependencies import Input, Output, State

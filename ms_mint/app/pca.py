@@ -2,11 +2,11 @@
 import numpy as np
 import seaborn as sns
 
-import dash_html_components as html
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
+from dash import html, dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+
+import dash_bootstrap_components as dbc
 
 from ..Mint import Mint
 

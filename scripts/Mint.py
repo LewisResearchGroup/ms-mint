@@ -124,10 +124,10 @@ if __name__ == '__main__':
 
     from ms_mint.app.app import app, register_callbacks
     
-    #register_callbacks(app)
+    register_callbacks(app)
 
     if args.debug:
-        app.css.config.serve_locally = True
+        #app.css.config.serve_locally = True
         #app.scripts.config.serve_locally = True 
         app.run_server(debug=args.debug, port=args.port, 
             dev_tools_hot_reload=False,

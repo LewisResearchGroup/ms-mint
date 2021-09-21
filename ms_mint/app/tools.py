@@ -679,5 +679,21 @@ def import_from_local_path(path, target_dir, fsc=None):
         except:
             logging.warning(f'Could not convert {fn}')
     return fns_out
-    
-            
+
+
+def df_to_in_memory_csv_file(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer)
+    buffer.seek(0)
+    return buffer.getvalue
+
+
+def df_to_in_memory_excel_file(df):
+
+    def to_xlsx(bytes_io):
+        xslx_writer = pd.ExcelWriter(bytes_io, engine="xlsxwriter")
+        df.to_excel(xslx_writer, index=True
+        , sheet_name="sheet1")
+        xslx_writer.save()
+
+    return to_xlsx

@@ -11,15 +11,15 @@ from pathlib import Path as P
 import matplotlib
 matplotlib.use('Agg')
 
-import dash_bootstrap_components as dbc
-import dash_html_components as html
-import dash_core_components as dcc
-
 import dash
+from dash import html, dcc
+
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_extensions import Download
 from dash_extensions.enrich import FileSystemCache
+
+import dash_bootstrap_components as dbc
 
 from flask_caching import Cache
 from flask_login import current_user
@@ -109,7 +109,7 @@ app.config['suppress_callback_exceptions'] = True
 logout_button = dbc.Button("Logout", id="logout-button", style={'marginRight': '10px', 'visibility': 'hidden'}),
 logout_button = html.A(href='/logout', children=logout_button)
 
-app.layout = html.Div([
+_layout = html.Div([
     #html.Img(src=app.get_asset_url('logo.png'), style={'height': '30px'}),
 
     html.Div(logout_button),
@@ -158,6 +158,9 @@ app.layout = html.Div([
     _outputs
     
 ], style={'margin':'2%'})
+
+
+app.layout = _layout
 
 
 def register_callbacks(app):
@@ -216,8 +219,6 @@ def register_callbacks(app):
         logging.info('Hide login button')
         return str(TMPDIR), {'visibility': 'hidden'}
 
-
-register_callbacks(app)
 
 
 if __name__ == '__main__':
