@@ -1,7 +1,6 @@
 import numpy as np
 
-from dash import html
-import dash_core_components as dcc
+from dash import html, dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
