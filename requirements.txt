@@ -42,3 +42,4 @@ flask-wtf
 flask-migrate
 flask-login
 alembic
+email_validator
