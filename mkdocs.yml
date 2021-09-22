@@ -6,13 +6,12 @@ nav:
   - Background: 'background.md'
   - Installation: 'install.md'
   - GUI: 'gui.md'
-  - Peaklists: 'peaklists.md'
+  - Targets: 'peaklists.md'
   #- Peak detection: 'peak-detection.md'
   #- Python: 'python.md'
   - Jupyter: 'jupyter.md'
   - Developer Notes: 'developer-notes.md'
-  - Gallery: gallery.
+  - Gallery: 'gallery.md'
 extra:
   analytics:
-    provider: google
-    property: G-KZQBC4NMD2
+    gtag: G-KZQBC4NMD2

@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['..\\scripts\\Mint.py'],
-             pathex=['C:\\Users\\soere\\workspace\\ms-mint'],
+             pathex=['C:\\Users\\soere\\workspace\\ms-mint\\scripts'],
              binaries=[],
              datas=[
                     ('C:\\Users\\soere\\anaconda3\\envs\\ms-mint\\lib\\site-packages\\dash\\favicon.ico', '.\\dash'),
@@ -26,13 +26,14 @@ a = Analysis(['..\\scripts\\Mint.py'],
              hiddenimports=['pkg_resources.py2_warn'],  
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['**/*.git', '**/__cache__', '**/dist', '**/build', '**/InnoSetup'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-pyz = PYZ(a.pure, a.zipped_data,
-             cipher=block_cipher)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
 exe = EXE(pyz,
           a.scripts,
           [],
@@ -43,6 +44,7 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=True )
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
