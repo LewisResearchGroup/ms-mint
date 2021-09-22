@@ -126,13 +126,15 @@ if __name__ == '__main__':
     
     app, cache, fsc = create_app()
     register_callbacks(app, cache, fsc)
+    
+    app.css.config.serve_locally = True
+    app.scripts.config.serve_locally = True 
 
     if args.debug:
-        #app.css.config.serve_locally = True
-        #app.scripts.config.serve_locally = True 
+
         app.run_server(debug=args.debug, port=args.port, 
             dev_tools_hot_reload=False,
             dev_tools_hot_reload_interval=3000,
             dev_tools_hot_reload_max_retry=30)
     else:
-        serve(app.server, port=9999)
+        serve(app.server, port=args.port)
