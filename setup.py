@@ -7,47 +7,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-install_requires = [
-    'numpy',
-    'pandas',
-    'plotly',
-    'lxml',
-    'matplotlib',
-    'pandoc',
-    'plotly',
-    'plotly_express',
-    'dash',
-    'scipy==1.6.2',  #
-    'setuptools',
-    'statsmodels',
-    'flask',
-    'pyteomics',
-    'openpyxl',
-    'colorlover',
-    'dash-bootstrap-components',
-    'dash-extensions',
-    'dash-tabulator',
-    'scikit-learn',
-    'xlrd',
-    'urllib3',
-    'ipywidgets',
-    'pymzml',
-    'tqdm',
-    'seaborn',
-    'ipyfilechooser',
-    'waitress',
-    'pyarrow>=3',
-    'flask-compress',
-    'molmass',
-    'dash_uploader',
-    'filelock',
-    'wget',
-    'bs4',
-    'pytest-cov',
-    'jsbeautifier',
-    'six',
-    'tables',
-    'flask-login']
+install_requires = []
 
 
 config = {
