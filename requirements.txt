@@ -29,7 +29,6 @@ waitress
 pyarrow>=3
 flask-compress
 molmass
-dash_uploader
 filelock
 wget
 bs4
