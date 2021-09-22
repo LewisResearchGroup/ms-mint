@@ -17,6 +17,7 @@ colorlover
 dash-bootstrap-components
 dash-extensions
 dash-tabulator
+dash-renderer
 scikit-learn
 xlrd
 urllib3
