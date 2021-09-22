@@ -12,8 +12,8 @@ test:
 	rm images/coverage.svg
 	coverage-badge -o images/coverage.svg
 
-build:
-	pyinstaller --onedir --noconfirm specfiles\Mint__onedir__.spec --additional-hooks-dir=hooks
+pyinstaller:
+	cd specfiles && pyinstaller --onedir --noconfirm Mint__onedir__.spec --additional-hooks-dir=hooks
 
 docs:
 	mkdocs build && mkdocs gh-deploy
