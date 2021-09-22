@@ -43,3 +43,5 @@ flask-migrate
 flask-login
 alembic
 email_validator
+./local_wheels/dash_uploader-0.5.0-py3-none-any.whl
+
