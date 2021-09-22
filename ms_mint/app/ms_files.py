@@ -78,7 +78,7 @@ _layout = html.Div([
                         filetypes=['tar', 'zip', 'mzxml', 'mzml'], 
                         upload_id=uuid.uuid1(),
                         max_files=10000,
-                        text='Upload mzXML/mzML or zip/tar archives here.'),
+                        text='Upload mzXML/mzML files.'),
               style={
                     'textAlign': 'center',
                     'width': '100%',
