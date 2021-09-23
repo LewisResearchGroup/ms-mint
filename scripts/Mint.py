@@ -85,7 +85,7 @@ if __name__ == '__main__':
         help='start MINT server in debug mode')
     parser.add_argument('--port', type=int, default=9999, 
         help='Port to use')
-    parser.add_argument('--port', type=int, default='127.0.0.1', 
+    parser.add_argument('--host', type=str, default='127.0.0.1', 
         help='Host binding address')        
     parser.add_argument('--serve-path', default=None, type=str, 
         help="(deprecated) serve app at a different path e.g. '/mint/' to serve the app at 'localhost:9999/mint/'")
@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
         app.run_server(debug=args.debug, 
             port=args.port, 
-            host=args.host
+            host=args.host,
             dev_tools_hot_reload=False,
             dev_tools_hot_reload_interval=3000,
             dev_tools_hot_reload_max_retry=30)
