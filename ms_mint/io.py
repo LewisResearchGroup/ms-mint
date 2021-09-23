@@ -100,6 +100,7 @@ def mzml_to_pandas_df_pyteomics(fn, read_only=False):
             try:
                 data = ms_data.next()
             except Exception as e:
+                logging.warning(e)
                 break
 
             scan = data['scanList']['scan'][0]

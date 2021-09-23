@@ -1,14 +1,12 @@
 import os
 import pandas as pd
 
-import dash_bootstrap_components as dbc
-import dash_html_components as html
-import dash_core_components as dcc
-
+from dash import html, dcc
 from dash.dependencies import Input, Output, State
-
 from dash.exceptions import PreventUpdate
 from dash_tabulator import DashTabulator
+
+import dash_bootstrap_components as dbc
 
 from ms_mint.standards import M_PROTON
 from . import tools as T

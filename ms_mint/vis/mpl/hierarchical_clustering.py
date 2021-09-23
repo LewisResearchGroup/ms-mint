@@ -6,10 +6,8 @@ from scipy.spatial.distance import pdist, squareform
 
 def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=2, left_width=2,
                             xmaxticks=None, ymaxticks=None, metric='euclidean', cmap=None):
-    '''based on heatmap function from
-    http://nbviewer.ipython.org/github/herrfz/dataanalysis/
-    blob/master/week3/svd_pca.ipynb
-    Generates a heatmap from the input matrix.
+    '''
+    Hierarchical clustering with visualization.
     '''
 
     if isinstance(metric, str):
@@ -91,4 +89,7 @@ def hierarchical_clustering(df, vmin=None, vmax=None, figsize=(8,8), top_height=
     _ = plt.yticks(ndx_y, clustered.iloc[ndx_y].index)
     _ = plt.xticks(ndx_x, clustered.columns[ndx_x], rotation=90)
 
-    return clustered, fig, Z1['leaves'][::-1], Z2['leaves']
+    ndx_leaves = Z1['leaves'][::-1]
+    col_leaves = Z2['leaves']
+
+    return clustered, fig, ndx_leaves, col_leaves 

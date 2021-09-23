@@ -11,4 +11,8 @@ nav:
   #- Python: 'python.md'
   - Jupyter: 'jupyter.md'
   - Developer Notes: 'developer-notes.md'
-  - Gallery: gallery.md
+  - Gallery: gallery.
+extra:
+  analytics:
+    provider: google
+    property: G-KZQBC4NMD2
