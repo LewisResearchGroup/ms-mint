@@ -18,8 +18,6 @@ def create_app():
     register_extensions(app)
     register_blueprints(app)
 
-    print(app.url_map)
-
     return app
 
 
@@ -43,13 +41,12 @@ def register_dashapps(app):
     with app.app_context():
         dashapp.title = dashapp.title
         dashapp.layout = dashapp.layout
+
     _protect_dashviews(dashapp)
 
 
 def _protect_dashviews(dashapp):
-    print( dashapp.server.view_functions )
     for view_func in dashapp.server.view_functions:
-        print('F', view_func)
         if view_func.startswith(dashapp.config.url_base_pathname):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])
