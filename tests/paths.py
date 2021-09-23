@@ -2,8 +2,6 @@
 import os
 from pathlib import Path as P
 
-from ms_mint.standards import MINT_ROOT
-
 
 TEST_MZXML = os.path.abspath( 
     os.path.join( 

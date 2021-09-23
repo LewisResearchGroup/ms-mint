@@ -1,8 +1,7 @@
-import base64
-from functools import lru_cache
 import os
 import io
 import shutil
+import base64
 import subprocess
 import platform
 import logging
@@ -19,11 +18,10 @@ import urllib3, ftplib
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-
 import matplotlib as mpl
+mpl.use('Agg')
+
+from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 
 import ms_mint
@@ -681,5 +679,21 @@ def import_from_local_path(path, target_dir, fsc=None):
         except:
             logging.warning(f'Could not convert {fn}')
     return fns_out
-    
-            
+
+
+def df_to_in_memory_csv_file(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer)
+    buffer.seek(0)
+    return buffer.getvalue
+
+
+def df_to_in_memory_excel_file(df):
+
+    def to_xlsx(bytes_io):
+        xslx_writer = pd.ExcelWriter(bytes_io, engine="xlsxwriter")
+        df.to_excel(xslx_writer, index=True
+        , sheet_name="sheet1")
+        xslx_writer.save()
+
+    return to_xlsx

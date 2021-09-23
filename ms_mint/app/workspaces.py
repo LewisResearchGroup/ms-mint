@@ -2,17 +2,13 @@ import re
 import shutil
 
 import pandas as pd
-from pandas.core.indexing import maybe_convert_ix
 
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html, dcc, dash_table
+from dash.exceptions import PreventUpdate
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 
-from dash.exceptions import PreventUpdate
-
-from dash_table import DataTable
-from dash.dependencies import Input, Output, State
 
 from . import tools as T
 
@@ -20,7 +16,7 @@ from . import tools as T
 ws_table = html.Div(id='ws-table-container', 
     style={'minHeight':  100, 'margin': '5%'},
     children=[
-        DataTable(id='ws-table',
+        dash_table.DataTable(id='ws-table',
             columns=[ {"name": i, "id": i, "selectable": True}  
                                 for i in ['Workspace']],
                     data=[],
@@ -133,6 +129,7 @@ def callbacks(app, fsc, cache):
             ws_name = T.get_active_workspace( tmpdir )
         
         if ws_name is None: raise PreventUpdate
+        
         wdir = T.workspace_path(tmpdir, ws_name)
 
         if ws_name is not None: 
