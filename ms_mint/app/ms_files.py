@@ -75,7 +75,7 @@ _label = 'MS-Files'
 _layout = html.Div([
     html.H3('Upload MS-files'),
     html.Div( du.Upload(id='ms-uploader', 
-                        filetypes=['tar', 'zip', 'mzxml', 'mzml'], 
+                        filetypes=['tar', 'zip', 'mzxml', 'mzml', 'mzXML', 'mzML'], 
                         upload_id=uuid.uuid1(),
                         max_files=10000,
                         text='Upload mzXML/mzML files.'),
