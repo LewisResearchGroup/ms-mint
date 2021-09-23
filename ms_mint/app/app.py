@@ -51,8 +51,6 @@ def make_dirs():
 
 TMPDIR, CACHEDIR = make_dirs()
 
-fsc = FileSystemCache(CACHEDIR)
-
 config = {
     "DEBUG": True,          # some Flask specific configs
     "CACHE_TYPE": "simple", # Flask-Caching related configs
@@ -78,32 +76,6 @@ modules = {module._label: module for module in _modules}
 _outputs = html.Div(id='outputs', children=[module._outputs for module in 
                                      _modules if module._outputs is not None], 
              style={'visibility': 'hidden'})
-
-app = dash.Dash(__name__, 
-    external_stylesheets=[
-        dbc.themes.MINTY,
-        "https://codepen.io/chriddyp/pen/bWLwgP.css"
-        ],
-    requests_pathname_prefix=os.getenv('MINT_SERVE_PATH', default='/'),
-    routes_pathname_prefix=os.getenv('MINT_SERVE_PATH', default='/')
-    )
-
-app.css.config.serve_locally = True
-app.scripts.config.serve_locally = True
-
-UPLOAD_FOLDER_ROOT = str( P( tempfile.gettempdir() )/'MINT-uploads' )
-print('Upload directory:', UPLOAD_FOLDER_ROOT)
-du.configure_upload(app, UPLOAD_FOLDER_ROOT)
-
-
-cache = Cache(app.server, config={
-    'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/tmp/MINT-cache'
-})
-
-app.title = 'MINT'
-
-app.config['suppress_callback_exceptions'] = True
 
 
 logout_button = dbc.Button("Logout", id="logout-button", style={'marginRight': '10px', 'visibility': 'hidden'}),
@@ -160,11 +132,12 @@ _layout = html.Div([
 ], style={'margin':'2%'})
 
 
-app.layout = _layout
+def register_callbacks(app, cache, fsc):
+    
+    UPLOAD_FOLDER_ROOT = str( P( tempfile.gettempdir() )/'MINT-uploads' )
+    print('Upload directory:', UPLOAD_FOLDER_ROOT)
+    du.configure_upload(app, UPLOAD_FOLDER_ROOT)
 
-
-def register_callbacks(app):
-        
     messages.callbacks(app=app, fsc=fsc, cache=cache)
     logging.info('Register callbacks')
 
@@ -221,7 +194,39 @@ def register_callbacks(app):
 
 
 
+def create_app(**kwargs):
+
+    app = dash.Dash(__name__, 
+        external_stylesheets=[
+            dbc.themes.MINTY,
+            "https://codepen.io/chriddyp/pen/bWLwgP.css"
+            ],
+        #requests_pathname_prefix=os.getenv('MINT_SERVE_PATH', default='/'),
+        #routes_pathname_prefix=os.getenv('MINT_SERVE_PATH', default='/'),
+        **kwargs
+        )
+
+    #app.css.config.serve_locally = True
+    #app.scripts.config.serve_locally = True
+    
+    app.layout = _layout
+    app.title = 'MINT'
+    app.config['suppress_callback_exceptions'] = True
+
+    cache = Cache(app.server, config={
+        'CACHE_TYPE': 'filesystem',
+        'CACHE_DIR': '/tmp/MINT-cache'
+        })
+
+    fsc = FileSystemCache(CACHEDIR)
+
+    return app, cache, fsc
+
+
+
 if __name__ == '__main__':
+    app, cache = create_app()
+    register_callbacks(app, cache)
     app.run_server(debug=True, threaded=True, 
         dev_tools_hot_reload_interval=5000,
         dev_tools_hot_reload_max_retry=30)

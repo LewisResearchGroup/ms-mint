@@ -122,9 +122,10 @@ if __name__ == '__main__':
 
     print('Loading app...')
 
-    from ms_mint.app.app import app, register_callbacks
+    from ms_mint.app.app import create_app, register_callbacks
     
-    register_callbacks(app)
+    app, cache, fsc = create_app()
+    register_callbacks(app, cache, fsc)
 
     if args.debug:
         #app.css.config.serve_locally = True
