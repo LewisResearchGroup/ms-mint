@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "MINT"
-#define MyAppVersion "0.0.54"
+#define MyAppVersion "0.0.56"
 #define MyAppPublisher "Lewis Research Group (University of Calgary)"
-#define MyAppURL "https://github.com/soerendip/ms-mint"
+#define MyAppURL "https://github.com/sorenwacker/ms-mint"
 #define MyAppExeName "Mint.exe"
 
 [Setup]
@@ -37,8 +37,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\soere\workspace\ms-mint\dist\Mint\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\soere\workspace\ms-mint\dist\Mint\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\soere\workspace\ms-mint\specfiles\dist\Mint\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\soere\workspace\ms-mint\specfiles\dist\Mint\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
