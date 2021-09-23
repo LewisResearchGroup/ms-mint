@@ -1,4 +1,4 @@
-![docs/images/MINT-logo.png]
+![](docs/images/MINT-logo.png)
 # MINT (Metabolomics Integrator)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 ![](images/coverage.svg)
