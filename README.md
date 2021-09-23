@@ -1,5 +1,6 @@
-![](docs/images/MINT-logo.png)
-#MINT (Metabolomics Integrator)
+![](docs/image/MINT-logo.png)
+
+# MINT (Metabolomics Integrator)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 ![](images/coverage.svg)
 [![Github All Releases](https://img.shields.io/github/downloads/sorenwacker/ms-mint/total.svg)]()
