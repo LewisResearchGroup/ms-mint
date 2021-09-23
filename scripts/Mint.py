@@ -84,9 +84,11 @@ if __name__ == '__main__':
     parser.add_argument('--debug', default=False, action='store_true', 
         help='start MINT server in debug mode')
     parser.add_argument('--port', type=int, default=9999, 
-        help='change the port')
+        help='Port to use')
+    parser.add_argument('--port', type=int, default='127.0.0.1', 
+        help='Host binding address')        
     parser.add_argument('--serve-path', default=None, type=str, 
-        help="serve app at a different path e.g. '/mint/' to serve the app at 'localhost:9999/mint/'")
+        help="(deprecated) serve app at a different path e.g. '/mint/' to serve the app at 'localhost:9999/mint/'")
 
     args = parser.parse_args()
 
@@ -94,7 +96,7 @@ if __name__ == '__main__':
         print('Mint version:', ms_mint.__version__)
         exit()
 
-    url = f'http://localhost:{args.port}'
+    url = f'http://{args.host}:{args.port}'
     
     if not args.no_browser:
         if os.name == 'nt':
@@ -132,9 +134,11 @@ if __name__ == '__main__':
 
     if args.debug:
 
-        app.run_server(debug=args.debug, port=args.port, 
+        app.run_server(debug=args.debug, 
+            port=args.port, 
+            host=args.host
             dev_tools_hot_reload=False,
             dev_tools_hot_reload_interval=3000,
             dev_tools_hot_reload_max_retry=30)
     else:
-        serve(app.server, port=args.port)
+        serve(app.server, port=args.port, host=args.host)
