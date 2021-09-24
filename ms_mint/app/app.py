@@ -135,10 +135,10 @@ _layout = html.Div([
 def register_callbacks(app, cache, fsc):
     
     upload_root = os.getenv('MINT_DATA_DIR', tempfile.gettempdir())
-    upload_dir = str( P(upload_root/'Uploads') )
+    upload_dir = str( P(upload_root)/'MINT-Uploads' )
     UPLOAD_FOLDER_ROOT = upload_dir
     
-    logging.info(f'Upload directory: {}'.format(UPLOAD_FOLDER_ROOT))
+    logging.info('Upload directory: {}'.format(UPLOAD_FOLDER_ROOT))
     du.configure_upload(app, UPLOAD_FOLDER_ROOT)
 
     messages.callbacks(app=app, fsc=fsc, cache=cache)
@@ -219,7 +219,7 @@ def create_app(**kwargs):
     upload_root = os.getenv('MINT_DATA_DIR', tempfile.gettempdir())
     CACHE_DIR = str( P(upload_root)/'MINT-Cache' )
     
-    logging.info(f'Cache directory: {}'.format(CACHE_DIR))
+    logging.info('Cache directory: {}'.format(CACHE_DIR))
     
     cache = Cache(app.server, config={
         'CACHE_TYPE': 'filesystem',
