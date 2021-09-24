@@ -134,7 +134,10 @@ _layout = html.Div([
 
 def register_callbacks(app, cache, fsc):
     
-    UPLOAD_FOLDER_ROOT = str( P( tempfile.gettempdir() )/'MINT-uploads' )
+    upload_root = os.getenv('MINT_DATA_DIR', tempfile.gettempdir())
+    upload_dir = str( P(upload_root/'Uploads') )
+    UPLOAD_FOLDER_ROOT = upload_dir
+    
     print('Upload directory:', UPLOAD_FOLDER_ROOT)
     du.configure_upload(app, UPLOAD_FOLDER_ROOT)
 
