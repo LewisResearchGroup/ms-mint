@@ -28,7 +28,9 @@ import dash_uploader as du
 from . import tools as T
 
 
-UPLOAD_FOLDER_ROOT = P( tempfile.gettempdir() )/'MINT-uploads'
+upload_root = os.getenv('MINT_DATA_DIR', tempfile.gettempdir())
+upload_dir = str( P(upload_root)/'MINT-Uploads' )
+UPLOAD_FOLDER_ROOT = upload_dir
 
 
 options = {
