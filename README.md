@@ -48,7 +48,7 @@ If your are up to enhance the codebase yourself, we ask you to followowing steps
 #### Code standards
 Before submitting a pull request please run `flake8`.
 
-## Acknowledgements
+# Acknowledgements
 This project would not be possible without the help of the open-source community. 
 The tools and resources provided by GitHub, Docker-Hub, the Python Package Index, as well the answers from dedicated users on [Stackoverflow](stackoverflow.com)
 and the [Plotly community](https://community.plotly.com/), as well as the free open-source packages used are the foundation of this project.
