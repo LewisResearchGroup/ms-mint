@@ -1,12 +1,10 @@
 ![](docs/image/MINT-logo.png)
 
 # MINT (Metabolomics Integrator)
-### Metabolomics with Python
 
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 ![](images/coverage.svg)
 [![Github All Releases](https://img.shields.io/github/downloads/sorenwacker/ms-mint/total.svg)]()
-
 
 The Metabolomics Integrator (MINT)) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
 Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
@@ -16,6 +14,7 @@ More information on how to install and run the program can be found in the [Docu
 
 ![](./docs/image/distributions.png)
 
+# Metabolomics with Python
 ## Python API for metabolomics
 
     from ms_mint.notebook import Mint
@@ -28,21 +27,24 @@ More information on how to install and run the program can be found in the [Docu
 
 More information in the documentation.
 
-# Errors, Feedback, Feature Requests
-If you encounter an error, if you have a request for a new feature, or for general feedback, please open a new ticket at the [issue tracker](https://github.com/sorenwacker/ms-mint/issues).
-
 # Contributions
 ## Contributions are welcome
 MINT integrates open-source software and packages into a Python library for metabolomics with a browser based GUI. It is programmed by scientists for scientists to contribute to  better and faster science integrating best practices of data management and computer science. Contributions are welcome that improve the efficiency of the code, bug fixes, feature implementations, security enhancements among others. If you want to contribute to MINT please send me a notification.
 
 ### How to contribute
-In general we ask you to followowing steps:
+
+#### Errors, Feedback, Feature Requests
+If you encounter an error, if you have a request for a new feature, or for general feedback, please open a new ticket at the [issue tracker](https://github.com/sorenwacker/ms-mint/issues).
+
+#### Code contributions
+If your are up to enhance the codebase yourself, we ask you to followowing steps:
 
 1. fork the repository
 1. implement the new feature or bug-fix
 1. add corresponding tests
 2. run `flake8`
 3. submit a pull request
+
 
 #### Code standards
 Before submitting a pull request please run `flake8`.
