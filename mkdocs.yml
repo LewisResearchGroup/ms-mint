@@ -6,7 +6,7 @@ nav:
   - Background: 'background.md'
   - Installation: 'install.md'
   - GUI: 'gui.md'
-  - Targets: 'peaklists.md'
+  - Targets: 'targets.md'
   #- Peak detection: 'peak-detection.md'
   #- Python: 'python.md'
   - Jupyter: 'jupyter.md'
@@ -15,4 +15,12 @@ nav:
 extra:
   analytics:
     provider: google
-    propertyl: G-KZQBC4NMD2
+    propertyl: UA-207276128-1
+  consent:
+    title: Cookie consent
+    description: > 
+
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
