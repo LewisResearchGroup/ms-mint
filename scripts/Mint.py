@@ -7,6 +7,7 @@ import multiprocessing
 import argparse
 import wget
 import pkg_resources
+import xlsxwriter
 
 from waitress import serve
 from os.path import expanduser
