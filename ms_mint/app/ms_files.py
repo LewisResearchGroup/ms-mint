@@ -193,7 +193,7 @@ def callbacks(app, fsc, cache):
             for filename in filenames:
                 file = root_folder / filename
                 out.append(file)
-                print(file)
+                # print(file)
             
             return str(file)
         return []
@@ -212,13 +212,11 @@ def callbacks(app, fsc, cache):
 
         ms_dir = T.get_ms_dirname( wdir )
 
-        # print(fn)
-
         fn_new = P(ms_dir)/P(fn).name
 
         shutil.move(fn, fn_new)
 
-        print(f'Move {fn} to {fn_new}')
+        logging.info(f'Move {fn} to {fn_new}')
 
         #if fn_new.endswith('.zip'):
         #    shutil.unpack_archive(fn_new, extract_dir=upload_path)
