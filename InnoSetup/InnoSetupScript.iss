@@ -37,8 +37,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\soere\workspace\ms-mint\specfiles\dist\Mint\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\soere\workspace\ms-mint\specfiles\dist\Mint\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\soere\workspace\ms-mint\specfiles\dist\Mint\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Excludes: "\mpl-data"
+Source: "C:\Users\soere\workspace\ms-mint\specfiles\dist\Mint\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "\mpl-data"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
