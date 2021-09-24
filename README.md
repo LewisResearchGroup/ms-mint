@@ -16,7 +16,6 @@ More information on how to install and run the program can be found in the [Docu
 ![](./docs/image/distributions.png)
 
 # Metabolomics with Python
-## Python API for metabolomics
 
     from ms_mint.notebook import Mint
     mint.ms_files = glob('/path/to/files/*mzML')
@@ -28,8 +27,7 @@ More information on how to install and run the program can be found in the [Docu
 
 More information in the documentation.
 
-# Contributions
-## Contributions are welcome
+# Contributions are welcome
 MINT integrates open-source software and packages into a Python library for metabolomics with a browser based GUI. It is programmed by scientists for scientists to contribute to  better and faster science integrating best practices of data management and computer science. Contributions are welcome that improve the efficiency of the code, bug fixes, feature implementations, security enhancements among others. If you want to contribute to MINT please send me a notification.
 
 ### How to contribute
