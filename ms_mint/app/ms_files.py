@@ -181,7 +181,7 @@ def callbacks(app, fsc, cache):
         if n_files == 0:
             return  # no files uploaded yet.
 
-        print(n_files, filenames, upload_id, iscompleted, latest_file)
+        # print(n_files, filenames, upload_id, iscompleted, latest_file)
 
         out = []
         if filenames is not None:
@@ -212,7 +212,7 @@ def callbacks(app, fsc, cache):
 
         ms_dir = T.get_ms_dirname( wdir )
 
-        print(fn)
+        # print(fn)
 
         fn_new = P(ms_dir)/P(fn).name
 
