@@ -42,3 +42,16 @@ In general I will ask you to followowing steps:
 
 ## Code standards
 Before submitting a pull request please run `flake8`.
+
+
+# Contributors
+This project would not be possible without the help of the open-source community. 
+The tools and resources provided by GitHub, Docker-Hub, the Python Package Index, as well the answers from dedicated users on (Stackoverflow)[stackoverflow.com]
+and the (Plotly community)[https://community.plotly.com/] forums and of course all the packages and tools used are the fuel of this project that translates 
+computer science and data science into the hands of metabolomics researchers to hopefully contribute to better and faster science. Beside this, several people have made direct contributions to the codebase and we are extremely grateful for that. 
+
+- @rokm refactored the specfile for `Pyinstaller` to create a windows package. 
+- @bucknerns helped with the configuration of the `versioneer` file.
+
+Last but not least, we want to thank all the users and early adopters that drive the development with feature requests and bug reports.
+
