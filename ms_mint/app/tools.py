@@ -90,26 +90,26 @@ def workspace_path(tmpdir, ws_name):
 
 
 def maybe_migrate_workspaces(tmpdir):
+    if not P(tmpdir).is_dir(): return None
     dir_names = get_dirnames(tmpdir)
     ws_path = get_workspaces_path(tmpdir)
     if not os.path.isdir(ws_path) and len(dir_names)>0:
-        print('Migrating to new directory scheme')
+        logging.info('Migrating to new directory scheme.')
         os.makedirs(ws_path)
         for dir_name in dir_names:
             old_dir = os.path.join( tmpdir, dir_name)
             new_dir = workspace_path(tmpdir, dir_name)
             shutil.move(old_dir, new_dir)
-            print('Moving', old_dir, 'to', new_dir)
+            logging.info('Moving', old_dir, 'to', new_dir)
 
 
 def maybe_update_workpace_scheme( wdir ):
-
     old_pkl_fn = P( wdir )/'peaklist'/'peaklist.csv'
     new_pkl_fn = P( get_targets_fn( wdir ))
     new_path = new_pkl_fn.parent
     old_path = old_pkl_fn.parent
     if old_pkl_fn.is_file():
-        print(f'Moving targets file to new default location ({new_pkl_fn}).')
+        logging.info(f'Moving targets file to new default location ({new_pkl_fn}).')
         if not new_path.is_dir(): 
             os.makedirs(new_path)
         os.rename(old_pkl_fn, new_pkl_fn)
@@ -161,6 +161,7 @@ def get_workspaces_path(tmpdir):
 
 def get_workspaces(tmpdir):
     ws_path = get_workspaces_path(tmpdir)
+    if not P(ws_path).is_dir(): return []
     ws_names = get_dirnames( ws_path )
     ws_names = [ws for ws in ws_names if not ws.startswith('.')]
     ws_names.sort()
