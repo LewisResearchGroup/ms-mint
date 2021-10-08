@@ -133,6 +133,8 @@ if __name__ == '__main__':
     app.css.config.serve_locally = True
     app.scripts.config.serve_locally = True 
 
+    print('Configuration done starting server...')
+
     if args.debug:
 
         app.run_server(debug=args.debug, 

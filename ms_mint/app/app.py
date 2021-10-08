@@ -47,7 +47,7 @@ def make_dirs():
     cachedir = os.path.join(tmpdir, '.cache')
     os.makedirs(tmpdir, exist_ok=True)
     os.makedirs(cachedir, exist_ok=True)
-    return tmpdir, cachedir
+    return P(tmpdir), P(cachedir)
 
 TMPDIR, CACHEDIR = make_dirs()
 
@@ -102,7 +102,7 @@ _layout = html.Div([
 
     Download(id='res-download-data'),
 
-    html.Div(id='tmpdir', children=TMPDIR, style={'visibility': 'hidden'}),
+    html.Div(id='tmpdir', children=str(TMPDIR), style={'visibility': 'hidden'}),
 
     html.P('Current Workspace: ', style={'display': 'inline-block', 'marginRight': '5px', 'marginTop': '5px'}),
 
@@ -191,9 +191,9 @@ def register_callbacks(app, cache, fsc):
         if hasattr(app.server, 'login_manager'):
             username = current_user.username
             logging.info('User: {username}')
-            return str(P(TMPDIR)/username), {'visibility': 'visible'}
+            return str(TMPDIR/'User'/username), {'visibility': 'visible'}
         logging.info('Hide login button')
-        return str(TMPDIR), {'visibility': 'hidden'}
+        return str(TMPDIR/'Local'), {'visibility': 'hidden'}
 
 
 
@@ -226,7 +226,7 @@ def create_app(**kwargs):
         'CACHE_DIR': CACHE_DIR
         })
 
-    fsc = FileSystemCache(CACHEDIR)
+    fsc = FileSystemCache(str(CACHEDIR))
 
     return app, cache, fsc
 
