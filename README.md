@@ -17,6 +17,8 @@ More information on how to install and run the program can be found in the [Docu
 
 ![](./docs/image/distributions.png)
 
+A demo server is available [here](https://mint.resistancedb.org).
+
 # Metabolomics with Python
 
     from ms_mint.notebook import Mint
