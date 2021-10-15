@@ -1,5 +1,6 @@
 ## Quickstart
 
+A demo server is available [here](https://mint.resistancedb.org). Be mindful, you share the server with others.
 
 Download the demo files from [Google Drive](https://drive.google.com/drive/folders/1giAiAJmtOWKN124S0iK9SeiZrFqJjqhQ?usp=sharing) and extract the archive.
 
