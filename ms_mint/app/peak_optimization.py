@@ -74,7 +74,7 @@ _layout = html.Div([
     html.Button('Regenerate all figures', id='pko-peak-preview-from-scratch'),
 
     html.Div(id='pko-peak-preview-images', 
-        style={"maxHeight": "600px", "overflowY": "scroll", 'padding': 'auto'}),
+        style={"maxHeight": "630px", "overflowY": "scroll", 'padding': 'auto'}),
     dcc.Markdown('---'),
     html.Div(id='pko-controls'),
     dcc.Dropdown(id='pko-dropdown', options=[], value=None),

@@ -32,7 +32,7 @@ _layout = html.Div([
     html.H3('Workspaces'),
     html.Button('Create Workspace', id='ws-create'),
     html.Button('Delete Workspace', id='ws-delete', style={'float': 'right'}),
-
+    
     ws_table,
 
     dbc.Modal(
@@ -241,7 +241,9 @@ def callbacks(app, fsc, cache):
     )
     def set_selected_row(tab, data, tmpdir):
         if tab != _label: raise PreventUpdate
+        
         ws_names = T.get_workspaces(tmpdir)
+        
         if len(ws_names) == 0: raise PreventUpdate
         data = pd.DataFrame(data)
         active_ws = T.get_active_workspace( tmpdir )

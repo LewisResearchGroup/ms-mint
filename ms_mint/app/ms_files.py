@@ -43,7 +43,6 @@ options = {
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 
-# If color column is not present, for some strange reason, the header filter disappears.
 columns = [
         { "formatter": "rowSelection", 
           "titleFormatter":"rowSelection",  
@@ -63,7 +62,7 @@ columns = [
 
 
 ms_table = html.Div(id='ms-table-container', 
-    style={'minHeight':  100, 'marginTop': '10%'},
+    style={'Height':  0, 'marginTop': '10%'},
     children=[
         DashTabulator(id='ms-table',
             columns=columns, 
@@ -94,6 +93,7 @@ _layout = html.Div([
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
+    html.Div(id='ms-n-files'),
     dcc.Loading( ms_table ),
     html.Div(id='ms-uploader-fns', style={'visibility': 'hidden'}),    
 ])
@@ -263,4 +263,11 @@ def callbacks(app, fsc, cache):
             if fns is None: return dbc.Alert(f'No MS files found at {url}', color='warning')
         return dbc.Alert(f'{len(fns)} files imported.', color='success')
 
-
+    @app.callback(
+        Output('ms-n-files', 'children'),
+        Input('ms-table', 'data')
+    )
+    def n_files(data):
+        n_files = len(data)
+        print(n_files, 'in workspace')
+        return dbc.Alert(f'{n_files} files in current workspace.', color='success') 
