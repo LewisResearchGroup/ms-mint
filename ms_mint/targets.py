@@ -81,26 +81,22 @@ def update_retention_time_columns(targets):
                 targets.loc[ndx, 'row'] = row[['rt_min', 'rt_max']].mean(axis=1)
 
 
-
 def check_targets(targets):
     '''
     Test if 
     1) targets has right type, 
-    2) all columns are present and 
+    2) all columns are present 
     3) dtype of column peak_label is string
+    4) rt_min and rt_max are set
     Returns a list of strings indicating identified errors.
     If list is empty targets is OK.
     '''
-    errors = []
-    if not isinstance(targets, pd.DataFrame):
-        errors.append('Peaklist is not a dataframe.')
+    assert isinstance(targets, pd.DataFrame), 'Targets is not a dataframe.'
     targets[TARGETS_COLUMNS]
-    if not (targets.dtypes['peak_label'] == np.dtype('O')):
-        errors.append('Provided peak labels are not strings.', 
-                       targets.dtypes['peak_label'] )
-    if not targets.peak_label.value_counts().max() == 1:
-        errors.append('Provided peak labels are not unique.')
-    return errors
+    assert targets.dtypes['peak_label'] == np.dtype('O'), 'Provided peak labels are not string: {}'.format(targets.dtypes['peak_label'])
+    assert targets.peak_label.value_counts().max() == 1, 'Provided peak labels are not unique.'
+    missing_rt = targets.loc[targets[['rt_min', 'rt_max']].isna().max(axis=1)]
+    assert len(missing_rt) == 0, 'Some targets have missing rt_min or rt_max.'
 
 
 def gen_target_grid(masses, dt, rt_max=10, 

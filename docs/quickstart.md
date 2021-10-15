@@ -12,7 +12,7 @@ Each file belongs to one of four batches (B1-B4).
 - `MINT-targets.csv` contains the extraction lists. The identification of the metabolites has been done before, so we know where the metabolites appear in the MS data.
 
 
-## 1. Open the MINT application and create a new worspace named DEMO.
+## 1. Open the MINT application and create a new workspace named DEMO.
 
 At `workspaces` click on `CREATE WORKSPACE`. Type `DEMO` into the text field and click on `CREATE`.
 
@@ -34,7 +34,7 @@ Wait until all files are uploaded.
 This file contains information about your samples. Setting up metadata is important and needs to be done with care.
 Your downstream analysis will benefit greatly from a good metadata table.
 
-- `PeakOpt` if True this files will be used in the peak optimization tab.
+- `PeakOpt` if True these files will be used in the peak optimization tab.
 - `Label` should be used to indicate the group of the sampe. E.g. treatment group vs control group.
 - `Batch` is the batch ID, for example the plate if samples come from multiple plates.
 - `Type` indicates the type for the sample. By default evertying is called `Biological Sample`, other meaningful labels are `Standard Sample` or `Quality Control`.
@@ -54,15 +54,15 @@ Switch the `File selection` to `Use all files`. Normally, especially for large d
 
 ![](quickstart/peak-preview.png)
 
-- here you can see the shapes of the extracted peaks
-- optimize the retention time with the interactive tool
-- you can click on the image to load the data into the interactive tool or use the dropdown menu
-- highlight the prefered region (highlighted in green) and click 
+- here you can see the shapes of the extracted peaks.
+- optimize the retention time with the interactive tool.
+- you can click on the image to load the data into the interactive tool or use the dropdown menu.
+- highlight the prefered region (highlighted in green) and click on `SET RT TO CURRENT VIEW` to update the retention time window.
 - the horizontal bar indicates how far away the selected window is from the `rt` reference value in the `Targets`.
 
 ![](quickstart/peak-optimization.png)
 
-- if you are happy with the peak shapes you can proceed to `Processing`
+- if you are happy with the peak shapes you can proceed to `Processing`.
 
 ## 6. Switch to `Processing` and start the data extraction with `Run MINT`
 
@@ -90,16 +90,16 @@ Let's create a few simple visualizations.
 And click on `Update`. A very simple bar-graph is shown, and we will gradually make it more complex. 
 This simple bar graph shows the average `peak_max` value across the whole dataset for all targets. 
 
-### a) select `peak_label` for the `X` axis
-### b) set aspect-ratio to 5
-### c) select `Logarithmic y-scale` in the dropdown options
-### d) click on `UPDATE`
+### a) select `peak_label` for the `X` axis.
+### b) set aspect-ratio to 5.
+### c) select `Logarithmic y-scale` in the dropdown options.
+### d) click on `UPDATE`.
 
 ![](quickstart/02-demo-plot.png)
 
-### e) set figure height to `1.5` and aspect ratio to `2`
-### e) set `Column` to `Label`
-### f) set `Row` to `Batch`
+### e) set figure height to `1.5` and aspect ratio to `2`.
+### e) set `Column` to `Label`.
+### f) set `Row` to `Batch`.
 
 ![](quickstart/03-demo-plot.png)
 

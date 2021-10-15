@@ -13,13 +13,15 @@
     <a href="{{ url_for('main.index') }}"><button>Home</button></a>
     {% if current_user.is_anonymous %}
     <a href="{{ url_for('main.login') }}"><button>Login</button></a>
+    <a href="https://sorenwacker.github.io/ms-mint" target="blank"><button style='float: right'>Documentation</button></a>
+
     {% else %}
     <a href="{{ url_for('main.logout') }}"><button>Logout</button></a>
     {% endif %}
   </div> 
 
   <div id='logo'>
-    <img src="/static/MINT-logo.png" style='width: 100%; max-width: 800px;'></img>
+    <img src="/static/MINT-logo.jpg" style='width: 100%; max-width: 800px;'></img>
   </div>
 
   <div class='container'>

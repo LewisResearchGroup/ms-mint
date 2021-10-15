@@ -71,7 +71,6 @@ def callbacks(app, fsc, cache):
             results = T.get_results(wdir)
             df = results.pivot_table('peak_max', 'peak_label', 'ms_file')
             df.columns = [P(x).with_suffix('') for x in df.columns]
-            print(df)
             buffer = T.df_to_in_memory_excel_file(df)
             return [send_bytes(buffer, filename=f'{T.today()}-{workspace}_MINT-peak-max.xlsx')]
 
@@ -84,13 +83,15 @@ def callbacks(app, fsc, cache):
     def run_mint(n_clicks, wdir):
         if n_clicks is None:
             raise PreventUpdate
-
         def set_progress(x):
             fsc.set('progress', x)
-
         mint = Mint(verbose=True, progress_callback=set_progress)
-        mint.targets_files = T.get_targets_fn( wdir )
-        mint.ms_files = T.get_ms_fns( wdir )
-        mint.run()
-        mint.export( T.get_results_fn(wdir) )
+        targets = T.get_targets_fn( wdir )
+        try: 
+            mint.targets_files = targets 
+            mint.ms_files = T.get_ms_fns( wdir )
+            mint.run()
+            mint.export( T.get_results_fn(wdir) )
+        except Exception as e:
+            return dbc.Alert(str(e), color='danger')
         return dbc.Alert('Finished running MINT', color='success')

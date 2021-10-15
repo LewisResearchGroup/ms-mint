@@ -2,7 +2,7 @@
 ![](images/coverage.svg)
 [![Github All Releases](https://img.shields.io/github/downloads/sorenwacker/ms-mint/total.svg)]()
 
-![](docs/image/MINT-Logo.jpg)
+![](docs/image/MINT-logo.jpg)
 
 # MINT (Metabolomics Integrator)
 

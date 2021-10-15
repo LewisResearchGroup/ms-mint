@@ -257,13 +257,7 @@ class Mint(object):
     @targets.setter
     def targets(self, targets):
         targets = standardize_targets(targets)
-        errors = check_targets(targets)
-        if len(errors) != 0:
-            targets = targets.drop_duplicates()
-            error_string = '\n'.join(errors)
-            if self.verbose:
-                logging.error(f'Errors in targets:\n{error_string}')
-            self._messages = errors
+        check_targets(targets)
         self._targets = targets
         if self.verbose:
             print('Set targets to:\n', self.targets.to_string(), '\n')
