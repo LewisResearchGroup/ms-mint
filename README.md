@@ -48,9 +48,12 @@ If your are up to enhance the codebase yourself, we ask you to followowing steps
 2. run `flake8`
 3. submit a pull request
 
-
 #### Code standards
 Before submitting a pull request please run `flake8`.
+
+## Get in touch
+
+Open an [issue](https://github.com/sorenwacker/ms-mint/issues) or join the [slack](https://ms-mint.slack.com/) channel.
 
 # Acknowledgements
 This project would not be possible without the help of the open-source community. 
