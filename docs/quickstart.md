@@ -9,7 +9,7 @@ You will find two `csv` files and 12 `mzXML` and/or `mzML` files.
 - A folder with 12 mass-spectrometry (MS) files from microbial samples. We have four files for each _Staphylococcus aureus_ (SA), _Escherichia coli_ (EC), and _Candida albicans_ (CA).
 Each file belongs to one of four batches (B1-B4). 
 - `MINT-metadata.csv` contains this information in tabular format. Setting up the metadata for your project is essential. 
-- `MINT-targets.csv` contains the extraction lists. The identification of the metabolites has been done before, so we know where the metabolites appear in the MS data. To setup your example workspace follow steps:
+- `MINT-targets.csv` contains the extraction lists. The identification of the metabolites has been done before, so we know where the metabolites appear in the MS data.
 
 
 ## 1. Open the MINT application and create a new worspace named DEMO.
