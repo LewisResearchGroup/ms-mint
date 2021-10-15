@@ -100,12 +100,8 @@ This simple bar graph shows the average `peak_max` value across the whole datase
 
 This way you can look at the whole dataset at once, sliced by `Batch` and `Label`
 
-## Exercise: Try to create the following plot.
+## Exercise: Try to create the following plot:
 
 ### A)
-
-![](quickstart/04-demo-plot.png)
-
-### B)
 
 ![](quickstart/05-demo-plot.png)
