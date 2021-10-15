@@ -13,7 +13,7 @@ or for the identification of pathogens such as methicillin resistant _Staphyloco
 More information on how to install and run the program can be found in the [Documentation](https://sorenwacker.github.io/ms-mint/) or check out the 
 [Quickstart](https:///sorenwacker.github.io/ms-mint/quickstart/) to jump right into it.
 
-
+# Browser based as standalone application or server based
 
 ![](./docs/image/distributions.png)
 
