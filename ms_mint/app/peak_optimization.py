@@ -46,28 +46,29 @@ _layout = html.Div([
         value='peakopt',
         clearable=False),
 
-    dcc.Markdown('---'),
-    html.H4('Process all peaks'),
 
-    dbc.Row([
-        html.Div([
-                html.Button('Find largest peaks for all', id='pko-find-largest-peak-for-all',  style={'width': '100%'}),
-                html.Label('Margin:'),
-                dcc.Slider(id='pko-margin', min=0.1, max=20, step=0.05, value=0.3),
-                html.Label('HALLO', id='pko-margin-display'),
-            ], style={'width': '45%', 'display': 'inline-block', 'margin': 'auto'}
-        ),
+    html.Div(id='experimental', children=[
+        dcc.Markdown('---'),
+        html.H4('Process all peaks'),
+        dbc.Row([
+            html.Div([
+                    html.Button('Find largest peaks for all', id='pko-find-largest-peak-for-all',  style={'width': '100%'}),
+                    html.Label('Margin:'),
+                    dcc.Slider(id='pko-margin', min=0.1, max=20, step=0.05, value=0.3),
+                    html.Label('HALLO', id='pko-margin-display'),
+                ], style={'width': '45%', 'display': 'inline-block', 'margin': 'auto'}
+            ),
 
-        html.Div([
-                html.Button('Remove low intensity peaks', id='pko-remove-low-intensity', style={'width': '100%'}),
-                html.Label('Threshold:'), 
-                dcc.Input(id='pko-threshold', value='1e4'),
-            ], style={'width': '45%', 'display': 'inline-block', 'margin': 'auto'}
-        ),
-    ]),
-        
+            html.Div([
+                    html.Button('Remove low intensity peaks', id='pko-remove-low-intensity', style={'width': '100%'}),
+                    html.Label('Threshold:'), 
+                    dcc.Input(id='pko-threshold', value='1e4'),
+                ], style={'width': '45%', 'display': 'inline-block', 'margin': 'auto'}
+            ),
+        ]),
+        dcc.Markdown('---'),
+    ], style={'visibility': 'hidden', 'height': '0px'}),
     
-    dcc.Markdown('---'),
     html.H4('Peak previews'),
 
     html.Button('Update peak previews', id='pko-peak-preview'),

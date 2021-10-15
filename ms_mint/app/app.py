@@ -47,6 +47,7 @@ def make_dirs():
     cachedir = os.path.join(tmpdir, '.cache')
     os.makedirs(tmpdir, exist_ok=True)
     os.makedirs(cachedir, exist_ok=True)
+    print('MAKEDIRS:', tmpdir, cachedir)
     return P(tmpdir), P(cachedir)
 
 TMPDIR, CACHEDIR = make_dirs()
@@ -82,11 +83,10 @@ logout_button = dbc.Button("Logout", id="logout-button", style={'marginRight': '
 logout_button = html.A(href='/logout', children=logout_button)
 
 _layout = html.Div([
-    #html.Img(src=app.get_asset_url('logo.png'), style={'height': '30px'}),
 
     html.Div(logout_button),
 
-    dcc.Interval(id="progress-interval", n_intervals=0, interval=500, disabled=False),
+    dcc.Interval(id="progress-interval", n_intervals=0, interval=2000, disabled=False),
 
     html.A(href='https://sorenwacker.github.io/ms-mint/gui/', 
          children=[html.Button('Documentation', id='B_help', style={'float': 'right', 'color': 'info'})],
@@ -104,11 +104,11 @@ _layout = html.Div([
 
     html.Div(id='tmpdir', children=str(TMPDIR), style={'visibility': 'hidden'}),
 
-    html.P('Current Workspace: ', style={'display': 'inline-block', 'marginRight': '5px', 'marginTop': '5px'}),
-
-    html.Div(id='active-workspace', style={'display': 'inline-block'}),
-
-    html.Div(id='wdir', children='', style={'display': 'inline-block', 'visibility': 'visible', 'float': 'right'}),
+    html.Div([ html.P('Current Workspace: ', style={'display': 'inline-block', 'marginRight': '5px', 'marginTop': '5px'}),
+               html.Div(id='active-workspace', style={'display': 'inline-block'}),
+               html.Div(id='wdir', children='', style={'display': 'inline-block', 'visibility': 'visible', 'float': 'right'}),
+             ], style={'marginBottom': '20px'}
+    ),
 
     html.Div(id='pko-creating-chromatograms'),
 
@@ -133,23 +133,20 @@ _layout = html.Div([
 
 
 def register_callbacks(app, cache, fsc):
-    
+    logging.warning('Register callbacks')    
     upload_root = os.getenv('MINT_DATA_DIR', tempfile.gettempdir())
     upload_dir = str( P(upload_root)/'MINT-Uploads' )
     UPLOAD_FOLDER_ROOT = upload_dir
-    
-    logging.info('Upload directory: {}'.format(UPLOAD_FOLDER_ROOT))
     du.configure_upload(app, UPLOAD_FOLDER_ROOT)
 
     messages.callbacks(app=app, fsc=fsc, cache=cache)
-    logging.info('Register callbacks')
 
     for module in _modules:
         func = module.callbacks
         if func is not None:
             func(app=app, fsc=fsc, cache=cache)
 
-
+    # Updates the current viewport
     app.clientside_callback(
         """
         function(href) {
@@ -190,8 +187,10 @@ def register_callbacks(app, cache, fsc):
     def upate_tmpdir(x):
         if hasattr(app.server, 'login_manager'):
             username = current_user.username
-            logging.info('User: {username}')
-            return str(TMPDIR/'User'/username), {'visibility': 'visible'}
+            logging.warning(f'User: {username}')
+            tmpdir =  str(TMPDIR/'User'/username)
+            logging.warning(tmpdir)
+            return tmpdir, {'visibility': 'visible'}
         logging.info('Hide login button')
         return str(TMPDIR/'Local'), {'visibility': 'hidden'}
 
