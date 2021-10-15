@@ -11,7 +11,7 @@ Each file belongs to one of four batches (B1-B4).
 - `MINT-targets.csv` contains the extraction lists. The identification of the metabolites has been done before, so we know where the metabolites appear in the MS data. To setup your example workspace follow steps:
 
 
-## 1. First, open the MINT application and create a new worspace named DEMO.
+## 1. Open the MINT application and create a new worspace named DEMO.
 
 At `workspaces` click on `CREATE WORKSPACE`. Type `DEMO` into the text field and click on `CREATE`.
 
@@ -30,13 +30,16 @@ Wait until all files are uploaded.
 
 ![](quickstart/metadata-table.png)
 
+This file contains information about your samples. Setting up metadata is important and needs to be done with care.
+Your downstream analysis will benefit greatly from a good metadata table.
+
 - `PeakOpt` if True this files will be used in the peak optimization tab.
 - `Label` should be used to indicate the group of the sampe. E.g. treatment group vs control group.
 - `Batch` is the batch ID, for example the plate if samples come from multiple plates.
 - `Type` indicates the type for the sample. By default evertying is called `Biological Sample`, other meaningful labels are `Standard Sample` or `Quality Control`.
 - `Row` and `Column` indicate the location of the sample on the plate e.g. 1-12 and A-H for a 96-well plate.
 - `RunOrder` can contain the order 1-N in which the samples were processed.
--  Add more columns if you need.
+-  Add more columns if you need. You can download the file, add new columns with Excel, and upload the table again. 
 
 ## 5. Switch to `Targets` and upload `MINT-targets.csv`.
 ![](quickstart/targets-table.png)
