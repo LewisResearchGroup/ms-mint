@@ -21,6 +21,8 @@ A demo server is available [here](https://mint.resistancedb.org). Be mindful, yo
 
 # Metabolomics with Python
 
+MINT originally started as Python project. The core of MINT is a Python class for targeted metabolomics that can be used independent of the graphical application.
+
     from ms_mint.notebook import Mint
     mint.ms_files = glob('/path/to/files/*mzML')
     mint.peaklist_files = '/path/to/peaklist/file/peaklist.csv'
