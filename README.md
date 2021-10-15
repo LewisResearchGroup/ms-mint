@@ -11,7 +11,7 @@ Metabolomics is the study of all metabolites (small chemical compounds) in a bio
 The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests 
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 More information on how to install and run the program can be found in the [Documentation](https://sorenwacker.github.io/ms-mint/) or check out the 
-[Quickstart](http://localhost:8000/sorenwacker/ms-mint/quickstart/) to jump right into it.
+[Quickstart](https:///sorenwacker.github.io/ms-mint/quickstart/) to jump right into it.
 
 
 
