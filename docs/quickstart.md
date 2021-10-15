@@ -40,6 +40,7 @@ Your downstream analysis will benefit greatly from a good metadata table.
 - `Row` and `Column` indicate the location of the sample on the plate e.g. 1-12 and A-H for a 96-well plate.
 - `RunOrder` can contain the order 1-N in which the samples were processed.
 -  Add more columns if you need. You can download the file, add new columns with Excel, and upload the table again. 
+-  Use the `action` to set multiple cell values at once. 
 
 ## 5. Switch to `Targets` and upload `MINT-targets.csv`.
 ![](quickstart/targets-table.png)
@@ -104,7 +105,5 @@ This simple bar graph shows the average `peak_max` value across the whole datase
 This way you can look at the whole dataset at once, sliced by `Batch` and `Label`
 
 ## Exercise: Try to create the following plot:
-
-### A)
 
 ![](quickstart/05-demo-plot.png)

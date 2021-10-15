@@ -31,7 +31,6 @@ MINT originally started as Python project. The core of MINT is a Python class fo
 
 ![Mint Jupyter Results](./docs/image/jupyter_results.png "Mint Jupyter Results")
 
-More information in the documentation.
 
 # Contributions are welcome
 MINT integrates open-source software and packages into a Python library for metabolomics with a browser based GUI. It is programmed by scientists for scientists to contribute to  better and faster science integrating best practices of data management and computer science. Contributions are welcome that improve the efficiency of the code, bug fixes, feature implementations, security enhancements among others. If you want to contribute to MINT please send me a notification.
