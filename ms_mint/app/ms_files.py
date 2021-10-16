@@ -43,7 +43,6 @@ options = {
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 
 
-# If color column is not present, for some strange reason, the header filter disappears.
 columns = [
         { "formatter": "rowSelection", 
           "titleFormatter":"rowSelection",  
@@ -63,7 +62,7 @@ columns = [
 
 
 ms_table = html.Div(id='ms-table-container', 
-    style={'minHeight':  100, 'marginTop': '10%'},
+    style={'Height':  0, 'marginTop': '10%'},
     children=[
         DashTabulator(id='ms-table',
             columns=columns, 
@@ -88,12 +87,14 @@ _layout = html.Div([
                     'margin-bottom': '20px',
                     'display': 'inline-block',
                 }),
-    html.Button('Import from URL or local path', id='ms-import-from-url'),
+
+    html.Button('Import from URL', id='ms-import-from-url'),
     dcc.Input(id='url', placeholder='Drop URL / path here', style={'width': '100%'}),
     dcc.Markdown('---', style={'marginTop': '10px'}),
     dcc.Markdown('##### Actions'),
     html.Button('Convert to Feather', id='ms-convert'),
     html.Button('Delete selected files', id='ms-delete', style={'float': 'right'}),
+    html.Div(id='ms-n-files'),
     dcc.Loading( ms_table ),
     html.Div(id='ms-uploader-fns', style={'visibility': 'hidden'}),    
 ])
@@ -179,12 +180,8 @@ def callbacks(app, fsc, cache):
         ],
     )
     def callback_on_completion(n_files, filenames, upload_id, iscompleted, latest_file):
-
         if n_files == 0:
             return  # no files uploaded yet.
-
-        # print(n_files, filenames, upload_id, iscompleted, latest_file)
-
         out = []
         if filenames is not None:
             if upload_id:
@@ -195,12 +192,8 @@ def callbacks(app, fsc, cache):
             for filename in filenames:
                 file = root_folder / filename
                 out.append(file)
-                # print(file)
-            
             return str(file)
         return []
-
-
 
 
     @app.callback(
@@ -211,33 +204,10 @@ def callbacks(app, fsc, cache):
     def get_a_list(fn, wdir):
         if fn is None:
             raise PreventUpdate
-
         ms_dir = T.get_ms_dirname( wdir )
-
         fn_new = P(ms_dir)/P(fn).name
-
         shutil.move(fn, fn_new)
-
         logging.info(f'Move {fn} to {fn_new}')
-
-        #if fn_new.endswith('.zip'):
-        #    shutil.unpack_archive(fn_new, extract_dir=upload_path)
-        
-        '''    
-        search_pattern = os.path.join( upload_path, '**', '*.*')
-        fns = glob(search_pattern, recursive=True)
-        n_total = len(fns)
-        for i, fn in tqdm( enumerate(fns), total=n_total ):
-            fsc.set('progress', int( 100 * (i+1) / n_total))
-            if fn.lower().endswith('mzxml') or fn.lower().endswith('mzml'):
-                try:
-                    shutil.move(fn, ms_dir)
-                except:
-                    pass
-        for remainings in glob(os.path.join(upload_path, '*')):
-            if os.path.isfile(remainings): os.remove(remainings)
-            elif os.path.isdir(remainings): shutil.rmtree(remainings)
-        '''
         return dbc.Alert('Upload finished', color='success')
 
 
@@ -250,17 +220,17 @@ def callbacks(app, fsc, cache):
     def import_from_url_or_path(n_clicks, url, wdir):
         if n_clicks is None or url is None:
             raise PreventUpdate
-
         url = url.strip()
-      
         ms_dir = T.get_ms_dirname( wdir )
-
-        if P(url).is_dir():
-            fns = T.import_from_local_path(url, ms_dir, fsc=fsc)
-        else:
-            logging.warning(f'Local file not found, looking for URL ({url}) [{P(url).is_dir()}, {os.path.isdir(url)}]')
-            fns = T.import_from_url(url, ms_dir, fsc=fsc)
-            if fns is None: return dbc.Alert(f'No MS files found at {url}', color='warning')
+        logging.warning(f'Local file not found, looking for URL ({url}) [{P(url).is_dir()}, {os.path.isdir(url)}]')
+        fns = T.import_from_url(url, ms_dir, fsc=fsc)
+        if fns is None: return dbc.Alert(f'No MS files found at {url}', color='warning')
         return dbc.Alert(f'{len(fns)} files imported.', color='success')
 
-
+    @app.callback(
+        Output('ms-n-files', 'children'),
+        Input('ms-table', 'data')
+    )
+    def n_files(data):
+        n_files = len(data)
+        return dbc.Alert(f'{n_files} files in current workspace.', color='success') 

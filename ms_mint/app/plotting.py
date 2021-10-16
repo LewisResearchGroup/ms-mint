@@ -1,7 +1,7 @@
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html, dcc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+import dash_bootstrap_components as dbc
 
 from matplotlib import pyplot as plt
 
@@ -206,20 +206,23 @@ def callbacks(app, fsc, cache):
                 facet_kws=dict(legend_out=True)
             )
 
-        g = plot_func(
-                x=x, 
-                y=y,
-                hue=hue, 
-                col=col, 
-                row=row, 
-                col_wrap=col_wrap,
-                data=df, 
-                kind=kind,
-                height=height, 
-                aspect=aspect,
-                palette=palette,
-                **kwargs
-                )
+        try:
+            g = plot_func(
+                    x=x, 
+                    y=y,
+                    hue=hue, 
+                    col=col, 
+                    row=row, 
+                    col_wrap=col_wrap,
+                    data=df, 
+                    kind=kind,
+                    height=height, 
+                    aspect=aspect,
+                    palette=palette,
+                    **kwargs
+                    )
+        except Exception as e:
+            return dbc.Alert(str(e), color='danger')
 
         g.fig.subplots_adjust(top=0.9)
         g.set_titles(col_template="{col_name}", row_template="{row_name}", y=1.05)
