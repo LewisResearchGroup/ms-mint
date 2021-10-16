@@ -37,6 +37,7 @@ columns = T.gen_tabulator_columns(CHEBI_CHEM.columns, editor=None, col_width='au
 add_metab_table = html.Div(id='add-metab-table-container', 
     style={'minHeight':  100, 'marginTop': '10%'},
     children=[
+        dbc.Alert('This feature is experimental. Please, check values and report errors to the issue tracker.', color='danger'),
         dcc.Dropdown(id='add-metab-ms-mode', placeholder='Select ionization mode',
             options=[{'label': 'Positive', 'value': 'Positive'},
                      {'label': 'Negative', 'value': 'Negative'}], 

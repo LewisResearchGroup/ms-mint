@@ -323,8 +323,8 @@ def get_metadata(wdir):
     if df is None or len(df) == 0:
         df = init_metadata( ms_files )
 
-    if 'Color' not in df.columns:
-        df['Color'] = None
+    for col in ['Color', 'Column', 'Row', 'Batch', 'Label', 'InAnalysis', 'PeakOpt', 'MS-file']:
+        if col not in df.columns: df[col] = None
     
     df = df[df['MS-file'] != '']
 
@@ -698,3 +698,7 @@ def df_to_in_memory_excel_file(df):
         xslx_writer.save()
 
     return to_xlsx
+
+
+def has_na(df):
+    return df.isna().sum().sum() > 0

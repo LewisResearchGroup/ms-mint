@@ -37,75 +37,159 @@ _feather_ format first.'
 _label = 'Peak Optimization'
 
 _layout = html.Div([
+    
     html.H3('Peak Optimization'),
-    html.H4('File selection'),
-    dcc.Dropdown(id='pko-ms-selection',
-        options=[
-            {'label': 'Use selected files from metadata table (PeakOpt)', 'value': 'peakopt'},
-            {'label': 'Use all files (may take a long time)', 'value': 'all'}], 
-        value='peakopt',
-        clearable=False),
+    
+    dcc.Markdown('---'),
 
+    html.H4('File selection'),
+    
+    dcc.Dropdown(id='pko-ms-selection',
+                 options=[{'label': 'Use selected files from metadata table (PeakOpt)', 
+                           'value': 'peakopt'},
+                          {'label': 'Use all files (may take a long time)', 
+                           'value': 'all'}
+                 ], 
+                 value='peakopt',
+                 clearable=False
+    ),
 
     html.Div(id='experimental', children=[
-        dcc.Markdown('---'),
-        html.H4('Process all peaks'),
-        dbc.Row([
-            html.Div([
-                    html.Button('Find largest peaks for all', id='pko-find-largest-peak-for-all',  style={'width': '100%'}),
-                    html.Label('Margin:'),
-                    dcc.Slider(id='pko-margin', min=0.1, max=20, step=0.05, value=0.3),
-                    html.Label('HALLO', id='pko-margin-display'),
-                ], style={'width': '45%', 'display': 'inline-block', 'margin': 'auto'}
-            ),
 
-            html.Div([
-                    html.Button('Remove low intensity peaks', id='pko-remove-low-intensity', style={'width': '100%'}),
-                    html.Label('Threshold:'), 
-                    dcc.Input(id='pko-threshold', value='1e4'),
-                ], style={'width': '45%', 'display': 'inline-block', 'margin': 'auto'}
-            ),
-        ]),
         dcc.Markdown('---'),
-    ], style={'visibility': 'hidden', 'height': '0px'}),
+        
+        dbc.Row(style={'visibility': 'hidden', 'height': '0px'},
+                children=[ 
+                    
+                    html.H4('Process all peaks'),
+
+                    html.Div([
+                            
+                            html.Button('Find largest peaks for all', 
+                                        id='pko-find-largest-peak-for-all',  
+                                        style={'width': '100%'}
+                            ),
+                                
+                            html.Label('Margin:'),
+                                
+                            dcc.Slider(id='pko-margin', min=0.1, max=20, step=0.05, value=0.3),
+                                
+                            html.Label('', id='pko-margin-display'),
+            
+                        ], 
+
+                        style={'width': '45%', 
+                            'display': 'inline-block', 
+                            'margin': 'auto'}
+                    ),
+
+                    html.Div([
+                        
+                        html.Button('Remove low intensity peaks', 
+                                    id='pko-remove-low-intensity', 
+                                    style={'width': '100%'}
+                        ),
+                        
+                        html.Label('Threshold:'), 
+                        
+                        dcc.Input(id='pko-threshold', 
+                                value='1e4'),
+                        
+                        ], 
+                        
+                        style={'width': '45%', 
+                            'display': 'inline-block', 
+                            'margin': 'auto'}
+                    ),
+                dcc.Markdown('---'),
+                ]
+            ),
+        ],
+    ),
     
     html.H4('Peak previews'),
 
-    html.Button('Update peak previews', id='pko-peak-preview'),
-    html.Button('Regenerate all figures', id='pko-peak-preview-from-scratch'),
+    html.Button('Update peak previews', 
+                id='pko-peak-preview'
+    ),
+
+    html.Button('Regenerate all figures', 
+                id='pko-peak-preview-from-scratch'
+    ),
 
     html.Div(id='pko-peak-preview-images', 
-        style={"maxHeight": "630px", "overflowY": "scroll", 'padding': 'auto'}),
-    dcc.Markdown('---'),
-    html.Div(id='pko-controls'),
-    dcc.Dropdown(id='pko-dropdown', options=[], value=None),
-    dbc.Progress(id="pko-progress-bar", value=0, 
-        style={'marginBottom': '20px', 'width': '100%'}),
-    dcc.Loading( dcc.Graph('pko-figure') ),
-    dcc.Checklist(id='pko-figure-options', 
-                  options=[{'value': 'log','label': 'Logarithmic y-scale'}], 
-                  value=[]),
+             style={"maxHeight": "630px", 
+                    "overflowX": "scroll", 
+                    'padding': 'auto'
+             }
+    ),
 
-    html.Button('Set RT to current view', id='pko-set-rt'),
-    html.Button('Find largest peak', id='pko-find-largest-peak'),
-    html.Button('Confirm retention time', id='pko-confirm-rt'),
-    html.Button('Remove Peak', id='pko-delete', style={'float': 'right'}),
+    dcc.Markdown('---'),
+
+    html.Div(id='pko-controls'),
+
+    dcc.Dropdown(id='pko-dropdown', 
+                 options=[], 
+                 value=None
+    ),
+
+    dbc.Progress(id="pko-progress-bar",
+                 value=0, 
+                 style={'marginBottom': '20px', 
+                        'width': '100%'
+                 }
+    ),
+
+    dcc.Loading( dcc.Graph('pko-figure') ),
+
+    dcc.Checklist(id='pko-figure-options', 
+                  options=[{
+                        'value': 'log', 
+                        'label': 'Logarithmic y-scale'
+                        }
+                  ], 
+                  value=[]
+    ),
+
+    html.Button('Set RT to current view', 
+                id='pko-set-rt'
+    ),
+
+    html.Button('Find largest peak', 
+                id='pko-find-largest-peak'),
+
+    html.Button('Confirm retention time', 
+                id='pko-confirm-rt'
+    ),
+
+    html.Button('Remove Peak', 
+                id='pko-delete', 
+                style={'float': 'right'}
+    ),
     
     html.Div(id='pko-image-clicked'),
-    html.Div([
-        html.Button('<< Previous', id='pko-prev'), 
-        html.Button('Suggest', id='pko-suggest-next'),
-        html.Button('Next >>', id='pko-next')],
-            style={'text-align': 'center', 'margin': 'auto', 'marginTop': '10%'}),
 
-    
+    html.Div(
+        children=[
+            html.Button('<< Previous', id='pko-prev'), 
+            html.Button('Suggest', id='pko-suggest-next'),
+            html.Button('Next >>', id='pko-next')
+        ],
+        style={
+            'text-align': 'center', 
+            'margin': 'auto', 
+            'marginTop': '10%'
+        }
+    ),
 ])
+
 
 pko_layout_no_data = html.Div([
     dcc.Markdown('''### No targets found.
     You did not generate a targets yet.
     ''')
 ])
+
 
 _outputs = html.Div(id='pko-outputs', 
     children=[
@@ -117,6 +201,7 @@ _outputs = html.Div(id='pko-outputs',
         html.Div(id={'index': 'pko-remove-low-intensity-output', 'type': 'output'}),
     ]
 )
+
 
 def layout():
     return _layout 
@@ -156,7 +241,6 @@ def callbacks(app, fsc, cache):
     State('pko-ms-selection', 'value'),
     State('pko-margin', 'value'),
     State('wdir', 'children'),
-    #State('pko-figure', 'figure')
     )
     def pko_figure(peak_label_ndx, options, n_clicks, options_changed, 
                    find_largest_peak, find_largest_peak_single, rt_set,
@@ -292,16 +376,21 @@ def callbacks(app, fsc, cache):
     def pko_confirm_rt(n_clicks, peak_label, fig, wdir):
         if n_clicks is None:
             raise PreventUpdate
+
         rt_min, rt_max = fig['layout']['xaxis']['range']
         rt_min, rt_max = np.round(rt_min, 4), np.round(rt_max, 4)
         
         image_label = f'{peak_label}_{rt_min}_{rt_max}'
 
-        _, fn = T.get_figure_fn(kind='peak-preview', wdir=wdir, 
-            label=image_label, format='png')
+        _, fn = T.get_figure_fn(kind='peak-preview', 
+                                wdir=wdir, 
+                                label=image_label, 
+                                format='png')
         
         rt = np.mean([rt_min, rt_max])
+
         T.update_targets(wdir, peak_label, rt=rt)
+
         if os.path.isfile(fn): os.remove(fn)
 
         return dbc.Alert(f'Set RT span to ({rt_min},{rt_max})', color='info')
@@ -328,9 +417,20 @@ def callbacks(app, fsc, cache):
         prop_id = dash.callback_context.triggered[0]['prop_id']        
 
         if prop_id.startswith('pko-suggest'):
+
             targets = T.get_targets( wdir ).reset_index()
+
+            # If targets have missing values in RT columns
+            # return first target with missing value
+            if T.has_na(targets[['rt_min', 'rt_max']]):
+                ndx_na_rt_min = targets[targets['rt_min'].isna()].index.to_list()
+                ndx_na_rt_max = targets[targets['rt_max'].isna()].index.to_list()
+                return min(ndx_na_rt_min+ndx_na_rt_max)
+
             rt_means = targets[['rt_min', 'rt_max']].mean(axis=1)
+
             peak_label_ndx = np.argmax( (targets.rt-rt_means).abs() )
+
             return peak_label_ndx      
 
         if prop_id.startswith('pko-image-clicked'):
