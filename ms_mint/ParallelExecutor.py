@@ -2,8 +2,7 @@ import time
 from multiprocessing import Pool, Manager, cpu_count
 
 
-
-class ParallelExecutor():
+class ParallelExecutor:
     def __init__(self, function, args, processes=None, progress_callback=None):
         self.args = args
         self.function = function
@@ -28,7 +27,7 @@ class ParallelExecutor():
                 break
             else:
                 size = q.qsize()
-                progress = int(100*(size+1)/len(args))
+                progress = int(100 * (size + 1) / len(args))
                 self.progress = progress
                 time.sleep(1)
 
@@ -41,7 +40,7 @@ class ParallelExecutor():
     @property
     def progress(self):
         return self.progress
-    
+
     @progress.setter
     def progress(self, value):
         self._progress = value

@@ -34,6 +34,7 @@ import logging
 import os
 import threading
 import time
+
 try:
     import warnings
 except ImportError:
@@ -66,13 +67,15 @@ __all__ = [
     "WindowsFileLock",
     "UnixFileLock",
     "SoftFileLock",
-    "FileLock"
+    "FileLock",
 ]
 
 __version__ = "3.0.12"
 
 
 _logger = None
+
+
 def logger():
     """Returns the logger instance used in this module."""
     global _logger
@@ -89,15 +92,13 @@ class Timeout(TimeoutError):
     """
 
     def __init__(self, lock_file):
-        """
-        """
+        """ """
         #: The path of the file lock.
         self.lock_file = lock_file
         return None
 
     def __str__(self):
-        temp = "The file lock '{}' could not be acquired."\
-               .format(self.lock_file)
+        temp = "The file lock '{}' could not be acquired.".format(self.lock_file)
         return temp
 
 
@@ -113,7 +114,6 @@ class Timeout(TimeoutError):
 #
 # :seealso: issue #37 (memory leak)
 class _Acquire_ReturnProxy(object):
-
     def __init__(self, lock):
         self.lock = lock
         return None
@@ -131,9 +131,8 @@ class BaseFileLock(object):
     Implements the base class of a file lock.
     """
 
-    def __init__(self, lock_file, timeout = -1):
-        """
-        """
+    def __init__(self, lock_file, timeout=-1):
+        """ """
         # The path to the lock file.
         self._lock_file = lock_file
 
@@ -180,8 +179,7 @@ class BaseFileLock(object):
 
     @timeout.setter
     def timeout(self, value):
-        """
-        """
+        """ """
         self._timeout = float(value)
         return None
 
@@ -267,19 +265,27 @@ class BaseFileLock(object):
             while True:
                 with self._thread_lock:
                     if not self.is_locked:
-                        logger().debug('Attempting to acquire lock %s on %s', lock_id, lock_filename)
+                        logger().debug(
+                            "Attempting to acquire lock %s on %s",
+                            lock_id,
+                            lock_filename,
+                        )
                         self._acquire()
 
                 if self.is_locked:
-                    logger().info('Lock %s acquired on %s', lock_id, lock_filename)
+                    logger().info("Lock %s acquired on %s", lock_id, lock_filename)
                     break
                 elif timeout >= 0 and time.time() - start_time > timeout:
-                    logger().debug('Timeout on acquiring lock %s on %s', lock_id, lock_filename)
+                    logger().debug(
+                        "Timeout on acquiring lock %s on %s", lock_id, lock_filename
+                    )
                     raise Timeout(self._lock_file)
                 else:
                     logger().debug(
-                        'Lock %s not acquired on %s, waiting %s seconds ...',
-                        lock_id, lock_filename, poll_intervall
+                        "Lock %s not acquired on %s, waiting %s seconds ...",
+                        lock_id,
+                        lock_filename,
+                        poll_intervall,
                     )
                     time.sleep(poll_intervall)
         except:
@@ -288,9 +294,9 @@ class BaseFileLock(object):
                 self._lock_counter = max(0, self._lock_counter - 1)
 
             raise
-        return _Acquire_ReturnProxy(lock = self)
+        return _Acquire_ReturnProxy(lock=self)
 
-    def release(self, force = False):
+    def release(self, force=False):
         """
         Releases the file lock.
 
@@ -312,10 +318,12 @@ class BaseFileLock(object):
                     lock_id = id(self)
                     lock_filename = self._lock_file
 
-                    logger().debug('Attempting to release lock %s on %s', lock_id, lock_filename)
+                    logger().debug(
+                        "Attempting to release lock %s on %s", lock_id, lock_filename
+                    )
                     self._release()
                     self._lock_counter = 0
-                    logger().info('Lock %s released on %s', lock_id, lock_filename)
+                    logger().info("Lock %s released on %s", lock_id, lock_filename)
 
         return None
 
@@ -328,12 +336,13 @@ class BaseFileLock(object):
         return None
 
     def __del__(self):
-        self.release(force = True)
+        self.release(force=True)
         return None
 
 
 # Windows locking mechanism
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 class WindowsFileLock(BaseFileLock):
     """
@@ -371,8 +380,10 @@ class WindowsFileLock(BaseFileLock):
             pass
         return None
 
+
 # Unix locking mechanism
 # ~~~~~~~~~~~~~~~~~~~~~~
+
 
 class UnixFileLock(BaseFileLock):
     """
@@ -402,8 +413,10 @@ class UnixFileLock(BaseFileLock):
         os.close(fd)
         return None
 
+
 # Soft lock
 # ~~~~~~~~~
+
 
 class SoftFileLock(BaseFileLock):
     """

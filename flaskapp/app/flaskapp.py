@@ -11,7 +11,7 @@ import dash_uploader as du
 
 
 def create_app():
-    app = Flask(__name__, static_url_path='/static')
+    app = Flask(__name__, static_url_path="/static")
     app.config.from_object(BaseConfig)
 
     register_dashapps(app)
@@ -24,17 +24,19 @@ def create_app():
 def register_dashapps(app):
     from ms_mint.app.app import create_app
     from ms_mint.app.app import register_callbacks
-    
+
     # Meta tags for viewport responsiveness
     meta_viewport = {
         "name": "viewport",
-        "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
+        "content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+    }
 
     dashapp, cache, fsc = create_app(
-                            server=app, 
-                            meta_tags=[meta_viewport],
-                            assets_folder=get_root_path(__name__) + '/assets/',
-                            url_base_pathname='/')
+        server=app,
+        meta_tags=[meta_viewport],
+        assets_folder=get_root_path(__name__) + "/assets/",
+        url_base_pathname="/",
+    )
 
     register_callbacks(dashapp, cache, fsc)
 
@@ -49,7 +51,8 @@ def _protect_dashviews(dashapp):
     for view_func in dashapp.server.view_functions:
         if view_func.startswith(dashapp.config.url_base_pathname):
             dashapp.server.view_functions[view_func] = login_required(
-                dashapp.server.view_functions[view_func])
+                dashapp.server.view_functions[view_func]
+            )
 
 
 def register_extensions(server):
@@ -59,7 +62,7 @@ def register_extensions(server):
 
     db.init_app(server)
     login.init_app(server)
-    login.login_view = 'main.login'
+    login.login_view = "main.login"
     migrate.init_app(server, db)
 
 
@@ -67,4 +70,3 @@ def register_blueprints(server):
     from app.webapp import server_bp
 
     server.register_blueprint(server_bp)
-

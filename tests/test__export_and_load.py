@@ -15,26 +15,25 @@ def tmp_path(tmpdir_factory):
     return path
 
 
-class _TestExportAndLoad():
-
+class _TestExportAndLoad:
     def test__load_example_data(self):
-        fn = 'tests/data/demo_results.xlsx'
+        fn = "tests/data/demo_results.xlsx"
         mint_a.load(fn)
-        assert len(mint_a.results) > 0, 'Could not load example data.'
-    
+        assert len(mint_a.results) > 0, "Could not load example data."
+
     def test__export_to_excel(self, tmp_path):
-        fn = os.path.join(tmp_path, 'results.xlsx')
+        fn = os.path.join(tmp_path, "results.xlsx")
         mint_a.export(fn)
-        assert os.path.isfile(fn), 'Output file not generated'
+        assert os.path.isfile(fn), "Output file not generated"
 
     def test__export_to_csv(self, tmp_path):
-        fn = os.path.join(tmp_path, 'results.csv')
+        fn = os.path.join(tmp_path, "results.csv")
         mint_a.export(fn)
-        assert os.path.isfile(fn), 'Output file not generated'
+        assert os.path.isfile(fn), "Output file not generated"
 
     def test__load_from_excel(self, tmp_path):
-        fn = os.path.join(tmp_path, 'results.xlsx')
-        print('Filename:', fn)
+        fn = os.path.join(tmp_path, "results.xlsx")
+        print("Filename:", fn)
         mint_b.load(fn)
 
         actual_results = mint_b.results.round(8)
@@ -42,22 +41,27 @@ class _TestExportAndLoad():
         actual_files = mint_b.ms_files
         expect_files = mint_a.ms_files
 
-        print('Expected results:\n', expect_results)
-        print('Actual results:\n', actual_results)
-        print('N diff dtypes:', (actual_results.dtypes != expect_results.dtypes).sum() )
-        print('N diff columns:', (actual_results.columns != expect_results.columns).sum() )
-        print('N diff index:', (actual_results.columns != expect_results.columns).sum() )
-        print('N diff values:', (actual_results.values != expect_results).values.sum() )
-        print('N diff values:', (actual_results == expect_results).sum())
+        print("Expected results:\n", expect_results)
+        print("Actual results:\n", actual_results)
+        print("N diff dtypes:", (actual_results.dtypes != expect_results.dtypes).sum())
+        print(
+            "N diff columns:", (actual_results.columns != expect_results.columns).sum()
+        )
+        print("N diff index:", (actual_results.columns != expect_results.columns).sum())
+        print("N diff values:", (actual_results.values != expect_results).values.sum())
+        print("N diff values:", (actual_results == expect_results).sum())
 
-        assert all([actual_results.equals(expect_results), 
-                    set(actual_files)==set(expect_files)]),\
-                'Loaded results differ from original data.'
+        assert all(
+            [
+                actual_results.equals(expect_results),
+                set(actual_files) == set(expect_files),
+            ]
+        ), "Loaded results differ from original data."
         mint_b.reset()
 
     def test__load_from_csv(self, tmp_path):
-        fn = os.path.join(tmp_path, 'results.csv')
-        print('Filename:', fn)
+        fn = os.path.join(tmp_path, "results.csv")
+        print("Filename:", fn)
         mint_c.load(fn)
 
         actual_results = mint_c.results.round(3)
@@ -71,32 +75,45 @@ class _TestExportAndLoad():
         print(actual_files)
         print(expect_files)
 
-        assert len(actual_results) == len(expect_results), pd.read_csv(fn).to_csv('/home/swacker/test.csv')
+        assert len(actual_results) == len(expect_results), pd.read_csv(fn).to_csv(
+            "/home/swacker/test.csv"
+        )
 
-        print('Expected results:\n', expect_results)
-        print('Actual results:\n', actual_results)
-        print('N diff dtypes:', (actual_results.dtypes != expect_results.dtypes).sum() )
-        print('N diff columns:', (actual_results.columns != expect_results.columns).sum() )
-        print('N diff index:', (actual_results.columns != expect_results.columns).sum() )
-        print('N diff values:', (actual_results.values != expect_results).values.sum() )
-        print('N diff values:', (actual_results == expect_results).sum())
+        print("Expected results:\n", expect_results)
+        print("Actual results:\n", actual_results)
+        print("N diff dtypes:", (actual_results.dtypes != expect_results.dtypes).sum())
+        print(
+            "N diff columns:", (actual_results.columns != expect_results.columns).sum()
+        )
+        print("N diff index:", (actual_results.columns != expect_results.columns).sum())
+        print("N diff values:", (actual_results.values != expect_results).values.sum())
+        print("N diff values:", (actual_results == expect_results).sum())
 
-        ndx = (actual_results.peak_rt_of_max != expect_results.peak_rt_of_max)
-        ndx = ndx[ ndx ].index
+        ndx = actual_results.peak_rt_of_max != expect_results.peak_rt_of_max
+        ndx = ndx[ndx].index
 
         print(ndx)
         print(actual_results.loc[ndx])
         print(expect_results.loc[ndx])
 
-        print('Comparison:')
-        print('Expected results:\n', expect_results.loc[ndx, 'peak_rt_of_max'])
-        print('Actual results:\n', actual_results.loc[ndx, 'peak_rt_of_max'])
+        print("Comparison:")
+        print("Expected results:\n", expect_results.loc[ndx, "peak_rt_of_max"])
+        print("Actual results:\n", actual_results.loc[ndx, "peak_rt_of_max"])
 
-        print(expect_results.loc[ndx, 'peak_rt_of_max'] == 
-              actual_results.loc[ndx, 'peak_rt_of_max'])
-        print((expect_results.loc[ndx, 'peak_rt_of_max'] == 
-               actual_results.loc[ndx, 'peak_rt_of_max']).sum() )
+        print(
+            expect_results.loc[ndx, "peak_rt_of_max"]
+            == actual_results.loc[ndx, "peak_rt_of_max"]
+        )
+        print(
+            (
+                expect_results.loc[ndx, "peak_rt_of_max"]
+                == actual_results.loc[ndx, "peak_rt_of_max"]
+            ).sum()
+        )
 
-        assert all([actual_results.equals(expect_results), 
-                    set(actual_files)==set(expect_files)]),\
-                'Loaded results differ from original data.'
+        assert all(
+            [
+                actual_results.equals(expect_results),
+                set(actual_files) == set(expect_files),
+            ]
+        ), "Loaded results differ from original data."
