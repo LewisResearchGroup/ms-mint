@@ -69,9 +69,8 @@ def callbacks(app, fsc, cache):
         df['ms_file'] = df['MS-file']
         mint.results = df
 
-        mint.plot_clustering(figsize=(fig_size_x, fig_size_y), 
-            transpose='Transposed' in options)
+        mint.plot_clustering(figsize=(fig_size_x, fig_size_y), transpose='Transposed' in options)
 
         src = T.fig_to_src()
-        print('HC figure created.')
+        
         return html.Img(src=src, style={'maxWidth': '80%'})

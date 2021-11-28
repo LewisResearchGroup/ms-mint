@@ -69,8 +69,6 @@ def callbacks(app, fsc, cache):
             ms_order, options, viewport, wdir):
         mint = Mint()
 
-        print('Viewport:', viewport)
-
         width, height = [int(e) for e in viewport.split(',')]
 
         df = T.get_complete_results( wdir, include_labels=include_labels, 
@@ -107,7 +105,6 @@ def callbacks(app, fsc, cache):
             call_show='call_show' in options,
             name=name)
         
-
         return fig
 
 

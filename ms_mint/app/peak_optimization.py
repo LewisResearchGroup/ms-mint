@@ -421,7 +421,7 @@ def callbacks(app, fsc, cache):
             targets = T.get_targets( wdir ).reset_index()
 
             # If targets have missing values in RT columns
-            # return first target with missing value
+            # return index of first target with missing value
             if T.has_na(targets[['rt_min', 'rt_max']]):
                 ndx_na_rt_min = targets[targets['rt_min'].isna()].index.to_list()
                 ndx_na_rt_max = targets[targets['rt_max'].isna()].index.to_list()

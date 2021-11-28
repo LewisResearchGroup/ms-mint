@@ -36,6 +36,7 @@ def test__process_ms1():
                              'rt_max': {0: 10},
                              'targets_filename': {0: 'unknown'},
                              'peak_area': {0: 3},
+                             'peak_area_top3': {0: 3},
                              'peak_n_datapoints': {0: 1},
                              'peak_max': {0: 3},
                              'peak_rt_of_max': {0: 2},
@@ -51,7 +52,8 @@ def test__process_ms1():
                              'peak_score': {0: None} 
                         })
     
-    print(result)
+    print('Result:')
+    print(result.T)
 
     assert result.equals(expect), result
 
@@ -68,7 +70,7 @@ def test__process_ms1_from_df():
          'rt_min': [0],
          'rt_max': [10]})
     result = processing.process_ms1_from_df(df, peaklist)
-    expect= [['A', 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0, None]]
+    expect= [['A', 3, 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0, None]]
     print(result)
     print(expect) 
     assert result == expect
@@ -96,8 +98,8 @@ def test__process_ms1_from_numpy():
 
     result = processing.process_ms1_from_numpy(array, peaks)
 
-    expect = [['A', 2, 1, 2, 1, 2, 2.0, 2.0, 0, '1', '2', 0.0, 0.0, 0.0, None],
-              ['B', 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0, None]]
+    expect = [['A', 2, 2, 1, 2, 1, 2, 2.0, 2.0, 0, '1', '2', 0.0, 0.0, 0.0, None],
+              ['B', 3, 3, 1, 3, 2, 3, 3.0, 3.0, 0, '2', '3', 0.0, 0.0, 0.0, None]]
     
     print('Expected:')
     [print(i) for i in expect]
