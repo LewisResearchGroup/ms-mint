@@ -60,9 +60,8 @@ class TestClass():
         results = []
         for _, grp in mint.results.groupby('ms_file'):
             results.append(grp.peak_area.astype(int))
-
         print(results)
-        assert (results[0] == results[1]).all(), results[0]-results[1]
+        assert (results[0].values == results[1].values).all(), results[0].values-results[1].values
 
     def test__target_v0_equals_v1(self):
         mint.reset()

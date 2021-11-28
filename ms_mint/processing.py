@@ -40,10 +40,12 @@ def process_ms1_files_in_parallel(args):
     if 'queue' in args.keys():
         q = args['queue']
         q.put('filename')
+
     try:
-        return process_ms1_file(filename=filename, targets=targets)
+        result = process_ms1_file(filename=filename, targets=targets)
     except:
-        return pd.DataFrame()
+        result = pd.DataFrame()
+    return result
 
 
 def process_ms1_file(filename, targets):
@@ -134,9 +136,14 @@ def extract_ms1_properties(array, mz_mean):
     intensities = array[:,2]
     peak_n_datapoints = len(array)
     if peak_n_datapoints == 0:
-        return dict(peak_area=0, peak_max=0, 
-                peak_min=0, peak_mean=None, 
-                peak_rt_of_max=None, peak_median=None,
+        return dict(
+                peak_area=0,
+                peak_area_top3=0,
+                peak_max=0, 
+                peak_min=0, 
+                peak_mean=None, 
+                peak_rt_of_max=None, 
+                peak_median=None,
                 peak_delta_int=None, 
                 peak_n_datapoints=0,
                 peak_mass_diff_25pc=None, 
@@ -144,9 +151,11 @@ def extract_ms1_properties(array, mz_mean):
                 peak_mass_diff_75pc=None,
                 peak_shape_rt='', 
                 peak_shape_int='',
-                peak_score=None)
+                peak_score=None
+              )
 
     peak_area = intensities.sum()
+    peak_area_top3 = np.sort(intensities)[:3].sum()
     peak_mean = intensities.mean()
     peak_max = intensities.max()
     peak_min = intensities.min()
@@ -170,9 +179,13 @@ def extract_ms1_properties(array, mz_mean):
     peak_shape_rt = float_list_to_comma_sep_str( projection[:,0] )
     peak_shape_int = int_list_to_comma_sep_str( projection[:,1] )
     
-    return dict(peak_area=peak_area, peak_max=peak_max, 
-                peak_min=peak_min, peak_mean=peak_mean, 
-                peak_rt_of_max=peak_rt_of_max, peak_median=peak_median,
+    return dict(peak_area=peak_area,
+                peak_area_top3=peak_area_top3,
+                peak_max=peak_max, 
+                peak_min=peak_min, 
+                peak_mean=peak_mean, 
+                peak_rt_of_max=peak_rt_of_max, 
+                peak_median=peak_median,
                 peak_delta_int=peak_delta_int, 
                 peak_n_datapoints=peak_n_datapoints,
                 peak_mass_diff_25pc=peak_mass_diff_25pc, 
@@ -192,9 +205,6 @@ def slice_ms1_array(array: np.array, rt_min, rt_max, mz_mean, mz_width,
     array = array[(array[:, 2] >= intensity_threshold)]
     return array
 
-
-#def gaus(x,a,x0,sigma):
-#    return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
 def score_peaks(mint_results):
     R = mint_results.copy()

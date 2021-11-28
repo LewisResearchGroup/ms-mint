@@ -105,7 +105,7 @@ class Mint(object):
     def clear_ms_files(self):
         self.ms_files = []
 
-    def run(self, nthreads=None, rt_margin=.5, mode='standard'):
+    def run(self, nthreads=None, rt_margin=.5, mode='standard', **kwargs):
         '''
         Run MINT with set up targets and ms-files.
         ----
@@ -138,7 +138,7 @@ class Mint(object):
         
         start = time.time()
         if nthreads > 1:
-            self.run_parallel(nthreads=nthreads, mode=mode)
+            self.run_parallel(nthreads=nthreads, mode=mode, **kwargs)
         else:
             results = []
             for i, filename in enumerate(self.ms_files):
@@ -148,7 +148,7 @@ class Mint(object):
                         'mode': mode}
                 results.append(process_ms1_files_in_parallel(args))
                 self.progress = int(100 * (i / self.n_files))
-            self.results = pd.concat(results)
+            self.results = pd.concat(results).reset_index(drop=True)
             self.progress = 100
         
         end = time.time()
@@ -161,11 +161,13 @@ class Mint(object):
             print(f'Runtime per file: {self.runtime_per_file:.2f}s')
             print(f'Runtime per peak ({len(self.targets)}): {self.runtime_per_peak:.2f}s\n')
             print('Results:', self.results )
+
         self._status = 'done'
 
 
-    def run_parallel(self, nthreads=1, mode='standard'):
-        pool = Pool(processes=nthreads)
+    def run_parallel(self, nthreads=1, mode='standard', maxtasksperchild=None):
+        print(f'maxtasksperchild: {maxtasksperchild}')
+        pool = Pool(processes=nthreads, maxtasksperchild=maxtasksperchild)
         m = Manager()
         q = m.Queue()
         args = []
@@ -191,7 +193,7 @@ class Mint(object):
         pool.close()
         pool.join()
         results = results.get()
-        self.results = pd.concat(results)
+        self.results = pd.concat(results).reset_index(drop=True)
 
     @property
     def messages(self):
@@ -321,6 +323,8 @@ class Mint(object):
 
             elif fn.endswith('.csv'):
                 results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
+                results['peak_shape_rt'] = results['peak_shape_rt'].fillna('')
+                results['peak_shape_int'] = results['peak_shape_int'].fillna('')
                 ms_files = get_ms_files_from_results(results)
                 targets = results[
                         [col for col in TARGETS_COLUMNS if col in results.columns]
@@ -466,7 +470,7 @@ class Mint(object):
                 name=col_name, correlation=correlation)
 
 
-    def pca(self, var_name='peak_max', n_vars=20, fillna='median', scaler='standard'):
+    def pca(self, var_name='peak_max', n_components=3, fillna='median', scaler='standard'):
 
         df = self.crosstab(var_name).fillna(fillna)
         
@@ -474,40 +478,57 @@ class Mint(object):
             fillna = df.median()
         elif fillna == 'mean':
             fillna = df.mean()
-        
-        df = df.fillna(fillna)
+        elif fillna == 'zero':
+            fillna = 0
 
+        df = df.fillna(fillna)
         if scaler is not None:
             df = scale_dataframe(df, scaler)
 
         min_dim = min(df.shape)
-        n_vars = min(n_vars, min_dim)
-        pca = PCA(n_vars)
+        n_components = min(n_components, min_dim)
+        pca = PCA(n_components)
         X_projected = pca.fit_transform(df)
-        df_projected = pd.DataFrame(X_projected, 
-            index=df.index.get_level_values(0)).add_prefix('PCA-')
-
-        explained_variance = pca.explained_variance_ratio_*100
+        # Convert to dataframe
+        df_projected = pd.DataFrame(X_projected, index=df.index.get_level_values(0))
+        # Set columns to PC-1, PC-2, ...                                    
+        df_projected.columns = [f'PC-{int(i)+1}' for i in df_projected.columns]
+        
+        # Calculate cumulative explained variance in percent
+        explained_variance = pca.explained_variance_ratio_ * 100
         cum_expl_var = np.cumsum(explained_variance)
         
+        # Create feature contributions
+        a = np.zeros((n_components, n_components), int)
+        np.fill_diagonal(a, 1)
+        dfc = pd.DataFrame(pca.inverse_transform(a))
+        dfc.columns = df.columns
+        dfc.index = [f'PC-{i+1}' for i in range(n_components)]
+        dfc.index.name = 'PC'
+        # convert to long format
+        dfc = dfc.stack().reset_index().rename(columns={0: 'Coefficient'})
+
         self.decomposition_results = {
             'df_projected': df_projected,
             'cum_expl_var': cum_expl_var,
-            'n_vars': n_vars,
-            'type': 'PCA'
+            'n_components': n_components,
+            'type': 'PCA',
+            'feature_contributions': dfc,
+            'class': pca
         }
 
 
     def pca_plot_cumulative_variance(self):
-        n_vars = self.decomposition_results['n_vars']
-        fig = plt.figure(figsize=(7,3))
+        n_vars = self.decomposition_results['n_components']
+        fig = plt.figure(figsize=(7,3), dpi=300)
         cum_expl_var = self.decomposition_results['cum_expl_var']
         plt.bar(np.arange(n_vars)+1, cum_expl_var, 
-            facecolor='grey', edgecolor='none')
-        plt.xlabel('# PCA-components')
-        plt.ylabel('Explained variance')
+                facecolor='grey', edgecolor='none')
+        plt.xlabel('Principal Component')
+        plt.ylabel('Explained variance [%]')
         plt.title('Cumulative explained variance')
         plt.grid()
+        plt.xticks(range(1, len(cum_expl_var)+1))
         return fig
 
 
@@ -521,7 +542,7 @@ class Mint(object):
             df[group_name] = color_groups
             df[group_name] = df[group_name].astype(str)
 
-        fig = plt.figure()
+        fig = plt.figure(dpi=300)
 
         if marker is None and len(df) > 20:
             marker = '+'
@@ -530,6 +551,6 @@ class Mint(object):
 
         if color_groups is not None:
             leg = g._legend
-            leg.set_bbox_to_anchor([1.05, 0.5])
+            #leg.set_bbox_to_anchor([1.05, 0.5])
 
         return fig

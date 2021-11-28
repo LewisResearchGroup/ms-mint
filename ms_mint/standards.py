@@ -10,6 +10,7 @@ TARGETS_COLUMNS = ['peak_label', 'mz_mean', 'mz_width',
 
 RESULTS_COLUMNS = [
     'peak_area', 
+    'peak_area_top3',
     'peak_n_datapoints', 
     'peak_max', 
     'peak_rt_of_max',
