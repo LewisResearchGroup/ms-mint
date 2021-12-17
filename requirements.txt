@@ -26,7 +26,6 @@ openpyxl
 pandas
 pandoc
 plotly
-plotly
 plotly_express
 pyarrow>=3
 pymzml
@@ -45,3 +44,5 @@ waitress
 wget
 xlrd
 xlsxwriter
+black
+nbval
