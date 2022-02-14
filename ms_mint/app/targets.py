@@ -81,7 +81,7 @@ _layout = html.Div(
             multiple=True,
         ),
         dcc.Dropdown(
-            "pkl-ms-mode",
+            id="pkl-ms-mode",
             options=[
                 {
                     "value": "positive",

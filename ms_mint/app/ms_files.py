@@ -41,6 +41,7 @@ options = {
 }
 
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text": "Clear Filters"}
+downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"xlsx"}
 
 
 columns = [
