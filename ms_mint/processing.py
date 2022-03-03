@@ -3,6 +3,9 @@
 import os
 import pandas as pd
 import numpy as np
+import logging 
+
+from ms_mint.app.tools import lock
 
 from .io import ms_file_to_df
 
@@ -36,16 +39,27 @@ def process_ms1_files_in_parallel(args):
 
     filename = args["filename"]
     targets = args["targets"]
+    output_fn = args["output_fn"]
 
     if "queue" in args.keys():
         q = args["queue"]
         q.put("filename")
-
     try:
-        result = process_ms1_file(filename=filename, targets=targets)
-    except:
-        result = pd.DataFrame()
-    return result
+        results = process_ms1_file(filename=filename, targets=targets)
+    except Exception as e:
+        logging.error(e)
+        results = pd.DataFrame()
+
+    if (output_fn is not None) and (len(results) > 0):
+        append_results(results, output_fn)
+        return None
+
+    return results
+
+
+def append_results(results, fn):
+    with lock(fn):
+        results.to_csv(fn, mode="a", header=False, index=False)
 
 
 def process_ms1_file(filename, targets):
@@ -89,7 +103,7 @@ def process_ms1_from_df(df, targets):
         "peak_label",
     ]
     array_peaks = targets[peak_cols].values
-    #if "ms_level" in df.columns:
+    # if "ms_level" in df.columns:
     #    df = df[df.ms_level == 1]
     array_data = df[["scan_time_min", "mz", "intensity"]].values
     result = process_ms1_from_numpy(array_data, array_peaks)
@@ -147,6 +161,7 @@ def extract_ms1_properties(array, mz_mean):
     masses = array[:, 1]
     intensities = array[:, 2]
     peak_n_datapoints = len(array)
+
     if peak_n_datapoints == 0:
         return dict(
             peak_area=0,

@@ -95,7 +95,6 @@ class Mint(object):
             rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
             self.targets.loc[ndx, ["rt_min", "rt_max"]] = rt_min, rt_max
 
-    @lru_cache(100)
     def ms_file_to_df(self, fn):
         return ms_file_to_df(fn)
 
@@ -151,6 +150,7 @@ class Mint(object):
                     "targets": self.targets,
                     "q": None,
                     "mode": mode,
+                    "output_fn": None,
                 }
                 results.append(process_ms1_files_in_parallel(args))
                 self.progress = int(100 * (i / self.n_files))
@@ -172,12 +172,17 @@ class Mint(object):
 
         self._status = "done"
 
-    def run_parallel(self, nthreads=1, mode="standard", maxtasksperchild=None):
+    def run_parallel(self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None):
         print(f"maxtasksperchild: {maxtasksperchild}")
         pool = Pool(processes=nthreads, maxtasksperchild=maxtasksperchild)
         m = Manager()
         q = m.Queue()
         args = []
+        
+        if output_fn is not None:
+            # Prepare output file (only headers)
+            pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(output_fn, index=False)
+
         for i, filename in enumerate(self.ms_files):
             args.append(
                 {
@@ -185,6 +190,7 @@ class Mint(object):
                     "targets": self.targets,
                     "queue": q,
                     "mode": mode,
+                    "output_fn": output_fn
                 }
             )
 
@@ -203,8 +209,10 @@ class Mint(object):
 
         pool.close()
         pool.join()
-        results = results.get()
-        self.results = pd.concat(results).reset_index(drop=True)
+        
+        if output_fn is None:
+            results = results.get()
+            self.results = pd.concat(results).reset_index(drop=True)
 
     @property
     def messages(self):

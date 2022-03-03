@@ -154,8 +154,6 @@ def layout():
 
 
 def callbacks(app, fsc, cache):
-
-
     @app.callback(
         Output("ms-table", "data"),
         Output("ms-table", "downloadButtonType"),
@@ -163,10 +161,10 @@ def callbacks(app, fsc, cache):
         Input("wdir", "children"),
         Input({"index": "ms-delete-output", "type": "output"}, "children"),
         Input({"index": "ms-convert-output", "type": "output"}, "children"),
-        State("active-workspace", "children")
+        State("active-workspace", "children"),
     )
     def ms_table(value, wdir, files_deleted, files_converted, workspace):
-        
+
         ms_files = T.get_ms_fns(wdir)
 
         data = pd.DataFrame(
@@ -179,15 +177,13 @@ def callbacks(app, fsc, cache):
         )
 
         downloadButtonType = {
-            "css": "btn btn-primary", 
-            "text":"Export", 
-            "type":"csv", 
-            "filename": f"{T.today()}__MINT__{workspace}__ms-files"
+            "css": "btn btn-primary",
+            "text": "Export",
+            "type": "csv",
+            "filename": f"{T.today()}__MINT__{workspace}__ms-files",
         }
 
         return data.to_dict("records"), downloadButtonType
-
-
 
     @app.callback(
         Output({"index": "ms-convert-output", "type": "output"}, "children"),
@@ -210,8 +206,6 @@ def callbacks(app, fsc, cache):
                 os.remove(fn)
         return dbc.Alert("Files converted to feather format.", color="info")
 
-
-
     @app.callback(
         Output({"index": "ms-delete-output", "type": "output"}, "children"),
         Input("ms-delete", "n_clicks"),
@@ -227,8 +221,6 @@ def callbacks(app, fsc, cache):
             fn = P(target_dir) / fn
             os.remove(fn)
         return dbc.Alert(f"{len(rows)} files deleted", color="info")
-
-
 
     @app.callback(
         Output("ms-uploader-fns", "children"),
@@ -256,8 +248,6 @@ def callbacks(app, fsc, cache):
             return str(file)
         return []
 
-
-
     @app.callback(
         Output({"index": "ms-uploader-output", "type": "output"}, "children"),
         Input("ms-uploader-fns", "children"),
@@ -271,8 +261,6 @@ def callbacks(app, fsc, cache):
         shutil.move(fn, fn_new)
         logging.info(f"Move {fn} to {fn_new}")
         return dbc.Alert("Upload finished", color="success")
-
-
 
     @app.callback(
         Output({"index": "ms-import-from-url-output", "type": "output"}, "children"),
@@ -292,8 +280,6 @@ def callbacks(app, fsc, cache):
         if fns is None:
             return dbc.Alert(f"No MS files found at {url}", color="warning")
         return dbc.Alert(f"{len(fns)} files imported.", color="success")
-
-
 
     @app.callback(Output("ms-n-files", "children"), Input("ms-table", "data"))
     def n_files(data):
