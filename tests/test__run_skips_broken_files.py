@@ -4,11 +4,11 @@ from ms_mint.Mint import Mint
 
 from paths import TEST_MZML, TEST_TARGETS_FN, TEST_MZXML_BROKEN
 
+
 def test__run_skips_broken_files():
     mint = Mint(verbose=True)
     mint.targets_files = TEST_TARGETS_FN
-    mint.files = [TEST_MZML, 
-                  TEST_MZXML_BROKEN]
+    mint.files = [TEST_MZML, TEST_MZXML_BROKEN]
 
     mint.run()
 
@@ -17,4 +17,3 @@ def test__run_skips_broken_files():
 
     assert broken_files_absent, mint.results.ms_file
     assert good_files_present, mint.results.ms_file
-

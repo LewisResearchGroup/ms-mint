@@ -6,21 +6,25 @@ from ms_mint.standards import MINT_RESULTS_COLUMNS
 from paths import TEST_MZML, TEST_MZXML
 
 
-targets = pd.DataFrame({
-    'mz_mean': [117.0188], 
-    'mz_width': [100],
-    'rt_min': [0], 
-    'rt_max': [15],
-    'rt': [2.3],
-    'intensity_threshold': [0],
-    'peak_label': ['Succinate-neg'],
-    'target_filename': ['unknown']})
+targets = pd.DataFrame(
+    {
+        "mz_mean": [117.0188],
+        "mz_width": [100],
+        "rt_min": [0],
+        "rt_max": [15],
+        "rt": [2.3],
+        "intensity_threshold": [0],
+        "peak_label": ["Succinate-neg"],
+        "target_filename": ["unknown"],
+    }
+)
 
 
 def check_result(result, targets):
     assert list(result.columns) == MINT_RESULTS_COLUMNS, list(result.columns)
     assert (result.peak_label == targets.peak_label).all(), result.peak_label
     return True
+
 
 def test__process_ms1_file_mzxml():
     result = process_ms1_file(TEST_MZXML, targets=targets)

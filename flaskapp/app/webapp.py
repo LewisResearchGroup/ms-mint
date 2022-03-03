@@ -14,47 +14,47 @@ from app.forms import LoginForm
 from app.forms import RegistrationForm
 from app.models import User
 
-server_bp = Blueprint('main', __name__)
+server_bp = Blueprint("main", __name__)
 
 
-@server_bp.route('/')
+@server_bp.route("/")
 def index():
-    return render_template("index.html", title='MINT')
+    return render_template("index.html", title="MINT")
 
 
-@server_bp.route('/login/', methods=['GET', 'POST'])
+@server_bp.route("/login/", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for("main.index"))
 
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            error = 'Invalid username or password'
-            return render_template('login.html', form=form, error=error)
+            error = "Invalid username or password"
+            return render_template("login.html", form=form, error=error)
 
         login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.index')
+        next_page = request.args.get("next")
+        if not next_page or url_parse(next_page).netloc != "":
+            next_page = url_for("main.index")
         return redirect(next_page)
 
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template("login.html", title="Sign In", form=form)
 
 
-@server_bp.route('/logout/')
+@server_bp.route("/logout/")
 @login_required
 def logout():
     logout_user()
 
-    return redirect(url_for('main.index'))
+    return redirect(url_for("main.index"))
 
 
-@server_bp.route('/register/', methods=['GET', 'POST'])
+@server_bp.route("/register/", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for("main.index"))
 
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -63,6 +63,6 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        return redirect(url_for('main.login'))
+        return redirect(url_for("main.login"))
 
-    return render_template('register.html', title='Register', form=form)
+    return render_template("register.html", title="Register", form=form)
