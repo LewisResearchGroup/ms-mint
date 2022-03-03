@@ -89,8 +89,8 @@ def process_ms1_from_df(df, targets):
         "peak_label",
     ]
     array_peaks = targets[peak_cols].values
-    if "ms_level" in df.columns:
-        df = df[df.ms_level == 1]
+    #if "ms_level" in df.columns:
+    #    df = df[df.ms_level == 1]
     array_data = df[["scan_time_min", "mz", "intensity"]].values
     result = process_ms1_from_numpy(array_data, array_peaks)
     return result
