@@ -1,6 +1,7 @@
 import os
 
 from pathlib import Path as P
+from .filelock import FileLock
 
 import dash
 from dash import html, dcc
@@ -73,7 +74,9 @@ def callbacks(app, fsc, cache):
         if prop_id == "res-download.n_clicks":
             fn = T.get_results_fn(wdir)
             workspace = os.path.basename(wdir)
-            return [send_file(fn, filename=f"{T.today()}__MINT__{workspace}__results.csv")]
+            return [
+                send_file(fn, filename=f"{T.today()}__MINT__{workspace}__results.csv")
+            ]
 
         elif prop_id == "res-download-peakmax.n_clicks":
             workspace = os.path.basename(wdir)
@@ -95,15 +98,16 @@ def callbacks(app, fsc, cache):
     def run_mint(n_clicks, wdir):
         if n_clicks is None:
             raise PreventUpdate
+
         def set_progress(x):
             fsc.set("progress", x)
+
         mint = Mint(verbose=True, progress_callback=set_progress)
         targets = T.get_targets_fn(wdir)
         try:
             mint.targets_files = targets
             mint.ms_files = T.get_ms_fns(wdir)
-            mint.run()
-            mint.export(T.get_results_fn(wdir))
+            mint.run(output_fn=T.get_results_fn(wdir))
         except Exception as e:
             return dbc.Alert(str(e), color="danger")
         return dbc.Alert("Finished running MINT", color="success")
