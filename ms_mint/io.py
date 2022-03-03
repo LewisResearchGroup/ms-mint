@@ -30,7 +30,6 @@ MS_FILE_COLUMNS = [
 ]
 
 
-@lru_cache(100)
 def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     assert time_unit in ["minutes", "seconds"]
     fn = str(fn)
@@ -46,6 +45,9 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
         df = read_parquet(fn, read_only=read_only)
     elif fn.lower().endswith(".mzmlb"):
         df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
+    else:
+        raise ValueError
+
     # Compatibility with old
     if not read_only:
         df = df.rename(
