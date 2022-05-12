@@ -5,6 +5,11 @@ from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from .standards import M_PROTON
 
+from .filelock import FileLock
+
+def lock(fn):
+    return FileLock(f"{fn}.lock", timeout=1)
+
 
 def get_mz_mean_from_formulas(formulas, ms_mode=None, verbose=False):
     if verbose:
