@@ -3,6 +3,7 @@
 ![](images/coverage.svg)
 [![Github All Releases](https://img.shields.io/github/downloads/lewisresearchgroup/ms-mint/total.svg)]()
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/sorenwacker/ms-mint/actions/workflows/codeql-analysis.yml)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
 
 
 # MINT (Metabolomics Integrator)
