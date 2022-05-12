@@ -46,7 +46,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     elif fn.lower().endswith(".mzmlb"):
         df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
     else:
-        raise ValueError
+        logging.error(f'Cannot read file {fn} of type {type(fn)}')
 
     # Compatibility with old
     if not read_only:

@@ -172,13 +172,15 @@ class Mint(object):
 
         self._status = "done"
 
-    def run_parallel(self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None):
+    def run_parallel(
+        self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None
+    ):
         print(f"maxtasksperchild: {maxtasksperchild}")
         pool = Pool(processes=nthreads, maxtasksperchild=maxtasksperchild)
         m = Manager()
         q = m.Queue()
         args = []
-        
+
         if output_fn is not None:
             # Prepare output file (only headers)
             pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(output_fn, index=False)
@@ -190,7 +192,7 @@ class Mint(object):
                     "targets": self.targets,
                     "queue": q,
                     "mode": mode,
-                    "output_fn": output_fn
+                    "output_fn": output_fn,
                 }
             )
 
@@ -209,7 +211,7 @@ class Mint(object):
 
         pool.close()
         pool.join()
-        
+
         if output_fn is None:
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)

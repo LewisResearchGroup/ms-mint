@@ -32,7 +32,7 @@ pymzml
 pyteomics
 pytest-cov
 scikit-learn
-scipy==1.6.2
+scipy
 seaborn
 setuptools
 six

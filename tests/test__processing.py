@@ -133,23 +133,22 @@ def test__run_parallel(tmp_path):
             "mz_mean": [128.034],
             "mz_width": [100],
             "intensity_threshold": [0],
-            "rt_min": [286/60],
-            "rt_max": [330/60],
-            "rt": [300/60],
+            "rt_min": [286 / 60],
+            "rt_max": [330 / 60],
+            "rt": [300 / 60],
             "target_filename": ["unknown"],
         }
     )
-
 
     pool = Pool(processes=2, maxtasksperchild=None)
     m = Manager()
     q = m.Queue()
 
     N = 4
-    fns = [P(tmp_path)/f'File-{i}.mzXML' for i in range(N)] 
- 
+    fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(N)]
+
     args_list = []
-    for fn in fns: 
+    for fn in fns:
         os.symlink(TEST_MZXML, fn)
 
         args = {
@@ -157,20 +156,18 @@ def test__run_parallel(tmp_path):
             "targets": targets,
             "q": None,
             "mode": None,
-            "output_fn": None
+            "output_fn": None,
         }
 
         args_list.append(args)
-    
+
     results = pool.map_async(processing.process_ms1_files_in_parallel, args_list)
 
     pool.close()
     pool.join()
-    
+
     result = pd.concat(results.get())
     print(result)
-
-
 
 
 def test__run_parallel_with_output_filename(tmp_path):
@@ -181,9 +178,9 @@ def test__run_parallel_with_output_filename(tmp_path):
             "mz_mean": [128.034],
             "mz_width": [100],
             "intensity_threshold": [0],
-            "rt_min": [286/60],
-            "rt_max": [330/60],
-            "rt": [300/60],
+            "rt_min": [286 / 60],
+            "rt_max": [330 / 60],
+            "rt": [300 / 60],
             "target_filename": ["unknown"],
         }
     )
@@ -193,11 +190,11 @@ def test__run_parallel_with_output_filename(tmp_path):
     q = m.Queue()
 
     N = 4
-    fns = [P(tmp_path)/f'File-{i}.mzXML' for i in range(N)] 
-    output_fn = P(tmp_path)/'results.csv'
+    fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(N)]
+    output_fn = P(tmp_path) / "results.csv"
 
     args_list = []
-    for fn in fns: 
+    for fn in fns:
         os.symlink(TEST_MZXML, fn)
 
         args = {
@@ -205,11 +202,11 @@ def test__run_parallel_with_output_filename(tmp_path):
             "targets": targets,
             "q": None,
             "mode": None,
-            "output_fn": output_fn
+            "output_fn": output_fn,
         }
 
         args_list.append(args)
-    
+
     # Prepare output file (only headers)
     pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(output_fn, index=False)
 
@@ -217,11 +214,11 @@ def test__run_parallel_with_output_filename(tmp_path):
 
     pool.close()
     pool.join()
-    
+
     returned_results = results.get()
 
     assert all([i is None for i in returned_results]), returned_results
 
     stored_results = pd.read_csv(output_fn)
-    
-    assert len(stored_results) == N*len(targets)
+
+    assert len(stored_results) == N * len(targets)
