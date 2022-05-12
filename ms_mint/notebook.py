@@ -1,12 +1,12 @@
 import os, io
-import ipywidgets as widgets
+import ipywidgets as W
 import tempfile
 
 from glob import glob
 from pathlib import Path as P
 
-from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
-from ipywidgets import IntProgress as Progress
+#from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
+#from ipywidgets import IntProgress as Progress
 from ipyfilechooser import FileChooser
 from IPython.display import display
 from IPython.core.display import HTML
@@ -30,22 +30,22 @@ class Mint(MintBase):
 
         self.ms_storage_path = fc
 
-        self.ms_upload = FileUpload()
+        self.ms_upload = W.FileUpload()
 
-        self.peaklist_files_button = FileUpload(
+        self.peaklist_files_button = W.FileUpload(
             description="Peaklists", accept="csv,xlsx", multiple=False
         )
 
         self.peaklist_files_button.observe(self.load_peaklist, names="value")
 
-        self.load_ms_button = Button(description="Load MS-files")
+        self.load_ms_button = W.Button(description="Load MS-files")
 
         self.load_ms_button.on_click(self.search_files)
 
-        self.detect_peaks_button = Button(description="Detect Peaks")
+        self.detect_peaks_button = W.Button(description="Detect Peaks")
         self.detect_peaks_button.on_click(self.detect_peaks)
 
-        self.message_box = Textarea(
+        self.message_box = W.Textarea(
             value="",
             placeholder="Please select some files and click on Run.",
             description="",
@@ -53,31 +53,31 @@ class Mint(MintBase):
             layout={"width": "90%", "height": "500px", "font_family": "monospace"},
         )
 
-        self.run_button = Button(description="Run")
+        self.run_button = W.Button(description="Run")
         self.run_button.on_click(self.run)
         self.run_button.style.button_color = "lightgray"
 
-        self.optimize_rt_button = Button(description="Find closest peaks")
+        self.optimize_rt_button = W.Button(description="Find closest peaks")
         self.optimize_rt_button.on_click(self.action_optimize_rt)
 
-        self.download_button = Button(description="Export")
+        self.download_button = W.Button(description="Export")
         self.download_button.on_click(self.export_action)
         self.download_button.style.button_color = "lightgray"
 
-        self.progress_bar = Progress(
+        self.progress_bar = W.IntProgress(
             min=0,
             max=100,
-            layout=Layout(width="90%"),
+            layout=W.Layout(width="90%"),
             description="Progress:",
             bar_style="info",
         )
 
-        self.output = widgets.Output()
+        self.output = W.Output()
 
-        tabs = Tab()
+        tabs = W.Tab()
         tabs.children = [
-            HBox([self.ms_storage_path, self.ms_upload, self.load_ms_button]),
-            HBox(
+            W.HBox([self.ms_storage_path, self.ms_upload, self.load_ms_button]),
+            W.HBox(
                 [
                     self.peaklist_files_button,
                     self.detect_peaks_button,
@@ -89,11 +89,11 @@ class Mint(MintBase):
         tabs.set_title(0, "MS-Files")
         tabs.set_title(1, "Peaklists")
 
-        self.layout = VBox(
+        self.layout = W.VBox(
             [
                 tabs,
                 self.message_box,
-                HBox([self.run_button, self.download_button]),
+                W.HBox([self.run_button, self.download_button]),
                 self.progress_bar,
             ]
         )

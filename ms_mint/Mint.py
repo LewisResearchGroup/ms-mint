@@ -601,7 +601,7 @@ class Mint(object):
             df[group_name] = color_groups
             df[group_name] = df[group_name].astype(str)
 
-        fig = plt.figure(dpi=300)
+        plt.figure(dpi=300)
 
         if marker is None and len(df) > 20:
             marker = "+"
@@ -610,4 +610,4 @@ class Mint(object):
             df, plot_kws={"s": 50, "marker": marker}, hue=group_name, **kwargs
         )
 
-        return fig
+        return g

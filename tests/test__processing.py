@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 from pathlib import Path as P
-from multiprocessing import Pool, Manager, cpu_count
+from multiprocessing import Pool
 from ms_mint import processing
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 from paths import TEST_MZXML
@@ -141,8 +141,6 @@ def test__run_parallel(tmp_path):
     )
 
     pool = Pool(processes=2, maxtasksperchild=None)
-    m = Manager()
-    q = m.Queue()
 
     N = 4
     fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(N)]
@@ -186,8 +184,6 @@ def test__run_parallel_with_output_filename(tmp_path):
     )
 
     pool = Pool(processes=2, maxtasksperchild=None)
-    m = Manager()
-    q = m.Queue()
 
     N = 4
     fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(N)]
