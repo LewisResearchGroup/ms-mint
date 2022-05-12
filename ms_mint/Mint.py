@@ -8,7 +8,6 @@ import logging
 
 from warnings import simplefilter
 from pathlib import Path as P
-from functools import lru_cache
 
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -22,7 +21,7 @@ from .processing import process_ms1_files_in_parallel, extract_chromatogram_from
 from .io import export_to_excel, ms_file_to_df
 from .targets import read_targets, check_targets, standardize_targets
 from .helpers import is_ms_file, get_ms_files_from_results
-from .vis.plotly import plotly_heatmap, plotly_peak_shapes
+from .vis.plotly import plotly_heatmap
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
 from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 from .tools import scale_dataframe
@@ -610,9 +609,5 @@ class Mint(object):
         g = sns.pairplot(
             df, plot_kws={"s": 50, "marker": marker}, hue=group_name, **kwargs
         )
-
-        if color_groups is not None:
-            leg = g._legend
-            # leg.set_bbox_to_anchor([1.05, 0.5])
 
         return fig

@@ -44,8 +44,6 @@ def hierarchical_clustering(
     top_h = 1 - main_h
     top_w = main_w
 
-    ydim, xdim = df.shape
-
     if xmaxticks is None:
         xmaxticks = int(5 * main_w * total_width)
     if ymaxticks is None:
