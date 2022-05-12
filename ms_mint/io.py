@@ -9,7 +9,6 @@ import pymzml
 from pathlib import Path as P
 from datetime import date
 from pyteomics import mzxml, mzml
-from functools import lru_cache
 
 try:
     from pyteomics import mzmlb

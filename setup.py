@@ -20,9 +20,7 @@ config = {
     "author": "Soren Wacker",
     "url": "https://github.com/LewisResearchGroup/ms-mint",
     "author_email": "swacker@ucalgary.ca",
-    "scripts": ["scripts/Mint.py"],
     "packages": find_packages(),
-    "data_files": [("scripts", ["scripts/Mint.py"])],
     "classifiers": [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
