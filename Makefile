@@ -21,3 +21,5 @@ docs:
 deploy:
 	python setup.py sdist bdist_wheel
     python -m twine upload --repository ms-mint dist/ms*mint-*
+
+	
