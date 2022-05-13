@@ -39,8 +39,9 @@ def test__standardize_targets():
     assert result.equals(expected), result
 
 
-def test__check_target():
-    pass
+def test__check_target__empty_list_ok():
+    emtpy_target_list = pd.DataFrame(columns=TARGETS_COLUMNS)
+    T.check_targets(emtpy_target_list)
 
 
 def test__peak_window_from_target():

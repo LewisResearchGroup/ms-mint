@@ -18,7 +18,7 @@ class TestClass:
         assert mint.n_files == 0, mint.n_files
         mint.ms_files = [TEST_MZXML]
         assert mint.n_files == 1, mint.n_files
-        assert mint.files == [TEST_MZXML]
+        assert mint.ms_files == [TEST_MZXML]
 
     def test__add_target(self):
         assert mint.n_targets_files == 0, mint.n_targets_files
@@ -34,7 +34,7 @@ class TestClass:
 
     def test__results_lenght(self):
         actual = len(mint.results)
-        expected = len(mint.targets) * len(mint.files)
+        expected = len(mint.targets) * len(mint.ms_files)
         assert (
             expected == actual
         ), f"Length of results ({actual}) does not equal expected length ({expected})"
@@ -51,13 +51,13 @@ class TestClass:
         ), f"Crosstab is not a DataFrame ({type(ct)})."
 
     def test__mint_run_parallel(self):
-        mint.files = [TEST_MZML, TEST_MZXML]
+        mint.ms_files = [TEST_MZML, TEST_MZXML]
         mint.targets_files = TEST_TARGETS_FN
         mint.run(nthreads=2)
 
     def test__mzxml_equals_mzml(self):
         mint.reset()
-        mint.files = [TEST_MZML, TEST_MZXML]
+        mint.ms_files = [TEST_MZML, TEST_MZXML]
         mint.targets_files = TEST_TARGETS_FN
         mint.run()
         results = []
@@ -70,7 +70,7 @@ class TestClass:
 
     def test__target_v0_equals_v1(self):
         mint.reset()
-        mint.files = [TEST_MZXML]
+        mint.ms_files = [TEST_MZXML]
         mint.targets_files = [TEST_TARGETS_FN_V0, TEST_TARGETS_FN]
         mint.run()
         results = []
@@ -83,7 +83,7 @@ class TestClass:
 
     def test__run_returns_none_without_target(self):
         mint.reset()
-        mint.files = [TEST_MZXML]
+        mint.ms_files = [TEST_MZXML]
         assert mint.run() is None
 
     def test__run_returns_none_without_ms_files(self):

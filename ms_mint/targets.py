@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+import logging
 
 from pathlib import Path as P
 
@@ -92,16 +93,46 @@ def check_targets(targets):
     Returns a list of strings indicating identified errors.
     If list is empty targets is OK.
     """
-    assert isinstance(targets, pd.DataFrame), "Targets is not a dataframe."
-    targets[TARGETS_COLUMNS]
-    assert targets.dtypes["peak_label"] == np.dtype(
-        "O"
-    ), "Provided peak labels are not string: {}".format(targets.dtypes["peak_label"])
-    assert (
-        targets.peak_label.value_counts().max() == 1
-    ), "Provided peak labels are not unique."
+    results = (
+        isinstance(targets, pd.DataFrame),
+        check_target_list_columns(targets),
+        check_labels_are_strings(targets),
+        check_duplicated_labels(targets),
+        check_targets_rt_values(targets),
+    )
+    print(results)
+    assert all(results)
+    return all(results)
+
+
+def check_labels_are_strings(targets):
+    if not targets.dtypes["peak_label"] == np.dtype("O"):
+        logging.warning('Target labels are not strings.')
+        return False
+    return True
+
+
+def check_duplicated_labels(targets):
+    max_target_label_count = targets.peak_label.value_counts().max()
+    if max_target_label_count > 1:
+        logging.warning('Target labels are not unique')
+        return False
+    return True
+
+
+def check_target_list_columns(targets):
+    if targets.columns.to_list() != TARGETS_COLUMNS:
+        logging.warning('Target columns are wrong.')
+        return False
+    return True
+
+
+def check_targets_rt_values(targets):
     missing_rt = targets.loc[targets[["rt_min", "rt_max"]].isna().max(axis=1)]
-    assert len(missing_rt) == 0, "Some targets have missing rt_min or rt_max."
+    if len(missing_rt) != 0: 
+        logging.warning("Some targets have missing rt_min or rt_max.")
+        return False
+    return True
 
 
 def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):

@@ -74,8 +74,6 @@ class Mint(object):
         n_peaks = len(targets)
         for i, (ndx, row) in tqdm(enumerate(targets.iterrows()), total=n_peaks):
             progress = int(100 * (i + 1) / n_peaks)
-            if self.progress_callback is not None:
-                self.progress_callback(progress)
             peak_label = row["peak_label"]
             if peak_label not in peak_labels:
                 continue
@@ -93,6 +91,7 @@ class Mint(object):
             rtopt = RetentionTimeOptimizer(**params, **kwargs)
             rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
             self.targets.loc[ndx, ["rt_min", "rt_max"]] = rt_min, rt_max
+
 
     def ms_file_to_df(self, fn):
         return ms_file_to_df(fn)
@@ -154,7 +153,8 @@ class Mint(object):
                 results.append(process_ms1_files_in_parallel(args))
                 self.progress = int(100 * (i / self.n_files))
             self.results = pd.concat(results).reset_index(drop=True)
-            self.progress = 100
+
+        self.progress = 100
 
         end = time.time()
         self.runtime = end - start
@@ -224,17 +224,8 @@ class Mint(object):
         return self._status
 
     @property
-    def files(self):
-        return self._files
-
-    @property
     def ms_files(self):
         return self._files
-
-    @files.setter
-    def files(self, list_of_files):
-        print("Mint.files is deprecated, please use Mint.ms_files instead!")
-        self.ms_files = list_of_files
 
     @property
     def n_files(self):
@@ -280,7 +271,7 @@ class Mint(object):
     @targets.setter
     def targets(self, targets):
         targets = standardize_targets(targets)
-        check_targets(targets)
+        assert check_targets(targets)
         self._targets = targets
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
@@ -373,7 +364,7 @@ class Mint(object):
             ].drop_duplicates()
             self.targets = targets
 
-    def plot_clustering(
+    def hierarchical_clustering(
         self,
         data=None,
         title=None,
@@ -388,7 +379,7 @@ class Mint(object):
         scaler_peak_label="standard",
         metric="euclidean",
         transform_filenames_func="basename",
-        transpose=False,
+        transposed=False,
         **kwargs,
     ):
         """
@@ -461,7 +452,7 @@ class Mint(object):
         if scaler_peak_label is not None:
             tmp_data = scale_dataframe(tmp_data, scaler_peak_label)
 
-        if transpose:
+        if transposed:
             tmp_data = tmp_data.T
 
         clustered, fig, ndx_x, ndx_y = hierarchical_clustering(
@@ -475,7 +466,7 @@ class Mint(object):
             **kwargs,
         )
 
-        if not transpose:
+        if not transposed:
             self.clustered = data.iloc[ndx_x, ndx_y]
         else:
             self.clustered = data.iloc[ndx_y, ndx_x]
@@ -485,7 +476,7 @@ class Mint(object):
         if len(self.results) > 0:
             return plot_peak_shapes(self.results, **kwargs)
 
-    def plotly_heatmap(
+    def heatmap(
         self,
         col_name="peak_max",
         normed_by_cols=False,
@@ -588,7 +579,7 @@ class Mint(object):
         plt.xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
-    def plot_pair_plot(
+    def pca_plot_scatter_matrix(
         self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
     ):
         df = self.decomposition_results["df_projected"]
