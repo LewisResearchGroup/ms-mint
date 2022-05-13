@@ -74,7 +74,7 @@ def standardize_targets(targets, ms_mode="neutral"):
 def update_retention_time_columns(targets):
     for ndx, row in targets.iterrows():
         if row["rt"] is not None:
-            if ["rt_min"] is None:
+            if row["rt_min"] is None:
                 targets.loc[ndx, "rt_min"] = 5  # max( 0, row['rt'] - 0.2 )
             if row["rt_max"] is None:
                 targets.loc[ndx, "rt_max"] = row["rt"] + 0.2
