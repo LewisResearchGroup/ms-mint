@@ -101,7 +101,6 @@ def check_targets(targets):
         check_targets_rt_values(targets),
     )
     print(results)
-    assert all(results)
     return all(results)
 
 
