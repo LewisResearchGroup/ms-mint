@@ -3,16 +3,6 @@ site_url: https://github.com/sorenwacker/ms-mint
 site_author: Soren Wacker 
 nav:
   - Home: 'index.md'
-  - Quickstart: 'quickstart.md'
-  - Background: 'background.md'
-  - Installation: 'install.md'
-  - GUI: 'gui.md'
-  - Targets: 'targets.md'
-  #- Peak detection: 'peak-detection.md'
-  #- Python: 'python.md'
-  - Jupyter: 'jupyter.md'
-  - Developer Notes: 'developer-notes.md'
-  - Gallery: 'gallery.md'
 extra:
   analytics:
     provider: google

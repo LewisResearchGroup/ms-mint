@@ -3,9 +3,9 @@
 import os
 import pandas as pd
 import numpy as np
-import logging 
+import logging
 
-from ms_mint.app.tools import lock
+from .tools import lock
 
 from .io import ms_file_to_df
 
