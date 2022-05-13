@@ -23,7 +23,6 @@ def plotly_heatmap(
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
     df = df.loc[non_zero_labels]
 
-    plot_type = "Heatmap"
     colorscale = "Bluered"
     plot_attributes = []
 
