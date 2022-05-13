@@ -16,3 +16,13 @@ More information on how to install and run the program can be found in the [Docu
 # News
 
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
+
+# Contributions
+
+All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
+You can reach out using the [issues](https://github.com/LewisResearchGroup/ms-mint/issues) page.
+
+
+# Code standards
+
+The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
