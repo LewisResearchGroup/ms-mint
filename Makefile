@@ -15,10 +15,11 @@ test:
 pyinstaller:
 	cd specfiles && pyinstaller --onedir --noconfirm Mint__onedir__.spec --additional-hooks-dir=hooks
 
-docs:
+doc:
 	mkdocs build && mkdocs gh-deploy
 
 deploy:
+	rm dist/*
 	python setup.py sdist bdist_wheel
 	python -m twine upload --repository ms-mint dist/ms*mint-*
 

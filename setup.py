@@ -7,7 +7,32 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-install_requires = []
+install_reqs = [
+    "pytest",
+    "six",
+    "jsonschema",
+    "entrypoints",
+    "pygments",
+    "pexpect",
+    "decorator",
+    "pillow",
+    "lxml",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "pyteomics",
+    "scikit-learn",
+    "molmass",
+    "pymzml",
+    "plotly",
+    "colorlover",
+    "tqdm",
+    "ipywidgets",
+    "ipyfilechooser",
+    "openpyxl",
+    "pyarrow",
+    "tables",
+]
 
 
 config = {
@@ -27,7 +52,7 @@ config = {
         "Operating System :: OS Independent",
     ],
     "python_requires": ">=3.7",
-    "install_requires": install_requires,
+    "install_requires": install_reqs,
     "include_package_data": True,
 }
 

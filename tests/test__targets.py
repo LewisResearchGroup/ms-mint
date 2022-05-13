@@ -2,6 +2,7 @@ import pandas as pd
 from ms_mint import targets as T
 from ms_mint.standards import TARGETS_COLUMNS
 
+from paths import TEST_TARGETS_FN
 
 def test__read_targets():
     pass
@@ -39,19 +40,44 @@ def test__standardize_targets():
     assert result.equals(expected), result
 
 
-def test__check_target():
-    pass
+def test__check_target__empty_list_ok():
+    emtpy_target_list = pd.DataFrame(columns=TARGETS_COLUMNS)
+    result = T.check_targets(emtpy_target_list)
+    assert result is True
 
 
-def test__peak_window_from_target():
-    pass
+def test__check_targets_labels_not_string():
+    targets = T.read_targets(TEST_TARGETS_FN)
+    targets['peak_label'] = range(len(targets))
+    result = T.check_targets(targets)
+    assert result is False
 
 
-def test__gen_target_grid():
-    target = T.gen_target_grid([115], 0.1, intensity_threshold=1000)
-    assert target is not None
+def test__check_targets_labels_missing_rtmax():
+    targets = T.read_targets(TEST_TARGETS_FN)
+    targets.loc[0, 'rt_max'] = None
+    result = T.check_targets(targets)
+    assert result is False
+    
+
+def test__check_targets_labels_missing_rtmin():
+    targets = T.read_targets(TEST_TARGETS_FN)
+    targets.loc[0, 'rt_min'] = None
+    result = T.check_targets(targets)
+    assert result is False
 
 
-def test__read_target__compound_formula():
-    fn = "tests/data/targets/compound-formula.csv"
-    T.read_targets(fn)
+def test__check_targets_labels_duplictated():
+    targets = T.read_targets(TEST_TARGETS_FN)
+    targets.loc[0, 'peak_label'] = "A"
+    targets.loc[1, 'peak_label'] = "A"
+    result = T.check_targets(targets)
+    assert result is False
+
+
+def test__check_targets_wrong_column_names():
+    targets = T.read_targets(TEST_TARGETS_FN).rename(columns={'peak_label': 'paek_label'})
+    targets.loc[0, 'peak_label'] = "A"
+    targets.loc[1, 'peak_label'] = "A"
+    result = T.check_targets(targets)
+    assert result is False    
