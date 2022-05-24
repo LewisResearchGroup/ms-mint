@@ -26,3 +26,12 @@ Before you modify the code please reach out to us using the [issues](https://git
 # Code standards
 
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
+
+
+# Change log
+
+## v0.1.5
+
+The way to load targets from files has been changed.
+
+    mint.target_files = [...]  -> mint.load_targets([...])
