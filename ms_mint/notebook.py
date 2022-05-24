@@ -1,6 +1,5 @@
 import os, io
 import ipywidgets as W
-import tempfile
 
 from glob import glob
 from pathlib import Path as P
