@@ -29,7 +29,7 @@ def test__read_ms_file():
 def test__clear_results():
     mint = Mint(verbose=False)
     mint.ms_files = TEST_MZML
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     assert len(mint.results) > 0
     mint.clear_results()
@@ -47,7 +47,7 @@ def test__clear_ms_files():
 def test__clear_results():
     mint = Mint(verbose=False)
     mint.ms_files = TEST_MZML
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     assert len(mint.results) > 0
     mint.clear_results()
@@ -56,7 +56,7 @@ def test__clear_results():
 
 def test__clear_targets():
     mint = Mint(verbose=False)
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     assert len(mint.targets) > 0
     mint.clear_targets()
     assert len(mint.targets) == 0
@@ -65,14 +65,14 @@ def test__clear_targets():
 def test__optimize_rt():
     mint = Mint(verbose=False)
     mint.ms_files = TEST_MZML
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.optimize_rt()
 
 
 def test__heatmap():
     mint = Mint(verbose=False)
     mint.ms_files = TEST_MZML
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     mint.plot.heatmap()
     mint.plot.heatmap(transposed=True)
@@ -81,7 +81,7 @@ def test__heatmap():
 def test__hierarchical_clustering():
     mint = Mint(verbose=False)
     mint.ms_files = [TEST_MZML, TEST_MZXML]
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     mint.plot.hierarchical_clustering()
     mint.plot.hierarchical_clustering(transposed=True)
@@ -95,7 +95,7 @@ def test__hierarchical_clustering():
 def test__pca_plots_are_working():
     mint = Mint(verbose=False)
     mint.ms_files = [TEST_MZML, TEST_MZXML]
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     mint.pca(fillna='mean')
     mint.pca(fillna='zero')
@@ -107,7 +107,7 @@ def test__pca_plots_are_working():
 def test__plot_peak_shapes():
     mint = Mint(verbose=False)
     mint.ms_files = [TEST_MZML]
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     mint.plot.peak_shapes()
 
@@ -118,7 +118,7 @@ def test__progress_callback():
     callback_func = lambda x: result.append(True)
     mint = Mint(progress_callback=callback_func)
     mint.ms_files = TEST_MZML
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     expected = [True, True]
     assert result == expected
@@ -127,7 +127,7 @@ def test__progress_callback():
 def test__progress():
     mint = Mint()
     mint.ms_files = [TEST_MZML, TEST_MZXML]
-    mint.targets_files = TEST_TARGETS_FN    
+    mint.load_targets(TEST_TARGETS_FN)
     assert mint.progress == 0
     mint.run()
     print(mint.progress, type(mint.progress))

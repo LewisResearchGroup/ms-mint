@@ -63,22 +63,10 @@ def test__plotly_heatmap__clustered_correlation():
     assert isinstance(img, Figure), type(img)
 
 
-"""
-def test__plotly_heatmap__call_show():
-    N = 10
-    data = np.random.uniform(size=(N,N)) + np.arange(N) - N / 2
-    df = pd.DataFrame(data)
-    df.index.name = 'INDEX'
-    df.columns.name = 'COLUMNS'
-    img = plotly_heatmap(df, call_show=True, name='TEST')
-    assert img is None, type(img)
-"""
-
-
 def test__plotly_peak_shapes():
     mint = Mint()
     mint.ms_files = TEST_FEATHER
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     img = plotly_peak_shapes(mint.results)
     assert isinstance(img, Figure), type(img)
@@ -87,7 +75,7 @@ def test__plotly_peak_shapes():
 def test__plotly_peak_shapes_3d():
     mint = Mint()
     mint.ms_files = TEST_FEATHER
-    mint.targets_files = TEST_TARGETS_FN
+    mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     img = plotly_peak_shapes_3d(mint.results, peak_label="11")
     assert isinstance(img, Figure), type(img)

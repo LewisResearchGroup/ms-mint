@@ -67,20 +67,8 @@ def standardize_targets(targets, ms_mode="neutral"):
     targets["peak_label"] = targets["peak_label"].astype(str)
     targets.index = range(len(targets))
     targets = targets[targets.mz_mean.notna()]
-
+    targets = targets.replace(np.NaN, None)
     return targets[TARGETS_COLUMNS]
-
-
-def update_retention_time_columns(targets):
-    for ndx, row in targets.iterrows():
-        if row["rt"] is not None:
-            if row["rt_min"] is None:
-                targets.loc[ndx, "rt_min"] = 5  # max( 0, row['rt'] - 0.2 )
-            if row["rt_max"] is None:
-                targets.loc[ndx, "rt_max"] = row["rt"] + 0.2
-        else:
-            if (row["rt_min"] is not None) & (row["rt_max"] is not None):
-                targets.loc[ndx, "row"] = row[["rt_min", "rt_max"]].mean(axis=1)
 
 
 def check_targets(targets):
@@ -157,7 +145,7 @@ def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
     )
     targets["mz_width"] = mz_ppm
     targets["intensity_threshold"] = intensity_threshold
-    targets["targets_name"] = "Generated"
+    targets["targets_name"] = "gen_target_grid"
     return targets
 
 
@@ -165,3 +153,5 @@ def diff_targets(old_pklist, new_pklist):
     df = df_diff(old_pklist, new_pklist)
     df = df[df["_merge"] == "right_only"]
     return df.drop("_merge", axis=1)
+
+
