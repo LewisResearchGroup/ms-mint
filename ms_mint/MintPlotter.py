@@ -5,7 +5,7 @@ from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
 
 from matplotlib import pyplot as plt
-from pathlib imort path as P
+from pathlib import path as P
 
 from .vis.plotly import plotly_heatmap
 from .vis.mpl import plot_peak_shapes, hierarchical_clustering
