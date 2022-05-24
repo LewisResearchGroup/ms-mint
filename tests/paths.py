@@ -36,6 +36,10 @@ TEST_TARGETS_FN_V0 = os.path.abspath(
     os.path.join("tests", "data", "targets", "targets_v0.csv")
 )
 
+TEST_TARGETS_FN_V0_XLSX = os.path.abspath(
+    os.path.join("tests", "data", "targets", "targets_v0.xlsx")
+)
+
 
 TEST_PEAK_AREA_RESULTS = os.path.abspath(
     os.path.join("tests", "data", "results", "test_peak_area_results.csv")

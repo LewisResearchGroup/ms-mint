@@ -241,12 +241,7 @@ class Mint(object):
         if self.verbose:
             print("Set files to:\n" + "\n".join(self.ms_files) + "\n")
 
-    @property
-    def targets_files(self):
-        return self._targets_files
-
-    @targets_files.setter
-    def targets_files(self, list_of_files):
+    def load_targets(self, list_of_files):
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
@@ -257,10 +252,7 @@ class Mint(object):
         if self.verbose:
             print("Set targets files to:\n".join(self.targets_files) + "\n")
         self.targets = read_targets(list_of_files)
-
-    @property
-    def n_targets_files(self):
-        return len(self.targets_files)
+        return self
 
     @property
     def targets(self):
