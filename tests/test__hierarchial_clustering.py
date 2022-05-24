@@ -13,8 +13,4 @@ def test__plotly_heatmap__call_show():
 
     clustered, fig, ndx_leaves, col_leaves = hierarchical_clustering(df)
 
-    print(clustered)
-    print(ndx_leaves)
-    print(col_leaves)
-
     assert True
