@@ -44,16 +44,6 @@ def test__clear_ms_files():
     assert len(mint.ms_files) == 0
 
 
-def test__clear_results():
-    mint = Mint(verbose=False)
-    mint.ms_files = TEST_MZML
-    mint.load_targets(TEST_TARGETS_FN)
-    mint.run()
-    assert len(mint.results) > 0
-    mint.clear_results()
-    assert len(mint.results) == 0
-
-
 def test__clear_targets():
     mint = Mint(verbose=False)
     mint.load_targets(TEST_TARGETS_FN)

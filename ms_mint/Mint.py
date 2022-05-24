@@ -71,7 +71,7 @@ class Mint(object):
         targets = targets[targets.peak_label.isin(peak_labels)]
         n_peaks = len(targets)
         for i, (ndx, row) in tqdm(enumerate(targets.iterrows()), total=n_peaks):
-            progress = int(100 * (i + 1) / n_peaks)
+            self.progress = int(100 * (i + 1) / n_peaks)
             peak_label = row["peak_label"]
             if peak_label not in peak_labels:
                 continue
