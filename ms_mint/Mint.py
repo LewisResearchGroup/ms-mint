@@ -168,6 +168,7 @@ class Mint(object):
             print("Results:", self.results)
 
         self._status = "done"
+        assert self.progress == 100
 
     def run_parallel(
         self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None
