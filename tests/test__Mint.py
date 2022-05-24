@@ -92,7 +92,7 @@ def test__hierarchical_clustering():
     mint.plot.hierarchical_clustering(transform_filenames_func=lambda x: x[:3])
  
 
-def test__pca_plots_are_running():
+def test__pca_plots_are_working():
     mint = Mint(verbose=False)
     mint.ms_files = [TEST_MZML, TEST_MZXML]
     mint.targets_files = TEST_TARGETS_FN
