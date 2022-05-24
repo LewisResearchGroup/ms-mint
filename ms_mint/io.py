@@ -12,7 +12,6 @@ from pyteomics import mzxml, mzml
 
 try:
     from pyteomics import mzmlb
-
     MZMLB_AVAILABLE = True
 except:
     logging.warning("Cound not import pyteomics.mzmlb")
@@ -47,7 +46,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     else:
         logging.error(f'Cannot read file {fn} of type {type(fn)}')
 
-    # Compatibility with old
+    # Compatibility with old schema
     if not read_only:
         df = df.rename(
             columns={

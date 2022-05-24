@@ -12,7 +12,7 @@ from IPython.display import display
 from IPython.core.display import HTML
 
 from .Mint import Mint as MintBase
-
+from .MintPlotter import MintPlotter
 
 HOME = str(P.home())
 
@@ -26,20 +26,16 @@ class Mint(MintBase):
 
         fc = FileChooser()
         fc.show_only_dirs = True
-        fc.default_path = tempfile.gettempdir()
+        fc.default_path = os.getcwd()
 
         self.ms_storage_path = fc
 
-        self.ms_upload = W.FileUpload()
-
-        self.peaklist_files_button = W.FileUpload(
+        self.target_files_button = W.FileUpload(
             description="Peaklists", accept="csv,xlsx", multiple=False
         )
-
-        self.peaklist_files_button.observe(self.load_peaklist, names="value")
+        self.target_files_button.observe(self.load_target, names="value")
 
         self.load_ms_button = W.Button(description="Load MS-files")
-
         self.load_ms_button.on_click(self.search_files)
 
         self.detect_peaks_button = W.Button(description="Detect Peaks")
@@ -47,7 +43,7 @@ class Mint(MintBase):
 
         self.message_box = W.Textarea(
             value="",
-            placeholder="Please select some files and click on Run.",
+            placeholder="Please, select ms-files define a target list.",
             description="",
             disabled=True,
             layout={"width": "90%", "height": "500px", "font_family": "monospace"},
@@ -76,10 +72,10 @@ class Mint(MintBase):
 
         tabs = W.Tab()
         tabs.children = [
-            W.HBox([self.ms_storage_path, self.ms_upload, self.load_ms_button]),
+            W.HBox([self.ms_storage_path, self.load_ms_button]),
             W.HBox(
                 [
-                    self.peaklist_files_button,
+                    self.target_files_button,
                     self.detect_peaks_button,
                     self.optimize_rt_button,
                 ]
@@ -98,13 +94,15 @@ class Mint(MintBase):
             ]
         )
 
-    def load_peaklist(self, value):
+        self.plot = MintPlotter(self)
+
+    def load_target(self, value):
         for fn, data in value["new"].items():
             self.load(io.BytesIO(data["content"]))
-        self.list_files()
+        self.message(f'{len(self.targets)} targets loaded.')
 
     def action_optimize_rt(self, b):
-        if (self.n_files > 0) and len(self.peaklist) > 0:
+        if (self.n_files > 0) and len(self.target) > 0:
             self.optimize_rt()
 
     def message(self, text):
@@ -122,7 +120,7 @@ class Mint(MintBase):
             + glob(os.path.join(self.ms_storage_path.selected_path, "*mzml"))
             + glob(os.path.join(self.ms_storage_path.selected_path, "*mzhdf"))
         )
-        self.list_files()
+        self.message(f'{self.n_files} MS-files loaded.')
 
     def show(self):
         display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
@@ -138,10 +136,9 @@ class Mint(MintBase):
             self.ms_files = self.ms_files + fns
         self.list_files()
 
-    def add_peaklist_files(self, fns):
+    def add_target_files(self, fns):
         if fns is not None:
-            self.peaklist_files = self.peaklist_files + fns
-        self.list_files()
+            self.target_files = self.target_files + fns
 
     def list_files(self, b=None):
         text = f"{self.n_files} MS-files to process:\n"
@@ -151,22 +148,25 @@ class Mint(MintBase):
                 text += line + "\n...\n"
                 break
         text += "\nUsing peak list:\n"
-        if len(self.peaklist_files) != 0:
-            text += "\n".join([str(i) for i in self.peaklist_files])
-        elif len(self.peaklist) != 0:
-            text += self.peaklist.to_string()
+        if len(self.target_files) != 0:
+            text += "\n".join([str(i) for i in self.target_files])
+        elif len(self.target) != 0:
+            text += self.target.to_string()
         else:
-            text += "\nNo peaklist defined."
-        self.message(text)
-        if (self.n_files != 0) and (self.n_peaklist_files != 0):
+            text += "\nNo target defined."
+
+        if (self.n_files != 0) and (self.n_target_files != 0):
             self.run_button.style.button_color = "lightgreen"
         else:
             self.run_button.style.button_color = "lightgray"
+        print(text)
+        self.message(text)
 
     def run(self, b=None, **kwargs):
+        self.message(f'Start processing...')
         self.progress = 0
         super(Mint, self).run(**kwargs)
-        self.message("Done processing MS-files.")
+        self.message("...finished processing.")
         if self.results is not None:
             self.download_button.style.button_color = "lightgreen"
 
@@ -180,6 +180,9 @@ class Mint(MintBase):
     def export_action(self, b=None, filename=None):
         if filename is None:
             filename = "MINT__results.xlsx"
-            filename = os.path.join(HOME, filename)
+            filename = os.path.join(os.getcwd(), filename)
         self.export(filename)
-        self.message(f"\n\nExported results to: {filename}")
+        self.message(f"/nExported results to: {filename}")
+
+    def state(self):
+        return f'{len(self.ms_files)} {len(self.targets)}'

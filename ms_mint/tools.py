@@ -11,13 +11,9 @@ def lock(fn):
     return FileLock(f"{fn}.lock", timeout=1)
 
 
-def get_mz_mean_from_formulas(formulas, ms_mode=None, verbose=False):
-    if verbose:
-        print(formulas)
+def get_mz_mean_from_formulas(formulas, ms_mode=None):
     masses = []
     for formula in formulas:
-        if verbose:
-            print(f'Mass from formula: "{formula}"')
         try:
             mass = Formula(formula).isotope.mass
         except:
@@ -29,8 +25,6 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None, verbose=False):
             mass -= M_PROTON
         mass = np.round(mass, 4)
         masses.append(mass)
-    if verbose:
-        print(masses)
     return masses
 
 

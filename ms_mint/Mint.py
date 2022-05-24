@@ -6,25 +6,22 @@ import pandas as pd
 import time
 import logging
 
-from warnings import simplefilter
 from pathlib import Path as P
 
-from matplotlib import pyplot as plt
-import seaborn as sns
+from sklearn.decomposition import PCA
 
 from multiprocessing import Pool, Manager, cpu_count
-from scipy.cluster.hierarchy import ClusterWarning
-from sklearn.decomposition import PCA
+
+from ms_mint.MintPlotter import MintPlotter
 
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
 from .targets import read_targets, check_targets, standardize_targets
 from .helpers import is_ms_file, get_ms_files_from_results
-from .vis.plotly import plotly_heatmap
-from .vis.mpl import plot_peak_shapes, hierarchical_clustering
-from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 from .tools import scale_dataframe
+
+from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 
 from tqdm import tqdm
 
@@ -39,6 +36,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
+        self.plot = MintPlotter(self)
 
     @property
     def verbose(self):
@@ -364,241 +362,52 @@ class Mint(object):
             ].drop_duplicates()
             self.targets = targets
 
-    def hierarchical_clustering(
-        self,
-        data=None,
-        title=None,
-        figsize=(8, 8),
-        targets_var="peak_max",
-        vmin=-3,
-        vmax=3,
-        xmaxticks=None,
-        ymaxticks=None,
-        transform_func="log2p1",
-        scaler_ms_file=None,
-        scaler_peak_label="standard",
-        metric="euclidean",
-        transform_filenames_func="basename",
-        transposed=False,
-        **kwargs,
-    ):
-        """
-        Performs a cluster analysis and plots a heatmap. If no data is provided,
-        data is taken form self.crosstab(targets_var).
-        The clustered non-transformed non-scaled data is stored in `self.clustered`.
-
-        -----
-        Args:
-
-        transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
-            - None: no transformation
-            - log1p: tranform data with lambda x: np.log1p(x)
-            - log2p1: transform data with lambda x: log2(x+1)
-            - log10p1: transform data with lambda x: log10(x+1)
-
-        scaler_ms_file: default None, values: [None, 'standard', 'robust']
-            - scaler used to scale along ms_file axis
-            - if None no scaling is applied
-            - if 'standard' use scikit learn StandardScaler()
-            - if 'robust' use scikit learn RobustScaler()
-
-        scaler_peak_label: default 'standard'
-            - like scaler_ms_file, but scaling along peak_label axis
-
-        metric: default 'euclidean', can be string or a list of two values:
-            if two values are provided e.g. ('cosine', 'euclidean') the first
-            will be used to cluster the x-axis and the second for the y-axis.
-
-            ‘braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
-            ‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’,
-            ‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’,
-            ‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
-            More information:
-            https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
-
-        transpose: bool, default False
-            - True: transpose the figure
-        """
-
-        if len(self.results) == 0:
-            return None
-
-        simplefilter("ignore", ClusterWarning)
-        if data is None:
-            data = self.crosstab(targets_var).copy()
-
-        tmp_data = data.copy()
-
-        if transform_func == "log1p":
-            transform_func = np.log1p
-        if transform_func == "log2p1":
-            transform_func = lambda x: np.log2(x + 1)
-        if transform_func == "log10p1":
-            transform_func = lambda x: np.log10(x + 1)
-
-        if transform_func is not None:
-            tmp_data = tmp_data.apply(transform_func)
-
-        if transform_filenames_func == "basename":
-            transform_filenames_func = lambda x: P(x).with_suffix("").name
-        elif transform_filenames_func is not None:
-            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns]
-
-        # Scale along ms-files
-        if scaler_ms_file is not None:
-            tmp_data = scale_dataframe(tmp_data.T, scaler_ms_file).T
-
-        # Scale along peak_labels
-        if scaler_peak_label is not None:
-            tmp_data = scale_dataframe(tmp_data, scaler_peak_label)
-
-        if transposed:
-            tmp_data = tmp_data.T
-
-        clustered, fig, ndx_x, ndx_y = hierarchical_clustering(
-            tmp_data,
-            vmin=vmin,
-            vmax=vmax,
-            figsize=figsize,
-            xmaxticks=xmaxticks,
-            ymaxticks=ymaxticks,
-            metric=metric,
-            **kwargs,
-        )
-
-        if not transposed:
-            self.clustered = data.iloc[ndx_x, ndx_y]
-        else:
-            self.clustered = data.iloc[ndx_y, ndx_x]
-        return fig
-
-    def plot_peak_shapes(self, **kwargs):
-        if len(self.results) > 0:
-            return plot_peak_shapes(self.results, **kwargs)
-
-    def heatmap(
-        self,
-        col_name="peak_max",
-        normed_by_cols=False,
-        transposed=False,
-        clustered=False,
-        add_dendrogram=False,
-        name="",
-        correlation=False,
-    ):
-        """Creates an interactive heatmap
-        that can be used to explore the data interactively.
-        `mint.crosstab()` is called and then subjected to
-        the `mint.vis.plotly.plotly_tools.plot_heatmap()`.
-
-        Arguments
-        ---------
-        col_name: str, default='peak_max'
-            Name of the column in `mint.results` to be analysed.
-        normed_by_cols: bool, default=True
-            Whether or not to normalize the columns in the crosstab.
-        clustered: bool, default=False
-            Whether or not to cluster the rows.
-        add_dendrogram: bool, default=False
-            Whether or not to replace row labels with a dendrogram.
-        transposed: bool, default=False
-            If True transpose matrix before plotting.
-        correlation: bool, default=False
-            If True convert data to correlation matrix before plotting.
-
-        """
-        if len(self.results) > 0:
-            return plotly_heatmap(
-                self.crosstab(col_name),
-                normed_by_cols=normed_by_cols,
-                transposed=transposed,
-                clustered=clustered,
-                add_dendrogram=add_dendrogram,
-                name=col_name,
-                correlation=correlation,
-            )
 
     def pca(
-        self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
-    ):
+            self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
+        ):
 
-        df = self.crosstab(var_name).fillna(fillna)
+            df = self.crosstab(var_name).fillna(fillna)
 
-        if fillna == "median":
-            fillna = df.median()
-        elif fillna == "mean":
-            fillna = df.mean()
-        elif fillna == "zero":
-            fillna = 0
+            if fillna == "median":
+                fillna = df.median()
+            elif fillna == "mean":
+                fillna = df.mean()
+            elif fillna == "zero":
+                fillna = 0
 
-        df = df.fillna(fillna)
-        if scaler is not None:
-            df = scale_dataframe(df, scaler)
+            df = df.fillna(fillna)
+            if scaler is not None:
+                df = scale_dataframe(df, scaler)
 
-        min_dim = min(df.shape)
-        n_components = min(n_components, min_dim)
-        pca = PCA(n_components)
-        X_projected = pca.fit_transform(df)
-        # Convert to dataframe
-        df_projected = pd.DataFrame(X_projected, index=df.index.get_level_values(0))
-        # Set columns to PC-1, PC-2, ...
-        df_projected.columns = [f"PC-{int(i)+1}" for i in df_projected.columns]
+            min_dim = min(df.shape)
+            n_components = min(n_components, min_dim)
+            pca = PCA(n_components)
+            X_projected = pca.fit_transform(df)
+            # Convert to dataframe
+            df_projected = pd.DataFrame(X_projected, index=df.index.get_level_values(0))
+            # Set columns to PC-1, PC-2, ...
+            df_projected.columns = [f"PC-{int(i)+1}" for i in df_projected.columns]
 
-        # Calculate cumulative explained variance in percent
-        explained_variance = pca.explained_variance_ratio_ * 100
-        cum_expl_var = np.cumsum(explained_variance)
+            # Calculate cumulative explained variance in percent
+            explained_variance = pca.explained_variance_ratio_ * 100
+            cum_expl_var = np.cumsum(explained_variance)
 
-        # Create feature contributions
-        a = np.zeros((n_components, n_components), int)
-        np.fill_diagonal(a, 1)
-        dfc = pd.DataFrame(pca.inverse_transform(a))
-        dfc.columns = df.columns
-        dfc.index = [f"PC-{i+1}" for i in range(n_components)]
-        dfc.index.name = "PC"
-        # convert to long format
-        dfc = dfc.stack().reset_index().rename(columns={0: "Coefficient"})
+            # Create feature contributions
+            a = np.zeros((n_components, n_components), int)
+            np.fill_diagonal(a, 1)
+            dfc = pd.DataFrame(pca.inverse_transform(a))
+            dfc.columns = df.columns
+            dfc.index = [f"PC-{i+1}" for i in range(n_components)]
+            dfc.index.name = "PC"
+            # convert to long format
+            dfc = dfc.stack().reset_index().rename(columns={0: "Coefficient"})
 
-        self.decomposition_results = {
-            "df_projected": df_projected,
-            "cum_expl_var": cum_expl_var,
-            "n_components": n_components,
-            "type": "PCA",
-            "feature_contributions": dfc,
-            "class": pca,
-        }
-
-    def pca_plot_cumulative_variance(self):
-        n_vars = self.decomposition_results["n_components"]
-        fig = plt.figure(figsize=(7, 3), dpi=300)
-        cum_expl_var = self.decomposition_results["cum_expl_var"]
-        plt.bar(np.arange(n_vars) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
-        plt.xlabel("Principal Component")
-        plt.ylabel("Explained variance [%]")
-        plt.title("Cumulative explained variance")
-        plt.grid()
-        plt.xticks(range(1, len(cum_expl_var) + 1))
-        return fig
-
-    def pca_plot_scatter_matrix(
-        self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
-    ):
-        df = self.decomposition_results["df_projected"]
-        cols = df.columns.to_list()[:n_vars]
-        df = df[cols]
-
-        if color_groups is not None:
-            if group_name is None:
-                group_name = "Group"
-            df[group_name] = color_groups
-            df[group_name] = df[group_name].astype(str)
-
-        plt.figure(dpi=300)
-
-        if marker is None and len(df) > 20:
-            marker = "+"
-
-        g = sns.pairplot(
-            df, plot_kws={"s": 50, "marker": marker}, hue=group_name, **kwargs
-        )
-
-        return g
+            self.decomposition_results = {
+                "df_projected": df_projected,
+                "cum_expl_var": cum_expl_var,
+                "n_components": n_components,
+                "type": "PCA",
+                "feature_contributions": dfc,
+                "class": pca,
+            }
