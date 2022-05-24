@@ -20,7 +20,7 @@ MINT has been split into the Python library and the app. This repository contain
 # Contributions
 
 All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
-You can reach out using the [issues](https://github.com/LewisResearchGroup/ms-mint/issues) page.
+Before you modify the code please reach out to us using the [issues](https://github.com/LewisResearchGroup/ms-mint/issues) page.
 
 
 # Code standards
