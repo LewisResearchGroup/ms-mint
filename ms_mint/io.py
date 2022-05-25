@@ -1,4 +1,6 @@
-# ms_mint/io.py
+"""
+Funtions to read and write MINT files.
+"""
 
 import pandas as pd
 import numpy as np
@@ -12,6 +14,7 @@ from pyteomics import mzxml, mzml
 
 try:
     from pyteomics import mzmlb
+
     MZMLB_AVAILABLE = True
 except:
     logging.warning("Cound not import pyteomics.mzmlb")
@@ -29,6 +32,17 @@ MS_FILE_COLUMNS = [
 
 
 def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
+    """Read MS file and convert it to a pandas.DataFrame.
+
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :param read_only: Whether or not to apply convert to dataframe (for testing purposes), defaults to False
+    :type read_only: bool, optional
+    :param time_unit: Time unit used in file, defaults to "seconds"
+    :type time_unit: str, ['seconds', 'minutes']
+    :return: MS data as DataFrame
+    :rtype: pandas.DataFrame
+    """
     assert time_unit in ["minutes", "seconds"]
     fn = str(fn)
     if fn.lower().endswith(".mzxml"):
@@ -44,7 +58,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     elif fn.lower().endswith(".mzmlb"):
         df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
     else:
-        logging.error(f'Cannot read file {fn} of type {type(fn)}')
+        logging.error(f"Cannot read file {fn} of type {type(fn)}")
 
     # Compatibility with old schema
     if not read_only:
@@ -59,9 +73,14 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
 
 
 def mzxml_to_df(fn, read_only=False):
-    """
-    Reads mzXML file and returns a pandas.DataFrame
-    using pyteomics library.
+    """Read mzXML file and convert it to pandas.DataFrame.
+
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :param read_only: Whether or not to convert to dataframe (for testing purposes), defaults to False
+    :type read_only: bool, optional
+    :return: MS data
+    :rtype: pandas.DataFrame
     """
 
     with mzxml.MzXML(fn) as ms_data:
@@ -116,7 +135,14 @@ extract_mzxml = np.vectorize(_extract_mzxml)
 def mzml_to_pandas_df_pyteomics(fn, read_only=False):
     """
     Reads mzML file and returns a pandas.DataFrame
-    using the pyteomics library. Needs refactoring.
+    using the pyteomics library.
+
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :param read_only: Whether or not to convert to dataframe, defaults to False
+    :type read_only: bool, optional
+    :return: MS data
+    :rtype: pandas.DataFrame
     """
     slices = []
     with mzml.MzML(fn) as ms_data:
@@ -169,7 +195,17 @@ def mzml_to_pandas_df_pyteomics(fn, read_only=False):
 
 
 def mzml_to_df(fn, time_unit="seconds", read_only=False):
+    """
+    Reads mzML file and returns a pandas.DataFrame
+    using the mzML library.
 
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :param read_only: Whether or not to convert to dataframe, defaults to False
+    :type read_only: bool, optional
+    :return: MS data
+    :rtype: pandas.DataFrame
+    """
     with pymzml.run.Reader(fn) as ms_data:
         data = [x for x in ms_data]
 
@@ -213,6 +249,16 @@ extract_mzml = np.vectorize(_extract_mzml)
 
 
 def read_parquet(fn, read_only=False):
+    """
+    Reads parquet file and returns a pandas.DataFrame.
+
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :param read_only: Whether or not to convert to dataframe, defaults to False
+    :type read_only: bool, optional
+    :return: MS data
+    :rtype: pandas.DataFrame
+    """    
     df = pd.read_parquet(fn)
     if read_only or (
         len(df.columns) == len(MS_FILE_COLUMNS) and all(df.columns == MS_FILE_COLUMNS)
@@ -251,6 +297,17 @@ def format_thermo_raw_file_reader_parquet(df):
 
 
 def mzmlb_to_df__pyteomics(fn, read_only=False):
+    """
+    Reads mzMLb file and returns a pandas.DataFrame
+    using the pyteomics library.
+
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :param read_only: Whether or not to convert to dataframe, defaults to False
+    :type read_only: bool, optional
+    :return: MS data
+    :rtype: pandas.DataFrame
+    """
     with mzmlb.MzMLb(fn) as ms_data:
         data = [x for x in ms_data]
 
@@ -298,6 +355,13 @@ def df_to_numeric(df):
 
 
 def export_to_excel(mint, fn=None):
+    """Export MINT state to Excel file.
+
+    :param mint: Mint instance
+    :type mint: ms_mint.Mint.Mint
+    :return: None, or file buffer (if fn is None)
+    :rtype: None or io.BytesIO
+    """
     date_string = str(date.today())
     if fn is None:
         file_buffer = io.BytesIO()
@@ -317,6 +381,15 @@ def export_to_excel(mint, fn=None):
 
 
 def convert_ms_file_to_feather(fn, fn_out=None):
+    """Convert MS file to feather format.
+
+    :param fn: Filename to convert
+    :type fn: str or PosixPath
+    :param fn_out: Output filename, defaults to None
+    :type fn_out: str or PosixPath, optional
+    :return: Filename of generated file
+    :rtype: str
+    """
     fn = P(fn)
     if fn_out is None:
         fn_out = fn.with_suffix(".feather")
@@ -326,6 +399,15 @@ def convert_ms_file_to_feather(fn, fn_out=None):
 
 
 def convert_ms_file_to_parquet(fn, fn_out=None):
+    """Convert MS file to parquet format.
+
+    :param fn: Filename to convert
+    :type fn: str or PosixPath
+    :param fn_out: Output filename, defaults to None
+    :type fn_out: str or PosixPath, optional
+    :return: Filename of generated file
+    :rtype: str
+    """    
     fn = P(fn)
     if fn_out is None:
         fn_out = fn.with_suffix(".parquet")

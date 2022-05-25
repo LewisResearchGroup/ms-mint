@@ -1,4 +1,3 @@
-
 from ms_mint.Mint import Mint
 
 from paths import TEST_TARGETS_FN, TEST_MZML, TEST_MZXML
@@ -18,7 +17,7 @@ def test__switch_verbosity_on():
     assert mint.verbose == True
 
 
-#def test__read_ms_file():
+# def test__read_ms_file():
 #    mint = Mint(verbose=False)
 #    result = mint.ms_file_to_df(TEST_MZML)
 #    assert isinstance(result, pd.DataFrame)
@@ -50,7 +49,7 @@ def test__clear_targets():
     assert len(mint.targets) == 0
 
 
-#def test__optimize_rt():
+# def test__optimize_rt():
 #    mint = Mint(verbose=False)
 #    mint.ms_files = TEST_MZML
 #    mint.load_targets(TEST_TARGETS_FN)
@@ -73,23 +72,23 @@ def test__hierarchical_clustering():
     mint.run()
     mint.plot.hierarchical_clustering()
     mint.plot.hierarchical_clustering(transposed=True)
-    mint.plot.hierarchical_clustering(transform_func='log1p')
-    mint.plot.hierarchical_clustering(transform_func='log2p1')
-    mint.plot.hierarchical_clustering(transform_func='log10p1')
-    mint.plot.hierarchical_clustering(transform_func='log10p1')
+    mint.plot.hierarchical_clustering(transform_func="log1p")
+    mint.plot.hierarchical_clustering(transform_func="log2p1")
+    mint.plot.hierarchical_clustering(transform_func="log10p1")
+    mint.plot.hierarchical_clustering(transform_func="log10p1")
     mint.plot.hierarchical_clustering(transform_filenames_func=lambda x: x[:3])
- 
+
 
 def test__pca_plots_are_working():
     mint = Mint(verbose=False)
     mint.ms_files = [TEST_MZML, TEST_MZXML]
     mint.load_targets(TEST_TARGETS_FN)
     mint.run()
-    mint.pca(fillna='mean')
-    mint.pca(fillna='zero')
-    mint.pca(fillna='median')
+    mint.pca(fillna="mean")
+    mint.pca(fillna="zero")
+    mint.pca(fillna="median")
     mint.plot.pca_cumulative_variance()
-    mint.plot.pca_scatter_matrix(color_groups='peak_label')
+    mint.plot.pca_scatter_matrix(color_groups="peak_label")
 
 
 def test__plot_peak_shapes():
@@ -98,7 +97,6 @@ def test__plot_peak_shapes():
     mint.load_targets(TEST_TARGETS_FN)
     mint.run()
     mint.plot.peak_shapes()
-
 
 
 def test__progress_callback():

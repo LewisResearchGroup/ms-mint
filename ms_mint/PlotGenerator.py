@@ -11,12 +11,14 @@ from .visualization.plotly import plotly_heatmap
 from .visualization.matplotlib import plot_peak_shapes, hierarchical_clustering
 from .tools import scale_dataframe
 
-class PlotGenerator():
+
+class PlotGenerator:
     """Plot generator for Mint instances.
 
     :param mint: Mint instance
     :type mint: ms_mint.Mint.Mint
     """
+
     def __init__(self, mint):
         self.mint = mint
 
@@ -43,7 +45,7 @@ class PlotGenerator():
         data is taken form self.mint.crosstab(targets_var).
         The clustered non-transformed non-scaled data is stored in `self.mint.clustered`.
 
-        
+
         :param transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
             - None: no transformation
             - log1p: tranform data with lambda x: np.log1p(x)
@@ -170,9 +172,8 @@ class PlotGenerator():
                 correlation=correlation,
             )
 
-
     def pca_cumulative_variance(self):
-        """After running mint.pca() this function can be used to plot the cumulative variance of the 
+        """After running mint.pca() this function can be used to plot the cumulative variance of the
         principal components.
 
         :return: Returns a matplotlib figure.
@@ -189,13 +190,12 @@ class PlotGenerator():
         plt.xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
-
     def pca_scatter_matrix(
         self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
     ):
-        """After running mint.pca() this function can be used to plot a scatter matrix of the 
+        """After running mint.pca() this function can be used to plot a scatter matrix of the
         principal components.
-        
+
         """
         df = self.mint.decomposition_results["df_projected"]
         cols = df.columns.to_list()[:n_vars]

@@ -1,9 +1,16 @@
 import pandas as pd
-from ms_mint.targets import standardize_targets, check_targets, read_targets, gen_target_grid, diff_targets
+from ms_mint.targets import (
+    standardize_targets,
+    check_targets,
+    read_targets,
+    gen_target_grid,
+    diff_targets,
+)
 from ms_mint.standards import TARGETS_COLUMNS
 from ms_mint import Mint
 
 from paths import TEST_TARGETS_FN, TEST_TARGETS_FN_V0_XLSX, TEST_TARGETS_FN_V0
+
 
 def test__read_targets():
     pass
@@ -16,7 +23,7 @@ def test__standardize_targets():
             "peakMz": [100],
             "rtmin": [1],
             "rtmax": [2],
-            "peaklist": ["TEST"],            
+            "peaklist": ["TEST"],
         }
     )
 
@@ -49,39 +56,39 @@ def test__check_target__empty_list_ok():
 
 def test__check_targets_labels_not_string():
     targets = read_targets(TEST_TARGETS_FN)
-    targets['peak_label'] = range(len(targets))
+    targets["peak_label"] = range(len(targets))
     result = check_targets(targets)
     assert result is False
 
 
 def test__check_targets_labels_missing_rtmax():
     targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, 'rt_max'] = None
+    targets.loc[0, "rt_max"] = None
     result = check_targets(targets)
     assert result is False
-    
+
 
 def test__check_targets_labels_missing_rtmin():
     targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, 'rt_min'] = None
+    targets.loc[0, "rt_min"] = None
     result = check_targets(targets)
     assert result is False
 
 
 def test__check_targets_labels_duplictated():
     targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, 'peak_label'] = "A"
-    targets.loc[1, 'peak_label'] = "A"
+    targets.loc[0, "peak_label"] = "A"
+    targets.loc[1, "peak_label"] = "A"
     result = check_targets(targets)
     assert result is False
 
 
 def test__check_targets_wrong_column_names():
-    targets = read_targets(TEST_TARGETS_FN).rename(columns={'peak_label': 'paek_label'})
-    targets.loc[0, 'peak_label'] = "A"
-    targets.loc[1, 'peak_label'] = "A"
+    targets = read_targets(TEST_TARGETS_FN).rename(columns={"peak_label": "paek_label"})
+    targets.loc[0, "peak_label"] = "A"
+    targets.loc[1, "peak_label"] = "A"
     result = check_targets(targets)
-    assert result is False    
+    assert result is False
 
 
 def test__import_csv_and_xlsx():
@@ -90,9 +97,9 @@ def test__import_csv_and_xlsx():
 
     mint1.load_targets(TEST_TARGETS_FN_V0)
     mint2.load_targets(TEST_TARGETS_FN_V0_XLSX)
- 
-    mint1.targets.drop('target_filename', inplace=True, axis=1)
-    mint2.targets.drop('target_filename', inplace=True, axis=1)
+
+    mint1.targets.drop("target_filename", inplace=True, axis=1)
+    mint2.targets.drop("target_filename", inplace=True, axis=1)
 
     print(mint1.targets)
     print(mint2.targets)
@@ -101,28 +108,28 @@ def test__import_csv_and_xlsx():
 
 
 def test__target_grid():
-    targets = gen_target_grid([1,2], dt=1, rt_max=1)
+    targets = gen_target_grid([1, 2], dt=1, rt_max=1)
 
     assert all(targets.mz_mean == [1, 1, 2, 2])
-    assert all(targets.rt_min  == [0, 1, 0, 1])
-    assert all(targets.rt_max  == [1, 2, 1, 2])
+    assert all(targets.rt_min == [0, 1, 0, 1])
+    assert all(targets.rt_max == [1, 2, 1, 2])
 
 
 def test__diff_targets():
     targets1 = read_targets(TEST_TARGETS_FN_V0)
     targets2 = targets1.copy()
-    
+
     new_value = 10.23434
     selected_ndx = 1
-    targets2.loc[selected_ndx, 'rt_max'] = new_value
+    targets2.loc[selected_ndx, "rt_max"] = new_value
 
     result = diff_targets(targets1, targets2)
 
     print(result)
 
     assert len(result) == 1
-    assert result.at[selected_ndx, 'peak_label'] == targets1.at[selected_ndx, 'peak_label']
-    assert result.at[selected_ndx, 'rt_min'] == targets1.at[selected_ndx, 'rt_min']
-    assert result.at[selected_ndx, 'rt_max'] == new_value
-
-
+    assert (
+        result.at[selected_ndx, "peak_label"] == targets1.at[selected_ndx, "peak_label"]
+    )
+    assert result.at[selected_ndx, "rt_min"] == targets1.at[selected_ndx, "rt_min"]
+    assert result.at[selected_ndx, "rt_max"] == new_value
