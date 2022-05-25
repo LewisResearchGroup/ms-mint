@@ -1,4 +1,6 @@
-# ms_mint/Mint.py
+"""
+Main module of the ms-mint library.
+"""
 
 import os
 import numpy as np
@@ -6,42 +8,62 @@ import pandas as pd
 import time
 import logging
 
-from warnings import simplefilter
 from pathlib import Path as P
 
-from matplotlib import pyplot as plt
-import seaborn as sns
-
-from multiprocessing import Pool, Manager, cpu_count
-from scipy.cluster.hierarchy import ClusterWarning
 from sklearn.decomposition import PCA
 
+from multiprocessing import Pool, Manager, cpu_count
+
+from ms_mint.PlotGenerator import PlotGenerator
+
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
-from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
-from .io import export_to_excel, ms_file_to_df
+from .processing import process_ms1_files_in_parallel
+from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets
 from .helpers import is_ms_file, get_ms_files_from_results
-from .vis.plotly import plotly_heatmap
-from .vis.mpl import plot_peak_shapes, hierarchical_clustering
-from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 from .tools import scale_dataframe
 
-from tqdm import tqdm
+from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 
 import ms_mint
 
 
+from typing import Callable
+
+
 class Mint(object):
+    """Main class of the ms_mint package, which processes metabolomics files.
+
+    :param verbose: Sets verbosity of the instance.
+    :type verbose: bool
+
+    :param progress_callback: A callback for a progress bar.
+    :type progress_callback: Callable[]
+
+    """
+
     def __init__(self, verbose: bool = False, progress_callback=None):
+
         self._verbose = verbose
         self._version = ms_mint.__version__
         self._progress_callback = progress_callback
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
+        self.plot = PlotGenerator(self)
+        self.optimizers = {"rt": RetentionTimeOptimizer}
 
     @property
     def verbose(self):
+        """Get/set verbosity.
+
+        :getter: Get current verbosity.
+        :return: True or False
+        :rtype: bool
+        :setter: Sets verbosity.
+        :param value: True or False
+        :type value: bool
+        """
         return self._verbose
 
     @verbose.setter
@@ -50,9 +72,19 @@ class Mint(object):
 
     @property
     def version(self):
+        """ms-mint version number.
+
+        :return: Version string.
+        :rtype: str
+        """
         return self._version
 
     def reset(self):
+        """Reset Mint instance. Removes targets, MS-files and results.
+
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
         self._files = []
         self._targets_files = []
         self._targets = pd.DataFrame(columns=TARGETS_COLUMNS)
@@ -62,61 +94,58 @@ class Mint(object):
         self.runtime = None
         self._status = "waiting"
         self._messages = []
+        return self
 
-    def optimize_rt(self, ms_files=None, peak_labels=None, rt_margin=0.5, **kwargs):
-        chromatograms = []
-        if ms_files is None:
-            ms_files = self.ms_files
-        if peak_labels is None:
-            peak_labels = self.targets.peak_label.values
-        targets = self.targets.copy()
-        targets = targets[targets.peak_label.isin(peak_labels)]
-        n_peaks = len(targets)
-        for i, (ndx, row) in tqdm(enumerate(targets.iterrows()), total=n_peaks):
-            progress = int(100 * (i + 1) / n_peaks)
-            peak_label = row["peak_label"]
-            if peak_label not in peak_labels:
-                continue
-            chromatograms = []
-            mz_mean, mz_width, rt, rt_min, rt_max = row[
-                ["mz_mean", "mz_width", "rt", "rt_min", "rt_max"]
-            ]
-            for fn in ms_files:
-                df = self.ms_file_to_df(fn)
-                chrom = extract_chromatogram_from_ms1(
-                    df, mz_mean=mz_mean, mz_width=mz_width
-                )
-                chromatograms.append(chrom)
-            params = dict(rt=rt, rt_min=rt_min, rt_max=rt_max, rt_margin=rt_margin)
-            rtopt = RetentionTimeOptimizer(**params, **kwargs)
-            rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
-            self.targets.loc[ndx, ["rt_min", "rt_max"]] = rt_min, rt_max
+    def optimize(self, what="rt", ms_files=None, peak_labels=None, **kwargs):
+        """Run optimizer.
 
+        :param what: Optimizer, defaults to 'rt'
+        :type what: str, optional
+        :param ms_files: MS-filenames to use, defaults to None
+        :type ms_files: str or list[str], optional
+        :param peak_labels: Targets to optimize, defaults to None
+        :type peak_labels: str or list[str], optional
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
 
-    def ms_file_to_df(self, fn):
-        return ms_file_to_df(fn)
+        RetentionTimeOptimizer(
+            self, ms_files=ms_files, peak_labels=peak_labels, **kwargs
+        )
+        return self
 
     def clear_targets(self):
+        """
+        Reset target list.
+        """
         self.targets = pd.DataFrame(columns=TARGETS_COLUMNS)
 
     def clear_results(self):
+        """
+        Reset results.
+        """
         self.results = pd.DataFrame(columns=MINT_RESULTS_COLUMNS)
 
     def clear_ms_files(self):
+        """
+        Reset ms files.
+        """
         self.ms_files = []
 
     def run(self, nthreads=None, rt_margin=0.5, mode="standard", **kwargs):
         """
-        Run MINT with set up targets and ms-files.
-        ----
-        Args
-            - nthreads: int or None, default = None
-                * None: Run with min(n_cpus, c_files) CPUs
+        Main routine to run MINT and process MS-files with current target list.
+
+        :param nthreads: Number of cores to use, defaults to None
+        :type nthreads: int
+                * None - Run with min(n_cpus, c_files) CPUs
                 * 1: Run without multiprocessing on one CPU
                 * >1: Run with multiprocessing enabled using nthreads threads.
-            - mode: str, default = 'standard'
+        :param mode: Compute mode ('standard' or 'express'), defaults to 'standard'
                 * 'standard': calculates peak shaped projected to RT dimension
                 * 'express': omits calculation of other features, only peak_areas
+        :type mode: str
+        :param kwargs: Arguments passed to the procesing function.
         """
         self._status = "running"
 
@@ -139,7 +168,7 @@ class Mint(object):
 
         start = time.time()
         if nthreads > 1:
-            self.run_parallel(nthreads=nthreads, mode=mode, **kwargs)
+            self.__run_parallel__(nthreads=nthreads, mode=mode, **kwargs)
         else:
             results = []
             for i, filename in enumerate(self.ms_files):
@@ -170,8 +199,10 @@ class Mint(object):
             print("Results:", self.results)
 
         self._status = "done"
+        assert self.progress == 100
+        return self
 
-    def run_parallel(
+    def __run_parallel__(
         self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None
     ):
         print(f"maxtasksperchild: {maxtasksperchild}")
@@ -215,21 +246,32 @@ class Mint(object):
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
 
-    @property
-    def messages(self):
-        return self._messages
+    # @property
+    # def messages(self):
+    #    return self._messages
 
     @property
     def status(self):
+        """Returns current status of Mint instance.
+
+        :return: ['waiting', 'running', 'done']
+        :rtype: str
+        """
         return self._status
 
     @property
     def ms_files(self):
-        return self._files
+        """Get/set ms-files to process.
 
-    @property
-    def n_files(self):
-        return len(self.ms_files)
+        :getter:
+        :return: List of filenames.
+        :rtype: list[str]
+
+        :setter:
+        :param list_of_files: Filename or list of file names of MS-files.
+        :type list_of_files: str or list[str]
+        """
+        return self._files
 
     @ms_files.setter
     def ms_files(self, list_of_files):
@@ -244,11 +286,22 @@ class Mint(object):
             print("Set files to:\n" + "\n".join(self.ms_files) + "\n")
 
     @property
-    def targets_files(self):
-        return self._targets_files
+    def n_files(self):
+        """Number of currently stored ms filenames.
 
-    @targets_files.setter
-    def targets_files(self, list_of_files):
+        :return: Number of files stored in self.ms_files
+        :rtype: int
+        """
+        return len(self.ms_files)
+
+    def load_targets(self, list_of_files):
+        """Load targets from a file (csv, xslx)
+
+        :param list_of_files: Filename or list of file names.
+        :type list_of_files: str or list[str]
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
@@ -259,13 +312,20 @@ class Mint(object):
         if self.verbose:
             print("Set targets files to:\n".join(self.targets_files) + "\n")
         self.targets = read_targets(list_of_files)
-
-    @property
-    def n_targets_files(self):
-        return len(self.targets_files)
+        return self
 
     @property
     def targets(self):
+        """Set/get target list.
+
+        :getter:
+        :return: Target list
+        :rtype: pandas.DataFrame
+
+        :setter:
+        :param targets: Sets the target list of the instance.
+        :type targets: pandas.DataFrame
+        """
         return self._targets
 
     @targets.setter
@@ -278,20 +338,34 @@ class Mint(object):
 
     @property
     def results(self):
+        """
+        Get/Set the Mint results.
+
+        :getter:
+        :return: Results
+        :rtype: pandas.DataFrame
+        :setter:
+        :param df: DataFrame with MINT results.
+        :type df: pandas.DataFrame
+        """
         return self._results
 
     @results.setter
     def results(self, df):
         self._results = df
 
-    @property
-    def rt_projections(self):
-        return DeprecationWarning(
-            "rt_projections is deprecated. Peak shapes are now "
-            "directly stored in the results table (mint.results)."
-        )
-
     def crosstab(self, col_name="peak_area"):
+        """
+        Create condensed representation of the results.
+        More specifically, a cross-table with filenames as index and target labels.
+        The values in the cells are determined by *col_name*.
+
+
+        :param col_name: Name of the column from *mint.results* table that is used for the cell values.
+        :type col_name: str
+
+        cells of the returned table.
+        """
         return pd.crosstab(
             self.results.ms_file,
             self.results.peak_label,
@@ -301,14 +375,24 @@ class Mint(object):
 
     @property
     def progress_callback(self):
+        """Assigns a callback function to update a progress bar.
+
+        :getter: Returns the current callback function.
+        :setter: Sets the callback function.
+        """
         return self._progress_callback
 
     @progress_callback.setter
-    def progress_callback(self, func=None):
+    def progress_callback(self, func: Callable = None):
         self._progress_callback = func
 
     @property
     def progress(self):
+        """Shows the current progress.
+
+        :getter: Returns the current progress value.
+        :setter: Set the progress to a value between 0 and 100 and calls the progress callback function.
+        """
         return self._progress
 
     @progress.setter
@@ -319,8 +403,20 @@ class Mint(object):
         if self.progress_callback is not None:
             self.progress_callback(value)
 
-    def export(self, filename=None):
-        fn = filename
+    def export(self, fn=None, filename=None):
+        """Export current results to file.
+
+        :param fn: Filename, defaults to None
+        :type fn: str, optional
+        :param filename: **deprecated**
+        :type filename: str, optional
+        :return: file buffer if *filename* is None otherwise returns None
+        :rtype: io.BytesIO
+        """
+
+        if filename is not None:
+            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
+            fn = filename
         if fn is None:
             buffer = export_to_excel(self, fn=fn)
             return buffer
@@ -330,6 +426,13 @@ class Mint(object):
             self.results.to_csv(fn, index=False)
 
     def load(self, fn):
+        """Load results into Mint instance.
+
+        :param fn: Filename (csv, xlsx)
+        :type fn: str
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
         if self.verbose:
             print("Loading MINT state")
         if isinstance(fn, str):
@@ -363,164 +466,23 @@ class Mint(object):
                 [col for col in TARGETS_COLUMNS if col in results.columns]
             ].drop_duplicates()
             self.targets = targets
-
-    def hierarchical_clustering(
-        self,
-        data=None,
-        title=None,
-        figsize=(8, 8),
-        targets_var="peak_max",
-        vmin=-3,
-        vmax=3,
-        xmaxticks=None,
-        ymaxticks=None,
-        transform_func="log2p1",
-        scaler_ms_file=None,
-        scaler_peak_label="standard",
-        metric="euclidean",
-        transform_filenames_func="basename",
-        transposed=False,
-        **kwargs,
-    ):
-        """
-        Performs a cluster analysis and plots a heatmap. If no data is provided,
-        data is taken form self.crosstab(targets_var).
-        The clustered non-transformed non-scaled data is stored in `self.clustered`.
-
-        -----
-        Args:
-
-        transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
-            - None: no transformation
-            - log1p: tranform data with lambda x: np.log1p(x)
-            - log2p1: transform data with lambda x: log2(x+1)
-            - log10p1: transform data with lambda x: log10(x+1)
-
-        scaler_ms_file: default None, values: [None, 'standard', 'robust']
-            - scaler used to scale along ms_file axis
-            - if None no scaling is applied
-            - if 'standard' use scikit learn StandardScaler()
-            - if 'robust' use scikit learn RobustScaler()
-
-        scaler_peak_label: default 'standard'
-            - like scaler_ms_file, but scaling along peak_label axis
-
-        metric: default 'euclidean', can be string or a list of two values:
-            if two values are provided e.g. ('cosine', 'euclidean') the first
-            will be used to cluster the x-axis and the second for the y-axis.
-
-            ‘braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
-            ‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’,
-            ‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’,
-            ‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
-            More information:
-            https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
-
-        transpose: bool, default False
-            - True: transpose the figure
-        """
-
-        if len(self.results) == 0:
-            return None
-
-        simplefilter("ignore", ClusterWarning)
-        if data is None:
-            data = self.crosstab(targets_var).copy()
-
-        tmp_data = data.copy()
-
-        if transform_func == "log1p":
-            transform_func = np.log1p
-        if transform_func == "log2p1":
-            transform_func = lambda x: np.log2(x + 1)
-        if transform_func == "log10p1":
-            transform_func = lambda x: np.log10(x + 1)
-
-        if transform_func is not None:
-            tmp_data = tmp_data.apply(transform_func)
-
-        if transform_filenames_func == "basename":
-            transform_filenames_func = lambda x: P(x).with_suffix("").name
-        elif transform_filenames_func is not None:
-            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns]
-
-        # Scale along ms-files
-        if scaler_ms_file is not None:
-            tmp_data = scale_dataframe(tmp_data.T, scaler_ms_file).T
-
-        # Scale along peak_labels
-        if scaler_peak_label is not None:
-            tmp_data = scale_dataframe(tmp_data, scaler_peak_label)
-
-        if transposed:
-            tmp_data = tmp_data.T
-
-        clustered, fig, ndx_x, ndx_y = hierarchical_clustering(
-            tmp_data,
-            vmin=vmin,
-            vmax=vmax,
-            figsize=figsize,
-            xmaxticks=xmaxticks,
-            ymaxticks=ymaxticks,
-            metric=metric,
-            **kwargs,
-        )
-
-        if not transposed:
-            self.clustered = data.iloc[ndx_x, ndx_y]
-        else:
-            self.clustered = data.iloc[ndx_y, ndx_x]
-        return fig
-
-    def plot_peak_shapes(self, **kwargs):
-        if len(self.results) > 0:
-            return plot_peak_shapes(self.results, **kwargs)
-
-    def heatmap(
-        self,
-        col_name="peak_max",
-        normed_by_cols=False,
-        transposed=False,
-        clustered=False,
-        add_dendrogram=False,
-        name="",
-        correlation=False,
-    ):
-        """Creates an interactive heatmap
-        that can be used to explore the data interactively.
-        `mint.crosstab()` is called and then subjected to
-        the `mint.vis.plotly.plotly_tools.plot_heatmap()`.
-
-        Arguments
-        ---------
-        col_name: str, default='peak_max'
-            Name of the column in `mint.results` to be analysed.
-        normed_by_cols: bool, default=True
-            Whether or not to normalize the columns in the crosstab.
-        clustered: bool, default=False
-            Whether or not to cluster the rows.
-        add_dendrogram: bool, default=False
-            Whether or not to replace row labels with a dendrogram.
-        transposed: bool, default=False
-            If True transpose matrix before plotting.
-        correlation: bool, default=False
-            If True convert data to correlation matrix before plotting.
-
-        """
-        if len(self.results) > 0:
-            return plotly_heatmap(
-                self.crosstab(col_name),
-                normed_by_cols=normed_by_cols,
-                transposed=transposed,
-                clustered=clustered,
-                add_dendrogram=add_dendrogram,
-                name=col_name,
-                correlation=correlation,
-            )
+            return self
 
     def pca(
         self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
     ):
+        """Run Principal Component Analysis on current results. Results are stored in
+        self.decomposition_results.
+
+        :param var_name: Column name to use for pca, defaults to "peak_max"
+        :type var_name: str, optional
+        :param n_components: Number of PCA components to return, defaults to 3
+        :type n_components: int, optional
+        :param fillna: Method to fill missing values, defaults to "median"
+        :type fillna: str, optional
+        :param scaler: Method to scale the columns, defaults to "standard"
+        :type scaler: str, optional
+        """
 
         df = self.crosstab(var_name).fillna(fillna)
 
@@ -566,39 +528,3 @@ class Mint(object):
             "feature_contributions": dfc,
             "class": pca,
         }
-
-    def pca_plot_cumulative_variance(self):
-        n_vars = self.decomposition_results["n_components"]
-        fig = plt.figure(figsize=(7, 3), dpi=300)
-        cum_expl_var = self.decomposition_results["cum_expl_var"]
-        plt.bar(np.arange(n_vars) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
-        plt.xlabel("Principal Component")
-        plt.ylabel("Explained variance [%]")
-        plt.title("Cumulative explained variance")
-        plt.grid()
-        plt.xticks(range(1, len(cum_expl_var) + 1))
-        return fig
-
-    def pca_plot_scatter_matrix(
-        self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
-    ):
-        df = self.decomposition_results["df_projected"]
-        cols = df.columns.to_list()[:n_vars]
-        df = df[cols]
-
-        if color_groups is not None:
-            if group_name is None:
-                group_name = "Group"
-            df[group_name] = color_groups
-            df[group_name] = df[group_name].astype(str)
-
-        plt.figure(dpi=300)
-
-        if marker is None and len(df) > 20:
-            marker = "+"
-
-        g = sns.pairplot(
-            df, plot_kws={"s": 50, "marker": marker}, hue=group_name, **kwargs
-        )
-
-        return g

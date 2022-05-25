@@ -12,7 +12,20 @@ from .io import ms_file_to_df
 from .standards import RESULTS_COLUMNS, MINT_RESULTS_COLUMNS
 
 
-def extract_chromatogram_from_ms1(df, mz_mean, mz_width, unit="minutes"):
+def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
+    """Extract single chromatogram of specific m/z value from MS-data.
+
+    :param df: MS-data
+    :type df: pandas.DataFrame with columns ['rt', 'm/z', 'intensity']
+    :param mz_mean: Target m/z value
+    :type mz_mean: float
+    :param mz_width: m/z width in ppm, defaults to 10
+    :type mz_width: float
+    :param unit: Time unit used in MS-data, defaults to "minutes"
+    :type unit: str, optional
+    :return: Chromatogram
+    :rtype: pandas.DataFrame
+    """
     dmz = mz_mean * 1e-6 * mz_width
     chrom = df[(df["mz"] - mz_mean).abs() <= dmz].copy()
     chrom["scan_time_min"] = chrom["scan_time_min"].round(3)
@@ -23,18 +36,6 @@ def extract_chromatogram_from_ms1(df, mz_mean, mz_width, unit="minutes"):
 def process_ms1_files_in_parallel(args):
     """
     Pickleable function for (parallel) peak integration.
-    Expects a dictionary with keys:
-        Mandatory:
-        - 'filename': 'path to file to be processed',
-        - 'targets': 'dataframe containing the targets'
-        - 'mode': 'express' or 'standard'
-            * 'express' omits calculcation of rt projections
-        Optional:
-        - 'queue': instance of multiprocessing.Manager().Queue()
-
-    Returns tuple with two elements:
-        1) results, dataframe with integration results
-        2) rt_projection, dictionary of dictionaries with peak shapes
     """
 
     filename = args["filename"]
@@ -58,6 +59,13 @@ def process_ms1_files_in_parallel(args):
 
 
 def append_results(results, fn):
+    """Appends results to file.
+
+    :param results: New results.
+    :type results: pandas.DataFrame
+    :param fn: Filename to append to.
+    :type fn: str
+    """
     with lock(fn):
         results.to_csv(fn, mode="a", header=False, index=False)
 
@@ -65,12 +73,13 @@ def append_results(results, fn):
 def process_ms1_file(filename, targets):
     """
     Peak integration using a filename as input.
-    -----
-    Args:
-        - filename: str or PosixPath, path to mzxml or mzml filename
-        - targets: pandas.DataFrame(), DataFrame in targets format
-    Returns:
-        pandas.DataFrame(), DataFrame with processd peak intensities
+
+    :param filename: Path to mzxml or mzml filename
+    :type filename: str or PosixPath
+    :param targets: DataFrame in target list format.
+    :type targets: pandas.DataFrame
+    :return: DataFrame with processd peak intensities.
+    :rtype: pandas.DataFrame
     """
     df = ms_file_to_df(filename)
     results = process_ms1(df, targets)
@@ -83,17 +92,23 @@ def process_ms1_file(filename, targets):
 
 
 def process_ms1(df, targets):
-    results = process_ms1_from_df(df, targets)
+    """Process MS-1 data with a target list.
+
+    :param df: MS-1 data.
+    :type df: pandas.DataFrame
+    :param targets: Target list
+    :type targets: pandas.DataFrame
+    :return: Mint results.
+    :rtype: pandas.DataFrame
+    """
+    results = _process_ms1_from_df_(df, targets)
     results = pd.DataFrame(results, columns=["peak_label"] + RESULTS_COLUMNS)
     results = pd.merge(targets, results, on=["peak_label"])
     results = results.reset_index(drop=True)
     return results
 
 
-def process_ms1_from_df(df, targets):
-    """
-    Processes multiple targets returns numpy array.
-    """
+def _process_ms1_from_df_(df, targets):
     peak_cols = [
         "mz_mean",
         "mz_width",
@@ -111,6 +126,15 @@ def process_ms1_from_df(df, targets):
 
 
 def process_ms1_from_numpy(array, peaks):
+    """Process MS1 data in numpy array format.
+
+    :param array: _description_
+    :type array: _type_
+    :param peaks: _description_
+    :type peaks: _type_
+    :return: _description_
+    :rtype: _type_
+    """
     results = []
     for (mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label) in peaks:
         props = _process_ms1_from_numpy(
@@ -148,6 +172,15 @@ def _process_ms1_from_numpy(
 
 
 def extract_ms1_properties(array, mz_mean):
+    """Process MS-1 data in array format.
+
+    :param array: _description_
+    :type array: _type_
+    :param mz_mean: _description_
+    :type mz_mean: _type_
+    :return: _description_
+    :rtype: _type_
+    """
 
     float_list_to_comma_sep_str = lambda x: ",".join([str(np.round(i, 4)) for i in x])
     int_list_to_comma_sep_str = lambda x: ",".join([str(int(i)) for i in x])
@@ -229,6 +262,23 @@ def extract_ms1_properties(array, mz_mean):
 def slice_ms1_array(
     array: np.array, rt_min, rt_max, mz_mean, mz_width, intensity_threshold
 ):
+    """Slice MS1 data by m/z, mz_width, rt_min, rt_max
+
+    :param array: _description_
+    :type array: np.array
+    :param rt_min: _description_
+    :type rt_min: _type_
+    :param rt_max: _description_
+    :type rt_max: _type_
+    :param mz_mean: _description_
+    :type mz_mean: _type_
+    :param mz_width: _description_
+    :type mz_width: _type_
+    :param intensity_threshold: _description_
+    :type intensity_threshold: _type_
+    :return: _description_
+    :rtype: _type_
+    """
     delta_mass = mz_width * mz_mean * 1e-6
     array = array[(array[:, 0] >= rt_min)]
     array = array[(array[:, 0] <= rt_max)]
@@ -238,6 +288,13 @@ def slice_ms1_array(
 
 
 def score_peaks(mint_results):
+    """Score the peak quality (experimental).
+
+    :param mint_results: _description_
+    :type mint_results: _type_
+    :return: _description_
+    :rtype: _type_
+    """
     R = mint_results.copy()
     scores = (
         ((1 - R.peak_delta_int.apply(abs) / R.peak_max))

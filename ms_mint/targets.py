@@ -11,32 +11,23 @@ from .helpers import df_diff
 from .tools import get_mz_mean_from_formulas
 
 
-def read_targets(filenames, ms_mode="negative"):
+def read_targets(fns, ms_mode="negative"):
     """
     Extracts peak data from csv files that contain peak definitions.
     CSV files must contain columns:
-        - 'peak_label': str, unique identifier
-        - 'mz_mean': float, center of mass to be extracted in [Da]
-        - 'mz_width': float, with of mass window in [ppm]
-        - 'rt_min': float, minimum retention time in [min]
-        - 'rt_max': float, maximum retention time in [min]
-    -----
-    Args:
-        - filenames: str or PosixPath or list of such with path to csv-file(s)
-    Returns:
-        pandas.DataFrame in targets format
+
+    :param fns: List of filenames of target lists.
+    :param ms_mode: "negative" or "positive"
     """
-    if isinstance(filenames, str):
-        filenames = [filenames]
+    if isinstance(fns, str):
+        fns = [fns]
     targets = []
 
-    for fn in filenames:
+    for fn in fns:
         if fn.endswith(".csv"):
             df = pd.read_csv(fn)
         elif fn.endswith(".xlsx"):
             df = pd.read_excel(fn)
-        # if len(df) == 0:
-        #    return pd.DataFrame(columns=TARGETS_COLUMNS, index=[])
         df = standardize_targets(df)
         df["target_filename"] = P(fn).name
         targets.append(df)
@@ -46,6 +37,15 @@ def read_targets(filenames, ms_mode="negative"):
 
 
 def standardize_targets(targets, ms_mode="neutral"):
+    """Standardize target list.
+
+    :param targets: _description_
+    :type targets: _type_
+    :param ms_mode: _description_, defaults to "neutral"
+    :type ms_mode: str, optional
+    :return: _description_
+    :rtype: _type_
+    """
     targets = targets.rename(columns=DEPRECATED_LABELS)
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
@@ -67,68 +67,53 @@ def standardize_targets(targets, ms_mode="neutral"):
     targets["peak_label"] = targets["peak_label"].astype(str)
     targets.index = range(len(targets))
     targets = targets[targets.mz_mean.notna()]
-
+    targets = targets.replace(np.NaN, None)
     return targets[TARGETS_COLUMNS]
 
 
-def update_retention_time_columns(targets):
-    for ndx, row in targets.iterrows():
-        if row["rt"] is not None:
-            if row["rt_min"] is None:
-                targets.loc[ndx, "rt_min"] = 5  # max( 0, row['rt'] - 0.2 )
-            if row["rt_max"] is None:
-                targets.loc[ndx, "rt_max"] = row["rt"] + 0.2
-        else:
-            if (row["rt_min"] is not None) & (row["rt_max"] is not None):
-                targets.loc[ndx, "row"] = row[["rt_min", "rt_max"]].mean(axis=1)
-
-
 def check_targets(targets):
-    """
-    Test if
-    1) targets has right type,
-    2) all columns are present
-    3) dtype of column peak_label is string
-    4) rt_min and rt_max are set
-    Returns a list of strings indicating identified errors.
-    If list is empty targets is OK.
+    """Check if targets are formated well.
+
+    :param targets: Target list
+    :type targets: pandas.DataFrame
+    :return: Returns True if all checks pass, else False
+    :rtype: bool
     """
     results = (
         isinstance(targets, pd.DataFrame),
-        check_target_list_columns(targets),
-        check_labels_are_strings(targets),
-        check_duplicated_labels(targets),
-        check_targets_rt_values(targets),
+        _check_target_list_columns_(targets),
+        _check_labels_are_strings_(targets),
+        _check_duplicated_labels_(targets),
+        _check_targets_rt_values_(targets),
     )
-    print(results)
     return all(results)
 
 
-def check_labels_are_strings(targets):
+def _check_labels_are_strings_(targets):
     if not targets.dtypes["peak_label"] == np.dtype("O"):
-        logging.warning('Target labels are not strings.')
+        logging.warning("Target labels are not strings.")
         return False
     return True
 
 
-def check_duplicated_labels(targets):
+def _check_duplicated_labels_(targets):
     max_target_label_count = targets.peak_label.value_counts().max()
     if max_target_label_count > 1:
-        logging.warning('Target labels are not unique')
+        logging.warning("Target labels are not unique")
         return False
     return True
 
 
-def check_target_list_columns(targets):
+def _check_target_list_columns_(targets):
     if targets.columns.to_list() != TARGETS_COLUMNS:
-        logging.warning('Target columns are wrong.')
+        logging.warning("Target columns are wrong.")
         return False
     return True
 
 
-def check_targets_rt_values(targets):
+def _check_targets_rt_values_(targets):
     missing_rt = targets.loc[targets[["rt_min", "rt_max"]].isna().max(axis=1)]
-    if len(missing_rt) != 0: 
+    if len(missing_rt) != 0:
         logging.warning("Some targets have missing rt_min or rt_max.")
         return False
     return True
@@ -137,13 +122,11 @@ def check_targets_rt_values(targets):
 def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
     """
     Creates a targets from a list of masses.
-    -----
-    Args:
-        - masses: iterable of float values
-        - dt: float or int, size of peak windows in time dimension [min]
-        - rt_max: float, maximum time [min]
-        - mz_ppm: width of peak window in m/z dimension
-            mass +/- (mz_ppm * mass * 1e-6)
+
+    :param masses: Target m/z values.
+    :param dt: Size of peak windows in time dimension [min]
+    :param rt_max: Maximum time
+    :param mz_ppm: Width of peak window in m/z dimension [ppm].
     """
     rt_cuts = np.arange(0, rt_max + dt, dt)
     targets = pd.DataFrame(index=rt_cuts, columns=masses).unstack().reset_index()
@@ -157,11 +140,20 @@ def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
     )
     targets["mz_width"] = mz_ppm
     targets["intensity_threshold"] = intensity_threshold
-    targets["targets_name"] = "Generated"
+    targets["targets_name"] = "gen_target_grid"
     return targets
 
 
 def diff_targets(old_pklist, new_pklist):
+    """Get the difference between two target lists.
+
+    :param old_pklist: Old target list
+    :type old_pklist: pandas.DataFrame
+    :param new_pklist: New target list
+    :type new_pklist: pandas.DataFrame
+    :return: Target list with new/changed targets
+    :rtype: pandas.DataFrame
+    """
     df = df_diff(old_pklist, new_pklist)
     df = df[df["_merge"] == "right_only"]
     return df.drop("_merge", axis=1)
