@@ -1,24 +1,41 @@
+""" Experimental module to run Mint interactively inside the Jupyter notebook.
+
+
+code-block::
+
+    from ms_mint.notebook import Mint
+
+    mint = Mint()
+
+    mint.display()
+
+
+"""
+
 import os, io
 import ipywidgets as W
 
 from glob import glob
 from pathlib import Path as P
 
-#from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
-#from ipywidgets import IntProgress as Progress
+# from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
+# from ipywidgets import IntProgress as Progress
 from ipyfilechooser import FileChooser
 from IPython.display import display
 from IPython.core.display import HTML
 
-from .Mint import Mint as MintBase
+from .Mint import Mint as _Mint_
 
 HOME = str(P.home())
 
 
-class Mint(MintBase):
+class Mint(_Mint_):
+    """MINT with added functions for interactive use in Jupyter Notebook (experimental).
+
+    """
     def __init__(self, *args, **kwargs):
 
-        self.progress_callback = self.set_progress
+        self.progress_callback = self._set_progress_
 
         super().__init__(progress_callback=self.progress_callback, *args, **kwargs)
 
@@ -31,13 +48,10 @@ class Mint(MintBase):
         self.target_files_button = W.FileUpload(
             description="Peaklists", accept="csv,xlsx", multiple=False
         )
-        self.target_files_button.observe(self.load_target, names="value")
+        self.target_files_button.observe(self._load_target_from_bytes_, names="value")
 
         self.load_ms_button = W.Button(description="Load MS-files")
-        self.load_ms_button.on_click(self.search_files)
-
-        self.detect_peaks_button = W.Button(description="Detect Peaks")
-        self.detect_peaks_button.on_click(self.detect_peaks)
+        self.load_ms_button.on_click(self._search_files_)
 
         self.message_box = W.Textarea(
             value="",
@@ -48,14 +62,11 @@ class Mint(MintBase):
         )
 
         self.run_button = W.Button(description="Run")
-        self.run_button.on_click(self.run)
+        self.run_button.on_click(self._run_)
         self.run_button.style.button_color = "lightgray"
 
-        self.optimize_rt_button = W.Button(description="Find closest peaks")
-        self.optimize_rt_button.on_click(self.action_optimize_rt)
-
         self.download_button = W.Button(description="Export")
-        self.download_button.on_click(self.export_action)
+        self.download_button.on_click(self._export_action_)
         self.download_button.style.button_color = "lightgray"
 
         self.progress_bar = W.IntProgress(
@@ -74,8 +85,6 @@ class Mint(MintBase):
             W.HBox(
                 [
                     self.target_files_button,
-                    self.detect_peaks_button,
-                    self.optimize_rt_button,
                 ]
             ),
         ]
@@ -92,23 +101,18 @@ class Mint(MintBase):
             ]
         )
 
-
-    def load_target(self, value):
+    def _load_target_from_bytes_(self, value):
         for fn, data in value["new"].items():
             self.load(io.BytesIO(data["content"]))
-        self.message(f'{len(self.targets)} targets loaded.')
+        self._message_(f"{len(self.targets)} targets loaded.")
 
-    def action_optimize_rt(self, b):
-        if (self.n_files > 0) and len(self.target) > 0:
-            self.optimize_rt()
-
-    def message(self, text):
+    def _message_(self, text):
         self.message_box.value = f"{text}\n" + self.message_box.value
 
-    def clear_messages(self):
+    def _clear_messages_(self):
         self.message_box.value = ""
 
-    def search_files(self, b=None):
+    def _search_files_(self, b=None):
         self.ms_files = (
             glob(os.path.join(self.ms_storage_path.selected_path, "*mzXML"))
             + glob(os.path.join(self.ms_storage_path.selected_path, "*mzML"))
@@ -117,69 +121,31 @@ class Mint(MintBase):
             + glob(os.path.join(self.ms_storage_path.selected_path, "*mzml"))
             + glob(os.path.join(self.ms_storage_path.selected_path, "*mzhdf"))
         )
-        self.message(f'{self.n_files} MS-files loaded.')
+        self.message(f"{self.n_files} MS-files loaded.")
 
-    def show(self):
+    def display(self):
+        """Display control elements in Jupyter notebook.
+
+        :return: IPython Widgets elements.
+        """
         display(HTML("<style>textarea, input { font-family: monospace; }</style>"))
         return self.layout
 
-    def files(self, files):
-        super(Mint, self).ms_files = files
-        self.ms_files_button.files = files
-        self.list_files()
-
-    def add_ms_files(self, fns):
-        if fns is not None:
-            self.ms_files = self.ms_files + fns
-        self.list_files()
-
-    def add_target_files(self, fns):
-        if fns is not None:
-            self.target_files = self.target_files + fns
-
-    def list_files(self, b=None):
-        text = f"{self.n_files} MS-files to process:\n"
-        for i, line in enumerate(self.ms_files):
-            text += line + "\n"
-            if i > 10:
-                text += line + "\n...\n"
-                break
-        text += "\nUsing peak list:\n"
-        if len(self.target_files) != 0:
-            text += "\n".join([str(i) for i in self.target_files])
-        elif len(self.target) != 0:
-            text += self.target.to_string()
-        else:
-            text += "\nNo target defined."
-
-        if (self.n_files != 0) and (self.n_target_files != 0):
-            self.run_button.style.button_color = "lightgreen"
-        else:
-            self.run_button.style.button_color = "lightgray"
-        print(text)
-        self.message(text)
-
-    def run(self, b=None, **kwargs):
-        self.message(f'Start processing...')
+    def _run_(self, b=None, **kwargs):
+        self.message(f"Start processing...")
         self.progress = 0
-        super(Mint, self).run(**kwargs)
+        self.run(**kwargs)
         self.message("...finished processing.")
         if self.results is not None:
             self.download_button.style.button_color = "lightgreen"
 
-    def detect_peaks(self, b=None, **kwargs):
-        self.message("\n\nRun peak detection.")
-        super(Mint, self).detect_peaks(**kwargs)
-
-    def set_progress(self, value):
+    def _set_progress_(self, value):
         self.progress_bar.value = value
 
-    def export_action(self, b=None, filename=None):
+    def _export_action_(self, b=None, filename=None):
         if filename is None:
             filename = "MINT__results.xlsx"
             filename = os.path.join(os.getcwd(), filename)
         self.export(filename)
         self.message(f"/nExported results to: {filename}")
 
-    def state(self):
-        return f'{len(self.ms_files)} {len(self.targets)}'

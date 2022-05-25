@@ -1,4 +1,6 @@
-# ms_mint/Mint.py
+"""
+Main module of the ms-mint library.
+"""
 
 import os
 import numpy as np
@@ -41,7 +43,7 @@ class Mint(object):
     """
 
     def __init__(self, verbose: bool = False, progress_callback=None):
-       
+
         self._verbose = verbose
         self._version = ms_mint.__version__
         self._progress_callback = progress_callback
@@ -49,7 +51,7 @@ class Mint(object):
         if self.verbose:
             print("Mint Version:", self.version, "\n")
         self.plot = PlotGenerator(self)
-        self.optimizers = {'rt': RetentionTimeOptimizer}
+        self.optimizers = {"rt": RetentionTimeOptimizer}
 
     @property
     def verbose(self):
@@ -75,7 +77,6 @@ class Mint(object):
         :return: Version string.
         :rtype: str
         """
-        
         return self._version
 
     def reset(self):
@@ -95,7 +96,7 @@ class Mint(object):
         self._messages = []
         return self
 
-    def optimize(self, what='rt', ms_files=None, peak_labels=None, **kwargs):
+    def optimize(self, what="rt", ms_files=None, peak_labels=None, **kwargs):
         """Run optimizer.
 
         :param what: Optimizer, defaults to 'rt'
@@ -108,7 +109,9 @@ class Mint(object):
         :rtype: ms_mint.Mint.Mint
         """
 
-        RetentionTimeOptimizer(self, ms_files=ms_files, peak_labels=peak_labels, **kwargs)
+        RetentionTimeOptimizer(
+            self, ms_files=ms_files, peak_labels=peak_labels, **kwargs
+        )
         return self
 
     def clear_targets(self):
@@ -132,7 +135,7 @@ class Mint(object):
     def run(self, nthreads=None, rt_margin=0.5, mode="standard", **kwargs):
         """
         Main routine to run MINT and process MS-files with current target list.
-        
+
         :param nthreads: Number of cores to use, defaults to None
         :type nthreads: int
                 * None - Run with min(n_cpus, c_files) CPUs
@@ -243,8 +246,8 @@ class Mint(object):
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
 
-    #@property
-    #def messages(self):
+    # @property
+    # def messages(self):
     #    return self._messages
 
     @property
@@ -290,7 +293,6 @@ class Mint(object):
         :rtype: int
         """
         return len(self.ms_files)
-
 
     def load_targets(self, list_of_files):
         """Load targets from a file (csv, xslx)
@@ -356,8 +358,8 @@ class Mint(object):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
-        The values in the cells are determined by *col_name*.         
-        
+        The values in the cells are determined by *col_name*.
+
 
         :param col_name: Name of the column from *mint.results* table that is used for the cell values.
         :type col_name: str
@@ -373,7 +375,7 @@ class Mint(object):
 
     @property
     def progress_callback(self):
-        """Assigns a callback function to update a progress bar. 
+        """Assigns a callback function to update a progress bar.
 
         :getter: Returns the current callback function.
         :setter: Sets the callback function.
@@ -381,7 +383,7 @@ class Mint(object):
         return self._progress_callback
 
     @progress_callback.setter
-    def progress_callback(self, func: Callable =None):
+    def progress_callback(self, func: Callable = None):
         self._progress_callback = func
 
     @property
@@ -466,11 +468,10 @@ class Mint(object):
             self.targets = targets
             return self
 
-
     def pca(
-            self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
-        ):
-        """Run Principal Component Analysis on current results. Results are stored in 
+        self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
+    ):
+        """Run Principal Component Analysis on current results. Results are stored in
         self.decomposition_results.
 
         :param var_name: Column name to use for pca, defaults to "peak_max"
