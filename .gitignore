@@ -19,3 +19,4 @@ InnoSetup/Output
 ChEBI.tsv
 data.sqlite
 app.db
+_*

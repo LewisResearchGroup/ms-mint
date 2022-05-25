@@ -11,7 +11,6 @@ from IPython.display import display
 from IPython.core.display import HTML
 
 from .Mint import Mint as MintBase
-from .MintPlotter import MintPlotter
 
 HOME = str(P.home())
 
@@ -93,7 +92,6 @@ class Mint(MintBase):
             ]
         )
 
-        self.plot = MintPlotter(self)
 
     def load_target(self, value):
         for fn, data in value["new"].items():

@@ -12,34 +12,56 @@ from sklearn.decomposition import PCA
 
 from multiprocessing import Pool, Manager, cpu_count
 
-from ms_mint.MintPlotter import MintPlotter
+from ms_mint.PlotGenerator import PlotGenerator
 
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
-from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
-from .io import export_to_excel, ms_file_to_df
+from .processing import process_ms1_files_in_parallel
+from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets
 from .helpers import is_ms_file, get_ms_files_from_results
 from .tools import scale_dataframe
 
 from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 
-from tqdm import tqdm
-
 import ms_mint
 
 
+from typing import Callable
+
+
 class Mint(object):
+    """Main class of the ms_mint package, which processes metabolomics files.
+
+    :param verbose: Sets verbosity of the instance.
+    :type verbose: bool
+
+    :param progress_callback: A callback for a progress bar.
+    :type progress_callback: Callable[]
+
+    """
+
     def __init__(self, verbose: bool = False, progress_callback=None):
+       
         self._verbose = verbose
         self._version = ms_mint.__version__
         self._progress_callback = progress_callback
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
-        self.plot = MintPlotter(self)
+        self.plot = PlotGenerator(self)
+        self.optimizers = {'rt': RetentionTimeOptimizer}
 
     @property
     def verbose(self):
+        """Get/set verbosity.
+
+        :getter: Get current verbosity.
+        :return: True or False
+        :rtype: bool
+        :setter: Sets verbosity.
+        :param value: True or False
+        :type value: bool
+        """
         return self._verbose
 
     @verbose.setter
@@ -48,9 +70,20 @@ class Mint(object):
 
     @property
     def version(self):
+        """ms-mint version number.
+
+        :return: Version string.
+        :rtype: str
+        """
+        
         return self._version
 
     def reset(self):
+        """Reset Mint instance. Removes targets, MS-files and results.
+
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
         self._files = []
         self._targets_files = []
         self._targets = pd.DataFrame(columns=TARGETS_COLUMNS)
@@ -60,61 +93,56 @@ class Mint(object):
         self.runtime = None
         self._status = "waiting"
         self._messages = []
+        return self
 
-    def optimize_rt(self, ms_files=None, peak_labels=None, rt_margin=0.5, **kwargs):
-        chromatograms = []
-        if ms_files is None:
-            ms_files = self.ms_files
-        if peak_labels is None:
-            peak_labels = self.targets.peak_label.values
-        targets = self.targets.copy()
-        targets = targets[targets.peak_label.isin(peak_labels)]
-        n_peaks = len(targets)
-        for i, (ndx, row) in tqdm(enumerate(targets.iterrows()), total=n_peaks):
-            self.progress = int(100 * (i + 1) / n_peaks)
-            peak_label = row["peak_label"]
-            if peak_label not in peak_labels:
-                continue
-            chromatograms = []
-            mz_mean, mz_width, rt, rt_min, rt_max = row[
-                ["mz_mean", "mz_width", "rt", "rt_min", "rt_max"]
-            ]
-            for fn in ms_files:
-                df = self.ms_file_to_df(fn)
-                chrom = extract_chromatogram_from_ms1(
-                    df, mz_mean=mz_mean, mz_width=mz_width
-                )
-                chromatograms.append(chrom)
-            params = dict(rt=rt, rt_min=rt_min, rt_max=rt_max, rt_margin=rt_margin)
-            rtopt = RetentionTimeOptimizer(**params, **kwargs)
-            rt_min, rt_max = rtopt.find_largest_peak(chromatograms)
-            self.targets.loc[ndx, ["rt_min", "rt_max"]] = rt_min, rt_max
+    def optimize(self, what='rt', ms_files=None, peak_labels=None, **kwargs):
+        """Run optimizer.
 
+        :param what: Optimizer, defaults to 'rt'
+        :type what: str, optional
+        :param ms_files: MS-filenames to use, defaults to None
+        :type ms_files: str or list[str], optional
+        :param peak_labels: Targets to optimize, defaults to None
+        :type peak_labels: str or list[str], optional
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
 
-    def ms_file_to_df(self, fn):
-        return ms_file_to_df(fn)
+        RetentionTimeOptimizer(self, ms_files=ms_files, peak_labels=peak_labels, **kwargs)
+        return self
 
     def clear_targets(self):
+        """
+        Reset target list.
+        """
         self.targets = pd.DataFrame(columns=TARGETS_COLUMNS)
 
     def clear_results(self):
+        """
+        Reset results.
+        """
         self.results = pd.DataFrame(columns=MINT_RESULTS_COLUMNS)
 
     def clear_ms_files(self):
+        """
+        Reset ms files.
+        """
         self.ms_files = []
 
     def run(self, nthreads=None, rt_margin=0.5, mode="standard", **kwargs):
         """
-        Run MINT with set up targets and ms-files.
-        ----
-        Args
-            - nthreads: int or None, default = None
-                * None: Run with min(n_cpus, c_files) CPUs
+        Main routine to run MINT and process MS-files with current target list.
+        
+        :param nthreads: Number of cores to use, defaults to None
+        :type nthreads: int
+                * None - Run with min(n_cpus, c_files) CPUs
                 * 1: Run without multiprocessing on one CPU
                 * >1: Run with multiprocessing enabled using nthreads threads.
-            - mode: str, default = 'standard'
+        :param mode: Compute mode ('standard' or 'express'), defaults to 'standard'
                 * 'standard': calculates peak shaped projected to RT dimension
                 * 'express': omits calculation of other features, only peak_areas
+        :type mode: str
+        :param kwargs: Arguments passed to the procesing function.
         """
         self._status = "running"
 
@@ -137,7 +165,7 @@ class Mint(object):
 
         start = time.time()
         if nthreads > 1:
-            self.run_parallel(nthreads=nthreads, mode=mode, **kwargs)
+            self.__run_parallel__(nthreads=nthreads, mode=mode, **kwargs)
         else:
             results = []
             for i, filename in enumerate(self.ms_files):
@@ -169,8 +197,9 @@ class Mint(object):
 
         self._status = "done"
         assert self.progress == 100
+        return self
 
-    def run_parallel(
+    def __run_parallel__(
         self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None
     ):
         print(f"maxtasksperchild: {maxtasksperchild}")
@@ -214,21 +243,32 @@ class Mint(object):
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
 
-    @property
-    def messages(self):
-        return self._messages
+    #@property
+    #def messages(self):
+    #    return self._messages
 
     @property
     def status(self):
+        """Returns current status of Mint instance.
+
+        :return: ['waiting', 'running', 'done']
+        :rtype: str
+        """
         return self._status
 
     @property
     def ms_files(self):
-        return self._files
+        """Get/set ms-files to process.
 
-    @property
-    def n_files(self):
-        return len(self.ms_files)
+        :getter:
+        :return: List of filenames.
+        :rtype: list[str]
+
+        :setter:
+        :param list_of_files: Filename or list of file names of MS-files.
+        :type list_of_files: str or list[str]
+        """
+        return self._files
 
     @ms_files.setter
     def ms_files(self, list_of_files):
@@ -242,7 +282,24 @@ class Mint(object):
         if self.verbose:
             print("Set files to:\n" + "\n".join(self.ms_files) + "\n")
 
+    @property
+    def n_files(self):
+        """Number of currently stored ms filenames.
+
+        :return: Number of files stored in self.ms_files
+        :rtype: int
+        """
+        return len(self.ms_files)
+
+
     def load_targets(self, list_of_files):
+        """Load targets from a file (csv, xslx)
+
+        :param list_of_files: Filename or list of file names.
+        :type list_of_files: str or list[str]
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
@@ -257,6 +314,16 @@ class Mint(object):
 
     @property
     def targets(self):
+        """Set/get target list.
+
+        :getter:
+        :return: Target list
+        :rtype: pandas.DataFrame
+
+        :setter:
+        :param targets: Sets the target list of the instance.
+        :type targets: pandas.DataFrame
+        """
         return self._targets
 
     @targets.setter
@@ -269,20 +336,34 @@ class Mint(object):
 
     @property
     def results(self):
+        """
+        Get/Set the Mint results.
+
+        :getter:
+        :return: Results
+        :rtype: pandas.DataFrame
+        :setter:
+        :param df: DataFrame with MINT results.
+        :type df: pandas.DataFrame
+        """
         return self._results
 
     @results.setter
     def results(self, df):
         self._results = df
 
-    @property
-    def rt_projections(self):
-        return DeprecationWarning(
-            "rt_projections is deprecated. Peak shapes are now "
-            "directly stored in the results table (mint.results)."
-        )
-
     def crosstab(self, col_name="peak_area"):
+        """
+        Create condensed representation of the results.
+        More specifically, a cross-table with filenames as index and target labels.
+        The values in the cells are determined by *col_name*.         
+        
+
+        :param col_name: Name of the column from *mint.results* table that is used for the cell values.
+        :type col_name: str
+
+        cells of the returned table.
+        """
         return pd.crosstab(
             self.results.ms_file,
             self.results.peak_label,
@@ -292,14 +373,24 @@ class Mint(object):
 
     @property
     def progress_callback(self):
+        """Assigns a callback function to update a progress bar. 
+
+        :getter: Returns the current callback function.
+        :setter: Sets the callback function.
+        """
         return self._progress_callback
 
     @progress_callback.setter
-    def progress_callback(self, func=None):
+    def progress_callback(self, func: Callable =None):
         self._progress_callback = func
 
     @property
     def progress(self):
+        """Shows the current progress.
+
+        :getter: Returns the current progress value.
+        :setter: Set the progress to a value between 0 and 100 and calls the progress callback function.
+        """
         return self._progress
 
     @progress.setter
@@ -310,8 +401,20 @@ class Mint(object):
         if self.progress_callback is not None:
             self.progress_callback(value)
 
-    def export(self, filename=None):
-        fn = filename
+    def export(self, fn=None, filename=None):
+        """Export current results to file.
+
+        :param fn: Filename, defaults to None
+        :type fn: str, optional
+        :param filename: **deprecated**
+        :type filename: str, optional
+        :return: file buffer if *filename* is None otherwise returns None
+        :rtype: io.BytesIO
+        """
+
+        if filename is not None:
+            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
+            fn = filename
         if fn is None:
             buffer = export_to_excel(self, fn=fn)
             return buffer
@@ -321,6 +424,13 @@ class Mint(object):
             self.results.to_csv(fn, index=False)
 
     def load(self, fn):
+        """Load results into Mint instance.
+
+        :param fn: Filename (csv, xlsx)
+        :type fn: str
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
         if self.verbose:
             print("Loading MINT state")
         if isinstance(fn, str):
@@ -354,53 +464,66 @@ class Mint(object):
                 [col for col in TARGETS_COLUMNS if col in results.columns]
             ].drop_duplicates()
             self.targets = targets
+            return self
 
 
     def pca(
             self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
         ):
+        """Run Principal Component Analysis on current results. Results are stored in 
+        self.decomposition_results.
 
-            df = self.crosstab(var_name).fillna(fillna)
+        :param var_name: Column name to use for pca, defaults to "peak_max"
+        :type var_name: str, optional
+        :param n_components: Number of PCA components to return, defaults to 3
+        :type n_components: int, optional
+        :param fillna: Method to fill missing values, defaults to "median"
+        :type fillna: str, optional
+        :param scaler: Method to scale the columns, defaults to "standard"
+        :type scaler: str, optional
+        """
 
-            if fillna == "median":
-                fillna = df.median()
-            elif fillna == "mean":
-                fillna = df.mean()
-            elif fillna == "zero":
-                fillna = 0
+        df = self.crosstab(var_name).fillna(fillna)
 
-            df = df.fillna(fillna)
-            if scaler is not None:
-                df = scale_dataframe(df, scaler)
+        if fillna == "median":
+            fillna = df.median()
+        elif fillna == "mean":
+            fillna = df.mean()
+        elif fillna == "zero":
+            fillna = 0
 
-            min_dim = min(df.shape)
-            n_components = min(n_components, min_dim)
-            pca = PCA(n_components)
-            X_projected = pca.fit_transform(df)
-            # Convert to dataframe
-            df_projected = pd.DataFrame(X_projected, index=df.index.get_level_values(0))
-            # Set columns to PC-1, PC-2, ...
-            df_projected.columns = [f"PC-{int(i)+1}" for i in df_projected.columns]
+        df = df.fillna(fillna)
+        if scaler is not None:
+            df = scale_dataframe(df, scaler)
 
-            # Calculate cumulative explained variance in percent
-            explained_variance = pca.explained_variance_ratio_ * 100
-            cum_expl_var = np.cumsum(explained_variance)
+        min_dim = min(df.shape)
+        n_components = min(n_components, min_dim)
+        pca = PCA(n_components)
+        X_projected = pca.fit_transform(df)
+        # Convert to dataframe
+        df_projected = pd.DataFrame(X_projected, index=df.index.get_level_values(0))
+        # Set columns to PC-1, PC-2, ...
+        df_projected.columns = [f"PC-{int(i)+1}" for i in df_projected.columns]
 
-            # Create feature contributions
-            a = np.zeros((n_components, n_components), int)
-            np.fill_diagonal(a, 1)
-            dfc = pd.DataFrame(pca.inverse_transform(a))
-            dfc.columns = df.columns
-            dfc.index = [f"PC-{i+1}" for i in range(n_components)]
-            dfc.index.name = "PC"
-            # convert to long format
-            dfc = dfc.stack().reset_index().rename(columns={0: "Coefficient"})
+        # Calculate cumulative explained variance in percent
+        explained_variance = pca.explained_variance_ratio_ * 100
+        cum_expl_var = np.cumsum(explained_variance)
 
-            self.decomposition_results = {
-                "df_projected": df_projected,
-                "cum_expl_var": cum_expl_var,
-                "n_components": n_components,
-                "type": "PCA",
-                "feature_contributions": dfc,
-                "class": pca,
-            }
+        # Create feature contributions
+        a = np.zeros((n_components, n_components), int)
+        np.fill_diagonal(a, 1)
+        dfc = pd.DataFrame(pca.inverse_transform(a))
+        dfc.columns = df.columns
+        dfc.index = [f"PC-{i+1}" for i in range(n_components)]
+        dfc.index.name = "PC"
+        # convert to long format
+        dfc = dfc.stack().reset_index().rename(columns={0: "Coefficient"})
+
+        self.decomposition_results = {
+            "df_projected": df_projected,
+            "cum_expl_var": cum_expl_var,
+            "n_components": n_components,
+            "type": "PCA",
+            "feature_contributions": dfc,
+            "class": pca,
+        }

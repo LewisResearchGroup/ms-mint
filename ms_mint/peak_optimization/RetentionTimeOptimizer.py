@@ -5,7 +5,7 @@ from scipy.signal import find_peaks, peak_widths
 from sklearn.neighbors import KernelDensity
 
 from ..tools import gaussian
-from ..Resampler import Resampler
+from ..resampling import Resampler
 
 
 class RetentionTimeOptimizer:

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ms_mint.vis.mpl import hierarchical_clustering
+from ms_mint.visualization.matplotlib import hierarchical_clustering
 
 
 def test__plotly_heatmap__call_show():
