@@ -79,7 +79,7 @@ def test__process_ms1_from_df():
             "rt_max": [10],
         }
     )
-    result = processing.process_ms1_from_df(df, peaklist)
+    result = processing._process_ms1_from_df_(df, peaklist)
     expect = [["A", 3, 3, 1, 3, 2, 3, 3.0, 3.0, 0, "2", "3", 0.0, 0.0, 0.0, None]]
     print(result)
     print(expect)
