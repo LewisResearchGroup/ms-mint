@@ -23,18 +23,7 @@ def extract_chromatogram_from_ms1(df, mz_mean, mz_width, unit="minutes"):
 def process_ms1_files_in_parallel(args):
     """
     Pickleable function for (parallel) peak integration.
-    Expects a dictionary with keys:
-        Mandatory:
-        - 'filename': 'path to file to be processed',
-        - 'targets': 'dataframe containing the targets'
-        - 'mode': 'express' or 'standard'
-            * 'express' omits calculcation of rt projections
-        Optional:
-        - 'queue': instance of multiprocessing.Manager().Queue()
-
-    Returns tuple with two elements:
-        1) results, dataframe with integration results
-        2) rt_projection, dictionary of dictionaries with peak shapes
+    
     """
 
     filename = args["filename"]
@@ -65,12 +54,13 @@ def append_results(results, fn):
 def process_ms1_file(filename, targets):
     """
     Peak integration using a filename as input.
-    -----
-    Args:
-        - filename: str or PosixPath, path to mzxml or mzml filename
-        - targets: pandas.DataFrame(), DataFrame in targets format
-    Returns:
-        pandas.DataFrame(), DataFrame with processd peak intensities
+    
+    :param filename: Path to mzxml or mzml filename
+    :type filename: str or PosixPath
+    :param targets: DataFrame in target list format.
+    :type targets: pandas.DataFrame
+    :return: DataFrame with processd peak intensities.
+    :rtype: pandas.DataFrame
     """
     df = ms_file_to_df(filename)
     results = process_ms1(df, targets)

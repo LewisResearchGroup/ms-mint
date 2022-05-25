@@ -11,32 +11,23 @@ from .helpers import df_diff
 from .tools import get_mz_mean_from_formulas
 
 
-def read_targets(filenames, ms_mode="negative"):
+def read_targets(fns, ms_mode="negative"):
     """
     Extracts peak data from csv files that contain peak definitions.
     CSV files must contain columns:
-        - 'peak_label': str, unique identifier
-        - 'mz_mean': float, center of mass to be extracted in [Da]
-        - 'mz_width': float, with of mass window in [ppm]
-        - 'rt_min': float, minimum retention time in [min]
-        - 'rt_max': float, maximum retention time in [min]
-    -----
-    Args:
-        - filenames: str or PosixPath or list of such with path to csv-file(s)
-    Returns:
-        pandas.DataFrame in targets format
+    
+    :param fns: List of filenames of target lists.
+    :param ms_mode: "negative" or "positive"
     """
-    if isinstance(filenames, str):
-        filenames = [filenames]
+    if isinstance(fns, str):
+        fns = [fns]
     targets = []
 
-    for fn in filenames:
+    for fn in fns:
         if fn.endswith(".csv"):
             df = pd.read_csv(fn)
         elif fn.endswith(".xlsx"):
             df = pd.read_excel(fn)
-        # if len(df) == 0:
-        #    return pd.DataFrame(columns=TARGETS_COLUMNS, index=[])
         df = standardize_targets(df)
         df["target_filename"] = P(fn).name
         targets.append(df)
@@ -125,13 +116,11 @@ def check_targets_rt_values(targets):
 def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
     """
     Creates a targets from a list of masses.
-    -----
-    Args:
-        - masses: iterable of float values
-        - dt: float or int, size of peak windows in time dimension [min]
-        - rt_max: float, maximum time [min]
-        - mz_ppm: width of peak window in m/z dimension
-            mass +/- (mz_ppm * mass * 1e-6)
+    
+    :param masses: Target m/z values.
+    :param dt: Size of peak windows in time dimension [min]
+    :param rt_max: Maximum time
+    :param mz_ppm: Width of peak window in m/z dimension [ppm].
     """
     rt_cuts = np.arange(0, rt_max + dt, dt)
     targets = pd.DataFrame(index=rt_cuts, columns=masses).unstack().reset_index()
