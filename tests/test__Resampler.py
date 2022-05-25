@@ -1,5 +1,5 @@
 import pandas as pd
-from ms_mint.Resampler import Resampler
+from ms_mint.resampling import Resampler
 
 
 def test__Resampler_50ms_minutes_dt():

@@ -20,11 +20,6 @@ class TestClass:
         assert mint.n_files == 1, mint.n_files
         assert mint.ms_files == [TEST_MZXML]
 
-    def test__add_target(self):
-        assert mint.n_targets_files == 0, mint.n_targets_files
-        mint.targets_files = TEST_TARGETS_FN
-        assert mint.n_targets_files == 1, mint.n_targets_files
-
     def test__mint_run_standard(self):
         mint.run()
 
@@ -56,27 +51,28 @@ class TestClass:
         mint.run(nthreads=2)
 
     def test__mzxml_equals_mzml(self):
-        mint.reset()
-        mint.ms_files = [TEST_MZML, TEST_MZXML]
-        mint.targets_files = TEST_TARGETS_FN
-        mint.run()
-        results = []
-        for _, grp in mint.results.groupby("ms_file"):
-            results.append(grp.peak_area.astype(int))
-        print(results)
-        assert (results[0].values == results[1].values).all(), (
-            results[0].values - results[1].values
-        )
+        mint1 = Mint()
+        mint2 = Mint()
 
-    def test__target_v0_equals_v1(self):
-        mint.reset()
-        mint.ms_files = [TEST_MZXML]
-        mint.targets_files = [TEST_TARGETS_FN_V0, TEST_TARGETS_FN]
-        mint.run()
-        results = []
-        for _, grp in mint.results.groupby("target_filename"):
-            results.append(grp.peak_area.values)
-        assert (results[0] == results[1]).all(), results
+        mint1.load_targets(TEST_TARGETS_FN)
+        mint1.ms_files = [TEST_MZML]
+
+        mint2.load_targets(TEST_TARGETS_FN)
+        mint2.ms_files = [TEST_MZXML]
+
+        assert mint1.results.equals(mint2.results)
+
+    def test__target_v0_equals_v1_results(self):
+        mint1 = Mint()
+        mint2 = Mint()
+
+        mint1.load_targets(TEST_TARGETS_FN_V0)
+        mint1.ms_files = [TEST_MZXML]
+
+        mint2.load_targets(TEST_TARGETS_FN)
+        mint2.ms_files = [TEST_MZXML]
+
+        assert mint1.results.equals(mint2.results)
 
     def test__status(self):
         mint.status == "waiting"
