@@ -1,6 +1,6 @@
 [![Python package](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/sorenwacker/ms-mint/actions/workflows/pythonpackage.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
-![Coverage](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
+![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
 
@@ -28,10 +28,6 @@ Before you modify the code please reach out to us using the [issues](https://git
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
 
 
-# Change log
+# Example
 
-## v0.1.5
 
-The way to load targets from files has been changed.
-
-    mint.target_files = [...]  -> mint.load_targets([...])
