@@ -390,8 +390,8 @@ class Mint(object):
         """
 
         if filename is not None:
-            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
             fn = filename
+            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
         if fn is None:
             buffer = export_to_excel(self, fn=fn)
             return buffer
