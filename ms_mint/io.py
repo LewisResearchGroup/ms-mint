@@ -16,7 +16,7 @@ try:
     from pyteomics import mzmlb
 
     MZMLB_AVAILABLE = True
-except:
+except ImportError:
     logging.warning("Cound not import pyteomics.mzmlb")
     MZMLB_AVAILABLE = False
 

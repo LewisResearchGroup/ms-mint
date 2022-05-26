@@ -377,10 +377,10 @@ def plotly_peak_shapes(
     # Create sub-plots
     for label_i, label in enumerate(labels):
         for file_i, file in enumerate(files):
-            try:
-                x, y = res.loc[(label, file), ["peak_shape_rt", "peak_shape_int"]]
-            except:
-                continue
+            #try:
+            x, y = res.loc[(label, file), ["peak_shape_rt", "peak_shape_int"]]
+            #except:
+            #    continue
             if not isinstance(x, Iterable):
                 continue
 
