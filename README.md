@@ -61,6 +61,7 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
     mint.run()
 
     mint.results
+    >>>
 
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png)
 
