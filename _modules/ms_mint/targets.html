@@ -107,12 +107,18 @@
 <div class="viewcode-block" id="standardize_targets"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.standardize_targets">[docs]</a><span class="k">def</span> <span class="nf">standardize_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;neutral&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Standardize target list.</span>
 
-<span class="sd">    :param targets: _description_</span>
-<span class="sd">    :type targets: _type_</span>
-<span class="sd">    :param ms_mode: _description_, defaults to &quot;neutral&quot;</span>
+<span class="sd">    - updates the target lists to newest format</span>
+
+<span class="sd">    - ensures peak labels are strings</span>
+
+<span class="sd">    - replaces np.NaN with None</span>
+
+<span class="sd">    :param targets: DataFrame in target-list format.</span>
+<span class="sd">    :type targets: pandas.DataFrame</span>
+<span class="sd">    :param ms_mode: Ionization mode, defaults to &quot;neutral&quot;</span>
 <span class="sd">    :type ms_mode: str, optional</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :return: DataFrame in formated target-list format</span>
+<span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>

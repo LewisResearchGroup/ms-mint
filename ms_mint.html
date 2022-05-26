@@ -1155,9 +1155,9 @@ using the pyteomics library.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.processing.score_peaks">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.processing.</span></span><span class="sig-name descname"><span class="pre">score_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/processing.html#score_peaks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.processing.score_peaks" title="Permalink to this definition"></a></dt>
-<dd><p>Score the peak quality (experimental).
-1 - means a good shape
-0 - means a bad shape</p>
+<dd><p>Score the peak quality (experimental).</p>
+<p>1 - means a good shape</p>
+<p>0 - means a bad shape</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>mint_results</strong> (<em>pandas.DataFrame</em>) – DataFrame in ms_mint results format.</p>
@@ -1310,18 +1310,23 @@ CSV files must contain columns:</p>
 <dt class="sig sig-object py" id="ms_mint.targets.standardize_targets">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">standardize_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'neutral'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#standardize_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.standardize_targets" title="Permalink to this definition"></a></dt>
 <dd><p>Standardize target list.</p>
+<ul class="simple">
+<li><p>updates the target lists to newest format</p></li>
+<li><p>ensures peak labels are strings</p></li>
+<li><p>replaces np.NaN with None</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>targets</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>ms_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “neutral”</p></li>
+<li><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – DataFrame in target-list format.</p></li>
+<li><p><strong>ms_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – Ionization mode, defaults to “neutral”</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>DataFrame in formated target-list format</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>pandas.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
