@@ -13,22 +13,22 @@ The metabolites can be used to define biomarkers used in medicine to find treatm
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 More information on how to install and run the program can be found in the [Documentation](https://lewisresearchgroup.github.io/ms-mint/).
 
-# News
+## News
 
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
 
-# Contributions
+## Contributions
 
 All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
 Before you modify the code please reach out to us using the [issues](https://github.com/LewisResearchGroup/ms-mint/issues) page.
 
 
-# Code standards
+## Code standards
 
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
 
 
-# Example
+## Example usage
 
     %pylab inline
     from ms_mint.notebook import Mint
