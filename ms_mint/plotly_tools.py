@@ -52,10 +52,10 @@ def plotly_heatmap(
     :type clustered: bool, optional
     :param add_dendrogram: Whether or not to show a dendrogram (only with `clustered=True`), defaults to False
     :type add_dendrogram: bool, optional
-    :param name: _description_, defaults to ""
-    :type name: str, optional
-    :param x_tick_colors: _description_, defaults to None
-    :type x_tick_colors: _type_, optional
+    :param title: Title for figure, defaults to ""
+    :type title: str, optional
+    :param x_tick_colors: Color of x-ticks, defaults to None
+    :type x_tick_colors: str, optional
     :param height: Image height in pixels, defaults to None
     :type height: int, optional
     :param width: Image width in pixels, defaults to None
