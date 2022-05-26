@@ -289,11 +289,13 @@ def slice_ms1_array(
 
 def score_peaks(mint_results):
     """Score the peak quality (experimental).
+    1 - means a good shape
+    0 - means a bad shape
 
-    :param mint_results: _description_
-    :type mint_results: _type_
-    :return: _description_
-    :rtype: _type_
+    :param mint_results: DataFrame in ms_mint results format.
+    :type mint_results: pandas.DataFrame
+    :return: Score
+    :rtype: float
     """
     R = mint_results.copy()
     scores = (
