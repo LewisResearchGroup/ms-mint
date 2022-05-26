@@ -28,14 +28,6 @@ ms\_mint.filelock module
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.helpers module
------------------------
-
-.. automodule:: ms_mint.helpers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ms\_mint.io module
 ------------------
 

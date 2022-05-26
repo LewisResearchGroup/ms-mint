@@ -7,8 +7,7 @@ import logging
 from pathlib import Path as P
 
 from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
-from .helpers import df_diff
-from .tools import get_mz_mean_from_formulas
+from .tools import get_mz_mean_from_formulas, df_diff
 
 
 def read_targets(fns, ms_mode="negative"):

@@ -18,8 +18,6 @@ import ipywidgets as W
 from glob import glob
 from pathlib import Path as P
 
-# from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
-# from ipywidgets import IntProgress as Progress
 from ipyfilechooser import FileChooser
 from IPython.display import display
 from IPython.core.display import HTML
