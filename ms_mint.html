@@ -1073,15 +1073,15 @@ using the pyteomics library.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>mz_mean</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>array</strong> (<em>numpy.array</em>) – MS-1 data slice.</p></li>
+<li><p><strong>mz_mean</strong> (<em>float</em>) – mz_mean value to calculate mass accuracy.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Extracted data.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1139,15 +1139,15 @@ using the pyteomics library.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>peaks</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>array</strong> (<em>numpy.Array</em>) – Input data.</p></li>
+<li><p><strong>peaks</strong> (<em>numpy.Array</em>) – Peak data np.array([[mz_mean_1, mz_width_1, rt_min_1, rt_max_1, intensity_threshold_1, peak_label_1], …])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Extracted data.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>

@@ -197,12 +197,12 @@
 <div class="viewcode-block" id="process_ms1_from_numpy"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1_from_numpy">[docs]</a><span class="k">def</span> <span class="nf">process_ms1_from_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">peaks</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Process MS1 data in numpy array format.</span>
 
-<span class="sd">    :param array: _description_</span>
-<span class="sd">    :type array: _type_</span>
-<span class="sd">    :param peaks: _description_</span>
-<span class="sd">    :type peaks: _type_</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param array: Input data.</span>
+<span class="sd">    :type array: numpy.Array</span>
+<span class="sd">    :param peaks: Peak data np.array([[mz_mean_1, mz_width_1, rt_min_1, rt_max_1, intensity_threshold_1, peak_label_1], ...])</span>
+<span class="sd">    :type peaks: numpy.Array</span>
+<span class="sd">    :return: Extracted data.</span>
+<span class="sd">    :rtype: list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">intensity_threshold</span><span class="p">,</span> <span class="n">peak_label</span><span class="p">)</span> <span class="ow">in</span> <span class="n">peaks</span><span class="p">:</span>
@@ -243,12 +243,12 @@
 <div class="viewcode-block" id="extract_ms1_properties"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_ms1_properties">[docs]</a><span class="k">def</span> <span class="nf">extract_ms1_properties</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Process MS-1 data in array format.</span>
 
-<span class="sd">    :param array: _description_</span>
-<span class="sd">    :type array: _type_</span>
-<span class="sd">    :param mz_mean: _description_</span>
-<span class="sd">    :type mz_mean: _type_</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param array: MS-1 data slice.</span>
+<span class="sd">    :type array: numpy.array</span>
+<span class="sd">    :param mz_mean: mz_mean value to calculate mass accuracy.</span>
+<span class="sd">    :type mz_mean: float</span>
+<span class="sd">    :return: Extracted data.</span>
+<span class="sd">    :rtype: dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">float_list_to_comma_sep_str</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
