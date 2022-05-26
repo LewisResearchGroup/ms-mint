@@ -7,8 +7,8 @@ from scipy.cluster.hierarchy import ClusterWarning
 from matplotlib import pyplot as plt
 from pathlib import Path as P
 
-from .visualization.plotly import plotly_heatmap
-from .visualization.matplotlib import plot_peak_shapes, hierarchical_clustering
+from .plotly_tools import plotly_heatmap
+from .matplotlib_tools import plot_peak_shapes, hierarchical_clustering
 from .tools import scale_dataframe
 
 

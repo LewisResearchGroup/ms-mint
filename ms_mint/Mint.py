@@ -20,10 +20,8 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets
-from .helpers import is_ms_file, get_ms_files_from_results
-from .tools import scale_dataframe
+from .tools import scale_dataframe, is_ms_file, get_ms_files_from_results
 
-from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 
 import ms_mint
 
@@ -51,7 +49,6 @@ class Mint(object):
         if self.verbose:
             print("Mint Version:", self.version, "\n")
         self.plot = PlotGenerator(self)
-        self.optimizers = {"rt": RetentionTimeOptimizer}
 
     @property
     def verbose(self):
@@ -94,24 +91,6 @@ class Mint(object):
         self.runtime = None
         self._status = "waiting"
         self._messages = []
-        return self
-
-    def optimize(self, what="rt", ms_files=None, peak_labels=None, **kwargs):
-        """Run optimizer.
-
-        :param what: Optimizer, defaults to 'rt'
-        :type what: str, optional
-        :param ms_files: MS-filenames to use, defaults to None
-        :type ms_files: str or list[str], optional
-        :param peak_labels: Targets to optimize, defaults to None
-        :type peak_labels: str or list[str], optional
-        :return: self
-        :rtype: ms_mint.Mint.Mint
-        """
-
-        RetentionTimeOptimizer(
-            self, ms_files=ms_files, peak_labels=peak_labels, **kwargs
-        )
         return self
 
     def clear_targets(self):
@@ -245,10 +224,6 @@ class Mint(object):
         if output_fn is None:
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
-
-    # @property
-    # def messages(self):
-    #    return self._messages
 
     @property
     def status(self):
@@ -415,8 +390,8 @@ class Mint(object):
         """
 
         if filename is not None:
-            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
             fn = filename
+            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
         if fn is None:
             buffer = export_to_excel(self, fn=fn)
             return buffer
