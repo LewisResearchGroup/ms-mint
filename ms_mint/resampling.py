@@ -36,11 +36,11 @@ class Resampler:
         return chrom
 
     def resample(self, chrom):
-        """Resample data.
+        """Resample chromatogram.
 
-        :param chrom: _description_
-        :type chrom: _type_
-        :return: _description_
-        :rtype: _type_
+        :param chrom: Chromatogram data
+        :type chrom: pandas.DataFrame
+        :return: Resampled chromatogram with constant time intervals.
+        :rtype: pandas.DataFrame
         """        
         return self._resample_unit_minutes_(chrom)
