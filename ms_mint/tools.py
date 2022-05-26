@@ -37,7 +37,7 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None):
         #try:
         mass = Formula(formula).isotope.mass
         #except:
-        masses.append(None)
+        #masses.append(None)
         # continue
         if ms_mode == "positive":
             mass += M_PROTON
