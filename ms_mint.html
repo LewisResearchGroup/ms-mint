@@ -1013,18 +1013,18 @@ using the pyteomics library.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>array</strong> (<em>np.array</em>) – Input MS-1 data.</p></li>
-<li><p><strong>rt_min</strong> (<em>_type_</em>) – Minimum rertadsfasdf</p></li>
-<li><p><strong>rt_max</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>mz_mean</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>mz_width</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>intensity_threshold</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>rt_min</strong> (<em>float</em>) – Minimum retention time for slice</p></li>
+<li><p><strong>rt_max</strong> (<em>float</em>) – Maximum retention time for slice</p></li>
+<li><p><strong>mz_mean</strong> (<em>float</em>) – Mean m/z value for slice</p></li>
+<li><p><strong>mz_width</strong> (<em>float</em><em> (</em><em>&gt;0</em><em>)</em>) – Width of slice in [ppm] of mz_mean</p></li>
+<li><p><strong>intensity_threshold</strong> (<em>float</em><em> (</em><em>&gt;0</em><em>)</em>) – Noise filter value</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Slice of numpy array</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>np.Array</p>
 </dd>
 </dl>
 </dd></dl>

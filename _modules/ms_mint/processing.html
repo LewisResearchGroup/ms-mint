@@ -335,18 +335,18 @@
 
 <span class="sd">    :param array: Input MS-1 data.</span>
 <span class="sd">    :type array: np.array</span>
-<span class="sd">    :param rt_min: Minimum rertadsfasdf</span>
-<span class="sd">    :type rt_min: _type_</span>
-<span class="sd">    :param rt_max: _description_</span>
-<span class="sd">    :type rt_max: _type_</span>
-<span class="sd">    :param mz_mean: _description_</span>
-<span class="sd">    :type mz_mean: _type_</span>
-<span class="sd">    :param mz_width: _description_</span>
-<span class="sd">    :type mz_width: _type_</span>
-<span class="sd">    :param intensity_threshold: _description_</span>
-<span class="sd">    :type intensity_threshold: _type_</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param rt_min: Minimum retention time for slice</span>
+<span class="sd">    :type rt_min: float</span>
+<span class="sd">    :param rt_max: Maximum retention time for slice</span>
+<span class="sd">    :type rt_max: float</span>
+<span class="sd">    :param mz_mean: Mean m/z value for slice</span>
+<span class="sd">    :type mz_mean: float</span>
+<span class="sd">    :param mz_width: Width of slice in [ppm] of mz_mean</span>
+<span class="sd">    :type mz_width: float (&gt;0)</span>
+<span class="sd">    :param intensity_threshold: Noise filter value</span>
+<span class="sd">    :type intensity_threshold: float (&gt;0)</span>
+<span class="sd">    :return: Slice of numpy array</span>
+<span class="sd">    :rtype: np.Array</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">delta_mass</span> <span class="o">=</span> <span class="n">mz_width</span> <span class="o">*</span> <span class="n">mz_mean</span> <span class="o">*</span> <span class="mf">1e-6</span>
     <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="p">[(</span><span class="n">array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">rt_min</span><span class="p">)]</span>
