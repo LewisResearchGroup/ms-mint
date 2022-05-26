@@ -128,12 +128,12 @@ def _process_ms1_from_df_(df, targets):
 def process_ms1_from_numpy(array, peaks):
     """Process MS1 data in numpy array format.
 
-    :param array: _description_
-    :type array: _type_
-    :param peaks: _description_
-    :type peaks: _type_
-    :return: _description_
-    :rtype: _type_
+    :param array: Input data.
+    :type array: numpy.Array
+    :param peaks: Peak data np.array([[mz_mean_1, mz_width_1, rt_min_1, rt_max_1, intensity_threshold_1, peak_label_1], ...])
+    :type peaks: numpy.Array
+    :return: Extracted data.
+    :rtype: list
     """
     results = []
     for (mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label) in peaks:
@@ -174,12 +174,12 @@ def _process_ms1_from_numpy(
 def extract_ms1_properties(array, mz_mean):
     """Process MS-1 data in array format.
 
-    :param array: _description_
-    :type array: _type_
-    :param mz_mean: _description_
-    :type mz_mean: _type_
-    :return: _description_
-    :rtype: _type_
+    :param array: MS-1 data slice.
+    :type array: numpy.array
+    :param mz_mean: mz_mean value to calculate mass accuracy.
+    :type mz_mean: float
+    :return: Extracted data.
+    :rtype: dict
     """
 
     float_list_to_comma_sep_str = lambda x: ",".join([str(np.round(i, 4)) for i in x])
