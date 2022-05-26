@@ -1,3 +1,7 @@
+"""
+A Python library for large-cohort metabolomics (MS1) processing.
+"""
+
 import os
 from ._version import get_versions
 from .Mint import Mint
