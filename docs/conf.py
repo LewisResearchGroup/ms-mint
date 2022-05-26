@@ -24,7 +24,7 @@ copyright = "2022, Soren Wacker"
 author = "Soren Wacker"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.5.1"
+release = "0.1.6"
 
 
 # -- General configuration ---------------------------------------------------
