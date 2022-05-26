@@ -40,11 +40,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">MINT (Metabolomics Integrator)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#news">News</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#contributions">Contributions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#code-standards">Code standards</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MINT (Metabolomics Integrator)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#news">News</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributions">Contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-standards">Code standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example usage</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">ms_mint</a></li>
 </ul>
 
@@ -84,22 +86,21 @@ Metabolomics is the study of all metabolites (small chemical compounds) in a bio
 The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests
 or for the identification of pathogens such as methicillin resistant <em>Staphylococcus aureus</em> (MRSA).
 More information on how to install and run the program can be found in the <a class="reference external" href="https://lewisresearchgroup.github.io/ms-mint/">Documentation</a>.</p>
-</section>
 <section id="news">
-<h1>News<a class="headerlink" href="#news" title="Permalink to this headline"></a></h1>
+<h2>News<a class="headerlink" href="#news" title="Permalink to this headline"></a></h2>
 <p>MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow <a class="reference external" href="https://github.com/LewisResearchGroup/ms-mint-app">this link</a>.</p>
 </section>
 <section id="contributions">
-<h1>Contributions<a class="headerlink" href="#contributions" title="Permalink to this headline"></a></h1>
+<h2>Contributions<a class="headerlink" href="#contributions" title="Permalink to this headline"></a></h2>
 <p>All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
 Before you modify the code please reach out to us using the <a class="reference external" href="https://github.com/LewisResearchGroup/ms-mint/issues">issues</a> page.</p>
 </section>
 <section id="code-standards">
-<h1>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this headline"></a></h1>
+<h2>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this headline"></a></h2>
 <p>The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.</p>
 </section>
-<section id="example">
-<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
+<section id="example-usage">
+<h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline"></a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>%pylab inline
 from ms_mint.notebook import Mint
 mint = Mint()
@@ -139,6 +140,7 @@ mint.results
 </pre></div>
 </div>
 <p><img alt="" src="https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical-clustering.png" /></p>
+</section>
 </section>
 
 
