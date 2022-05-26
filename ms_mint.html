@@ -50,7 +50,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.Mint">ms_mint.Mint module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.PlotGenerator">ms_mint.PlotGenerator module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filelock">ms_mint.filelock module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.helpers">ms_mint.helpers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.io">ms_mint.io module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.matplotlib_tools">ms_mint.matplotlib_tools module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.notebook">ms_mint.notebook module</a></li>
@@ -673,64 +672,6 @@ seconds.</p>
 <dd><p>Bases: <a class="reference internal" href="#ms_mint.filelock.BaseFileLock" title="ms_mint.filelock.BaseFileLock"><code class="xref py py-class docutils literal notranslate"><span class="pre">ms_mint.filelock.BaseFileLock</span></code></a></p>
 <p>Uses the <code class="xref py py-func docutils literal notranslate"><span class="pre">msvcrt.locking()</span></code> function to hard lock the lock file on
 windows systems.</p>
-</dd></dl>
-
-</section>
-<section id="module-ms_mint.helpers">
-<span id="ms-mint-helpers-module"></span><h2>ms_mint.helpers module<a class="headerlink" href="#module-ms_mint.helpers" title="Permalink to this headline"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="ms_mint.helpers.df_diff">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.helpers.</span></span><span class="sig-name descname"><span class="pre">df_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/helpers.html#df_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.helpers.df_diff" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df1</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>df2</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>which</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “both”</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ms_mint.helpers.get_ms_files_from_results">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.helpers.</span></span><span class="sig-name descname"><span class="pre">get_ms_files_from_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/helpers.html#get_ms_files_from_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.helpers.get_ms_files_from_results" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>results</strong> (<em>_type_</em>) – _description_</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ms_mint.helpers.is_ms_file">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.helpers.</span></span><span class="sig-name descname"><span class="pre">is_ms_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/helpers.html#is_ms_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.helpers.is_ms_file" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fn</strong> (<em>function</em>) – _description_</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
-</dd>
-</dl>
 </dd></dl>
 
 </section>
@@ -1417,6 +1358,27 @@ CSV files must contain columns:</p>
 <section id="module-ms_mint.tools">
 <span id="ms-mint-tools-module"></span><h2>ms_mint.tools module<a class="headerlink" href="#module-ms_mint.tools" title="Permalink to this headline"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.tools.df_diff">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">df_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#df_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.df_diff" title="Permalink to this definition"></a></dt>
+<dd><p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df1</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>df2</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>which</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “both”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.tools.gaussian">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#gaussian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.gaussian" title="Permalink to this definition"></a></dt>
 <dd><p>Simple gaussian function generator.</p>
@@ -1427,6 +1389,23 @@ CSV files must contain columns:</p>
 <li><p><strong>mu</strong> (<em>_type_</em>) – _description_</p></li>
 <li><p><strong>sig</strong> (<em>_type_</em>) – _description_</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.tools.get_ms_files_from_results">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">get_ms_files_from_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#get_ms_files_from_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.get_ms_files_from_results" title="Permalink to this definition"></a></dt>
+<dd><p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>results</strong> (<em>_type_</em>) – _description_</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>_description_</p>
@@ -1453,6 +1432,23 @@ CSV files must contain columns:</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.tools.is_ms_file">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">is_ms_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#is_ms_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.is_ms_file" title="Permalink to this definition"></a></dt>
+<dd><p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>function</em>) – _description_</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_type_</p>
 </dd>
 </dl>
 </dd></dl>
