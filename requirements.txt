@@ -24,3 +24,4 @@ pyarrow
 tables
 h5py
 hdf5plugin
+sphinx-rtd-theme
