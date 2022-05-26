@@ -5,7 +5,7 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
 
 
-# MINT (Metabolomics Integrator)
+# ms-mint - Python library for large-cohort metabolomics (MS1) processing.
 
 The Metabolomics Integrator (MINT) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
 Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
@@ -62,6 +62,8 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
     mint.run()
 
+    # Use mint.run(output_fn='results')
+
     mint.results
     >>>
 
@@ -79,14 +81,14 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 A target list is a pandas dataframe with specific columns. 
 
-- peak_label: str, Label of the peak (must be unique).
-- mz_mean: float, m/z value of the target ion.
-- mz_width: float, width of the peak in [ppm] of the `mz_mean` value.
-- rt: float (optional), expected time of the peak maximum.
-- rt_min: float, starting time for peak integration.
-- rt_max: float, ending time for peak integration.
-- intensity_threshold: float (optional, >=0), minimum intensity value.
-- target_filename: str (optional), name of the target list file.
+- **peak_label**: str, Label of the peak (must be unique).
+- **mz_mean**: float, m/z value of the target ion.
+- **mz_width**: float, width of the peak in [ppm] of the `mz_mean` value.
+- **rt**: float (optional), expected time of the peak maximum.
+- **rt_min**: float, starting time for peak integration.
+- **rt_max**: float, ending time for peak integration.
+- **intensity_threshold**: float (>=0), minimum intensity value to include, serves as a noise filter.
+- **target_filename**: str (optional), name of the target list file.
 
 The target list can be stored as csv or Excel file. 
 
