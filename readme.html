@@ -47,6 +47,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#example-usage">Example usage</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#faq">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-a-target-list">What is a target list?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-input-files-can-be-used">What input files can be used?</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">ms_mint</a></li>
 </ul>
 
@@ -86,6 +91,7 @@ Metabolomics is the study of all metabolites (small chemical compounds) in a bio
 The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests
 or for the identification of pathogens such as methicillin resistant <em>Staphylococcus aureus</em> (MRSA).
 More information on how to install and run the program can be found in the <a class="reference external" href="https://lewisresearchgroup.github.io/ms-mint/">Documentation</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> library can be used for targeted metabolomics with large amounts of files (1000+). It uses a target list and the MS-filenames as input.</p>
 <section id="news">
 <h2>News<a class="headerlink" href="#news" title="Permalink to this headline"></a></h2>
 <p>MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow <a class="reference external" href="https://github.com/LewisResearchGroup/ms-mint-app">this link</a>.</p>
@@ -140,6 +146,28 @@ mint.results
 </pre></div>
 </div>
 <p><img alt="" src="https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical-clustering.png" /></p>
+</section>
+</section>
+<section id="faq">
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"></a></h1>
+<section id="what-is-a-target-list">
+<h2>What is a target list?<a class="headerlink" href="#what-is-a-target-list" title="Permalink to this headline"></a></h2>
+<p>A target list is a pandas dataframe with specific columns.</p>
+<ul class="simple">
+<li><p>peak_label: str, Label of the peak (must be unique).</p></li>
+<li><p>mz_mean: float, m/z value of the target ion.</p></li>
+<li><p>mz_width: float, width of the peak in [ppm] of the <code class="docutils literal notranslate"><span class="pre">mz_mean</span></code> value.</p></li>
+<li><p>rt: float (optional), expected time of the peak maximum.</p></li>
+<li><p>rt_min: float, starting time for peak integration.</p></li>
+<li><p>rt_max: float, ending time for peak integration.</p></li>
+<li><p>intensity_threshold: float (optional, &gt;=0), minimum intensity value.</p></li>
+<li><p>target_filename: str (optional), name of the target list file.</p></li>
+</ul>
+<p>The target list can be stored as csv or Excel file.</p>
+</section>
+<section id="what-input-files-can-be-used">
+<h2>What input files can be used?<a class="headerlink" href="#what-input-files-can-be-used" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ms_mint</span></code> can be used with <code class="docutils literal notranslate"><span class="pre">mzXML</span></code>, <code class="docutils literal notranslate"><span class="pre">mzML</span></code>, <code class="docutils literal notranslate"><span class="pre">mzMLb</span></code> and experimental formats in <code class="docutils literal notranslate"><span class="pre">.feather</span></code> and <code class="docutils literal notranslate"><span class="pre">.parquet</span></code> format.</p>
 </section>
 </section>
 
