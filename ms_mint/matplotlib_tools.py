@@ -20,8 +20,30 @@ def hierarchical_clustering(
     metric="euclidean",
     cmap=None,
 ):
-    """
-    Hierarchical clustering with visualization.
+    """_summary_
+
+    :param df: _description_
+    :type df: _type_
+    :param vmin: _description_, defaults to None
+    :type vmin: _type_, optional
+    :param vmax: _description_, defaults to None
+    :type vmax: _type_, optional
+    :param figsize: _description_, defaults to (8, 8)
+    :type figsize: tuple, optional
+    :param top_height: _description_, defaults to 2
+    :type top_height: int, optional
+    :param left_width: _description_, defaults to 2
+    :type left_width: int, optional
+    :param xmaxticks: _description_, defaults to None
+    :type xmaxticks: _type_, optional
+    :param ymaxticks: _description_, defaults to None
+    :type ymaxticks: _type_, optional
+    :param metric: _description_, defaults to "euclidean"
+    :type metric: str, optional
+    :param cmap: _description_, defaults to None
+    :type cmap: _type_, optional
+    :return: _description_
+    :rtype: _type_
     """
 
     if isinstance(metric, str):
@@ -123,6 +145,39 @@ def plot_peak_shapes(
     sharey=False,
     **kwargs
 ):
+    """_summary_
+
+    :param mint_results: _description_
+    :type mint_results: _type_
+    :param ms_files: _description_, defaults to None
+    :type ms_files: _type_, optional
+    :param peak_labels: _description_, defaults to None
+    :type peak_labels: _type_, optional
+    :param height: _description_, defaults to 4
+    :type height: int, optional
+    :param aspect: _description_, defaults to 1
+    :type aspect: int, optional
+    :param legend: _description_, defaults to False
+    :type legend: bool, optional
+    :param n_cols: _description_, defaults to None
+    :type n_cols: _type_, optional
+    :param col_wrap: _description_, defaults to 4
+    :type col_wrap: int, optional
+    :param hue: _description_, defaults to "ms_file"
+    :type hue: str, optional
+    :param top: _description_, defaults to None
+    :type top: _type_, optional
+    :param title: _description_, defaults to None
+    :type title: _type_, optional
+    :param dpi: _description_, defaults to None
+    :type dpi: _type_, optional
+    :param sharex: _description_, defaults to False
+    :type sharex: bool, optional
+    :param sharey: _description_, defaults to False
+    :type sharey: bool, optional
+    :return: _description_
+    :rtype: _type_
+    """
 
     # fig = plt.figure(dpi=dpi)
 

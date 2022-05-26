@@ -15,6 +15,8 @@ from plotly.subplots import make_subplots
 
 
 def set_template():
+    """_summary_
+    """
     pio.templates["draft"] = go.layout.Template(
         layout=dict(font={"size": 10}),
     )
@@ -40,6 +42,35 @@ def plotly_heatmap(
     call_show=False,
     verbose=False,
 ):
+    """_summary_
+
+    :param df: _description_
+    :type df: _type_
+    :param normed_by_cols: _description_, defaults to False
+    :type normed_by_cols: bool, optional
+    :param transposed: _description_, defaults to False
+    :type transposed: bool, optional
+    :param clustered: _description_, defaults to False
+    :type clustered: bool, optional
+    :param add_dendrogram: _description_, defaults to False
+    :type add_dendrogram: bool, optional
+    :param name: _description_, defaults to ""
+    :type name: str, optional
+    :param x_tick_colors: _description_, defaults to None
+    :type x_tick_colors: _type_, optional
+    :param height: _description_, defaults to None
+    :type height: _type_, optional
+    :param width: _description_, defaults to None
+    :type width: _type_, optional
+    :param correlation: _description_, defaults to False
+    :type correlation: bool, optional
+    :param call_show: _description_, defaults to False
+    :type call_show: bool, optional
+    :param verbose: _description_, defaults to False
+    :type verbose: bool, optional
+    :return: _description_
+    :rtype: _type_
+    """
 
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
@@ -196,9 +227,22 @@ def plotly_peak_shapes_3d(
     call_show=False,
     verbose=False,
 ):
-    """
-    Returns a plotly 3D plot of all peak_shapes in mint.results
-    where mint.results.peak_label == peak_label.
+    """_summary_
+
+    :param mint_results: _description_
+    :type mint_results: _type_
+    :param peak_label: _description_, defaults to None
+    :type peak_label: _type_, optional
+    :param legend: _description_, defaults to True
+    :type legend: bool, optional
+    :param legend_orientation: _description_, defaults to "v"
+    :type legend_orientation: str, optional
+    :param call_show: _description_, defaults to False
+    :type call_show: bool, optional
+    :param verbose: _description_, defaults to False
+    :type verbose: bool, optional
+    :return: _description_
+    :rtype: _type_
     """
 
     mint_results = mint_results.copy()
@@ -265,9 +309,26 @@ def plotly_peak_shapes(
     legend_orientation="v",
     call_show=False,
 ):
-    """
-    Returns a plotly multiplost of all peak_shapes in mint.results
-    grouped by peak_label.
+    """_summary_
+
+    :param mint_results: _description_
+    :type mint_results: _type_
+    :param n_cols: _description_, defaults to 1
+    :type n_cols: int, optional
+    :param biomarkers: _description_, defaults to None
+    :type biomarkers: _type_, optional
+    :param peak_labels: _description_, defaults to None
+    :type peak_labels: _type_, optional
+    :param legend: _description_, defaults to True
+    :type legend: bool, optional
+    :param verbose: _description_, defaults to False
+    :type verbose: bool, optional
+    :param legend_orientation: _description_, defaults to "v"
+    :type legend_orientation: str, optional
+    :param call_show: _description_, defaults to False
+    :type call_show: bool, optional
+    :return: _description_
+    :rtype: _type_
     """
     mint_results = mint_results.copy()
     mint_results.ms_file = [basename(i) for i in mint_results.ms_file]
