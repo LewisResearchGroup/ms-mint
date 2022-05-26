@@ -1,4 +1,6 @@
-# ms_mint/standards.py
+"""
+Contains standard column names and other values.
+"""
 
 import os
 
