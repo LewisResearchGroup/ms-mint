@@ -38,12 +38,18 @@ def read_targets(fns, ms_mode="negative"):
 def standardize_targets(targets, ms_mode="neutral"):
     """Standardize target list.
 
-    :param targets: _description_
-    :type targets: _type_
-    :param ms_mode: _description_, defaults to "neutral"
+    - updates the target lists to newest format
+
+    - ensures peak labels are strings
+
+    - replaces np.NaN with None
+
+    :param targets: DataFrame in target-list format.
+    :type targets: pandas.DataFrame
+    :param ms_mode: Ionization mode, defaults to "neutral"
     :type ms_mode: str, optional
-    :return: _description_
-    :rtype: _type_
+    :return: DataFrame in formated target-list format
+    :rtype: pandas.DataFrame
     """
     targets = targets.rename(columns=DEPRECATED_LABELS)
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
