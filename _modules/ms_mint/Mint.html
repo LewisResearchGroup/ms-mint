@@ -459,8 +459,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;&#39;filename&#39; is deprecated use &#39;fn&#39; instead&quot;</span><span class="p">)</span>
             <span class="n">fn</span> <span class="o">=</span> <span class="n">filename</span>
+            <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;&#39;filename&#39; is deprecated use &#39;fn&#39; instead&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">buffer</span> <span class="o">=</span> <span class="n">export_to_excel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">fn</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">buffer</span>
