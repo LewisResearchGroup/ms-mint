@@ -20,30 +20,30 @@ def hierarchical_clustering(
     metric="euclidean",
     cmap=None,
 ):
-    """_summary_
+    """Performs and plot hierarchical clustering on dataframe in dense format.
 
-    :param df: _description_
-    :type df: _type_
-    :param vmin: _description_, defaults to None
-    :type vmin: _type_, optional
-    :param vmax: _description_, defaults to None
-    :type vmax: _type_, optional
-    :param figsize: _description_, defaults to (8, 8)
+    :param df: Input data.
+    :type df: pandas.DataFrame
+    :param vmin: Minimum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.
+    :type vmin: int, optional
+    :param vmin: Maximum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.
+    :type vmax: int, optional    
+    :param figsize: Size of the main figure in inches, defaults to (8, 8)
     :type figsize: tuple, optional
-    :param top_height: _description_, defaults to 2
+    :param top_height: Height of the top dendrogram, defaults to 2
     :type top_height: int, optional
-    :param left_width: _description_, defaults to 2
+    :param left_width: Width of the left dendrogram, defaults to 2
     :type left_width: int, optional
-    :param xmaxticks: _description_, defaults to None
-    :type xmaxticks: _type_, optional
-    :param ymaxticks: _description_, defaults to None
-    :type ymaxticks: _type_, optional
-    :param metric: _description_, defaults to "euclidean"
+    :param xmaxticks: Maximum number of x-ticks to display, defaults to None
+    :type xmaxticks: int, optional
+    :param ymaxticks: Maxiumum number of y-ticks to display, defaults to None
+    :type ymaxticks: int, optional
+    :param metric: Metric to be used for distance calculation (both axes), defaults to "euclidean"
     :type metric: str, optional
-    :param cmap: _description_, defaults to None
-    :type cmap: _type_, optional
-    :return: _description_
-    :rtype: _type_
+    :param cmap: Matplotlib color map name, defaults to None
+    :type cmap: str, optional
+    :return: Matplotlib figure
+    :rtype: matplotlib.pyplot.Figure
     """
 
     if isinstance(metric, str):
@@ -135,48 +135,42 @@ def plot_peak_shapes(
     height=4,
     aspect=1,
     legend=False,
-    n_cols=None,
     col_wrap=4,
     hue="ms_file",
-    top=None,
     title=None,
     dpi=None,
     sharex=False,
     sharey=False,
     **kwargs
 ):
-    """_summary_
+    """Plot peak shapes of mint results.
 
-    :param mint_results: _description_
-    :type mint_results: _type_
-    :param ms_files: _description_, defaults to None
-    :type ms_files: _type_, optional
-    :param peak_labels: _description_, defaults to None
-    :type peak_labels: _type_, optional
-    :param height: _description_, defaults to 4
+    :param mint_results: DataFrame in Mint results format.
+    :type mint_results: pandas.DataFrame
+    :param ms_files: Filenames to include, defaults to None
+    :type ms_files: list, optional
+    :param peak_labels: Peak-labels to include, defaults to None
+    :type peak_labels: list, optional
+    :param height: Height of the figure facets, defaults to 4
     :type height: int, optional
-    :param aspect: _description_, defaults to 1
+    :param aspect: Aspect ratio of the figure facets, defaults to 1
     :type aspect: int, optional
-    :param legend: _description_, defaults to False
+    :param legend: Whether or not to add a legend, defaults to False
     :type legend: bool, optional
-    :param n_cols: _description_, defaults to None
-    :type n_cols: _type_, optional
-    :param col_wrap: _description_, defaults to 4
+    :param col_wrap: Number of columns for sub-plots, defaults to 4
     :type col_wrap: int, optional
-    :param hue: _description_, defaults to "ms_file"
+    :param hue: Column name for color groups, defaults to "ms_file"
     :type hue: str, optional
-    :param top: _description_, defaults to None
-    :type top: _type_, optional
-    :param title: _description_, defaults to None
-    :type title: _type_, optional
-    :param dpi: _description_, defaults to None
-    :type dpi: _type_, optional
-    :param sharex: _description_, defaults to False
+    :param title: Title to add, defaults to None
+    :type title: str, optional
+    :param dpi: Resolution of generated image, defaults to None
+    :type dpi: int, optional
+    :param sharex: Whether or not to share x-axis range between subplots, defaults to False
     :type sharex: bool, optional
-    :param sharey: _description_, defaults to False
+    :param sharey: Whether or not to share y-axis range between subplots, defaults to False
     :type sharey: bool, optional
-    :return: _description_
-    :rtype: _type_
+    :return: Generated figure object.
+    :rtype: matplotlib.pyplot.Figure
     """
 
     # fig = plt.figure(dpi=dpi)
@@ -212,9 +206,6 @@ def plot_peak_shapes(
             dfs.append(df)
 
     df = pd.concat(dfs)
-
-    if n_cols is not None:
-        col_wrap = n_cols
 
     g = sns.relplot(
         data=df,
