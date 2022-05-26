@@ -264,9 +264,9 @@ def slice_ms1_array(
 ):
     """Slice MS1 data by m/z, mz_width, rt_min, rt_max
 
-    :param array: _description_
+    :param array: Input MS-1 data.
     :type array: np.array
-    :param rt_min: _description_
+    :param rt_min: Minimum rertadsfasdf
     :type rt_min: _type_
     :param rt_max: _description_
     :type rt_max: _type_
