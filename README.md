@@ -58,7 +58,7 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
     mint.run()
 
-    # Use mint.run(output_fn='results')
+    # Use mint.run(output_fn='results') for many files to prevent memory issues.
 
     mint.results
     >>>
