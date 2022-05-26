@@ -81,12 +81,12 @@
 
 
 <div class="viewcode-block" id="lock"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.lock">[docs]</a><span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;File lock to ensure safe writing to file.</span>
 
-<span class="sd">    :param fn: _description_</span>
-<span class="sd">    :type fn: function</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param fn: Filename to lock.</span>
+<span class="sd">    :type fn: str or PosixPath</span>
+<span class="sd">    :return: File lock object.</span>
+<span class="sd">    :rtype: FileLock</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">FileLock</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">.lock&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
@@ -98,7 +98,7 @@
 <span class="sd">    :type formulas: list[str]</span>
 <span class="sd">    :param ms_mode: Ionization mode, defaults to None</span>
 <span class="sd">    :type ms_mode: str, optional</span>
-<span class="sd">    :return: List of calculated masses.</span>
+<span class="sd">    :return: List of calculated masses</span>
 <span class="sd">    :rtype: list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">masses</span> <span class="o">=</span> <span class="p">[]</span>
@@ -120,14 +120,14 @@
 <div class="viewcode-block" id="gaussian"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.gaussian">[docs]</a><span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simple gaussian function generator.</span>
 
-<span class="sd">    :param x: _description_</span>
-<span class="sd">    :type x: _type_</span>
-<span class="sd">    :param mu: _description_</span>
-<span class="sd">    :type mu: _type_</span>
-<span class="sd">    :param sig: _description_</span>
-<span class="sd">    :type sig: _type_</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param x: x-values to generate function values</span>
+<span class="sd">    :type x: np.array</span>
+<span class="sd">    :param mu: Mean of gaussian</span>
+<span class="sd">    :type mu: float</span>
+<span class="sd">    :param sig: Sigma of gaussian</span>
+<span class="sd">    :type sig: float</span>
+<span class="sd">    :return: f(x)</span>
+<span class="sd">    :rtype: np.array</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)))</span></div>
@@ -140,7 +140,7 @@
 <span class="sd">    :type df: pandas.DataFrame</span>
 <span class="sd">    :param scaler: Scaler to use [&#39;robust&#39;, &#39;standard&#39;], defaults to &quot;standard&quot;</span>
 <span class="sd">    :type scaler: str, optional</span>
-<span class="sd">    :return: Scaled dataframe.</span>
+<span class="sd">    :return: Scaled dataframe</span>
 <span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -153,16 +153,16 @@
 
 
 <div class="viewcode-block" id="df_diff"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.df_diff">[docs]</a><span class="k">def</span> <span class="nf">df_diff</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;Difference between two dataframes.</span>
 
-<span class="sd">    :param df1: _description_</span>
-<span class="sd">    :type df1: _type_</span>
-<span class="sd">    :param df2: _description_</span>
-<span class="sd">    :type df2: _type_</span>
-<span class="sd">    :param which: _description_, defaults to &quot;both&quot;</span>
+<span class="sd">    :param df1: Reference dataframe</span>
+<span class="sd">    :type df1: pandas.DataFrame</span>
+<span class="sd">    :param df2: Dataframe to compare</span>
+<span class="sd">    :type df2: pandas.DataFrame</span>
+<span class="sd">    :param which: Direction in which to compare, defaults to &quot;both&quot;</span>
 <span class="sd">    :type which: str, optional</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :return: DataFrame that contains unique rows.</span>
+<span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_df</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="n">indicator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
     <span class="n">diff_df</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;_merge&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">which</span><span class="p">]</span>
@@ -170,12 +170,12 @@
 
 
 <div class="viewcode-block" id="is_ms_file"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.is_ms_file">[docs]</a><span class="k">def</span> <span class="nf">is_ms_file</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;Check if file is a MS-file based on filename.</span>
 
-<span class="sd">    :param fn: _description_</span>
-<span class="sd">    :type fn: function</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param fn: Filename</span>
+<span class="sd">    :type fn: str or PosixPath</span>
+<span class="sd">    :return: Whether or not the file is recognized as MS-file</span>
+<span class="sd">    :rtype: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzxml&quot;</span><span class="p">))</span>
@@ -192,12 +192,12 @@
 
 
 <div class="viewcode-block" id="get_ms_files_from_results"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.get_ms_files_from_results">[docs]</a><span class="k">def</span> <span class="nf">get_ms_files_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;Extract MS-filenames from Mint results.</span>
 
-<span class="sd">    :param results: _description_</span>
-<span class="sd">    :type results: _type_</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param results: DataFrame in Mint fesults format</span>
+<span class="sd">    :type results: pandas.DataFrame</span>
+<span class="sd">    :return: List of filenames</span>
+<span class="sd">    :rtype: list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;ms_path&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
     <span class="n">ms_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span><span class="p">)</span> <span class="k">for</span> <span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span> <span class="ow">in</span> <span class="n">ms_files</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>

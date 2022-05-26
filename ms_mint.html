@@ -1337,20 +1337,20 @@ CSV files must contain columns:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.tools.df_diff">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">df_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#df_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.df_diff" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>Difference between two dataframes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df1</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>df2</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>which</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “both”</p></li>
+<li><p><strong>df1</strong> (<em>pandas.DataFrame</em>) – Reference dataframe</p></li>
+<li><p><strong>df2</strong> (<em>pandas.DataFrame</em>) – Dataframe to compare</p></li>
+<li><p><strong>which</strong> (<em>str</em><em>, </em><em>optional</em>) – Direction in which to compare, defaults to “both”</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>DataFrame that contains unique rows.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>pandas.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1362,16 +1362,16 @@ CSV files must contain columns:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>mu</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>sig</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>x</strong> (<em>np.array</em>) – x-values to generate function values</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – Mean of gaussian</p></li>
+<li><p><strong>sig</strong> (<em>float</em>) – Sigma of gaussian</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>f(x)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>np.array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1379,16 +1379,16 @@ CSV files must contain columns:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.tools.get_ms_files_from_results">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">get_ms_files_from_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#get_ms_files_from_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.get_ms_files_from_results" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>Extract MS-filenames from Mint results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>results</strong> (<em>_type_</em>) – _description_</p>
+<dd class="field-odd"><p><strong>results</strong> (<em>pandas.DataFrame</em>) – DataFrame in Mint fesults format</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>List of filenames</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1405,7 +1405,7 @@ CSV files must contain columns:</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of calculated masses.</p>
+<dd class="field-even"><p>List of calculated masses</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list</p>
@@ -1416,16 +1416,16 @@ CSV files must contain columns:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.tools.is_ms_file">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">is_ms_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#is_ms_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.is_ms_file" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>Check if file is a MS-file based on filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fn</strong> (<em>function</em>) – _description_</p>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em><em> or </em><em>PosixPath</em>) – Filename</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Whether or not the file is recognized as MS-file</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1433,16 +1433,16 @@ CSV files must contain columns:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.tools.lock">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.tools.</span></span><span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/tools.html#lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.tools.lock" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>File lock to ensure safe writing to file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fn</strong> (<em>function</em>) – _description_</p>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em><em> or </em><em>PosixPath</em>) – Filename to lock.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>File lock object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>FileLock</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1459,7 +1459,7 @@ CSV files must contain columns:</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Scaled dataframe.</p>
+<dd class="field-even"><p>Scaled dataframe</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pandas.DataFrame</p>
