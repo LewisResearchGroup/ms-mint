@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; ms-mint 0.1.5.1 documentation</title>
+  <title>MINT (Metabolomics Integrator) &mdash; ms-mint 0.1.5.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/readme.html" />
@@ -18,7 +18,9 @@
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ms_mint" href="modules.html" />
+    <link rel="prev" title="Welcome to ms-mint’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -37,7 +39,15 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MINT (Metabolomics Integrator)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#news">News</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#contributions">Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#code-standards">Code standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#change-log">Change log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-5">v0.1.5</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">ms_mint</a></li>
 </ul>
 
@@ -55,7 +65,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>&lt;no title&gt;</li>
+      <li>MINT (Metabolomics Integrator)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -65,11 +75,50 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
+  <p><a class="reference external" href="https://github.com/sorenwacker/ms-mint/actions/workflows/pythonpackage.yml"><img alt="Python package" src="https://github.com/lewisresearchgroup/ms-mint/actions/workflows/pythonpackage.yml/badge.svg" /></a>
+<a class="reference external" href="https://bestpractices.coreinfrastructure.org/projects/5178"><img alt="CII Best Practices" src="https://bestpractices.coreinfrastructure.org/projects/5178/badge" /></a>
+<img alt="" src="images/coverage.svg" />
+<a class="reference external" href="https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml"><img alt="CodeQL" src="https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg" /></a>
+<a class="reference external" href="https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python"><img alt="Language grade: Python" src="https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&amp;logoWidth=18" /></a></p>
+<section id="mint-metabolomics-integrator">
+<h1>MINT (Metabolomics Integrator)<a class="headerlink" href="#mint-metabolomics-integrator" title="Permalink to this headline"></a></h1>
+<p>The Metabolomics Integrator (MINT) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics.
+Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample.
+The metabolites can be used to define biomarkers used in medicine to find treatments for diseases or for the development of diagnostic tests
+or for the identification of pathogens such as methicillin resistant <em>Staphylococcus aureus</em> (MRSA).
+More information on how to install and run the program can be found in the <a class="reference external" href="https://lewisresearchgroup.github.io/ms-mint/">Documentation</a>.</p>
+</section>
+<section id="news">
+<h1>News<a class="headerlink" href="#news" title="Permalink to this headline"></a></h1>
+<p>MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow <a class="reference external" href="https://github.com/LewisResearchGroup/ms-mint-app">this link</a>.</p>
+</section>
+<section id="contributions">
+<h1>Contributions<a class="headerlink" href="#contributions" title="Permalink to this headline"></a></h1>
+<p>All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
+Before you modify the code please reach out to us using the <a class="reference external" href="https://github.com/LewisResearchGroup/ms-mint/issues">issues</a> page.</p>
+</section>
+<section id="code-standards">
+<h1>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this headline"></a></h1>
+<p>The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.</p>
+</section>
+<section id="change-log">
+<h1>Change log<a class="headerlink" href="#change-log" title="Permalink to this headline"></a></h1>
+<section id="v0-1-5">
+<h2>v0.1.5<a class="headerlink" href="#v0-1-5" title="Permalink to this headline"></a></h2>
+<p>The way to load targets from files has been changed.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.target_files = [...]  -&gt; mint.load_targets([...])
+</pre></div>
+</div>
+</section>
+</section>
+
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to ms-mint’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="ms_mint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

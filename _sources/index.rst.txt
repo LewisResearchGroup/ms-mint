@@ -10,8 +10,7 @@ Welcome to ms-mint's documentation!
    :maxdepth: 4
    :caption: Contents:
 
-   source/../README.md
-   
+   readme
    modules   
    
 
