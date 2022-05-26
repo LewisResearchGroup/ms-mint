@@ -12,12 +12,12 @@ from .filelock import FileLock
 
 
 def lock(fn):
-    """_summary_
+    """File lock to ensure safe writing to file.
 
-    :param fn: _description_
-    :type fn: function
-    :return: _description_
-    :rtype: _type_
+    :param fn: Filename to lock.
+    :type fn: str or PosixPath
+    :return: File lock object.
+    :rtype: FileLock
     """
     return FileLock(f"{fn}.lock", timeout=1)
 
@@ -29,7 +29,7 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None):
     :type formulas: list[str]
     :param ms_mode: Ionization mode, defaults to None
     :type ms_mode: str, optional
-    :return: List of calculated masses.
+    :return: List of calculated masses
     :rtype: list
     """
     masses = []
@@ -51,14 +51,14 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None):
 def gaussian(x, mu, sig):
     """Simple gaussian function generator.
 
-    :param x: _description_
-    :type x: _type_
-    :param mu: _description_
-    :type mu: _type_
-    :param sig: _description_
-    :type sig: _type_
-    :return: _description_
-    :rtype: _type_
+    :param x: x-values to generate function values
+    :type x: np.array
+    :param mu: Mean of gaussian
+    :type mu: float
+    :param sig: Sigma of gaussian
+    :type sig: float
+    :return: f(x)
+    :rtype: np.array
     """
     x = np.array(x)
     return np.exp(-np.power(x - mu, 2.0) / (2 * np.power(sig, 2.0)))
@@ -71,7 +71,7 @@ def scale_dataframe(df, scaler="standard", **kwargs):
     :type df: pandas.DataFrame
     :param scaler: Scaler to use ['robust', 'standard'], defaults to "standard"
     :type scaler: str, optional
-    :return: Scaled dataframe.
+    :return: Scaled dataframe
     :rtype: pandas.DataFrame
     """
     df = df.copy()
@@ -84,16 +84,16 @@ def scale_dataframe(df, scaler="standard", **kwargs):
 
 
 def df_diff(df1, df2, which="both"):
-    """_summary_
+    """Difference between two dataframes.
 
-    :param df1: _description_
-    :type df1: _type_
-    :param df2: _description_
-    :type df2: _type_
-    :param which: _description_, defaults to "both"
+    :param df1: Reference dataframe
+    :type df1: pandas.DataFrame
+    :param df2: Dataframe to compare
+    :type df2: pandas.DataFrame
+    :param which: Direction in which to compare, defaults to "both"
     :type which: str, optional
-    :return: _description_
-    :rtype: _type_
+    :return: DataFrame that contains unique rows.
+    :rtype: pandas.DataFrame
     """
     _df = df1.merge(df2, indicator=True, how="outer")
     diff_df = _df[_df["_merge"] != which]
@@ -101,12 +101,12 @@ def df_diff(df1, df2, which="both"):
 
 
 def is_ms_file(fn):
-    """_summary_
+    """Check if file is a MS-file based on filename.
 
-    :param fn: _description_
-    :type fn: function
-    :return: _description_
-    :rtype: _type_
+    :param fn: Filename
+    :type fn: str or PosixPath
+    :return: Whether or not the file is recognized as MS-file
+    :rtype: bool
     """
     if (
         (fn.lower().endswith(".mzxml"))
@@ -123,12 +123,12 @@ def is_ms_file(fn):
 
 
 def get_ms_files_from_results(results):
-    """_summary_
+    """Extract MS-filenames from Mint results.
 
-    :param results: _description_
-    :type results: _type_
-    :return: _description_
-    :rtype: _type_
+    :param results: DataFrame in Mint fesults format
+    :type results: pandas.DataFrame
+    :return: List of filenames
+    :rtype: list
     """
     ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
     ms_files = [os.path.join(ms_path, ms_file) for ms_path, ms_file in ms_files.values]
