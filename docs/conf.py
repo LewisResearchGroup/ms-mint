@@ -13,7 +13,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../ms_mint"))
+sys.path.insert(0, os.path.abspath(".."))
 
 
 # -- Project information -----------------------------------------------------
@@ -94,5 +94,5 @@ source_suffix = [".rst"]
 
 html_baseurl = 'https://lewisresearchgroup.github.io/ms-mint'
 
-requirements_path = 'requirements.txt'
+requirements_path = 'docs/requirements.txt'
 
