@@ -18,8 +18,6 @@ import ipywidgets as W
 from glob import glob
 from pathlib import Path as P
 
-# from ipywidgets import Button, HBox, VBox, Textarea, Layout, FileUpload, Tab
-# from ipywidgets import IntProgress as Progress
 from ipyfilechooser import FileChooser
 from IPython.display import display
 from IPython.core.display import HTML
@@ -105,6 +103,10 @@ class Mint(_Mint_):
         for fn, data in value["new"].items():
             self.load(io.BytesIO(data["content"]))
         self._message_(f"{len(self.targets)} targets loaded.")
+
+    @property
+    def messages(self):
+       return self._messages
 
     def _message_(self, text):
         self.message_box.value = f"{text}\n" + self.message_box.value

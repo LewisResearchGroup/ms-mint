@@ -10,7 +10,9 @@ Welcome to ms-mint's documentation!
    :maxdepth: 4
    :caption: Contents:
 
+   readme
    modules   
+   
 
 Indices and tables
 ==================
