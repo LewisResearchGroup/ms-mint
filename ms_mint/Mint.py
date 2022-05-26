@@ -23,7 +23,7 @@ from .targets import read_targets, check_targets, standardize_targets
 from .helpers import is_ms_file, get_ms_files_from_results
 from .tools import scale_dataframe
 
-from .peak_optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
+from .optimization.RetentionTimeOptimizer import RetentionTimeOptimizer
 
 import ms_mint
 
