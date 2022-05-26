@@ -13,6 +13,8 @@ The metabolites can be used to define biomarkers used in medicine to find treatm
 or for the identification of pathogens such as methicillin resistant _Staphylococcus aureus_ (MRSA). 
 More information on how to install and run the program can be found in the [Documentation](https://lewisresearchgroup.github.io/ms-mint/).
 
+The `ms-mint` library can be used for targeted metabolomics with large amounts of files (1000+). It uses a target list and the MS-filenames as input. 
+
 ## News
 
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
@@ -69,3 +71,27 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical-clustering.png)
+
+
+# FAQ
+
+## What is a target list?
+
+A target list is a pandas dataframe with specific columns. 
+
+- peak_label: str, Label of the peak (must be unique).
+- mz_mean: float, m/z value of the target ion.
+- mz_width: float, width of the peak in [ppm] of the `mz_mean` value.
+- rt: float (optional), expected time of the peak maximum.
+- rt_min: float, starting time for peak integration.
+- rt_max: float, ending time for peak integration.
+- intensity_threshold: float (optional, >=0), minimum intensity value.
+- target_filename: str (optional), name of the target list file.
+
+The target list can be stored as csv or Excel file. 
+
+## What input files can be used?
+
+`ms_mint` can be used with `mzXML`, `mzML`, `mzMLb` and experimental formats in `.feather` and `.parquet` format.
+
+
