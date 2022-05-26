@@ -266,18 +266,18 @@ def slice_ms1_array(
 
     :param array: Input MS-1 data.
     :type array: np.array
-    :param rt_min: Minimum rertadsfasdf
-    :type rt_min: _type_
-    :param rt_max: _description_
-    :type rt_max: _type_
-    :param mz_mean: _description_
-    :type mz_mean: _type_
-    :param mz_width: _description_
-    :type mz_width: _type_
-    :param intensity_threshold: _description_
-    :type intensity_threshold: _type_
-    :return: _description_
-    :rtype: _type_
+    :param rt_min: Minimum retention time for slice
+    :type rt_min: float
+    :param rt_max: Maximum retention time for slice
+    :type rt_max: float
+    :param mz_mean: Mean m/z value for slice
+    :type mz_mean: float
+    :param mz_width: Width of slice in [ppm] of mz_mean
+    :type mz_width: float (>0)
+    :param intensity_threshold: Noise filter value
+    :type intensity_threshold: float (>0)
+    :return: Slice of numpy array
+    :rtype: np.Array
     """
     delta_mass = mz_width * mz_mean * 1e-6
     array = array[(array[:, 0] >= rt_min)]
