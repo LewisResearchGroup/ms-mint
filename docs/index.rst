@@ -6,13 +6,12 @@
 Welcome to ms-mint's documentation!
 ===================================
 
-.. mdinclude:: ../../README.md
-
-
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
 
+   source/../README.md
+   
    modules   
 
 Indices and tables
