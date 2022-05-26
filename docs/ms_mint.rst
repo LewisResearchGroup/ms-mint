@@ -1,15 +1,6 @@
 ms\_mint package
 ================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   ms_mint.peak_optimization
-   ms_mint.visualization
-
 Submodules
 ----------
 
@@ -25,6 +16,14 @@ ms\_mint.PlotGenerator module
 -----------------------------
 
 .. automodule:: ms_mint.PlotGenerator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.filelock module
+------------------------
+
+.. automodule:: ms_mint.filelock
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,10 +44,26 @@ ms\_mint.io module
    :undoc-members:
    :show-inheritance:
 
+ms\_mint.matplotlib\_tools module
+---------------------------------
+
+.. automodule:: ms_mint.matplotlib_tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ms\_mint.notebook module
 ------------------------
 
 .. automodule:: ms_mint.notebook
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.plotly\_tools module
+-----------------------------
+
+.. automodule:: ms_mint.plotly_tools
    :members:
    :undoc-members:
    :show-inheritance:
@@ -65,6 +80,14 @@ ms\_mint.resampling module
 --------------------------
 
 .. automodule:: ms_mint.resampling
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.standards module
+-------------------------
+
+.. automodule:: ms_mint.standards
    :members:
    :undoc-members:
    :show-inheritance:
