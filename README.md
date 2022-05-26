@@ -9,14 +9,8 @@
 
 ## A Python library for large-cohort metabolomics (MS1) processing
 
-The `ms-mint` library can be used for targeted metabolomics with large amounts of files (1000+). It uses a target list and the MS-filenames as input. 
-`ms-mint` contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. 
-
-Metabolomics is the study of all small chemical compounds (metabolites) in a biological sample. 
-The metabolites can be biomarkers to be used in medicine as indicators of disease or for the development of diagnostic tests.
-
-The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/).
-
+The `ms-mint` library can be used for targeted metabolomics and large amounts of files (1000+). Metabolomics is the study of all small chemical compounds (metabolites) in a biological sample. 
+It uses a target list and the MS-filenames as input. The metabolites can be biomarkers to be used in medicine as indicators of disease or for the development of diagnostic tests. `ms-mint` contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/).
 
 ## News
 
@@ -26,7 +20,6 @@ MINT has been split into the Python library and the app. This repository contain
 
 All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
 Before you modify the code please reach out to us using the [issues](https://github.com/LewisResearchGroup/ms-mint/issues) page.
-
 
 ## Code standards
 
