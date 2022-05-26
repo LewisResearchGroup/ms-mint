@@ -99,5 +99,5 @@ source_suffix = [".rst"]
 
 html_baseurl = 'https://lewisresearchgroup.github.io/ms-mint'
 
-requirements_path = 'requirements.txt'
+requirements_path = 'docs/requirements.txt'
 
