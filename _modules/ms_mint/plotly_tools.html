@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ms_mint.plotly_tools &mdash; ms-mint 0.1.5.1 documentation</title>
+  <title>ms_mint.plotly_tools &mdash; ms-mint 0.1.6 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/_modules/ms_mint/plotly_tools.html" />
@@ -84,7 +84,7 @@
 
 
 <div class="viewcode-block" id="set_template"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.set_template">[docs]</a><span class="k">def</span> <span class="nf">set_template</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;A function that sets a template for plotly figures.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="p">[</span><span class="s2">&quot;draft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
         <span class="n">layout</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}),</span>
@@ -92,9 +92,7 @@
 
     <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;draft&quot;</span></div>
 
-
 <span class="n">set_template</span><span class="p">()</span>
-
 
 
 <div class="viewcode-block" id="plotly_heatmap"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_heatmap">[docs]</a><span class="k">def</span> <span class="nf">plotly_heatmap</span><span class="p">(</span>
@@ -111,34 +109,34 @@
     <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;Creates an interactive heatmap from a dense-formated dataframe.</span>
 
-<span class="sd">    :param df: _description_</span>
-<span class="sd">    :type df: _type_</span>
-<span class="sd">    :param normed_by_cols: _description_, defaults to False</span>
+<span class="sd">    :param df: Input data</span>
+<span class="sd">    :type df: pandas.DataFrame</span>
+<span class="sd">    :param normed_by_cols: Whether or not to normalize column vectors, defaults to False</span>
 <span class="sd">    :type normed_by_cols: bool, optional</span>
-<span class="sd">    :param transposed: _description_, defaults to False</span>
+<span class="sd">    :param transposed: Whether or not to transpose the generated image, defaults to False</span>
 <span class="sd">    :type transposed: bool, optional</span>
-<span class="sd">    :param clustered: _description_, defaults to False</span>
+<span class="sd">    :param clustered: Whether or not to apply hierarchical clustering or rows, defaults to False</span>
 <span class="sd">    :type clustered: bool, optional</span>
-<span class="sd">    :param add_dendrogram: _description_, defaults to False</span>
+<span class="sd">    :param add_dendrogram: Whether or not to show a dendrogram (only with `clustered=True`), defaults to False</span>
 <span class="sd">    :type add_dendrogram: bool, optional</span>
 <span class="sd">    :param name: _description_, defaults to &quot;&quot;</span>
 <span class="sd">    :type name: str, optional</span>
 <span class="sd">    :param x_tick_colors: _description_, defaults to None</span>
 <span class="sd">    :type x_tick_colors: _type_, optional</span>
-<span class="sd">    :param height: _description_, defaults to None</span>
-<span class="sd">    :type height: _type_, optional</span>
-<span class="sd">    :param width: _description_, defaults to None</span>
-<span class="sd">    :type width: _type_, optional</span>
-<span class="sd">    :param correlation: _description_, defaults to False</span>
+<span class="sd">    :param height: Image height in pixels, defaults to None</span>
+<span class="sd">    :type height: int, optional</span>
+<span class="sd">    :param width: Image width in pixels, defaults to None</span>
+<span class="sd">    :type width: int, optional</span>
+<span class="sd">    :param correlation: Whether or not to convert the table to a correlation matrix, defaults to False</span>
 <span class="sd">    :type correlation: bool, optional</span>
-<span class="sd">    :param call_show: _description_, defaults to False</span>
+<span class="sd">    :param call_show: Whether or not to call fig.show() to show image in new browser tab, defaults to False</span>
 <span class="sd">    :type call_show: bool, optional</span>
-<span class="sd">    :param verbose: _description_, defaults to False</span>
+<span class="sd">    :param verbose: Whether or not to be loud, defaults to False</span>
 <span class="sd">    :type verbose: bool, optional</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :return: Returns a plotly image object.</span>
+<span class="sd">    :rtype: plotly.Figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">max_is_not_zero</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
@@ -287,117 +285,33 @@
         <span class="k">return</span> <span class="n">fig</span></div>
 
 
-
-<div class="viewcode-block" id="plotly_peak_shapes_3d"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes_3d">[docs]</a><span class="k">def</span> <span class="nf">plotly_peak_shapes_3d</span><span class="p">(</span>
-    <span class="n">mint_results</span><span class="p">,</span>
-    <span class="n">peak_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_orientation</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
-    <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
-
-<span class="sd">    :param mint_results: _description_</span>
-<span class="sd">    :type mint_results: _type_</span>
-<span class="sd">    :param peak_label: _description_, defaults to None</span>
-<span class="sd">    :type peak_label: _type_, optional</span>
-<span class="sd">    :param legend: _description_, defaults to True</span>
-<span class="sd">    :type legend: bool, optional</span>
-<span class="sd">    :param legend_orientation: _description_, defaults to &quot;v&quot;</span>
-<span class="sd">    :type legend_orientation: str, optional</span>
-<span class="sd">    :param call_show: _description_, defaults to False</span>
-<span class="sd">    :type call_show: bool, optional</span>
-<span class="sd">    :param verbose: _description_, defaults to False</span>
-<span class="sd">    :type verbose: bool, optional</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">basename</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
-
-    <span class="n">data</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_label</span> <span class="o">==</span> <span class="n">peak_label</span><span class="p">]</span>
-    <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
-
-    <span class="n">grps</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;ms_file&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Peak labels are supposed to be strings</span>
-    <span class="c1"># Sometimes they are converted to int though</span>
-
-    <span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-        <span class="n">grp</span> <span class="o">=</span> <span class="n">grps</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">peak_max</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span>
-                <span class="p">[</span><span class="s2">&quot;peak_shape_rt&quot;</span><span class="p">,</span> <span class="s2">&quot;peak_shape_int&quot;</span><span class="p">,</span> <span class="s2">&quot;peak_max&quot;</span><span class="p">]</span>
-            <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">continue</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
-        <span class="n">sample</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Scan Time&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;Intensity&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
-        <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;peak_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_max</span>
-        <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;ms_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-        <span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="n">samples</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
-
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line_3d</span><span class="p">(</span>
-        <span class="n">samples</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Scan Time&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;ms_file&quot;</span>
-    <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">({</span><span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">})</span>
-
-    <span class="c1"># Layout</span>
-    <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">legend_orientation</span><span class="o">=</span><span class="n">legend_orientation</span><span class="p">)</span>
-
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="n">legend</span><span class="p">)</span>
-
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">({</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">peak_label</span><span class="p">,</span> <span class="s2">&quot;title_x&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">})</span>
-
-    <span class="k">if</span> <span class="n">call_show</span><span class="p">:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;displaylogo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fig</span></div>
-
-
-
 <div class="viewcode-block" id="plotly_peak_shapes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes">[docs]</a><span class="k">def</span> <span class="nf">plotly_peak_shapes</span><span class="p">(</span>
     <span class="n">mint_results</span><span class="p">,</span>
     <span class="n">n_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">biomarkers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">legend_orientation</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
     <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;_summary_</span>
+    <span class="sd">&quot;&quot;&quot;Plot peak shapes of selected peaks and MS-files.</span>
 
-<span class="sd">    :param mint_results: _description_</span>
-<span class="sd">    :type mint_results: _type_</span>
-<span class="sd">    :param n_cols: _description_, defaults to 1</span>
+<span class="sd">    :param mint_results: DataFrame in mint.results format</span>
+<span class="sd">    :type mint_results: pandas.DataFrame</span>
+<span class="sd">    :param n_cols: Number of columns for sub-plots, defaults to 1</span>
 <span class="sd">    :type n_cols: int, optional</span>
-<span class="sd">    :param biomarkers: _description_, defaults to None</span>
-<span class="sd">    :type biomarkers: _type_, optional</span>
-<span class="sd">    :param peak_labels: _description_, defaults to None</span>
-<span class="sd">    :type peak_labels: _type_, optional</span>
-<span class="sd">    :param legend: _description_, defaults to True</span>
+<span class="sd">    :param peak_labels: List of peak-labels to plot, defaults to None</span>
+<span class="sd">    :type peak_labels: list or str, optional</span>
+<span class="sd">    :param legend: Whether or not to add a legend, defaults to True</span>
 <span class="sd">    :type legend: bool, optional</span>
-<span class="sd">    :param verbose: _description_, defaults to False</span>
+<span class="sd">    :param verbose: Whether or not to be loud, defaults to False</span>
 <span class="sd">    :type verbose: bool, optional</span>
-<span class="sd">    :param legend_orientation: _description_, defaults to &quot;v&quot;</span>
+<span class="sd">    :param legend_orientation: Wether or not to show the legend in horizontal (&#39;h&#39;) or vertical (&#39;v&#39;) format, defaults to &quot;v&quot;</span>
 <span class="sd">    :type legend_orientation: str, optional</span>
-<span class="sd">    :param call_show: _description_, defaults to False</span>
+<span class="sd">    :param call_show: Whether or not to call fig.show() to show image in new browser tab, defaults to False</span>
 <span class="sd">    :type call_show: bool, optional</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :return: Returns a plotly image object.</span>
+<span class="sd">    :rtype: plotly.Figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">basename</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
@@ -413,18 +327,8 @@
         <span class="n">peak_labels</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># peak_labels = mint_results.groupby(&#39;peak_label&#39;).mean().peak_max.sort_values(ascending=False).index.astype(str)</span>
 
-    <span class="k">if</span> <span class="n">biomarkers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">biomarkers</span> <span class="o">=</span> <span class="n">peak_labels</span>
-
-    <span class="k">if</span> <span class="n">biomarkers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">biomarkers</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="c1"># biomarkers = mint_results.groupby(&#39;peak_label&#39;).mean().peak_max.sort_values(ascending=False).index.astype(str)</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">biomarkers</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">biomarkers</span> <span class="o">=</span> <span class="p">[</span><span class="n">biomarkers</span><span class="p">]</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">biomarkers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">biomarkers</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">peak_labels</span><span class="p">]</span>
 
     <span class="c1"># Calculate neccessary number of rows</span>
     <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">//</span> <span class="n">n_cols</span>

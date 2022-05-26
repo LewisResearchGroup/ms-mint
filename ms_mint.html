@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ms_mint package &mdash; ms-mint 0.1.5.1 documentation</title>
+  <title>ms_mint package &mdash; ms-mint 0.1.6 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/ms_mint.html" />
@@ -873,59 +873,57 @@ using the pyteomics library.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.matplotlib_tools.hierarchical_clustering">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.matplotlib_tools.</span></span><span class="sig-name descname"><span class="pre">hierarchical_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmaxticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymaxticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/matplotlib_tools.html#hierarchical_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.matplotlib_tools.hierarchical_clustering" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>Performs and plot hierarchical clustering on dataframe in dense format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>vmin</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>vmax</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>figsize</strong> (<em>tuple</em><em>, </em><em>optional</em>) – _description_, defaults to (8, 8)</p></li>
-<li><p><strong>top_height</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 2</p></li>
-<li><p><strong>left_width</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 2</p></li>
-<li><p><strong>xmaxticks</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>ymaxticks</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>metric</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “euclidean”</p></li>
-<li><p><strong>cmap</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data.</p></li>
+<li><p><strong>vmin</strong> (<em>int</em><em>, </em><em>optional</em>) – Minimum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.</p></li>
+<li><p><strong>vmin</strong> – Maximum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Size of the main figure in inches, defaults to (8, 8)</p></li>
+<li><p><strong>top_height</strong> (<em>int</em><em>, </em><em>optional</em>) – Height of the top dendrogram, defaults to 2</p></li>
+<li><p><strong>left_width</strong> (<em>int</em><em>, </em><em>optional</em>) – Width of the left dendrogram, defaults to 2</p></li>
+<li><p><strong>xmaxticks</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of x-ticks to display, defaults to None</p></li>
+<li><p><strong>ymaxticks</strong> (<em>int</em><em>, </em><em>optional</em>) – Maxiumum number of y-ticks to display, defaults to None</p></li>
+<li><p><strong>metric</strong> (<em>str</em><em>, </em><em>optional</em>) – Metric to be used for distance calculation (both axes), defaults to “euclidean”</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em>, </em><em>optional</em>) – Matplotlib color map name, defaults to None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Matplotlib figure</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>matplotlib.pyplot.Figure</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.matplotlib_tools.plot_peak_shapes">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.matplotlib_tools.</span></span><span class="sig-name descname"><span class="pre">plot_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ms_file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/matplotlib_tools.html#plot_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.matplotlib_tools.plot_peak_shapes" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.matplotlib_tools.</span></span><span class="sig-name descname"><span class="pre">plot_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ms_file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/matplotlib_tools.html#plot_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.matplotlib_tools.plot_peak_shapes" title="Permalink to this definition"></a></dt>
+<dd><p>Plot peak shapes of mint results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mint_results</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>ms_files</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>peak_labels</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 4</p></li>
-<li><p><strong>aspect</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 1</p></li>
-<li><p><strong>legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>n_cols</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>col_wrap</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 4</p></li>
-<li><p><strong>hue</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “ms_file”</p></li>
-<li><p><strong>top</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>title</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>dpi</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>sharex</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>sharey</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
+<li><p><strong>mint_results</strong> (<em>pandas.DataFrame</em>) – DataFrame in Mint results format.</p></li>
+<li><p><strong>ms_files</strong> (<em>list</em><em>, </em><em>optional</em>) – Filenames to include, defaults to None</p></li>
+<li><p><strong>peak_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – Peak-labels to include, defaults to None</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Height of the figure facets, defaults to 4</p></li>
+<li><p><strong>aspect</strong> (<em>int</em><em>, </em><em>optional</em>) – Aspect ratio of the figure facets, defaults to 1</p></li>
+<li><p><strong>legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to add a legend, defaults to False</p></li>
+<li><p><strong>col_wrap</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of columns for sub-plots, defaults to 4</p></li>
+<li><p><strong>hue</strong> (<em>str</em><em>, </em><em>optional</em>) – Column name for color groups, defaults to “ms_file”</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title to add, defaults to None</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Resolution of generated image, defaults to None</p></li>
+<li><p><strong>sharex</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to share x-axis range between subplots, defaults to False</p></li>
+<li><p><strong>sharey</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to share y-axis range between subplots, defaults to False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Generated figure object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>matplotlib.pyplot.Figure</p>
 </dd>
 </dl>
 </dd></dl>
@@ -971,79 +969,54 @@ using the pyteomics library.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_heatmap">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normed_by_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clustered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_dendrogram</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_tick_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_heatmap" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>Creates an interactive heatmap from a dense-formated dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>normed_by_cols</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>transposed</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>clustered</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>add_dendrogram</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data</p></li>
+<li><p><strong>normed_by_cols</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to normalize column vectors, defaults to False</p></li>
+<li><p><strong>transposed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to transpose the generated image, defaults to False</p></li>
+<li><p><strong>clustered</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to apply hierarchical clustering or rows, defaults to False</p></li>
+<li><p><strong>add_dendrogram</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to show a dendrogram (only with <cite>clustered=True</cite>), defaults to False</p></li>
 <li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “”</p></li>
 <li><p><strong>x_tick_colors</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>height</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>width</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>correlation</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Image height in pixels, defaults to None</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Image width in pixels, defaults to None</p></li>
+<li><p><strong>correlation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to convert the table to a correlation matrix, defaults to False</p></li>
+<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to call fig.show() to show image in new browser tab, defaults to False</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to be loud, defaults to False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Returns a plotly image object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>plotly.Figure</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_peak_shapes">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biomarkers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'v'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_peak_shapes" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'v'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_peak_shapes" title="Permalink to this definition"></a></dt>
+<dd><p>Plot peak shapes of selected peaks and MS-files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mint_results</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>n_cols</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 1</p></li>
-<li><p><strong>biomarkers</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>peak_labels</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to True</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>legend_orientation</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “v”</p></li>
-<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
+<li><p><strong>mint_results</strong> (<em>pandas.DataFrame</em>) – DataFrame in mint.results format</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of columns for sub-plots, defaults to 1</p></li>
+<li><p><strong>peak_labels</strong> (<em>list</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – List of peak-labels to plot, defaults to None</p></li>
+<li><p><strong>legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to add a legend, defaults to True</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to be loud, defaults to False</p></li>
+<li><p><strong>legend_orientation</strong> (<em>str</em><em>, </em><em>optional</em>) – Wether or not to show the legend in horizontal (‘h’) or vertical (‘v’) format, defaults to “v”</p></li>
+<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to call fig.show() to show image in new browser tab, defaults to False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Returns a plotly image object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_peak_shapes_3d">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_peak_shapes_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'v'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_peak_shapes_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_peak_shapes_3d" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mint_results</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>peak_label</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_, defaults to None</p></li>
-<li><p><strong>legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to True</p></li>
-<li><p><strong>legend_orientation</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “v”</p></li>
-<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_, defaults to False</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>plotly.Figure</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1051,7 +1024,7 @@ using the pyteomics library.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.plotly_tools.set_template">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">set_template</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#set_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.set_template" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dd><p>A function that sets a template for plotly figures.</p>
 </dd></dl>
 
 </section>
