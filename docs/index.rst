@@ -6,7 +6,7 @@
 Welcome to ms-mint's documentation!
 ===================================
 
-.. include:: ../README.rst
+.. include:: ../README.md
 
 
 .. toctree::
