@@ -106,6 +106,10 @@ class Mint(_Mint_):
             self.load(io.BytesIO(data["content"]))
         self._message_(f"{len(self.targets)} targets loaded.")
 
+    @property
+    def messages(self):
+       return self._messages
+
     def _message_(self, text):
         self.message_box.value = f"{text}\n" + self.message_box.value
 

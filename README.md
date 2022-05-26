@@ -30,4 +30,37 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 # Example
 
+    %pylab inline
+    from ms_mint.notebook import Mint
+    mint = Mint()
 
+    mint.ms_files = [
+        './input/EC_B2.mzXML',
+        './input/EC_B1.mzXML',
+        './input/CA_B1.mzXML',
+        './input/CA_B4.mzXML',
+        './input/CA_B2.mzXML',
+        './input/CA_B3.mzXML',
+        './input/EC_B4.mzXML',
+        './input/EC_B3.mzXML',
+        './input/SA_B4.mzML',
+        './input/SA_B2.mzML',
+        './input/SA_B1.mzML',
+        './input/SA_B3.mzML'
+    ]
+
+    mint.load_targets('/home/swacker/workspace/ms-mint/tests/data/targets/targets_v0.csv')
+    
+    mint.targets
+    >>>   peak_label    mz_mean  mz_width    rt  rt_min  rt_max  intensity_threshold target_filename
+        0          1  151.06050         5  None    5.07    5.09                    0  targets_v0.csv
+        1          2  216.05040         5  None    3.98    4.39                    0  targets_v0.csv
+        2          3  115.00320         5  None    3.45    4.39                    0  targets_v0.csv
+        3          4  273.00061         5  None    1.10    2.22                    0  targets_v0.csv
+
+    mint.run()
+
+    mint.plot.hierarchical_clustering()
+
+
+![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical_clustering.png)
