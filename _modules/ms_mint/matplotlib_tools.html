@@ -92,8 +92,30 @@
     <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
     <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Hierarchical clustering with visualization.</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    :param df: _description_</span>
+<span class="sd">    :type df: _type_</span>
+<span class="sd">    :param vmin: _description_, defaults to None</span>
+<span class="sd">    :type vmin: _type_, optional</span>
+<span class="sd">    :param vmax: _description_, defaults to None</span>
+<span class="sd">    :type vmax: _type_, optional</span>
+<span class="sd">    :param figsize: _description_, defaults to (8, 8)</span>
+<span class="sd">    :type figsize: tuple, optional</span>
+<span class="sd">    :param top_height: _description_, defaults to 2</span>
+<span class="sd">    :type top_height: int, optional</span>
+<span class="sd">    :param left_width: _description_, defaults to 2</span>
+<span class="sd">    :type left_width: int, optional</span>
+<span class="sd">    :param xmaxticks: _description_, defaults to None</span>
+<span class="sd">    :type xmaxticks: _type_, optional</span>
+<span class="sd">    :param ymaxticks: _description_, defaults to None</span>
+<span class="sd">    :type ymaxticks: _type_, optional</span>
+<span class="sd">    :param metric: _description_, defaults to &quot;euclidean&quot;</span>
+<span class="sd">    :type metric: str, optional</span>
+<span class="sd">    :param cmap: _description_, defaults to None</span>
+<span class="sd">    :type cmap: _type_, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -195,6 +217,39 @@
     <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    :param mint_results: _description_</span>
+<span class="sd">    :type mint_results: _type_</span>
+<span class="sd">    :param ms_files: _description_, defaults to None</span>
+<span class="sd">    :type ms_files: _type_, optional</span>
+<span class="sd">    :param peak_labels: _description_, defaults to None</span>
+<span class="sd">    :type peak_labels: _type_, optional</span>
+<span class="sd">    :param height: _description_, defaults to 4</span>
+<span class="sd">    :type height: int, optional</span>
+<span class="sd">    :param aspect: _description_, defaults to 1</span>
+<span class="sd">    :type aspect: int, optional</span>
+<span class="sd">    :param legend: _description_, defaults to False</span>
+<span class="sd">    :type legend: bool, optional</span>
+<span class="sd">    :param n_cols: _description_, defaults to None</span>
+<span class="sd">    :type n_cols: _type_, optional</span>
+<span class="sd">    :param col_wrap: _description_, defaults to 4</span>
+<span class="sd">    :type col_wrap: int, optional</span>
+<span class="sd">    :param hue: _description_, defaults to &quot;ms_file&quot;</span>
+<span class="sd">    :type hue: str, optional</span>
+<span class="sd">    :param top: _description_, defaults to None</span>
+<span class="sd">    :type top: _type_, optional</span>
+<span class="sd">    :param title: _description_, defaults to None</span>
+<span class="sd">    :type title: _type_, optional</span>
+<span class="sd">    :param dpi: _description_, defaults to None</span>
+<span class="sd">    :type dpi: _type_, optional</span>
+<span class="sd">    :param sharex: _description_, defaults to False</span>
+<span class="sd">    :type sharex: bool, optional</span>
+<span class="sd">    :param sharey: _description_, defaults to False</span>
+<span class="sd">    :type sharey: bool, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># fig = plt.figure(dpi=dpi)</span>
 

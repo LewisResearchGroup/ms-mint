@@ -87,6 +87,8 @@
 
 
 <div class="viewcode-block" id="set_template"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.set_template">[docs]</a><span class="k">def</span> <span class="nf">set_template</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="p">[</span><span class="s2">&quot;draft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
         <span class="n">layout</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}),</span>
     <span class="p">)</span>
@@ -112,6 +114,35 @@
     <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    :param df: _description_</span>
+<span class="sd">    :type df: _type_</span>
+<span class="sd">    :param normed_by_cols: _description_, defaults to False</span>
+<span class="sd">    :type normed_by_cols: bool, optional</span>
+<span class="sd">    :param transposed: _description_, defaults to False</span>
+<span class="sd">    :type transposed: bool, optional</span>
+<span class="sd">    :param clustered: _description_, defaults to False</span>
+<span class="sd">    :type clustered: bool, optional</span>
+<span class="sd">    :param add_dendrogram: _description_, defaults to False</span>
+<span class="sd">    :type add_dendrogram: bool, optional</span>
+<span class="sd">    :param name: _description_, defaults to &quot;&quot;</span>
+<span class="sd">    :type name: str, optional</span>
+<span class="sd">    :param x_tick_colors: _description_, defaults to None</span>
+<span class="sd">    :type x_tick_colors: _type_, optional</span>
+<span class="sd">    :param height: _description_, defaults to None</span>
+<span class="sd">    :type height: _type_, optional</span>
+<span class="sd">    :param width: _description_, defaults to None</span>
+<span class="sd">    :type width: _type_, optional</span>
+<span class="sd">    :param correlation: _description_, defaults to False</span>
+<span class="sd">    :type correlation: bool, optional</span>
+<span class="sd">    :param call_show: _description_, defaults to False</span>
+<span class="sd">    :type call_show: bool, optional</span>
+<span class="sd">    :param verbose: _description_, defaults to False</span>
+<span class="sd">    :type verbose: bool, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">max_is_not_zero</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
     <span class="n">non_zero_labels</span> <span class="o">=</span> <span class="n">max_is_not_zero</span><span class="p">[</span><span class="n">max_is_not_zero</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
@@ -268,9 +299,22 @@
     <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a plotly 3D plot of all peak_shapes in mint.results</span>
-<span class="sd">    where mint.results.peak_label == peak_label.</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    :param mint_results: _description_</span>
+<span class="sd">    :type mint_results: _type_</span>
+<span class="sd">    :param peak_label: _description_, defaults to None</span>
+<span class="sd">    :type peak_label: _type_, optional</span>
+<span class="sd">    :param legend: _description_, defaults to True</span>
+<span class="sd">    :type legend: bool, optional</span>
+<span class="sd">    :param legend_orientation: _description_, defaults to &quot;v&quot;</span>
+<span class="sd">    :type legend_orientation: str, optional</span>
+<span class="sd">    :param call_show: _description_, defaults to False</span>
+<span class="sd">    :type call_show: bool, optional</span>
+<span class="sd">    :param verbose: _description_, defaults to False</span>
+<span class="sd">    :type verbose: bool, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -337,9 +381,26 @@
     <span class="n">legend_orientation</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">,</span>
     <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a plotly multiplost of all peak_shapes in mint.results</span>
-<span class="sd">    grouped by peak_label.</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    :param mint_results: _description_</span>
+<span class="sd">    :type mint_results: _type_</span>
+<span class="sd">    :param n_cols: _description_, defaults to 1</span>
+<span class="sd">    :type n_cols: int, optional</span>
+<span class="sd">    :param biomarkers: _description_, defaults to None</span>
+<span class="sd">    :type biomarkers: _type_, optional</span>
+<span class="sd">    :param peak_labels: _description_, defaults to None</span>
+<span class="sd">    :type peak_labels: _type_, optional</span>
+<span class="sd">    :param legend: _description_, defaults to True</span>
+<span class="sd">    :type legend: bool, optional</span>
+<span class="sd">    :param verbose: _description_, defaults to False</span>
+<span class="sd">    :type verbose: bool, optional</span>
+<span class="sd">    :param legend_orientation: _description_, defaults to &quot;v&quot;</span>
+<span class="sd">    :type legend_orientation: str, optional</span>
+<span class="sd">    :param call_show: _description_, defaults to False</span>
+<span class="sd">    :type call_show: bool, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">basename</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
