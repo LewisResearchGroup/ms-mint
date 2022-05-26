@@ -1155,16 +1155,18 @@ using the pyteomics library.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.processing.score_peaks">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.processing.</span></span><span class="sig-name descname"><span class="pre">score_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/processing.html#score_peaks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.processing.score_peaks" title="Permalink to this definition"></a></dt>
-<dd><p>Score the peak quality (experimental).</p>
+<dd><p>Score the peak quality (experimental).
+1 - means a good shape
+0 - means a bad shape</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mint_results</strong> (<em>_type_</em>) – _description_</p>
+<dd class="field-odd"><p><strong>mint_results</strong> (<em>pandas.DataFrame</em>) – DataFrame in ms_mint results format.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
+<dd class="field-even"><p>Score</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>_type_</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>

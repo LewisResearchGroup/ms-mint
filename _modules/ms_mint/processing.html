@@ -358,11 +358,13 @@
 
 <div class="viewcode-block" id="score_peaks"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.score_peaks">[docs]</a><span class="k">def</span> <span class="nf">score_peaks</span><span class="p">(</span><span class="n">mint_results</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Score the peak quality (experimental).</span>
+<span class="sd">    1 - means a good shape</span>
+<span class="sd">    0 - means a bad shape</span>
 
-<span class="sd">    :param mint_results: _description_</span>
-<span class="sd">    :type mint_results: _type_</span>
-<span class="sd">    :return: _description_</span>
-<span class="sd">    :rtype: _type_</span>
+<span class="sd">    :param mint_results: DataFrame in ms_mint results format.</span>
+<span class="sd">    :type mint_results: pandas.DataFrame</span>
+<span class="sd">    :return: Score</span>
+<span class="sd">    :rtype: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">(</span>
