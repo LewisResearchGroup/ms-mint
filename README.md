@@ -5,7 +5,9 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
 
 
-# ms-mint - Python library for large-cohort metabolomics (MS1) processing.
+# ms-mint 
+
+## A Python library for large-cohort metabolomics (MS1) processing
 
 The Metabolomics Integrator (MINT) is a post-processing tool for liquid chromatography-mass spectrometry (LCMS) based metabolomics. 
 Metabolomics is the study of all metabolites (small chemical compounds) in a biological sample e.g. from bacteria or a human blood sample. 
