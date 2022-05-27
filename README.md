@@ -47,14 +47,17 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
         './input/SA_B3.mzML'
     ]
 
-    mint.load_targets('/home/swacker/workspace/ms-mint/tests/data/targets/targets_v0.csv')
+    mint.load_targets('targets.csv')
     
     mint.targets
-    >>>   peak_label    mz_mean  mz_width    rt  rt_min  rt_max  intensity_threshold target_filename
-        0          1  151.06050         5  None    5.07    5.09                    0  targets_v0.csv
-        1          2  216.05040         5  None    3.98    4.39                    0  targets_v0.csv
-        2          3  115.00320         5  None    3.45    4.39                    0  targets_v0.csv
-        3          4  273.00061         5  None    1.10    2.22                    0  targets_v0.csv
+    >>>    peak_label    mz_mean  mz_width       rt  rt_min  rt_max  intensity_threshold target_filename
+        0    Arabitol  151.06050        10  4.92500    4.65    5.20                    0     targets.csv
+        1    Xanthine  151.02585        10  4.37265    4.18    4.53                    0     targets.csv
+        2   Succinate  117.01905        10  2.04390    0.87    2.50                    0     targets.csv
+        3   Urocanate  137.03540        10  4.41500    4.30    4.60                    0     targets.csv
+        4  Mevalonate  147.06570        10  3.00000    1.70    4.30                    0     targets.csv
+        5  Nicotinate  122.02455        10  3.05340    2.75    3.75                    0     targets.csv
+        6  Citrulline  174.08810        10  8.40070    8.35    8.50                    0     targets.csv
 
     mint.run()
 
@@ -65,10 +68,21 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png)
 
+
     mint.plot.hierarchical_clustering()
 
-
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical-clustering.png)
+
+
+    mint.plot.peak_shapes(hue=None, col_wrap=3, height=2)
+
+![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/peak-shapes.png)
+
+
+    mint.plot.heatmap(normed_by_cols=True, transposed=True, clustered=True)
+
+![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/heatmap.png)
+
 
 
 # FAQ
@@ -94,6 +108,7 @@ The target list can be stored as csv or Excel file.
 
 ## Which properties does ms-mint extract?
 
+### Parameters from target list
 - **ms_file**: Filename of MS-file
 - **peak_label**: From target list
 - **mz_mean**: From target list
@@ -105,6 +120,8 @@ The target list can be stored as csv or Excel file.
 - **target_filename**: From target list
 
 ---
+
+### Results columns
 - **peak_area**: The sum of all intensities
 - **peak_area_top3**: The sum of the 3 largest intensities
 - **peak_n_datapoints**: Number of datapoints
