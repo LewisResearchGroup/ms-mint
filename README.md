@@ -87,14 +87,14 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 A target list is a pandas dataframe with specific columns. 
 
-  - **peak_label**: str, Label of the peak (must be unique).
-  - **mz_mean**: float, m/z value of the target ion.
-  - **mz_width**: float, width of the peak in [ppm] of the `mz_mean` value.
-  - **rt**: float (optional), expected time of the peak maximum.
-  - **rt_min**: float, starting time for peak integration.
-  - **rt_max**: float, ending time for peak integration.
-  - **intensity_threshold**: float (>=0), minimum intensity value to include, serves as a noise filter.
-  - **target_filename**: str (optional), name of the target list file.
+- **peak_label**: str, Label of the peak (must be unique).
+- **mz_mean**: float, m/z value of the target ion.
+- **mz_width**: float, width of the peak in [ppm] of the `mz_mean` value.
+- **rt**: float (optional), expected time of the peak maximum.
+- **rt_min**: float, starting time for peak integration.
+- **rt_max**: float, ending time for peak integration.
+- **intensity_threshold**: float (>=0), minimum intensity value to include, serves as a noise filter.
+- **target_filename**: str (optional), name of the target list file.
 
 The target list can be stored as csv or Excel file. 
 
@@ -105,35 +105,35 @@ The target list can be stored as csv or Excel file.
 ## Which properties does ms-mint extract?
 
 ### Parameters from target list
-  - **ms_file**: Filename of MS-file
-  - **peak_label**: From target list
-  - **mz_mean**: From target list
-  - **mz_width**: From target list
-  - **rt**: From target list
-  - **rt_min**: From target list
-  - **rt_max**: From target list
-  - **intensity_threshold**: From target list
-  - **target_filename**: From target list
+- **ms_file**: Filename of MS-file
+- **peak_label**: From target list
+- **mz_mean**: From target list
+- **mz_width**: From target list
+- **rt**: From target list
+- **rt_min**: From target list
+- **rt_max**: From target list
+- **intensity_threshold**: From target list
+- **target_filename**: From target list
 
 ---
 
 ### Results columns
-  - **peak_area**: The sum of all intensities
-  - **peak_area_top3**: The sum of the 3 largest intensities
-  - **peak_n_datapoints**: Number of datapoints
-  - **peak_max**: Intensity of peak maximum
-  - **peak_rt_of_max**: Retentiontime of peak maximum
-  - **peak_min**: Minimm peak intensity (offset)
-  - **peak_median**: Median of all intensities 
-  - **peak_mean**: Average of all intensities
-  - **peak_delta_int**: Difference between first and last intensity
-  - **peak_shape_rt**: Array of retention times
-  - **peak_shape_int**: Array of projected intensities
-  - **peak_mass_diff_25pc**: 25th percentile between *mz_mean* minus m/z values of all datapoints
-  - **peak_mass_diff_50pc**: Median between *mz_mean* minus m/z values of all datapoints
-  - **peak_mass_diff_75pc**: 75th percentile between *mz_mean* minus m/z values of all datapoints
-  - **peak_score**: Score of peak quality (experimental)
-  - **total_intensity**: Sum of all intensities in the file
-  - **ms_path**: Path of the MS-file
-  - **ms_file_size**: Size of the MS-file in MB
+- **peak_area**: The sum of all intensities
+- **peak_area_top3**: The sum of the 3 largest intensities
+- **peak_n_datapoints**: Number of datapoints
+- **peak_max**: Intensity of peak maximum
+- **peak_rt_of_max**: Retentiontime of peak maximum
+- **peak_min**: Minimm peak intensity (offset)
+- **peak_median**: Median of all intensities 
+- **peak_mean**: Average of all intensities
+- **peak_delta_int**: Difference between first and last intensity
+- **peak_shape_rt**: Array of retention times
+- **peak_shape_int**: Array of projected intensities
+- **peak_mass_diff_25pc**: 25th percentile between *mz_mean* minus m/z values of all datapoints
+- **peak_mass_diff_50pc**: Median between *mz_mean* minus m/z values of all datapoints
+- **peak_mass_diff_75pc**: 75th percentile between *mz_mean* minus m/z values of all datapoints
+- **peak_score**: Score of peak quality (experimental)
+- **total_intensity**: Sum of all intensities in the file
+- **ms_path**: Path of the MS-file
+- **ms_file_size**: Size of the MS-file in MB
 ---
