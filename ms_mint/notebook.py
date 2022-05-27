@@ -1,4 +1,4 @@
-""" 
+"""
 Experimental module to run Mint interactively inside the Jupyter notebook.
 
 
