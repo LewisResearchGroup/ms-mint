@@ -92,5 +92,33 @@ The target list can be stored as csv or Excel file.
 
 `ms_mint` can be used with `mzXML`, `mzML`, `mzMLb` and experimental formats in `.feather` and `.parquet` format.
 
+## Which properties does ms-mint extract?
 
+- *ms_file*: Filename of MS-file
+- *peak_label*: From target list
+- *mz_mean*: From target list
+- *mz_width*: From target list
+- *rt*: From target list
+- *rt_min*: From target list
+- *rt_max*: From target list
+- *intensity_threshold*: 
+- *target_filename*: 
+- *peak_area*: The sum of all intensities
+- *peak_area_top3*: The sum of the 3 largest intensities
+- *peak_n_datapoints*: Number of datapoints
+- *peak_max*: Intensity of peak maximum
+- *peak_rt_of_max*: Retentiontime of peak maximum
+- *peak_min*: Minimm peak intensity (offset)
+- *peak_median*: Median of all intensities 
+- *peak_mean*: Average of all intensities
+- *peak_delta_int*: Difference between first and last intensity
+- *peak_shape_rt*: Array of retention times
+- *peak_shape_int*: Array of projected intensities
+- *peak_mass_diff_25pc*: 25th percentile between *mz_mean* minus m/z values of all datapoints
+- *peak_mass_diff_50pc*: Median between *mz_mean* minus m/z values of all datapoints
+- *peak_mass_diff_75pc*: 75th percentile between *mz_mean* minus m/z values of all datapoints
+- *peak_score*: Score of peak quality (experimental)
+- *total_intensity*: Sum of all intensities in the file
+- *ms_path*: Path of the MS-file
+- *ms_file_size*: Size of the MS-file in MB
 
