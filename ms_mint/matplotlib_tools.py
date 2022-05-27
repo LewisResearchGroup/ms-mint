@@ -19,7 +19,8 @@ def hierarchical_clustering(
     metric="euclidean",
     cmap=None,
 ):
-    """Performs and plot hierarchical clustering on dataframe in dense format.
+    """
+    Performs and plot hierarchical clustering on dataframe in dense format.
 
     :param df: Input data.
     :type df: pandas.DataFrame
@@ -142,7 +143,8 @@ def plot_peak_shapes(
     sharey=False,
     **kwargs
 ):
-    """Plot peak shapes of mint results.
+    """
+    Plot peak shapes of mint results.
 
     :param mint_results: DataFrame in Mint results format.
     :type mint_results: pandas.DataFrame

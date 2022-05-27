@@ -12,7 +12,8 @@ from .filelock import FileLock
 
 
 def lock(fn):
-    """File lock to ensure safe writing to file.
+    """
+    File lock to ensure safe writing to file.
 
     :param fn: Filename to lock.
     :type fn: str or PosixPath
@@ -23,7 +24,8 @@ def lock(fn):
 
 
 def get_mz_mean_from_formulas(formulas, ms_mode=None):
-    """Calculate mz-mean vallue from formulas for specific ionization mode.
+    """
+    Calculate mz-mean vallue from formulas for specific ionization mode.
 
     :param formulas: List of molecular formulas e.g. ['H2O']
     :type formulas: list[str]
@@ -49,7 +51,8 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None):
 
 
 def gaussian(x, mu, sig):
-    """Simple gaussian function generator.
+    """
+    Simple gaussian function generator.
 
     :param x: x-values to generate function values
     :type x: np.array
@@ -65,7 +68,8 @@ def gaussian(x, mu, sig):
 
 
 def scale_dataframe(df, scaler="standard", **kwargs):
-    """Scale all columns in a dense dataframe.
+    """
+    Scale all columns in a dense dataframe.
 
     :param df: Dataframe to scale
     :type df: pandas.DataFrame
@@ -84,7 +88,8 @@ def scale_dataframe(df, scaler="standard", **kwargs):
 
 
 def df_diff(df1, df2, which="both"):
-    """Difference between two dataframes.
+    """
+    Difference between two dataframes.
 
     :param df1: Reference dataframe
     :type df1: pandas.DataFrame
@@ -101,7 +106,8 @@ def df_diff(df1, df2, which="both"):
 
 
 def is_ms_file(fn):
-    """Check if file is a MS-file based on filename.
+    """
+    Check if file is a MS-file based on filename.
 
     :param fn: Filename
     :type fn: str or PosixPath
@@ -123,7 +129,8 @@ def is_ms_file(fn):
 
 
 def get_ms_files_from_results(results):
-    """Extract MS-filenames from Mint results.
+    """
+    Extract MS-filenames from Mint results.
 
     :param results: DataFrame in Mint fesults format
     :type results: pandas.DataFrame

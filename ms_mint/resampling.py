@@ -6,7 +6,8 @@ import pandas as pd
 
 
 class Resampler:
-    """Class to resample a chromatogram.
+    """
+    Class to resample a chromatogram.
 
     :param tau: Resampling frequency, defaults to '50ms'
     :type tau: str
@@ -37,7 +38,8 @@ class Resampler:
         return chrom
 
     def resample(self, chrom):
-        """Resample chromatogram.
+        """
+        Resample chromatogram.
 
         :param chrom: Chromatogram data
         :type chrom: pandas.DataFrame

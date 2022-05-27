@@ -30,7 +30,8 @@ from typing import Callable
 
 
 class Mint(object):
-    """Main class of the ms_mint package, which processes metabolomics files.
+    """
+    Main class of the ms_mint package, which processes metabolomics files.
 
     :param verbose: Sets verbosity of the instance.
     :type verbose: bool
@@ -52,7 +53,8 @@ class Mint(object):
 
     @property
     def verbose(self):
-        """Get/set verbosity.
+        """
+        Get/set verbosity.
 
         :getter: Get current verbosity.
         :return: True or False
@@ -69,7 +71,8 @@ class Mint(object):
 
     @property
     def version(self):
-        """ms-mint version number.
+        """
+        ms-mint version number.
 
         :return: Version string.
         :rtype: str
@@ -77,7 +80,8 @@ class Mint(object):
         return self._version
 
     def reset(self):
-        """Reset Mint instance. Removes targets, MS-files and results.
+        """
+        Reset Mint instance. Removes targets, MS-files and results.
 
         :return: self
         :rtype: ms_mint.Mint.Mint
@@ -227,7 +231,8 @@ class Mint(object):
 
     @property
     def status(self):
-        """Returns current status of Mint instance.
+        """
+        Returns current status of Mint instance.
 
         :return: ['waiting', 'running', 'done']
         :rtype: str
@@ -236,7 +241,8 @@ class Mint(object):
 
     @property
     def ms_files(self):
-        """Get/set ms-files to process.
+        """
+        Get/set ms-files to process.
 
         :getter:
         :return: List of filenames.
@@ -262,7 +268,8 @@ class Mint(object):
 
     @property
     def n_files(self):
-        """Number of currently stored ms filenames.
+        """
+        Number of currently stored ms filenames.
 
         :return: Number of files stored in self.ms_files
         :rtype: int
@@ -270,7 +277,8 @@ class Mint(object):
         return len(self.ms_files)
 
     def load_targets(self, list_of_files):
-        """Load targets from a file (csv, xslx)
+        """
+        Load targets from a file (csv, xslx)
 
         :param list_of_files: Filename or list of file names.
         :type list_of_files: str or list[str]
@@ -291,7 +299,8 @@ class Mint(object):
 
     @property
     def targets(self):
-        """Set/get target list.
+        """
+        Set/get target list.
 
         :getter:
         :return: Target list
@@ -350,7 +359,8 @@ class Mint(object):
 
     @property
     def progress_callback(self):
-        """Assigns a callback function to update a progress bar.
+        """
+        Assigns a callback function to update a progress bar.
 
         :getter: Returns the current callback function.
         :setter: Sets the callback function.
@@ -363,7 +373,8 @@ class Mint(object):
 
     @property
     def progress(self):
-        """Shows the current progress.
+        """
+        Shows the current progress.
 
         :getter: Returns the current progress value.
         :setter: Set the progress to a value between 0 and 100 and calls the progress callback function.
@@ -379,7 +390,8 @@ class Mint(object):
             self.progress_callback(value)
 
     def export(self, fn=None, filename=None):
-        """Export current results to file.
+        """
+        Export current results to file.
 
         :param fn: Filename, defaults to None
         :type fn: str, optional
@@ -401,7 +413,8 @@ class Mint(object):
             self.results.to_csv(fn, index=False)
 
     def load(self, fn):
-        """Load results into Mint instance.
+        """
+        Load results into Mint instance.
 
         :param fn: Filename (csv, xlsx)
         :type fn: str
@@ -446,7 +459,8 @@ class Mint(object):
     def pca(
         self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
     ):
-        """Run Principal Component Analysis on current results. Results are stored in
+        """
+        Run Principal Component Analysis on current results. Results are stored in
         self.decomposition_results.
 
         :param var_name: Column name to use for pca, defaults to "peak_max"
