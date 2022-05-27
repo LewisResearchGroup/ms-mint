@@ -1,6 +1,12 @@
 import numpy as np
 import pandas as pd
-from ms_mint.tools import get_mz_mean_from_formulas, gaussian, scale_dataframe, df_diff, is_ms_file
+from ms_mint.tools import (
+    get_mz_mean_from_formulas,
+    gaussian,
+    scale_dataframe,
+    df_diff,
+    is_ms_file,
+)
 
 
 def test__get_mz_mean_from_formulas():

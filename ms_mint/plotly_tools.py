@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import colorlover as cl
@@ -13,15 +12,14 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 
 
-
 def set_template():
-    """A function that sets a template for plotly figures.
-    """
+    """A function that sets a template for plotly figures."""
     pio.templates["draft"] = go.layout.Template(
         layout=dict(font={"size": 10}),
     )
 
     pio.templates.default = "draft"
+
 
 set_template()
 
@@ -281,9 +279,9 @@ def plotly_peak_shapes(
     # Create sub-plots
     for label_i, label in enumerate(labels):
         for file_i, file in enumerate(files):
-            #try:
+            # try:
             x, y = res.loc[(label, file), ["peak_shape_rt", "peak_shape_int"]]
-            #except:
+            # except:
             #    continue
             if not isinstance(x, Iterable):
                 continue

@@ -7,7 +7,6 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
 
-
 def hierarchical_clustering(
     df,
     vmin=None,
@@ -27,7 +26,7 @@ def hierarchical_clustering(
     :param vmin: Minimum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.
     :type vmin: int, optional
     :param vmin: Maximum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.
-    :type vmax: int, optional    
+    :type vmax: int, optional
     :param figsize: Size of the main figure in inches, defaults to (8, 8)
     :type figsize: tuple, optional
     :param top_height: Height of the top dendrogram, defaults to 2
@@ -176,8 +175,6 @@ def plot_peak_shapes(
     # fig = plt.figure(dpi=dpi)
 
     R = mint_results.copy()
-
-
 
     if peak_labels is not None:
         if isinstance(peak_labels, str):

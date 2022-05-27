@@ -15,6 +15,7 @@ class Resampler:
     :param smooth: Whether or not to apply rolling average.
     :type smooth: bool
     """
+
     def __init__(self, tau="50ms", unit="minutes", smooth=True):
         self._unit = unit
         self._tau = tau
@@ -42,5 +43,5 @@ class Resampler:
         :type chrom: pandas.DataFrame
         :return: Resampled chromatogram with constant time intervals.
         :rtype: pandas.DataFrame
-        """        
+        """
         return self._resample_unit_minutes_(chrom)

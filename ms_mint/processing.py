@@ -291,7 +291,7 @@ def score_peaks(mint_results):
     """Score the peak quality (experimental).
 
     1 - means a good shape
-    
+
     0 - means a bad shape
 
     :param mint_results: DataFrame in ms_mint results format.
