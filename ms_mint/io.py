@@ -258,7 +258,7 @@ def read_parquet(fn, read_only=False):
     :type read_only: bool, optional
     :return: MS data
     :rtype: pandas.DataFrame
-    """    
+    """
     df = pd.read_parquet(fn)
     if read_only or (
         len(df.columns) == len(MS_FILE_COLUMNS) and all(df.columns == MS_FILE_COLUMNS)
@@ -407,7 +407,7 @@ def convert_ms_file_to_parquet(fn, fn_out=None):
     :type fn_out: str or PosixPath, optional
     :return: Filename of generated file
     :rtype: str
-    """    
+    """
     fn = P(fn)
     if fn_out is None:
         fn_out = fn.with_suffix(".parquet")
