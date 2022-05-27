@@ -79,11 +79,6 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/peak-shapes.png)
 
 
-    mint.plot.heatmap(normed_by_cols=True, transposed=True, clustered=True)
-
-![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/heatmap.png)
-
-
 
 # FAQ
 
