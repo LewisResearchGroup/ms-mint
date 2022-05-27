@@ -177,6 +177,8 @@ def plot_peak_shapes(
 
     R = mint_results.copy()
 
+
+
     if peak_labels is not None:
         if isinstance(peak_labels, str):
             peak_labels = [peak_labels]
@@ -205,7 +207,7 @@ def plot_peak_shapes(
             )
             dfs.append(df)
 
-    df = pd.concat(dfs)
+    df = pd.concat(dfs).reset_index(drop=True)
 
     g = sns.relplot(
         data=df,
