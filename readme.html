@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="#faq">FAQ</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#what-is-a-target-list">What is a target list?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-input-files-can-be-used">What input files can be used?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#which-properties-does-ms-mint-extract">Which properties does ms-mint extract?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">ms_mint</a></li>
@@ -170,6 +171,38 @@ mint.results
 <section id="what-input-files-can-be-used">
 <h2>What input files can be used?<a class="headerlink" href="#what-input-files-can-be-used" title="Permalink to this headline"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">ms_mint</span></code> can be used with <code class="docutils literal notranslate"><span class="pre">mzXML</span></code>, <code class="docutils literal notranslate"><span class="pre">mzML</span></code>, <code class="docutils literal notranslate"><span class="pre">mzMLb</span></code> and experimental formats in <code class="docutils literal notranslate"><span class="pre">.feather</span></code> and <code class="docutils literal notranslate"><span class="pre">.parquet</span></code> format.</p>
+</section>
+<section id="which-properties-does-ms-mint-extract">
+<h2>Which properties does ms-mint extract?<a class="headerlink" href="#which-properties-does-ms-mint-extract" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><em>ms_file</em>: Filename of MS-file</p></li>
+<li><p><em>peak_label</em>: From target list</p></li>
+<li><p><em>mz_mean</em>: From target list</p></li>
+<li><p><em>mz_width</em>: From target list</p></li>
+<li><p><em>rt</em>: From target list</p></li>
+<li><p><em>rt_min</em>: From target list</p></li>
+<li><p><em>rt_max</em>: From target list</p></li>
+<li><p><em>intensity_threshold</em>:</p></li>
+<li><p><em>target_filename</em>:</p></li>
+<li><p><em>peak_area</em>: The sum of all intensities</p></li>
+<li><p><em>peak_area_top3</em>: The sum of the 3 largest intensities</p></li>
+<li><p><em>peak_n_datapoints</em>: Number of datapoints</p></li>
+<li><p><em>peak_max</em>: Intensity of peak maximum</p></li>
+<li><p><em>peak_rt_of_max</em>: Retentiontime of peak maximum</p></li>
+<li><p><em>peak_min</em>: Minimm peak intensity (offset)</p></li>
+<li><p><em>peak_median</em>: Median of all intensities</p></li>
+<li><p><em>peak_mean</em>: Average of all intensities</p></li>
+<li><p><em>peak_delta_int</em>: Difference between first and last intensity</p></li>
+<li><p><em>peak_shape_rt</em>: Array of retention times</p></li>
+<li><p><em>peak_shape_int</em>: Array of projected intensities</p></li>
+<li><p><em>peak_mass_diff_25pc</em>: 25th percentile between <em>mz_mean</em> minus m/z values of all datapoints</p></li>
+<li><p><em>peak_mass_diff_50pc</em>: Median between <em>mz_mean</em> minus m/z values of all datapoints</p></li>
+<li><p><em>peak_mass_diff_75pc</em>: 75th percentile between <em>mz_mean</em> minus m/z values of all datapoints</p></li>
+<li><p><em>peak_score</em>: Score of peak quality (experimental)</p></li>
+<li><p><em>total_intensity</em>: Sum of all intensities in the file</p></li>
+<li><p><em>ms_path</em>: Path of the MS-file</p></li>
+<li><p><em>ms_file_size</em>: Size of the MS-file in MB</p></li>
+</ul>
 </section>
 </section>
 
