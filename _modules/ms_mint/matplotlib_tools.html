@@ -76,7 +76,6 @@
 <span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
 
 
-
 <div class="viewcode-block" id="hierarchical_clustering"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.hierarchical_clustering">[docs]</a><span class="k">def</span> <span class="nf">hierarchical_clustering</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -96,7 +95,7 @@
 <span class="sd">    :param vmin: Minimum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.</span>
 <span class="sd">    :type vmin: int, optional</span>
 <span class="sd">    :param vmin: Maximum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.</span>
-<span class="sd">    :type vmax: int, optional    </span>
+<span class="sd">    :type vmax: int, optional</span>
 <span class="sd">    :param figsize: Size of the main figure in inches, defaults to (8, 8)</span>
 <span class="sd">    :type figsize: tuple, optional</span>
 <span class="sd">    :param top_height: Height of the top dendrogram, defaults to 2</span>
@@ -245,8 +244,6 @@
     <span class="c1"># fig = plt.figure(dpi=dpi)</span>
 
     <span class="n">R</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-
 
     <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>

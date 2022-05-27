@@ -327,7 +327,7 @@
 <span class="sd">    :type read_only: bool, optional</span>
 <span class="sd">    :return: MS data</span>
 <span class="sd">    :rtype: pandas.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>    
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">read_only</span> <span class="ow">or</span> <span class="p">(</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS_FILE_COLUMNS</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">==</span> <span class="n">MS_FILE_COLUMNS</span><span class="p">)</span>
@@ -476,7 +476,7 @@
 <span class="sd">    :type fn_out: str or PosixPath, optional</span>
 <span class="sd">    :return: Filename of generated file</span>
 <span class="sd">    :rtype: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>    
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fn</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fn_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fn_out</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.parquet&quot;</span><span class="p">)</span>
