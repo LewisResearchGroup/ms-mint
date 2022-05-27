@@ -198,7 +198,7 @@ class Mint(object):
             # Prepare output file (only headers)
             pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(output_fn, index=False)
 
-        for i, filename in enumerate(self.ms_files):
+        for filename in self.ms_files:
             args.append(
                 {
                     "filename": filename,

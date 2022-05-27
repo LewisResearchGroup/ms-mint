@@ -110,9 +110,9 @@ def test__process_ms1_from_numpy():
     ]
 
     print("Expected:")
-    [print(i) for i in expect]
+    _ = [print(i) for i in expect]
     print("Actual")
-    [print(i) for i in result]
+    _ = [print(i) for i in result]
     assert result == expect
 
 
