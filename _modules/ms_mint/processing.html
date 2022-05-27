@@ -82,7 +82,8 @@
 
 
 <div class="viewcode-block" id="extract_chromatogram_from_ms1"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_chromatogram_from_ms1">[docs]</a><span class="k">def</span> <span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;minutes&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Extract single chromatogram of specific m/z value from MS-data.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract single chromatogram of specific m/z value from MS-data.</span>
 
 <span class="sd">    :param df: MS-data</span>
 <span class="sd">    :type df: pandas.DataFrame with columns [&#39;rt&#39;, &#39;m/z&#39;, &#39;intensity&#39;]</span>
@@ -128,7 +129,8 @@
 
 
 <div class="viewcode-block" id="append_results"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.append_results">[docs]</a><span class="k">def</span> <span class="nf">append_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Appends results to file.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Appends results to file.</span>
 
 <span class="sd">    :param results: New results.</span>
 <span class="sd">    :type results: pandas.DataFrame</span>
@@ -161,7 +163,8 @@
 
 
 <div class="viewcode-block" id="process_ms1"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1">[docs]</a><span class="k">def</span> <span class="nf">process_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Process MS-1 data with a target list.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process MS-1 data with a target list.</span>
 
 <span class="sd">    :param df: MS-1 data.</span>
 <span class="sd">    :type df: pandas.DataFrame</span>
@@ -195,7 +198,8 @@
 
 
 <div class="viewcode-block" id="process_ms1_from_numpy"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1_from_numpy">[docs]</a><span class="k">def</span> <span class="nf">process_ms1_from_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">peaks</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Process MS1 data in numpy array format.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process MS1 data in numpy array format.</span>
 
 <span class="sd">    :param array: Input data.</span>
 <span class="sd">    :type array: numpy.Array</span>
@@ -241,7 +245,8 @@
 
 
 <div class="viewcode-block" id="extract_ms1_properties"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_ms1_properties">[docs]</a><span class="k">def</span> <span class="nf">extract_ms1_properties</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Process MS-1 data in array format.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process MS-1 data in array format.</span>
 
 <span class="sd">    :param array: MS-1 data slice.</span>
 <span class="sd">    :type array: numpy.array</span>
@@ -331,7 +336,8 @@
 <div class="viewcode-block" id="slice_ms1_array"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.slice_ms1_array">[docs]</a><span class="k">def</span> <span class="nf">slice_ms1_array</span><span class="p">(</span>
     <span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">intensity_threshold</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Slice MS1 data by m/z, mz_width, rt_min, rt_max</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Slice MS1 data by m/z, mz_width, rt_min, rt_max</span>
 
 <span class="sd">    :param array: Input MS-1 data.</span>
 <span class="sd">    :type array: np.array</span>
@@ -357,7 +363,8 @@
 
 
 <div class="viewcode-block" id="score_peaks"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.score_peaks">[docs]</a><span class="k">def</span> <span class="nf">score_peaks</span><span class="p">(</span><span class="n">mint_results</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Score the peak quality (experimental).</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Score the peak quality (experimental).</span>
 
 <span class="sd">    1 - means a good shape</span>
 

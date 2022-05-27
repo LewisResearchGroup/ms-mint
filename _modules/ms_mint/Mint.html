@@ -99,7 +99,8 @@
 
 
 <div class="viewcode-block" id="Mint"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint">[docs]</a><span class="k">class</span> <span class="nc">Mint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Main class of the ms_mint package, which processes metabolomics files.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class of the ms_mint package, which processes metabolomics files.</span>
 
 <span class="sd">    :param verbose: Sets verbosity of the instance.</span>
 <span class="sd">    :type verbose: bool</span>
@@ -121,7 +122,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">verbose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get/set verbosity.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get/set verbosity.</span>
 
 <span class="sd">        :getter: Get current verbosity.</span>
 <span class="sd">        :return: True or False</span>
@@ -138,7 +140,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;ms-mint version number.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ms-mint version number.</span>
 
 <span class="sd">        :return: Version string.</span>
 <span class="sd">        :rtype: str</span>
@@ -146,7 +149,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
 
 <div class="viewcode-block" id="Mint.reset"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Reset Mint instance. Removes targets, MS-files and results.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset Mint instance. Removes targets, MS-files and results.</span>
 
 <span class="sd">        :return: self</span>
 <span class="sd">        :rtype: ms_mint.Mint.Mint</span>
@@ -296,7 +300,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns current status of Mint instance.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns current status of Mint instance.</span>
 
 <span class="sd">        :return: [&#39;waiting&#39;, &#39;running&#39;, &#39;done&#39;]</span>
 <span class="sd">        :rtype: str</span>
@@ -305,7 +310,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get/set ms-files to process.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get/set ms-files to process.</span>
 
 <span class="sd">        :getter:</span>
 <span class="sd">        :return: List of filenames.</span>
@@ -331,7 +337,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of currently stored ms filenames.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of currently stored ms filenames.</span>
 
 <span class="sd">        :return: Number of files stored in self.ms_files</span>
 <span class="sd">        :rtype: int</span>
@@ -339,7 +346,8 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Mint.load_targets"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load_targets">[docs]</a>    <span class="k">def</span> <span class="nf">load_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_files</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Load targets from a file (csv, xslx)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load targets from a file (csv, xslx)</span>
 
 <span class="sd">        :param list_of_files: Filename or list of file names.</span>
 <span class="sd">        :type list_of_files: str or list[str]</span>
@@ -360,7 +368,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set/get target list.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set/get target list.</span>
 
 <span class="sd">        :getter:</span>
 <span class="sd">        :return: Target list</span>
@@ -419,7 +428,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">progress_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Assigns a callback function to update a progress bar.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns a callback function to update a progress bar.</span>
 
 <span class="sd">        :getter: Returns the current callback function.</span>
 <span class="sd">        :setter: Sets the callback function.</span>
@@ -432,7 +442,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Shows the current progress.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows the current progress.</span>
 
 <span class="sd">        :getter: Returns the current progress value.</span>
 <span class="sd">        :setter: Set the progress to a value between 0 and 100 and calls the progress callback function.</span>
@@ -448,7 +459,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">progress_callback</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Mint.export"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Export current results to file.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export current results to file.</span>
 
 <span class="sd">        :param fn: Filename, defaults to None</span>
 <span class="sd">        :type fn: str, optional</span>
@@ -470,7 +482,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mint.load"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Load results into Mint instance.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load results into Mint instance.</span>
 
 <span class="sd">        :param fn: Filename (csv, xlsx)</span>
 <span class="sd">        :type fn: str</span>
@@ -515,7 +528,8 @@
 <div class="viewcode-block" id="Mint.pca"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run Principal Component Analysis on current results. Results are stored in</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run Principal Component Analysis on current results. Results are stored in</span>
 <span class="sd">        self.decomposition_results.</span>
 
 <span class="sd">        :param var_name: Column name to use for pca, defaults to &quot;peak_max&quot;</span>
