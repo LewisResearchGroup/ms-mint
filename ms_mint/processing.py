@@ -13,7 +13,8 @@ from .standards import RESULTS_COLUMNS, MINT_RESULTS_COLUMNS
 
 
 def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
-    """Extract single chromatogram of specific m/z value from MS-data.
+    """
+    Extract single chromatogram of specific m/z value from MS-data.
 
     :param df: MS-data
     :type df: pandas.DataFrame with columns ['rt', 'm/z', 'intensity']
@@ -59,7 +60,8 @@ def process_ms1_files_in_parallel(args):
 
 
 def append_results(results, fn):
-    """Appends results to file.
+    """
+    Appends results to file.
 
     :param results: New results.
     :type results: pandas.DataFrame
@@ -92,7 +94,8 @@ def process_ms1_file(filename, targets):
 
 
 def process_ms1(df, targets):
-    """Process MS-1 data with a target list.
+    """
+    Process MS-1 data with a target list.
 
     :param df: MS-1 data.
     :type df: pandas.DataFrame
@@ -126,7 +129,8 @@ def _process_ms1_from_df_(df, targets):
 
 
 def process_ms1_from_numpy(array, peaks):
-    """Process MS1 data in numpy array format.
+    """
+    Process MS1 data in numpy array format.
 
     :param array: Input data.
     :type array: numpy.Array
@@ -172,7 +176,8 @@ def _process_ms1_from_numpy(
 
 
 def extract_ms1_properties(array, mz_mean):
-    """Process MS-1 data in array format.
+    """
+    Process MS-1 data in array format.
 
     :param array: MS-1 data slice.
     :type array: numpy.array
@@ -262,7 +267,8 @@ def extract_ms1_properties(array, mz_mean):
 def slice_ms1_array(
     array: np.array, rt_min, rt_max, mz_mean, mz_width, intensity_threshold
 ):
-    """Slice MS1 data by m/z, mz_width, rt_min, rt_max
+    """
+    Slice MS1 data by m/z, mz_width, rt_min, rt_max
 
     :param array: Input MS-1 data.
     :type array: np.array
@@ -288,7 +294,8 @@ def slice_ms1_array(
 
 
 def score_peaks(mint_results):
-    """Score the peak quality (experimental).
+    """
+    Score the peak quality (experimental).
 
     1 - means a good shape
 

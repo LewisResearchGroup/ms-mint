@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import colorlover as cl
 
@@ -8,12 +7,13 @@ from collections.abc import Iterable
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.io as pio
-import plotly.express as px
 from plotly.subplots import make_subplots
 
 
 def set_template():
-    """A function that sets a template for plotly figures."""
+    """
+    A function that sets a template for plotly figures.
+    """
     pio.templates["draft"] = go.layout.Template(
         layout=dict(font={"size": 10}),
     )
@@ -38,7 +38,8 @@ def plotly_heatmap(
     call_show=False,
     verbose=False,
 ):
-    """Creates an interactive heatmap from a dense-formated dataframe.
+    """
+    Creates an interactive heatmap from a dense-formated dataframe.
 
     :param df: Input data
     :type df: pandas.DataFrame
@@ -223,7 +224,8 @@ def plotly_peak_shapes(
     legend_orientation="v",
     call_show=False,
 ):
-    """Plot peak shapes of selected peaks and MS-files.
+    """
+    Plot peak shapes of selected peaks and MS-files.
 
     :param mint_results: DataFrame in mint.results format
     :type mint_results: pandas.DataFrame

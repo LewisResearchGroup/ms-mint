@@ -32,7 +32,8 @@ MS_FILE_COLUMNS = [
 
 
 def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
-    """Read MS file and convert it to a pandas.DataFrame.
+    """
+    Read MS file and convert it to a pandas.DataFrame.
 
     :param fn: Filename
     :type fn: str or PosixPath
@@ -73,7 +74,8 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
 
 
 def mzxml_to_df(fn, read_only=False):
-    """Read mzXML file and convert it to pandas.DataFrame.
+    """
+    Read mzXML file and convert it to pandas.DataFrame.
 
     :param fn: Filename
     :type fn: str or PosixPath
@@ -355,7 +357,8 @@ def df_to_numeric(df):
 
 
 def export_to_excel(mint, fn=None):
-    """Export MINT state to Excel file.
+    """
+    Export MINT state to Excel file.
 
     :param mint: Mint instance
     :type mint: ms_mint.Mint.Mint
@@ -381,7 +384,8 @@ def export_to_excel(mint, fn=None):
 
 
 def convert_ms_file_to_feather(fn, fn_out=None):
-    """Convert MS file to feather format.
+    """
+    Convert MS file to feather format.
 
     :param fn: Filename to convert
     :type fn: str or PosixPath
@@ -399,7 +403,8 @@ def convert_ms_file_to_feather(fn, fn_out=None):
 
 
 def convert_ms_file_to_parquet(fn, fn_out=None):
-    """Convert MS file to parquet format.
+    """
+    Convert MS file to parquet format.
 
     :param fn: Filename to convert
     :type fn: str or PosixPath

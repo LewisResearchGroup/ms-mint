@@ -36,7 +36,8 @@ def read_targets(fns, ms_mode="negative"):
 
 
 def standardize_targets(targets, ms_mode="neutral"):
-    """Standardize target list.
+    """
+    Standardize target list.
 
     - updates the target lists to newest format
 
@@ -77,7 +78,8 @@ def standardize_targets(targets, ms_mode="neutral"):
 
 
 def check_targets(targets):
-    """Check if targets are formated well.
+    """
+    Check if targets are formated well.
 
     :param targets: Target list
     :type targets: pandas.DataFrame
@@ -150,7 +152,8 @@ def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
 
 
 def diff_targets(old_pklist, new_pklist):
-    """Get the difference between two target lists.
+    """
+    Get the difference between two target lists.
 
     :param old_pklist: Old target list
     :type old_pklist: pandas.DataFrame
