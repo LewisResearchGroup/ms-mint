@@ -69,14 +69,15 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png)
 
 
+    mint.plot.peak_shapes(hue=None, col_wrap=3, height=2)
+
+![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/peak-shapes.png)
+
+
     mint.plot.hierarchical_clustering()
 
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical-clustering.png)
 
-
-    mint.plot.peak_shapes(hue=None, col_wrap=3, height=2)
-
-![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/peak-shapes.png)
 
 
 
