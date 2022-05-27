@@ -229,13 +229,13 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
 
 
 def _extract_mzml(data, time_unit):
-    #try:
-    RT = data.scan_time_in_minutes()
-    #except:
-    #    if time_unit == "seconds":
-    #        RT = data.scan_time[0] / 60.0
-    #    elif time_unit == "minutes":
-    #        RT = data.scan_time[0]
+    try:
+        RT = data.scan_time_in_minutes()
+    except Exception:
+        if time_unit == "seconds":
+            RT = data.scan_time[0] / 60.0
+        elif time_unit == "minutes":
+            RT = data.scan_time[0]
     peaks = data.peaks("centroided")
     return {
         "scan_id": data["id"],
