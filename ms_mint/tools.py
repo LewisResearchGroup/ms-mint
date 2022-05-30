@@ -2,9 +2,15 @@ import os
 
 import numpy as np
 
+import pandas as pd
+
 from molmass import Formula
 
+from matplotlib import pyplot as plt
+
 from sklearn.preprocessing import StandardScaler, RobustScaler
+
+from scipy.signal import find_peaks, peak_widths
 
 from .standards import M_PROTON
 
@@ -140,3 +146,67 @@ def get_ms_files_from_results(results):
     ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
     ms_files = [os.path.join(ms_path, ms_file) for ms_path, ms_file in ms_files.values]
     return ms_files
+
+
+def find_peaks_in_timeseries(series, prominence=None, plot=False):
+    """_summary_
+
+    :param series: _description_
+    :type series: _type_
+    :param prominence: _description_, defaults to None
+    :type prominence: _type_, optional
+    :param plot: _description_, defaults to False
+    :type plot: bool, optional
+    :return: _description_
+    :rtype: _type_
+    """
+    t = series.index
+    x = series.values
+    peak_ndxs, _ = find_peaks(x, prominence=prominence)
+    widths, heights, left_ips, right_ips = peak_widths(x, peak_ndxs, rel_height=0.9)  
+    times = series.iloc[peak_ndxs].index
+    
+    t_start = _map_ndxs_to_time(left_ips, min(t), max(t), 0, len(t))
+    t_end = _map_ndxs_to_time(right_ips, min(t), max(t), 0, len(t))
+    
+    data = dict(
+        ndxs=peak_ndxs,
+        rt=times,
+        rt_span=widths,
+        peak_height=heights,
+        rt_min=t_start,
+        rt_max=t_end
+    )
+    
+    peaks = pd.DataFrame(data) 
+    
+    if plot:
+        _plot_peaks(series, peaks)
+    
+    return peaks
+        
+
+def _plot_peaks(series, peaks, highlight=None):
+    if highlight is None: 
+        highlight = []
+    series.plot()
+    if peaks is not None:
+        series.iloc[peaks.ndxs].plot(label='Peaks', marker='x', y='intensity', lw=0, ax=plt.gca())
+        for ndx, (_, rt, rt_span, peak_height, rt_min, rt_max) in peaks.iterrows():
+            if ndx in highlight:
+                plt.axvspan(rt_min, rt_max, color='lightgreen', alpha=0.25)
+            else:
+                color = 'orange'
+            plt.hlines(peak_height, rt_min, rt_max, color=color)    
+
+
+def _map_ndxs_to_time(x, t_min, t_max, x_min, x_max):
+    assert t_min < t_max
+    assert x_min < x_max
+    t_span = t_max - t_min
+    x_span = x_max - x_min
+    m = (t_span/x_span)
+    b = t_min
+    x = np.array(x)
+    result = ( m * x + b ).flatten()   
+    return result   
