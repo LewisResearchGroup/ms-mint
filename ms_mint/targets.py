@@ -63,6 +63,8 @@ def standardize_targets(targets, ms_mode="neutral"):
         targets["mz_width"] = 10
     if "target_filename" not in cols:
         targets["target_filename"] = "unknown"
+    if "rt_unit" not in targets.columns:
+        targets['rt_unit'] = 'min'
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
             targets[c] = None
@@ -74,7 +76,19 @@ def standardize_targets(targets, ms_mode="neutral"):
     targets.index = range(len(targets))
     targets = targets[targets.mz_mean.notna()]
     targets = targets.replace(np.NaN, None)
+
+    convert_to_seconds(targets)
+
     return targets[TARGETS_COLUMNS]
+
+
+def convert_to_seconds(targets):
+    for ndx, row in targets.iterrows():
+        if row.rt_unit == 'min':
+            targets.loc[ndx, 'rt_unit'] = 's'
+            targets.loc[ndx, 'rt'] *= 60.
+            targets.loc[ndx, 'rt_min'] *= 60.
+            targets.loc[ndx, 'rt_max'] *= 60.
 
 
 def check_targets(targets):

@@ -13,6 +13,7 @@ TARGETS_COLUMNS = [
     "rt",
     "rt_min",
     "rt_max",
+    "rt_unit",
     "intensity_threshold",
     "target_filename",
 ]
@@ -53,6 +54,7 @@ DEPRECATED_LABELS = {
     "rtmax": "rt_max",
     "peaklist": "target_filename",
     "peaklist_name": "target_filename",
+    "scan_time_min": "scan_time"
 }
 
 M_PROTON = 1.00782503223
