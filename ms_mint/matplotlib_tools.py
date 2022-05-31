@@ -177,6 +177,7 @@ def plot_peak_shapes(
     # fig = plt.figure(dpi=dpi)
 
     R = mint_results.copy()
+    R = R[R.peak_area > 0]
 
     if peak_labels is not None:
         if isinstance(peak_labels, str):

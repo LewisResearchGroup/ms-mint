@@ -31,7 +31,7 @@ def test__ms_file_to_df__mzML():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -45,7 +45,7 @@ def test__ms_file_to_df__mzML_timeunit_minutes():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -59,7 +59,7 @@ def test__ms_file_to_df__mzXML():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -73,7 +73,7 @@ def test__mzml_to_pandas_df_pyteomics_pos():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -88,7 +88,7 @@ def test__mzml_to_pandas_df_pyteomics_neg():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -103,7 +103,7 @@ def test__read_parquet():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -120,7 +120,7 @@ def test__write_read_hdf(tmpdir):
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -136,7 +136,7 @@ def test__read_mzMLb(tmpdir):
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -189,8 +189,10 @@ def test__export_to_excel_without_fn():
             "mz_mean": [200],
             "mz_width": [10],
             "intensity_threshold": [0],
+            "rt": [5],
             "rt_min": [0],
             "rt_max": [10],
+            "rt_units": ['min'],
             "targets_filename": ["unknown"],
         }
     )

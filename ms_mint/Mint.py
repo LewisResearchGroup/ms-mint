@@ -293,7 +293,7 @@ class Mint(object):
             assert os.path.isfile(f), f"File not found ({f})"
         self._targets_files = list_of_files
         if self.verbose:
-            print("Set targets files to:\n".join(self.targets_files) + "\n")
+            print("Set targets files to:\n".join(self._targets_files) + "\n")
         self.targets = read_targets(list_of_files)
         return self
 
@@ -411,6 +411,8 @@ class Mint(object):
             export_to_excel(self, fn=fn)
         elif fn.endswith(".csv"):
             self.results.to_csv(fn, index=False)
+        elif fn.endswith(".parquet"):
+            self.results.to_parquet(fn, index=False)
 
     def load(self, fn):
         """
@@ -423,27 +425,26 @@ class Mint(object):
         """
         if self.verbose:
             print("Loading MINT state")
+            
         if isinstance(fn, str):
             if fn.endswith("xlsx"):
                 results = pd.read_excel(fn, sheet_name="Results").rename(
                     columns=DEPRECATED_LABELS
                 )
                 self.results = results
-                self.targets = pd.read_excel(fn, sheet_name="Peaklist")
-                self.ms_files = get_ms_files_from_results(results)
+                self.digest_results()
+                return None
 
             elif fn.endswith(".csv"):
                 results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
                 results["peak_shape_rt"] = results["peak_shape_rt"].fillna("")
                 results["peak_shape_int"] = results["peak_shape_int"].fillna("")
-                ms_files = get_ms_files_from_results(results)
-                targets = results[
-                    [col for col in TARGETS_COLUMNS if col in results.columns]
-                ].drop_duplicates()
                 self.results = results
-                self.ms_files = ms_files
-                self.targets = targets
+                self.digest_results()
                 return None
+            elif fn.endswith('.parquet'):
+                results = pd.read_parquet(fn).rename(columns=DEPRECATED_LABELS)
+                
         else:
             results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
             if "ms_file" in results.columns:
@@ -455,6 +456,10 @@ class Mint(object):
             ].drop_duplicates()
             self.targets = targets
             return self
+
+    def digest_results(self):
+        self.ms_files = self.results.ms_files.unique()
+        self.targets = self.results[[col for col in TARGETS_COLUMNS if col in self.results.columns]].drop_duplicates()
 
     def pca(
         self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
