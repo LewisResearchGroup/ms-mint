@@ -7,7 +7,7 @@ import logging
 from pathlib import Path as P
 
 from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
-from .tools import get_mz_mean_from_formulas, df_diff
+from .tools import formula_to_mass, df_diff
 
 
 def read_targets(fns, ms_mode="negative"):
@@ -56,7 +56,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
     if "formula" in targets.columns and not "mz_mean" in targets.columns:
-        targets["mz_mean"] = get_mz_mean_from_formulas(targets["formula"], ms_mode)
+        targets["mz_mean"] = formula_to_mass(targets["formula"], ms_mode)
     if "intensity_threshold" not in cols:
         targets["intensity_threshold"] = 0
     if "mz_width" not in cols:
@@ -68,17 +68,18 @@ def standardize_targets(targets, ms_mode="neutral"):
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
             targets[c] = None
+            targets[c] = targets[c].astype(float)
     del c
     if "peak_label" not in cols:
         targets["peak_label"] = [f"C_{i}" for i in range(len(targets))]
     targets["intensity_threshold"] = targets["intensity_threshold"].fillna(0)
     targets["peak_label"] = targets["peak_label"].astype(str)
+
     targets.index = range(len(targets))
     targets = targets[targets.mz_mean.notna()]
     targets = targets.replace(np.NaN, None)
-
+    fill_missing_rt_values(targets)
     convert_to_seconds(targets)
-
     return targets[TARGETS_COLUMNS]
 
 
@@ -86,9 +87,18 @@ def convert_to_seconds(targets):
     for ndx, row in targets.iterrows():
         if row.rt_unit == 'min':
             targets.loc[ndx, 'rt_unit'] = 's'
-            targets.loc[ndx, 'rt'] *= 60.
-            targets.loc[ndx, 'rt_min'] *= 60.
-            targets.loc[ndx, 'rt_max'] *= 60.
+            if targets.loc[ndx, 'rt']: 
+                targets.loc[ndx, 'rt'] *= 60.
+            if targets.loc[ndx, 'rt_min']:
+                targets.loc[ndx, 'rt_min'] *= 60.
+            if targets.loc[ndx, 'rt_max']:
+                targets.loc[ndx, 'rt_max'] *= 60.
+
+
+def fill_missing_rt_values(targets):
+    for ndx, row in targets.iterrows():
+        if (row.rt is None) and (row.rt_min is not None) and (not row.rt_max is not None):
+            targets.loc[ndx, 'rt'] = np.mean(row.rt_min, row.rt_max)
 
 
 def check_targets(targets):

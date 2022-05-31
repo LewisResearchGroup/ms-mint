@@ -4,7 +4,9 @@ import numpy as np
 
 import pandas as pd
 
-from molmass import Formula
+import logging
+
+from molmass import Formula, FormulaError
 
 from matplotlib import pyplot as plt
 
@@ -29,7 +31,7 @@ def lock(fn):
     return FileLock(f"{fn}.lock", timeout=1)
 
 
-def get_mz_mean_from_formulas(formulas, ms_mode=None):
+def formula_to_mass(formulas, ms_mode=None):
     """
     Calculate mz-mean vallue from formulas for specific ionization mode.
 
@@ -41,12 +43,15 @@ def get_mz_mean_from_formulas(formulas, ms_mode=None):
     :rtype: list
     """
     masses = []
+    assert ms_mode in [None, 'negative', 'positive', 'neutral'], ms_mode
+    if isinstance(formulas, str):
+        formulas = [formulas]
     for formula in formulas:
-        # try:
-        mass = Formula(formula).isotope.mass
-        # except:
-        # masses.append(None)
-        # continue
+        try:
+            mass = Formula(formula).isotope.mass
+        except FormulaError as e:
+            masses.append(None)
+            logging.waringin(e)
         if ms_mode == "positive":
             mass += M_PROTON
         elif ms_mode == "negative":
@@ -173,7 +178,8 @@ def find_peaks_in_timeseries(series, prominence=None, plot=False):
         ndxs=peak_ndxs,
         rt=times,
         rt_span=widths,
-        peak_height=heights,
+        peak_base_height=heights,
+        peak_height=series.iloc[peak_ndxs].values,
         rt_min=t_start,
         rt_max=t_end
     )
@@ -185,19 +191,6 @@ def find_peaks_in_timeseries(series, prominence=None, plot=False):
     
     return peaks
         
-
-def _plot_peaks(series, peaks, highlight=None):
-    if highlight is None: 
-        highlight = []
-    series.plot()
-    if peaks is not None:
-        series.iloc[peaks.ndxs].plot(label='Peaks', marker='x', y='intensity', lw=0, ax=plt.gca())
-        for ndx, (_, rt, rt_span, peak_height, rt_min, rt_max) in peaks.iterrows():
-            if ndx in highlight:
-                plt.axvspan(rt_min, rt_max, color='lightgreen', alpha=0.25)
-            else:
-                color = 'orange'
-            plt.hlines(peak_height, rt_min, rt_max, color=color)    
 
 
 def _map_ndxs_to_time(x, t_min, t_max, x_min, x_max):

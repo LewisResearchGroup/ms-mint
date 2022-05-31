@@ -1,18 +1,19 @@
 import numpy as np
 import pandas as pd
+import logging
 
 from matplotlib import pyplot as plt
 
 from pathlib import Path as P
 
-from .tools import find_peaks_in_timeseries, _plot_peaks
+from .tools import find_peaks_in_timeseries, gaussian
 from .io import ms_file_to_df
 from .filter import Resampler, Smoother
 
 
 class Chromatogram():
     
-    def __init__(self, scan_times=None, intensities=None, filters=None):
+    def __init__(self, scan_times=None, intensities=None, filters=None, expected_rt=None):
         self.t = None
         self.x = None
         if scan_times is not None:
@@ -22,13 +23,18 @@ class Chromatogram():
         self.noise_level = None
         if filters is None:
             self.filters = [Resampler(), Smoother()]
+        else: self.filters = filters
         self.peaks = None
         self.selected_peak_ndxs = None
+        self.expected_rt = expected_rt
+        self.weights = None
 
-    def from_file(self, fn, mz_mean, mz_width=10):
+    def from_file(self, fn, mz_mean, mz_width=10, expected_rt=None):
         chrom = get_chromatogram_from_ms_file(fn, mz_mean=mz_mean, mz_width=mz_width)     
         self.t = chrom.index
         self.x = chrom.values
+        if expected_rt is not None:
+            self.expected_rt = expected_rt
 
     def estimate_noise_level(self, window=20):
         data = pd.Series(index=self.t, data=self.x)
@@ -44,7 +50,6 @@ class Chromatogram():
             prominence = self.noise_level * 3
         self.peaks = find_peaks_in_timeseries(self.data.intensity, prominence=prominence)
     
-
     def optimise_peak_times_with_diff(self, rolling_window=20, plot=False):
         peaks = self.peaks
         diff = (self.data - self.data.shift(1)).rolling(rolling_window, center=True).mean().fillna(0)
@@ -54,7 +59,7 @@ class Chromatogram():
         if plot: plt.show()
         peak_endings = find_peaks_in_timeseries(-diff.fillna(0).intensity, prominence=prominence, plot=plot)
         if plot: plt.show()
-        
+
         for ndx, row in peaks.iterrows():
 
             new_rt_min = row.rt_min
@@ -75,18 +80,43 @@ class Chromatogram():
         peaks = self.peaks
         selected_ndx = (peaks.rt - rt).abs().sort_values().index[0]
         self.selected_peak_ndxs = [selected_ndx]
+        return self.selected_peaks
         
+    def select_peak_by_highest_intensity(self):
+        peaks = self.peaks
+        selected_ndx = peaks.sort_values('peak_height', ascending=False).index.values[0]
+        self.selected_peak_ndxs = [selected_ndx]
+        return self.selected_peaks
+    
+    def select_peak_method1(self, rt, sigma):
+        peaks = self.peaks
+        if peaks is None or len(peaks) == 0:
+            logging.warning('No peaks available to select.')
+            return None
+        weights = gaussian(peaks.rt, rt, sigma)
+        weighted_peaks = weights * peaks.peak_height
+        x = np.arange( int(self.t.min()), int(self.t.max()) )
+        self.weights = max(peaks.peak_height) * gaussian(x, rt, sigma)
+        selected_ndx = weighted_peaks.sort_values(ascending=False).index.values[0]
+        self.selected_peak_ndxs = [selected_ndx]
+        return self.selected_peaks        
+
+    @property
+    def selected_peaks(self):
+        self.peaks.loc[self.selected_peak_ndxs]
+
     @property
     def data(self):
         df = pd.DataFrame(index=self.t, data={'intensity': self.x})
         df.index.name = 'scan_time'
         return df
     
-    def plot(self):
+    def plot(self, **kwargs):
         series = self.data
         peaks = self.peaks
         selected_peak_ndxs = self.selected_peak_ndxs
-        _plot_peaks(series, peaks, highlight=selected_peak_ndxs)
+        weights = self.weights
+        _plot_peaks(series, peaks, highlight=selected_peak_ndxs, expected_rt=self.expected_rt, weights=weights, **kwargs)
 
 
 
@@ -108,3 +138,27 @@ def mz_mean_width_to_mass_range(mz_mean, mz_width_ppm=10):
     mz_min = mz_mean - dmz
     mz_max = mz_mean + dmz
     return mz_min, mz_max        
+
+
+def _plot_peaks(series, peaks, highlight=None, expected_rt=None, weights=None, legend=True):
+    if highlight is None: 
+        highlight = []
+    ax = plt.gca()
+    series.intensity.plot(ax=ax, color='black', label='Intensity')
+    if peaks is not None:
+        series.iloc[peaks.ndxs].plot(label='Peaks', marker='x', y='intensity', lw=0, ax=ax)
+        for i, (ndx, (_, rt, rt_span, peak_base_height, peak_height, rt_min, rt_max)) in enumerate(peaks.iterrows()):
+            if ndx in highlight:
+                plt.axvspan(rt_min, rt_max, color='green', alpha=0.25, label='Selected')
+            plt.hlines(peak_base_height, rt_min, rt_max, color='orange', label='Peak width' if i ==0 else None)    
+    if expected_rt is not None:
+        plt.axvspan(expected_rt, expected_rt+1, color='blue', alpha=1, label='Expected Rt')
+    if weights is not None:
+        plt.plot(weights, linestyle='--', label='Gaussian weight')
+    plt.ylabel('Intensity')
+    plt.xlabel('Scan Time [s]')
+    ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+    plt.ylim((0.1,None))
+    if not legend:
+        ax.get_legend().remove()
+

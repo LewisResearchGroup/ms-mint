@@ -66,6 +66,10 @@ class TestClass:
         mint1 = Mint()
         mint2 = Mint()
 
+
+        print(TEST_TARGETS_FN_V0)
+        print(TEST_TARGETS_FN)
+        
         mint1.load_targets(TEST_TARGETS_FN_V0)
         mint1.ms_files = [TEST_MZXML]
 

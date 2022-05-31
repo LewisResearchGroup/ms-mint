@@ -32,9 +32,10 @@ def test__standardize_targets():
             "peak_label": {0: "A"},
             "mz_mean": {0: 100},
             "mz_width": {0: 10},
-            "rt_min": {0: 1},
-            "rt_max": {0: 2},
+            "rt_min": {0: 1*60},
+            "rt_max": {0: 2*60},
             "rt": {0: None},
+            "rt_unit": {0: 's'},
             "intensity_threshold": {0: 0},
             "target_filename": {0: "TEST"},
         },
@@ -43,7 +44,10 @@ def test__standardize_targets():
 
     result = standardize_targets(targets)
 
-    print(result)
+
+    print(expected.T)
+
+    print(result.T)
 
     assert result.equals(expected), result
 

@@ -15,7 +15,7 @@ def test__find_test_mzxml():
 
 def test__process_ms1():
     ms_data = pd.DataFrame(
-        {"scan_time_min": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
+        {"scan_time": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
     )
 
     targets = pd.DataFrame(
@@ -67,7 +67,7 @@ def test__process_ms1():
 
 def test__process_ms1_from_df():
     df = pd.DataFrame(
-        {"scan_time_min": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
+        {"scan_time": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
     )
     peaklist = pd.DataFrame(
         {
@@ -118,7 +118,7 @@ def test__process_ms1_from_numpy():
 
 def test__extract_chromatogram_from_ms1():
     df = pd.DataFrame(
-        {"scan_time_min": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
+        {"scan_time": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
     )
     result = processing.extract_chromatogram_from_ms1(df, 200, 10, "minutes")
     expected = pd.Series([3], index=[2])
@@ -176,9 +176,10 @@ def test__run_parallel_with_output_filename(tmp_path):
             "mz_mean": [128.034],
             "mz_width": [100],
             "intensity_threshold": [0],
-            "rt_min": [286 / 60],
-            "rt_max": [330 / 60],
-            "rt": [300 / 60],
+            "rt_min": [286],
+            "rt_max": [330],
+            "rt": [300],
+            "rt_unit": 's',
             "target_filename": ["unknown"],
         }
     )
