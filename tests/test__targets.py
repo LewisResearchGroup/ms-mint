@@ -65,20 +65,6 @@ def test__check_targets_labels_not_string():
     assert result is False
 
 
-def test__check_targets_labels_missing_rtmax():
-    targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, "rt_max"] = None
-    result = check_targets(targets)
-    assert result is False
-
-
-def test__check_targets_labels_missing_rtmin():
-    targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, "rt_min"] = None
-    result = check_targets(targets)
-    assert result is False
-
-
 def test__check_targets_labels_duplictated():
     targets = read_targets(TEST_TARGETS_FN)
     targets.loc[0, "peak_label"] = "A"

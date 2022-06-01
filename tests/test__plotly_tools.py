@@ -4,15 +4,10 @@ import numpy as np
 
 from plotly.graph_objs._figure import Figure
 
-from ms_mint import Mint
-
 from ms_mint.plotly_tools import (
     set_template,
     plotly_heatmap,
-    plotly_peak_shapes,
 )
-
-from paths import TEST_MZML, TEST_TARGETS_FN
 
 
 def test__plotly_heatmap():

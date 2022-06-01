@@ -4,9 +4,7 @@ import logging
 
 from matplotlib import pyplot as plt
 
-from pathlib import Path as P
-
-from .tools import find_peaks_in_timeseries, gaussian
+from .tools import find_peaks_in_timeseries, gaussian, plot_peaks
 from .io import ms_file_to_df
 from .filter import Resampler, Smoother
 
@@ -140,25 +138,4 @@ def mz_mean_width_to_mass_range(mz_mean, mz_width_ppm=10):
     return mz_min, mz_max        
 
 
-def _plot_peaks(series, peaks, highlight=None, expected_rt=None, weights=None, legend=True):
-    if highlight is None: 
-        highlight = []
-    ax = plt.gca()
-    series.intensity.plot(ax=ax, color='black', label='Intensity')
-    if peaks is not None:
-        series.iloc[peaks.ndxs].plot(label='Peaks', marker='x', y='intensity', lw=0, ax=ax)
-        for i, (ndx, (_, rt, rt_span, peak_base_height, peak_height, rt_min, rt_max)) in enumerate(peaks.iterrows()):
-            if ndx in highlight:
-                plt.axvspan(rt_min, rt_max, color='green', alpha=0.25, label='Selected')
-            plt.hlines(peak_base_height, rt_min, rt_max, color='orange', label='Peak width' if i ==0 else None)    
-    if expected_rt is not None:
-        plt.axvspan(expected_rt, expected_rt+1, color='blue', alpha=1, label='Expected Rt')
-    if weights is not None:
-        plt.plot(weights, linestyle='--', label='Gaussian weight')
-    plt.ylabel('Intensity')
-    plt.xlabel('Scan Time [s]')
-    ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
-    plt.ylim((0.1,None))
-    if not legend:
-        ax.get_legend().remove()
 

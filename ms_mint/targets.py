@@ -120,7 +120,6 @@ def check_targets(targets):
         _check_target_list_columns_(targets),
         _check_labels_are_strings_(targets),
         _check_duplicated_labels_(targets),
-        _check_targets_rt_values_(targets),
     )
     result = all(results)
     if not result: 
@@ -146,14 +145,6 @@ def _check_duplicated_labels_(targets):
 def _check_target_list_columns_(targets):
     if targets.columns.to_list() != TARGETS_COLUMNS:
         logging.warning("Target columns are wrong.")
-        return False
-    return True
-
-
-def _check_targets_rt_values_(targets):
-    missing_rt = targets.loc[targets[["rt", "rt"]].isna().max(axis=1)]
-    if len(missing_rt) != 0:
-        logging.warning("Some targets have missing rt_min or rt_max.")
         return False
     return True
 
