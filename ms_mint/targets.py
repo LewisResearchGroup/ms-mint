@@ -227,7 +227,7 @@ class TargetOptimizer:
 
             chrom.apply_filter()
             chrom.find_peaks()
-            chrom.select_peak_method1(rt, sigma)
+            chrom.select_peak_with_gaussian_weight(rt, sigma)
             chrom.optimise_peak_times_with_diff(window)
 
             ndx = chrom.selected_peak_ndxs[0]
