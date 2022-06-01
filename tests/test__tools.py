@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from ms_mint.tools import (
-    get_mz_mean_from_formulas,
+    formula_to_mass,
     gaussian,
     scale_dataframe,
     df_diff,
@@ -9,20 +9,20 @@ from ms_mint.tools import (
 )
 
 
-def test__get_mz_mean_from_formulas():
-    result = get_mz_mean_from_formulas(["C", "CCCC", "CNO"])
+def test__formula_to_mass():
+    result = formula_to_mass(["C", "CCCC", "CNO"])
     expected = [12, 48, 41.998]
     assert result == expected, result
 
 
-def test__get_mz_mean_from_formulas__positive_ion():
-    result = get_mz_mean_from_formulas(["C", "CCCC", "CNO"], ms_mode="positive")
+def test__formula_to_mass__positive_ion():
+    result = formula_to_mass(["C", "CCCC", "CNO"], ms_mode="positive")
     expected = [13.0078, 49.0078, 43.0058]
     assert result == expected, result
 
 
-def test__get_mz_mean_from_formulas__negative_ion():
-    result = get_mz_mean_from_formulas(["C", "CCCC", "CNO"], ms_mode="negative")
+def test__formula_to_mass__negative_ion():
+    result = formula_to_mass(["C", "CCCC", "CNO"], ms_mode="negative")
     expected = [10.9922, 46.9922, 40.9902]
     assert result == expected, result
 
