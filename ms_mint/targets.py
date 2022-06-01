@@ -5,9 +5,13 @@ import numpy as np
 import logging
 
 from pathlib import Path as P
+from matplotlib import pyplot as plt
 
+from .chromatogram import extract_chromatogram_from_ms1, Chromatogram
+from .io import ms_file_to_df
 from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
 from .tools import formula_to_mass, df_diff
+
 
 
 def read_targets(fns, ms_mode="negative"):
@@ -189,3 +193,61 @@ def diff_targets(old_pklist, new_pklist):
     df = df_diff(old_pklist, new_pklist)
     df = df[df["_merge"] == "right_only"]
     return df.drop("_merge", axis=1)
+
+
+class TargetOptimizer():
+    
+    def __init__(self, fns, targets):
+        self.ms1 = pd.concat([ms_file_to_df(fn) for fn in fns]).sort_values(['scan_time', 'mz'])
+        self.targets = targets
+        
+    def find_rt_min_max(self, minimum_intensity=1e4, plot=True, sigma=20, window=20, filters=None):
+        
+        targets = self.targets
+        _targets = self.targets.set_index('peak_label')
+    
+        if plot:
+            fig = plt.figure(figsize=(30,20))
+        
+        i = 0
+        for (peak_label, row) in tqdm( _targets.iterrows(), total=len(targets) ):
+
+            mz = row.mz_mean
+            rt = row.rt
+            
+            _slice = extract_chromatogram_from_ms1(self.ms1, mz)
+                        
+            chrom = Chromatogram(_slice.index, _slice.values, expected_rt=rt, filters=filters)
+            
+            if chrom.x.max() < minimum_intensity: continue
+ 
+            chrom.apply_filter()
+            chrom.find_peaks()
+            chrom.select_peak_method1(rt, sigma)
+            chrom.optimise_peak_times_with_diff(window)   
+
+            ndx = chrom.selected_peak_ndxs[0]
+            rt_min = chrom.peaks.at[ndx, 'rt_min']
+            rt_max = chrom.peaks.at[ndx, 'rt_max']
+
+            _targets.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
+            
+            if plot:
+                i += 1
+
+                if i<=100:
+                    subplot(10, 10, i)                       
+                    chrom.plot()
+                    gca().get_legend().remove()
+                    title(f'{peak_label}\nm/z={mz:.3f}')
+
+                if i == 100:
+                    plt.show()
+
+        targets = _targets.reset_index()
+        self.targets = targets
+        
+        if plot:
+            return self, fig
+        else:
+            return self
