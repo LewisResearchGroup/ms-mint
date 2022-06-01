@@ -31,7 +31,7 @@ def test__ms_file_to_df__mzML():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -45,7 +45,7 @@ def test__ms_file_to_df__mzML_timeunit_minutes():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -59,7 +59,7 @@ def test__ms_file_to_df__mzXML():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -73,7 +73,7 @@ def test__mzml_to_pandas_df_pyteomics_pos():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -88,7 +88,7 @@ def test__mzml_to_pandas_df_pyteomics_neg():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -103,7 +103,7 @@ def test__read_parquet():
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -120,7 +120,7 @@ def test__write_read_hdf(tmpdir):
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -136,7 +136,7 @@ def test__read_mzMLb(tmpdir):
         "scan_id",
         "ms_level",
         "polarity",
-        "scan_time_min",
+        "scan_time",
         "mz",
         "intensity",
     ]
@@ -182,22 +182,24 @@ def test__export_to_excel(tmp_path):
 
 def test__export_to_excel_without_fn():
     mint = Mint(verbose=True)
-    mint.ms_files = TEST_MZXML
-    mint.targets = pd.DataFrame(
+
+    data = pd.DataFrame(
         {
-            "peak_label": ["A"],
-            "mz_mean": [200],
+            "peak_label": ["2-DEOXYADENOSINE"],
+            "mz_mean": [250.094559],
             "mz_width": [10],
             "intensity_threshold": [0],
-            "rt_min": [0],
-            "rt_max": [10],
+            "rt": [320],
+            "rt_min": [300],
+            "rt_max": [337],
+            "rt_units": ["s"],
             "targets_filename": ["unknown"],
         }
     )
-    mint.run()
+
+    mint.results = data
+
     buffer = mint.export()
     assert isinstance(buffer, io.BytesIO)
-    df = pd.read_excel(buffer, sheet_name="Results")
-    assert len(df) == 1, len(df)
-    assert df.loc[0, "peak_label"] == "A", df.loc[0, "peak_label"]
-    assert df.loc[0, "ms_file"] == P(TEST_MZXML).name, df.loc[0, "ms_file"]
+    result = pd.read_excel(buffer, sheet_name="Results")
+    assert data.equals(result)

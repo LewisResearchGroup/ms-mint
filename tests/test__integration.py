@@ -3,7 +3,7 @@ import pandas as pd
 from ms_mint.Mint import Mint
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 
-from paths import TEST_MZML, TEST_MZXML, TEST_TARGETS_FN, TEST_TARGETS_FN_V0
+from paths import TEST_MZML, TEST_MZXML, TEST_TARGETS_FN_V2_CSV_SEC, TEST_TARGETS_FN_V0, TEST_TARGETS_FN_V1
 
 
 mint = Mint(verbose=True)
@@ -47,17 +47,17 @@ class TestClass:
 
     def test__mint_run_parallel(self):
         mint.ms_files = [TEST_MZML, TEST_MZXML]
-        mint.targets_files = TEST_TARGETS_FN
+        mint.targets_files = TEST_TARGETS_FN_V2_CSV_SEC
         mint.run(nthreads=2)
 
     def test__mzxml_equals_mzml(self):
         mint1 = Mint()
         mint2 = Mint()
 
-        mint1.load_targets(TEST_TARGETS_FN)
+        mint1.load_targets(TEST_TARGETS_FN_V2_CSV_SEC)
         mint1.ms_files = [TEST_MZML]
 
-        mint2.load_targets(TEST_TARGETS_FN)
+        mint2.load_targets(TEST_TARGETS_FN_V2_CSV_SEC)
         mint2.ms_files = [TEST_MZXML]
 
         assert mint1.results.equals(mint2.results)
@@ -66,10 +66,13 @@ class TestClass:
         mint1 = Mint()
         mint2 = Mint()
 
+        print(TEST_TARGETS_FN_V0)
+        print(TEST_TARGETS_FN_V1)
+
         mint1.load_targets(TEST_TARGETS_FN_V0)
         mint1.ms_files = [TEST_MZXML]
 
-        mint2.load_targets(TEST_TARGETS_FN)
+        mint2.load_targets(TEST_TARGETS_FN_V1)
         mint2.ms_files = [TEST_MZXML]
 
         assert mint1.results.equals(mint2.results)
@@ -84,5 +87,5 @@ class TestClass:
 
     def test__run_returns_none_without_ms_files(self):
         mint.reset()
-        mint.targets_files = TEST_TARGETS_FN
+        mint.targets_files = TEST_TARGETS_FN_V0
         assert mint.run() is None

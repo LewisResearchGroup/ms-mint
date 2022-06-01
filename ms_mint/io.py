@@ -25,7 +25,7 @@ MS_FILE_COLUMNS = [
     "scan_id",
     "ms_level",
     "polarity",
-    "scan_time_min",
+    "scan_time",
     "mz",
     "intensity",
 ]
@@ -65,7 +65,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     if not read_only:
         df = df.rename(
             columns={
-                "retentionTime": "scan_time_min",
+                "retentionTime": "scan_time",
                 "intensity array": "intensity",
                 "m/z array": "mz",
             }
@@ -100,7 +100,7 @@ def mzxml_to_df(fn, read_only=False):
         .reset_index()
     )
 
-    df["retentionTime"] = df["retentionTime"].astype(np.float64)
+    df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
     df["m/z array"] = df["m/z array"].astype(np.float64)
     df["intensity array"] = df["intensity array"].astype(np.float64)
 
@@ -108,7 +108,7 @@ def mzxml_to_df(fn, read_only=False):
         columns={
             "num": "scan_id",
             "msLevel": "ms_level",
-            "retentionTime": "scan_time_min",
+            "retentionTime": "scan_time",
             "m/z array": "mz",
             "intensity array": "intensity",
         }
@@ -168,9 +168,10 @@ def mzml_to_pandas_df_pyteomics(fn, read_only=False):
                 data["polarity"] = None
 
             if "scan start time" in scan.keys():
-                data["scan_time_min"] = scan["scan start time"] / 60
+                data["scan_time"] = scan["scan start time"]
+
             elif "scan time" in scan.keys():
-                data["scan_time_min"] = scan["scan time"] / 60
+                data["scan_time"] = scan["scan time"]
             else:
                 logging.error(f"No scan time identified \n{scan}")
                 break
@@ -218,13 +219,14 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
 
     df = (
         pd.DataFrame.from_dict(data)
-        .set_index(["scan_id", "ms_level", "polarity", "scan_time_min"])
+        .set_index(["scan_id", "ms_level", "polarity", "scan_time"])
         .apply(pd.Series.explode)
         .reset_index()
     )
 
     df["mz"] = df["mz"].astype("float64")
     df["intensity"] = df["intensity"].astype("float64")
+    df["scan_time"] = df["scan_time"] * 60.0
     return df
 
 
@@ -233,15 +235,15 @@ def _extract_mzml(data, time_unit):
         RT = data.scan_time_in_minutes()
     except Exception:
         if time_unit == "seconds":
-            RT = data.scan_time[0] / 60.0
-        elif time_unit == "minutes":
             RT = data.scan_time[0]
+        elif time_unit == "minutes":
+            RT = data.scan_time[0] * 60.0
     peaks = data.peaks("centroided")
     return {
         "scan_id": data["id"],
         "ms_level": data.ms_level,
         "polarity": "+" if data["positive scan"] else "-",
-        "scan_time_min": RT,
+        "scan_time": RT,
         "mz": peaks[:, 0].astype("float64"),
         "intensity": peaks[:, 1].astype("float64"),
     }
@@ -286,7 +288,7 @@ def format_thermo_raw_file_reader_parquet(df):
             columns={
                 "ScanNumber": "scan_id",
                 "MsOrder": "ms_level",
-                "RetentionTime": "scan_time_min",
+                "RetentionTime": "scan_time",
                 "Masses": "mz",
                 "Intensities": "intensity",
             }
@@ -326,7 +328,7 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
         .rename(
             columns={
                 "index": "scan_id",
-                "retentionTime": "scan_time_min",
+                "retentionTime": "scan_time",
                 "m/z array": "mz",
                 "ms level": "ms_level",
                 "intensity array": "intensity",
