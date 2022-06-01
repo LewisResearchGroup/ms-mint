@@ -58,7 +58,6 @@ def test__plotly_heatmap__clustered_correlation():
     assert isinstance(img, Figure), type(img)
 
 
-
 def test__set_template():
     set_template()
     assert True

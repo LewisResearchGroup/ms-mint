@@ -41,7 +41,7 @@ class Mint(object):
 
     """
 
-    def __init__(self, verbose: bool = False, progress_callback=None, time_unit='s'):
+    def __init__(self, verbose: bool = False, progress_callback=None, time_unit="s"):
 
         self._verbose = verbose
         self._version = ms_mint.__version__
@@ -425,7 +425,7 @@ class Mint(object):
         """
         if self.verbose:
             print("Loading MINT state")
-            
+
         if isinstance(fn, str):
             if fn.endswith("xlsx"):
                 results = pd.read_excel(fn, sheet_name="Results").rename(
@@ -442,9 +442,9 @@ class Mint(object):
                 self.results = results
                 self.digest_results()
                 return None
-            elif fn.endswith('.parquet'):
+            elif fn.endswith(".parquet"):
                 results = pd.read_parquet(fn).rename(columns=DEPRECATED_LABELS)
-                
+
         else:
             results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
             if "ms_file" in results.columns:
@@ -459,7 +459,9 @@ class Mint(object):
 
     def digest_results(self):
         self.ms_files = self.results.ms_file.unique()
-        self.targets = self.results[[col for col in TARGETS_COLUMNS if col in self.results.columns]].drop_duplicates()
+        self.targets = self.results[
+            [col for col in TARGETS_COLUMNS if col in self.results.columns]
+        ].drop_duplicates()
 
     def pca(
         self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"

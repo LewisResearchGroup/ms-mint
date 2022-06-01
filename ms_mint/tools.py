@@ -18,6 +18,8 @@ from .standards import M_PROTON
 
 from .filelock import FileLock
 
+from .matplotlib_tools import plot_peaks
+
 
 def lock(fn):
     """
@@ -43,7 +45,7 @@ def formula_to_mass(formulas, ms_mode=None):
     :rtype: list
     """
     masses = []
-    assert ms_mode in [None, 'negative', 'positive', 'neutral'], ms_mode
+    assert ms_mode in [None, "negative", "positive", "neutral"], ms_mode
     if isinstance(formulas, str):
         formulas = [formulas]
     for formula in formulas:
@@ -168,12 +170,12 @@ def find_peaks_in_timeseries(series, prominence=None, plot=False):
     t = series.index
     x = series.values
     peak_ndxs, _ = find_peaks(x, prominence=prominence)
-    widths, heights, left_ips, right_ips = peak_widths(x, peak_ndxs, rel_height=0.9)  
+    widths, heights, left_ips, right_ips = peak_widths(x, peak_ndxs, rel_height=0.9)
     times = series.iloc[peak_ndxs].index
-    
+
     t_start = _map_ndxs_to_time(left_ips, min(t), max(t), 0, len(t))
     t_end = _map_ndxs_to_time(right_ips, min(t), max(t), 0, len(t))
-    
+
     data = dict(
         ndxs=peak_ndxs,
         rt=times,
@@ -181,46 +183,24 @@ def find_peaks_in_timeseries(series, prominence=None, plot=False):
         peak_base_height=heights,
         peak_height=series.iloc[peak_ndxs].values,
         rt_min=t_start,
-        rt_max=t_end
+        rt_max=t_end,
     )
-    
-    peaks = pd.DataFrame(data) 
-    
+
+    peaks = pd.DataFrame(data)
+
     if plot:
         plot_peaks(series, peaks)
-    
-    return peaks
-        
 
-def plot_peaks(series, peaks, highlight=None, expected_rt=None, weights=None, legend=True):
-    if highlight is None: 
-        highlight = []
-    ax = plt.gca()
-    series.intensity.plot(ax=ax, color='black', label='Intensity')
-    if peaks is not None:
-        series.iloc[peaks.ndxs].plot(label='Peaks', marker='x', y='intensity', lw=0, ax=ax)
-        for i, (ndx, (_, rt, rt_span, peak_base_height, peak_height, rt_min, rt_max)) in enumerate(peaks.iterrows()):
-            if ndx in highlight:
-                plt.axvspan(rt_min, rt_max, color='green', alpha=0.25, label='Selected')
-            plt.hlines(peak_base_height, rt_min, rt_max, color='orange', label='Peak width' if i ==0 else None)    
-    if expected_rt is not None:
-        plt.axvspan(expected_rt, expected_rt+1, color='blue', alpha=1, label='Expected Rt')
-    if weights is not None:
-        plt.plot(weights, linestyle='--', label='Gaussian weight')
-    plt.ylabel('Intensity')
-    plt.xlabel('Scan Time [s]')
-    ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
-    plt.ylim((0.1,None))
-    if not legend:
-        ax.get_legend().remove()
+    return peaks
+
 
 def _map_ndxs_to_time(x, t_min, t_max, x_min, x_max):
     assert t_min < t_max
     assert x_min < x_max
     t_span = t_max - t_min
     x_span = x_max - x_min
-    m = (t_span/x_span)
+    m = t_span / x_span
     b = t_min
     x = np.array(x)
-    result = ( m * x + b ).flatten()   
-    return result   
+    result = (m * x + b).flatten()
+    return result
