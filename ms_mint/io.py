@@ -100,7 +100,7 @@ def mzxml_to_df(fn, read_only=False):
         .reset_index()
     )
 
-    df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.
+    df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
     df["m/z array"] = df["m/z array"].astype(np.float64)
     df["intensity array"] = df["intensity array"].astype(np.float64)
 
@@ -169,7 +169,7 @@ def mzml_to_pandas_df_pyteomics(fn, read_only=False):
 
             if "scan start time" in scan.keys():
                 data["scan_time"] = scan["scan start time"]
-                
+
             elif "scan time" in scan.keys():
                 data["scan_time"] = scan["scan time"]
             else:
@@ -226,7 +226,7 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
 
     df["mz"] = df["mz"].astype("float64")
     df["intensity"] = df["intensity"].astype("float64")
-    df['scan_time'] = df['scan_time'] * 60.
+    df["scan_time"] = df["scan_time"] * 60.0
     return df
 
 
@@ -237,7 +237,7 @@ def _extract_mzml(data, time_unit):
         if time_unit == "seconds":
             RT = data.scan_time[0]
         elif time_unit == "minutes":
-            RT = data.scan_time[0] * 60.
+            RT = data.scan_time[0] * 60.0
     peaks = data.peaks("centroided")
     return {
         "scan_id": data["id"],

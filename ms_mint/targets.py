@@ -14,7 +14,6 @@ from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
 from .tools import formula_to_mass, df_diff
 
 
-
 def read_targets(fns, ms_mode="negative"):
     """
     Extracts peak data from csv files that contain peak definitions.
@@ -69,7 +68,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     if "target_filename" not in cols:
         targets["target_filename"] = "unknown"
     if "rt_unit" not in targets.columns:
-        targets['rt_unit'] = 'min'
+        targets["rt_unit"] = "min"
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
             targets[c] = None
@@ -90,20 +89,24 @@ def standardize_targets(targets, ms_mode="neutral"):
 
 def convert_to_seconds(targets):
     for ndx, row in targets.iterrows():
-        if row.rt_unit == 'min':
-            targets.loc[ndx, 'rt_unit'] = 's'
-            if targets.loc[ndx, 'rt']: 
-                targets.loc[ndx, 'rt'] *= 60.
-            if targets.loc[ndx, 'rt_min']:
-                targets.loc[ndx, 'rt_min'] *= 60.
-            if targets.loc[ndx, 'rt_max']:
-                targets.loc[ndx, 'rt_max'] *= 60.
+        if row.rt_unit == "min":
+            targets.loc[ndx, "rt_unit"] = "s"
+            if targets.loc[ndx, "rt"]:
+                targets.loc[ndx, "rt"] *= 60.0
+            if targets.loc[ndx, "rt_min"]:
+                targets.loc[ndx, "rt_min"] *= 60.0
+            if targets.loc[ndx, "rt_max"]:
+                targets.loc[ndx, "rt_max"] *= 60.0
 
 
 def fill_missing_rt_values(targets):
     for ndx, row in targets.iterrows():
-        if (row.rt is None) and (row.rt_min is not None) and (not row.rt_max is not None):
-            targets.loc[ndx, 'rt'] = np.mean(row.rt_min, row.rt_max)
+        if (
+            (row.rt is None)
+            and (row.rt_min is not None)
+            and (not row.rt_max is not None)
+        ):
+            targets.loc[ndx, "rt"] = np.mean(row.rt_min, row.rt_max)
 
 
 def check_targets(targets):
@@ -122,7 +125,7 @@ def check_targets(targets):
         _check_duplicated_labels_(targets),
     )
     result = all(results)
-    if not result: 
+    if not result:
         print(results)
     return all(results)
 
@@ -190,58 +193,64 @@ def diff_targets(old_pklist, new_pklist):
     return df.drop("_merge", axis=1)
 
 
-class TargetOptimizer():
-    
+class TargetOptimizer:
     def __init__(self, fns, targets):
-        self.ms1 = pd.concat([ms_file_to_df(fn) for fn in fns]).sort_values(['scan_time', 'mz'])
+        self.ms1 = pd.concat([ms_file_to_df(fn) for fn in fns]).sort_values(
+            ["scan_time", "mz"]
+        )
         self.targets = targets
-        
-    def find_rt_min_max(self, minimum_intensity=1e4, plot=True, sigma=20, window=20, filters=None):
-        
+
+    def find_rt_min_max(
+        self, minimum_intensity=1e4, plot=True, sigma=20, window=20, filters=None
+    ):
+
         targets = self.targets
-        _targets = self.targets.set_index('peak_label')
-    
+        _targets = self.targets.set_index("peak_label")
+
         if plot:
-            fig = plt.figure(figsize=(30,20))
-        
+            fig = plt.figure(figsize=(30, 20))
+
         i = 0
-        for (peak_label, row) in tqdm( _targets.iterrows(), total=len(targets) ):
+        for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
 
             mz = row.mz_mean
             rt = row.rt
-            
+
             _slice = extract_chromatogram_from_ms1(self.ms1, mz)
-                        
-            chrom = Chromatogram(_slice.index, _slice.values, expected_rt=rt, filters=filters)
-            
-            if chrom.x.max() < minimum_intensity: continue
- 
+
+            chrom = Chromatogram(
+                _slice.index, _slice.values, expected_rt=rt, filters=filters
+            )
+
+            if chrom.x.max() < minimum_intensity:
+                continue
+
             chrom.apply_filter()
             chrom.find_peaks()
             chrom.select_peak_method1(rt, sigma)
-            chrom.optimise_peak_times_with_diff(window)   
+            chrom.optimise_peak_times_with_diff(window)
 
             ndx = chrom.selected_peak_ndxs[0]
-            rt_min = chrom.peaks.at[ndx, 'rt_min']
-            rt_max = chrom.peaks.at[ndx, 'rt_max']
+            rt_min = chrom.peaks.at[ndx, "rt_min"]
+            rt_max = chrom.peaks.at[ndx, "rt_max"]
 
-            _targets.loc[peak_label, ['rt_min', 'rt_max']] = rt_min, rt_max
-            
+            _targets.loc[peak_label, ["rt_min", "rt_max"]] = rt_min, rt_max
+
             if plot:
                 i += 1
 
-                if i<=100:
-                    plt.subplot(10, 10, i)                       
+                if i <= 100:
+                    plt.subplot(10, 10, i)
                     chrom.plot()
                     plt.gca().get_legend().remove()
-                    plt.title(f'{peak_label}\nm/z={mz:.3f}')
+                    plt.title(f"{peak_label}\nm/z={mz:.3f}")
 
                 if i == 100:
                     plt.show()
 
         targets = _targets.reset_index()
         self.targets = targets
-        
+
         if plot:
             return self, fig
         else:

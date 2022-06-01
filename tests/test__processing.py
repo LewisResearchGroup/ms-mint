@@ -179,7 +179,7 @@ def test__run_parallel_with_output_filename(tmp_path):
             "rt_min": [286],
             "rt_max": [330],
             "rt": [300],
-            "rt_unit": 's',
+            "rt_unit": "s",
             "target_filename": ["unknown"],
         }
     )
