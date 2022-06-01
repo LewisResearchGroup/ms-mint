@@ -296,7 +296,7 @@
 
             <span class="n">chrom</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">()</span>
             <span class="n">chrom</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">()</span>
-            <span class="n">chrom</span><span class="o">.</span><span class="n">select_peak_method1</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">select_peak_with_gaussian_weight</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
             <span class="n">chrom</span><span class="o">.</span><span class="n">optimise_peak_times_with_diff</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
 
             <span class="n">ndx</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
