@@ -63,15 +63,6 @@ def test__plotly_heatmap__clustered_correlation():
     assert isinstance(img, Figure), type(img)
 
 
-def test__plotly_peak_shapes():
-    mint = Mint()
-    mint.ms_files = TEST_MZML
-    mint.load_targets(TEST_TARGETS_FN)
-    mint.run()
-    print(mint.results)
-    img = plotly_peak_shapes(mint.results)
-    assert isinstance(img, Figure), type(img)
-
 
 def test__set_template():
     set_template()

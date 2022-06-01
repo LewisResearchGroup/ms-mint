@@ -458,7 +458,7 @@ class Mint(object):
             return self
 
     def digest_results(self):
-        self.ms_files = self.results.ms_files.unique()
+        self.ms_files = self.results.ms_file.unique()
         self.targets = self.results[[col for col in TARGETS_COLUMNS if col in self.results.columns]].drop_duplicates()
 
     def pca(
