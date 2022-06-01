@@ -63,9 +63,6 @@ class Chromatogram:
         )
         prominence = 0
 
-        print(diff)
-        print(type(diff))
-
         peak_startings = find_peaks_in_timeseries(
             diff.fillna(0).intensity, prominence=prominence, plot=plot
         )
