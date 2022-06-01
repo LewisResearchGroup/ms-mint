@@ -165,8 +165,9 @@ def test__Chromatogram_from_files_runs_through():
 
     chrom = Chromatogram()
     chrom.from_file(TEST_MZML, mz_mean=101.024323, mz_width=10)
-    
+    chrom.apply_filter()
     chrom.find_peaks()
+    chrom.select_peak_by_highest_intensity()
     peaks = chrom.selected_peak_ndxs
 
     print(chrom.data)
