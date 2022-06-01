@@ -208,7 +208,7 @@ class TargetOptimizer:
         _targets = self.targets.set_index("peak_label")
 
         if plot:
-            fig = plt.figure(figsize=(30, 20))
+            fig = plt.figure(figsize=(60, 30))
 
         i = 0
         for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
@@ -246,6 +246,7 @@ class TargetOptimizer:
                     plt.title(f"{peak_label}\nm/z={mz:.3f}")
 
                 if i == 100:
+                    plt.tight_layout()
                     plt.show()
 
         targets = _targets.reset_index()
