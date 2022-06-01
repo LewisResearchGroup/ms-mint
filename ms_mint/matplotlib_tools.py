@@ -178,6 +178,7 @@ def plot_peak_shapes(
 
     R = mint_results.copy()
     R = R[R.peak_area > 0]
+    R['peak_label'] = R['peak_label']
 
     if peak_labels is not None:
         if isinstance(peak_labels, str):
@@ -197,12 +198,15 @@ def plot_peak_shapes(
             peak_rt = [float(i) for i in row.peak_shape_rt.split(",")]
             peak_int = [float(i) for i in row.peak_shape_int.split(",")]
             ms_file = row.ms_file
+            mz = row.mz_mean
+            rt = row.rt
             df = pd.DataFrame(
                 {
                     "Scan time [s]": peak_rt,
                     "Intensity": peak_int,
                     "ms_file": ms_file,
-                    "peak_label": peak_label,
+                    "peak_label": peak_label + f'\nm/z={mz:.3f}',
+                    "Expected Scan Time": rt
                 }
             )
             dfs.append(df)
