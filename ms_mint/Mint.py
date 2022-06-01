@@ -9,7 +9,6 @@ import time
 import logging
 
 from pathlib import Path as P
-from tqdm import tqdm
 
 from sklearn.decomposition import PCA
 
@@ -316,7 +315,7 @@ class Mint(object):
     @targets.setter
     def targets(self, targets):
         targets = standardize_targets(targets)
-        assert check_targets(targets)
+        assert check_targets(targets), check_targets(targets)
         self._targets = targets
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
