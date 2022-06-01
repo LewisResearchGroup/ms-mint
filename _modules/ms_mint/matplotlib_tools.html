@@ -201,8 +201,8 @@
     <span class="n">mint_results</span><span class="p">,</span>
     <span class="n">ms_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">aspect</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">aspect</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">col_wrap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;ms_file&quot;</span><span class="p">,</span>
@@ -246,6 +246,8 @@
     <span class="c1"># fig = plt.figure(dpi=dpi)</span>
 
     <span class="n">R</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">peak_area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">R</span><span class="p">[</span><span class="s1">&#39;peak_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="s1">&#39;peak_label&#39;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -265,12 +267,15 @@
             <span class="n">peak_rt</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">peak_shape_rt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
             <span class="n">peak_int</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">peak_shape_int</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
             <span class="n">ms_file</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">ms_file</span>
+            <span class="n">mz</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mz_mean</span>
+            <span class="n">rt</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;Retention Time [min]&quot;</span><span class="p">:</span> <span class="n">peak_rt</span><span class="p">,</span>
-                    <span class="s2">&quot;MS-Intensity&quot;</span><span class="p">:</span> <span class="n">peak_int</span><span class="p">,</span>
+                    <span class="s2">&quot;Scan time [s]&quot;</span><span class="p">:</span> <span class="n">peak_rt</span><span class="p">,</span>
+                    <span class="s2">&quot;Intensity&quot;</span><span class="p">:</span> <span class="n">peak_int</span><span class="p">,</span>
                     <span class="s2">&quot;ms_file&quot;</span><span class="p">:</span> <span class="n">ms_file</span><span class="p">,</span>
-                    <span class="s2">&quot;peak_label&quot;</span><span class="p">:</span> <span class="n">peak_label</span><span class="p">,</span>
+                    <span class="s2">&quot;peak_label&quot;</span><span class="p">:</span> <span class="n">peak_label</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">m/z=</span><span class="si">{</span><span class="n">mz</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s2">&quot;Expected Scan Time&quot;</span><span class="p">:</span> <span class="n">rt</span>
                 <span class="p">}</span>
             <span class="p">)</span>
             <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -279,8 +284,8 @@
 
     <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Retention Time [min]&quot;</span><span class="p">,</span>
-        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;MS-Intensity&quot;</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span>
         <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span>
         <span class="n">col</span><span class="o">=</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span>
@@ -301,6 +306,45 @@
         <span class="n">g</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="plot_peaks"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_peaks">[docs]</a><span class="k">def</span> <span class="nf">plot_peaks</span><span class="p">(</span>
+    <span class="n">series</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">highlight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">highlight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">highlight</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Intensity&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">peaks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">peaks</span><span class="o">.</span><span class="n">ndxs</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Peaks&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;intensity&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span>
+            <span class="n">ndx</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">rt</span><span class="p">,</span> <span class="n">rt_span</span><span class="p">,</span> <span class="n">peak_base_height</span><span class="p">,</span> <span class="n">peak_height</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">),</span>
+        <span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="n">highlight</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Selected&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span>
+                <span class="n">peak_base_height</span><span class="p">,</span>
+                <span class="n">rt_min</span><span class="p">,</span>
+                <span class="n">rt_max</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Peak width&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">expected_rt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span>
+            <span class="n">expected_rt</span><span class="p">,</span> <span class="n">expected_rt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Expected Rt&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Gaussian weight&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan Time [s]&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;sci&quot;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mf">0.1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">legend</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

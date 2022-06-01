@@ -104,13 +104,15 @@
 </li>
       <li><a href="ms_mint.html#ms_mint.Mint.Mint.clear_results">clear_results() (ms_mint.Mint.Mint method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ms_mint.html#ms_mint.Mint.Mint.clear_targets">clear_targets() (ms_mint.Mint.Mint method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ms_mint.html#ms_mint.io.convert_ms_file_to_feather">convert_ms_file_to_feather() (in module ms_mint.io)</a>
 </li>
       <li><a href="ms_mint.html#ms_mint.io.convert_ms_file_to_parquet">convert_ms_file_to_parquet() (in module ms_mint.io)</a>
+</li>
+      <li><a href="ms_mint.html#ms_mint.targets.convert_to_seconds">convert_to_seconds() (in module ms_mint.targets)</a>
 </li>
       <li><a href="ms_mint.html#ms_mint.Mint.Mint.crosstab">crosstab() (ms_mint.Mint.Mint method)</a>
 </li>
@@ -127,6 +129,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ms_mint.html#ms_mint.targets.diff_targets">diff_targets() (in module ms_mint.targets)</a>
+</li>
+      <li><a href="ms_mint.html#ms_mint.Mint.Mint.digest_results">digest_results() (ms_mint.Mint.Mint method)</a>
 </li>
       <li><a href="ms_mint.html#ms_mint.notebook.Mint.display">display() (ms_mint.notebook.Mint method)</a>
 </li>
@@ -152,7 +156,19 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ms_mint.html#ms_mint.targets.fill_missing_rt_values">fill_missing_rt_values() (in module ms_mint.targets)</a>
+</li>
+      <li><a href="ms_mint.html#ms_mint.tools.find_peaks_in_timeseries">find_peaks_in_timeseries() (in module ms_mint.tools)</a>
+</li>
+      <li><a href="ms_mint.html#ms_mint.targets.TargetOptimizer.find_rt_min_max">find_rt_min_max() (ms_mint.targets.TargetOptimizer method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ms_mint.html#ms_mint.Mint.Mint.find_rtmin_rtmax">find_rtmin_rtmax() (ms_mint.Mint.Mint method)</a>
+</li>
       <li><a href="ms_mint.html#ms_mint.io.format_thermo_raw_file_reader_parquet">format_thermo_raw_file_reader_parquet() (in module ms_mint.io)</a>
+</li>
+      <li><a href="ms_mint.html#ms_mint.tools.formula_to_mass">formula_to_mass() (in module ms_mint.tools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -162,13 +178,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ms_mint.html#ms_mint.tools.gaussian">gaussian() (in module ms_mint.tools)</a>
 </li>
-      <li><a href="ms_mint.html#ms_mint.targets.gen_target_grid">gen_target_grid() (in module ms_mint.targets)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ms_mint.html#ms_mint.tools.get_ms_files_from_results">get_ms_files_from_results() (in module ms_mint.tools)</a>
+      <li><a href="ms_mint.html#ms_mint.targets.gen_target_grid">gen_target_grid() (in module ms_mint.targets)</a>
 </li>
-      <li><a href="ms_mint.html#ms_mint.tools.get_mz_mean_from_formulas">get_mz_mean_from_formulas() (in module ms_mint.tools)</a>
+      <li><a href="ms_mint.html#ms_mint.tools.get_ms_files_from_results">get_ms_files_from_results() (in module ms_mint.tools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -240,8 +254,6 @@
 </li>
         <li><a href="ms_mint.html#module-ms_mint.processing">ms_mint.processing</a>
 </li>
-        <li><a href="ms_mint.html#module-ms_mint.resampling">ms_mint.resampling</a>
-</li>
         <li><a href="ms_mint.html#module-ms_mint.standards">ms_mint.standards</a>
 </li>
         <li><a href="ms_mint.html#module-ms_mint.targets">ms_mint.targets</a>
@@ -305,13 +317,6 @@
 </li>
       </ul></li>
       <li>
-    ms_mint.resampling
-
-      <ul>
-        <li><a href="ms_mint.html#module-ms_mint.resampling">module</a>
-</li>
-      </ul></li>
-      <li>
     ms_mint.standards
 
       <ul>
@@ -364,12 +369,14 @@
 </li>
       <li><a href="ms_mint.html#ms_mint.matplotlib_tools.plot_peak_shapes">plot_peak_shapes() (in module ms_mint.matplotlib_tools)</a>
 </li>
-      <li><a href="ms_mint.html#ms_mint.PlotGenerator.PlotGenerator">PlotGenerator (class in ms_mint.PlotGenerator)</a>
+      <li><a href="ms_mint.html#ms_mint.matplotlib_tools.plot_peaks">plot_peaks() (in module ms_mint.matplotlib_tools)</a>
 </li>
-      <li><a href="ms_mint.html#ms_mint.plotly_tools.plotly_heatmap">plotly_heatmap() (in module ms_mint.plotly_tools)</a>
+      <li><a href="ms_mint.html#ms_mint.PlotGenerator.PlotGenerator">PlotGenerator (class in ms_mint.PlotGenerator)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ms_mint.html#ms_mint.plotly_tools.plotly_heatmap">plotly_heatmap() (in module ms_mint.plotly_tools)</a>
+</li>
       <li><a href="ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes">plotly_peak_shapes() (in module ms_mint.plotly_tools)</a>
 </li>
       <li><a href="ms_mint.html#ms_mint.processing.process_ms1">process_ms1() (in module ms_mint.processing)</a>
@@ -394,12 +401,8 @@
 </li>
       <li><a href="ms_mint.html#ms_mint.targets.read_targets">read_targets() (in module ms_mint.targets)</a>
 </li>
-      <li><a href="ms_mint.html#ms_mint.resampling.Resampler.resample">resample() (ms_mint.resampling.Resampler method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ms_mint.html#ms_mint.resampling.Resampler">Resampler (class in ms_mint.resampling)</a>
-</li>
       <li><a href="ms_mint.html#ms_mint.Mint.Mint.reset">reset() (ms_mint.Mint.Mint method)</a>
 </li>
       <li><a href="ms_mint.html#ms_mint.Mint.Mint.results">results (ms_mint.Mint.Mint property)</a>
@@ -431,6 +434,10 @@
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ms_mint.html#ms_mint.targets.TargetOptimizer">TargetOptimizer (class in ms_mint.targets)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ms_mint.html#ms_mint.Mint.Mint.targets">targets (ms_mint.Mint.Mint property)</a>
 </li>

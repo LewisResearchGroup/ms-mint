@@ -74,9 +74,13 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
+<span class="kn">from</span> <span class="nn">.chromatogram</span> <span class="kn">import</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">,</span> <span class="n">Chromatogram</span>
+<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
 <span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">get_mz_mean_from_formulas</span><span class="p">,</span> <span class="n">df_diff</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">formula_to_mass</span><span class="p">,</span> <span class="n">df_diff</span>
 
 
 <div class="viewcode-block" id="read_targets"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.read_targets">[docs]</a><span class="k">def</span> <span class="nf">read_targets</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;negative&quot;</span><span class="p">):</span>
@@ -125,25 +129,53 @@
     <span class="k">assert</span> <span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="n">cols</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span>
     <span class="k">if</span> <span class="s2">&quot;formula&quot;</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s2">&quot;mz_mean&quot;</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;mz_mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_mz_mean_from_formulas</span><span class="p">(</span><span class="n">targets</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">],</span> <span class="n">ms_mode</span><span class="p">)</span>
+        <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;mz_mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formula_to_mass</span><span class="p">(</span><span class="n">targets</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">],</span> <span class="n">ms_mode</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;intensity_threshold&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
         <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;intensity_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="s2">&quot;mz_width&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
         <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;mz_width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="k">if</span> <span class="s2">&quot;target_filename&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
         <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;target_filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;rt_unit&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;rt_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;rt&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
             <span class="n">targets</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">targets</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">targets</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="k">del</span> <span class="n">c</span>
     <span class="k">if</span> <span class="s2">&quot;peak_label&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
         <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;C_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">))]</span>
     <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;intensity_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;intensity_threshold&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
     <span class="n">targets</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="p">[</span><span class="n">targets</span><span class="o">.</span><span class="n">mz_mean</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">fill_missing_rt_values</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+    <span class="n">convert_to_seconds</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">targets</span><span class="p">[</span><span class="n">TARGETS_COLUMNS</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="convert_to_seconds"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.convert_to_seconds">[docs]</a><span class="k">def</span> <span class="nf">convert_to_seconds</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">rt_unit</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
+            <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
+            <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">]:</span>
+                <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">60.0</span>
+            <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">]:</span>
+                <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">60.0</span>
+            <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]:</span>
+                <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">60.0</span></div>
+
+
+<div class="viewcode-block" id="fill_missing_rt_values"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.fill_missing_rt_values">[docs]</a><span class="k">def</span> <span class="nf">fill_missing_rt_values</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">rt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">rt_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">row</span><span class="o">.</span><span class="n">rt_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">rt_max</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="check_targets"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.check_targets">[docs]</a><span class="k">def</span> <span class="nf">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
@@ -160,8 +192,10 @@
         <span class="n">_check_target_list_columns_</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span>
         <span class="n">_check_labels_are_strings_</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span>
         <span class="n">_check_duplicated_labels_</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span>
-        <span class="n">_check_targets_rt_values_</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span>
     <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
 
 
@@ -183,14 +217,6 @@
 <span class="k">def</span> <span class="nf">_check_target_list_columns_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span> <span class="o">!=</span> <span class="n">TARGETS_COLUMNS</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Target columns are wrong.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">return</span> <span class="kc">True</span>
-
-
-<span class="k">def</span> <span class="nf">_check_targets_rt_values_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
-    <span class="n">missing_rt</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">targets</span><span class="p">[[</span><span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_rt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Some targets have missing rt_min or rt_max.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>
 
@@ -234,6 +260,70 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">df_diff</span><span class="p">(</span><span class="n">old_pklist</span><span class="p">,</span> <span class="n">new_pklist</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;_merge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;right_only&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;_merge&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TargetOptimizer"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer">[docs]</a><span class="k">class</span> <span class="nc">TargetOptimizer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ms1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span> <span class="s2">&quot;mz&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+
+<div class="viewcode-block" id="TargetOptimizer.find_rt_min_max"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.find_rt_min_max">[docs]</a>    <span class="k">def</span> <span class="nf">find_rt_min_max</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">minimum_intensity</span><span class="o">=</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span>
+        <span class="n">_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;peak_label&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">peak_label</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">_targets</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)):</span>
+
+            <span class="n">mz</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mz_mean</span>
+            <span class="n">rt</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt</span>
+
+            <span class="n">_slice</span> <span class="o">=</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms1</span><span class="p">,</span> <span class="n">mz</span><span class="p">)</span>
+
+            <span class="n">chrom</span> <span class="o">=</span> <span class="n">Chromatogram</span><span class="p">(</span>
+                <span class="n">_slice</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_slice</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="n">rt</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">chrom</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">minimum_intensity</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">chrom</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">()</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">()</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">select_peak_method1</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">optimise_peak_times_with_diff</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+
+            <span class="n">ndx</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">rt_min</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">]</span>
+            <span class="n">rt_max</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
+
+            <span class="n">_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_label</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span>
+
+            <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">chrom</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="se">\n</span><span class="s2">m/z=</span><span class="si">{</span><span class="n">mz</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">_targets</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fig</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 
            </div>

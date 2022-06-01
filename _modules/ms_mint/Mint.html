@@ -88,7 +88,7 @@
 <span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">MINT_RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
 <span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="n">process_ms1_files_in_parallel</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">export_to_excel</span>
-<span class="kn">from</span> <span class="nn">.targets</span> <span class="kn">import</span> <span class="n">read_targets</span><span class="p">,</span> <span class="n">check_targets</span><span class="p">,</span> <span class="n">standardize_targets</span>
+<span class="kn">from</span> <span class="nn">.targets</span> <span class="kn">import</span> <span class="n">read_targets</span><span class="p">,</span> <span class="n">check_targets</span><span class="p">,</span> <span class="n">standardize_targets</span><span class="p">,</span> <span class="n">TargetOptimizer</span>
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">scale_dataframe</span><span class="p">,</span> <span class="n">is_ms_file</span><span class="p">,</span> <span class="n">get_ms_files_from_results</span>
 
 
@@ -110,7 +110,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="n">ms_mint</span><span class="o">.</span><span class="n">__version__</span>
@@ -362,7 +362,7 @@
             <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;File not found (</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_targets_files</span> <span class="o">=</span> <span class="n">list_of_files</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set targets files to:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets_files</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set targets files to:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_targets_files</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">read_targets</span><span class="p">(</span><span class="n">list_of_files</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -384,7 +384,7 @@
     <span class="nd">@targets</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="n">standardize_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span> <span class="n">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span> <span class="o">=</span> <span class="n">targets</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set targets to:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -479,7 +479,9 @@
         <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.xlsx&quot;</span><span class="p">):</span>
             <span class="n">export_to_excel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">fn</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.parquet&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mint.load"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -492,27 +494,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading MINT state&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;xlsx&quot;</span><span class="p">):</span>
                 <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Results&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
                     <span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">results</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Peaklist&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span> <span class="o">=</span> <span class="n">get_ms_files_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">digest_results</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">None</span>
 
             <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
                 <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span><span class="p">)</span>
                 <span class="n">results</span><span class="p">[</span><span class="s2">&quot;peak_shape_rt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;peak_shape_rt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                 <span class="n">results</span><span class="p">[</span><span class="s2">&quot;peak_shape_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;peak_shape_int&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-                <span class="n">ms_files</span> <span class="o">=</span> <span class="n">get_ms_files_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
-                <span class="n">targets</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span>
-                    <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">TARGETS_COLUMNS</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-                <span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">results</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span> <span class="o">=</span> <span class="n">ms_files</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">digest_results</span><span class="p">()</span>
                 <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.parquet&quot;</span><span class="p">):</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;ms_file&quot;</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -524,6 +525,12 @@
             <span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
             <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Mint.digest_results"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.digest_results">[docs]</a>    <span class="k">def</span> <span class="nf">digest_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span>
+            <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">TARGETS_COLUMNS</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Mint.pca"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span>
@@ -585,7 +592,17 @@
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;PCA&quot;</span><span class="p">,</span>
             <span class="s2">&quot;feature_contributions&quot;</span><span class="p">:</span> <span class="n">dfc</span><span class="p">,</span>
             <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">pca</span><span class="p">,</span>
-        <span class="p">}</span></div></div>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Mint.find_rtmin_rtmax"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.find_rtmin_rtmax">[docs]</a>    <span class="k">def</span> <span class="nf">find_rtmin_rtmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span>
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">TargetOptimizer</span><span class="p">(</span><span class="n">fns</span><span class="o">=</span><span class="n">fns</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">find_rt_min_max</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">targets</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 
            </div>
