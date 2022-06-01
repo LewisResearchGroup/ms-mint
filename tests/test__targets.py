@@ -9,7 +9,7 @@ from ms_mint.targets import (
 from ms_mint.standards import TARGETS_COLUMNS
 from ms_mint import Mint
 
-from paths import TEST_TARGETS_FN, TEST_TARGETS_FN_V0_XLSX, TEST_TARGETS_FN_V0
+from paths import TEST_TARGETS_FN_V2_CSV_SEC, TEST_TARGETS_FN_V0_XLSX, TEST_TARGETS_FN_V0, TEST_TARGETS_FN_V1
 
 
 def test__read_targets():
@@ -32,9 +32,10 @@ def test__standardize_targets():
             "peak_label": {0: "A"},
             "mz_mean": {0: 100},
             "mz_width": {0: 10},
-            "rt_min": {0: 1},
-            "rt_max": {0: 2},
+            "rt_min": {0: 1 * 60},
+            "rt_max": {0: 2 * 60},
             "rt": {0: None},
+            "rt_unit": {0: "s"},
             "intensity_threshold": {0: 0},
             "target_filename": {0: "TEST"},
         },
@@ -43,7 +44,9 @@ def test__standardize_targets():
 
     result = standardize_targets(targets)
 
-    print(result)
+    print(expected.T)
+
+    print(result.T)
 
     assert result.equals(expected), result
 
@@ -55,28 +58,14 @@ def test__check_target__empty_list_ok():
 
 
 def test__check_targets_labels_not_string():
-    targets = read_targets(TEST_TARGETS_FN)
+    targets = read_targets(TEST_TARGETS_FN_V1)
     targets["peak_label"] = range(len(targets))
     result = check_targets(targets)
     assert result is False
 
 
-def test__check_targets_labels_missing_rtmax():
-    targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, "rt_max"] = None
-    result = check_targets(targets)
-    assert result is False
-
-
-def test__check_targets_labels_missing_rtmin():
-    targets = read_targets(TEST_TARGETS_FN)
-    targets.loc[0, "rt_min"] = None
-    result = check_targets(targets)
-    assert result is False
-
-
 def test__check_targets_labels_duplictated():
-    targets = read_targets(TEST_TARGETS_FN)
+    targets = read_targets(TEST_TARGETS_FN_V1)
     targets.loc[0, "peak_label"] = "A"
     targets.loc[1, "peak_label"] = "A"
     result = check_targets(targets)
@@ -84,7 +73,7 @@ def test__check_targets_labels_duplictated():
 
 
 def test__check_targets_wrong_column_names():
-    targets = read_targets(TEST_TARGETS_FN).rename(columns={"peak_label": "paek_label"})
+    targets = read_targets(TEST_TARGETS_FN_V1).rename(columns={"peak_label": "paek_label"})
     targets.loc[0, "peak_label"] = "A"
     targets.loc[1, "peak_label"] = "A"
     result = check_targets(targets)

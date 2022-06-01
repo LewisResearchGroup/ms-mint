@@ -29,8 +29,8 @@ def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
     """
     dmz = mz_mean * 1e-6 * mz_width
     chrom = df[(df["mz"] - mz_mean).abs() <= dmz].copy()
-    chrom["scan_time_min"] = chrom["scan_time_min"].round(3)
-    chrom = chrom.groupby("scan_time_min").max()
+    chrom["scan_time"] = chrom["scan_time"].round(3)
+    chrom = chrom.groupby("scan_time").max()
     return chrom["intensity"]
 
 
@@ -123,7 +123,7 @@ def _process_ms1_from_df_(df, targets):
     array_peaks = targets[peak_cols].values
     # if "ms_level" in df.columns:
     #    df = df[df.ms_level == 1]
-    array_data = df[["scan_time_min", "mz", "intensity"]].values
+    array_data = df[["scan_time", "mz", "intensity"]].values
     result = process_ms1_from_numpy(array_data, array_peaks)
     return result
 

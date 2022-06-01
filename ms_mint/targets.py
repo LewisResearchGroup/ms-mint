@@ -5,9 +5,13 @@ import numpy as np
 import logging
 
 from pathlib import Path as P
+from matplotlib import pyplot as plt
+from tqdm import tqdm
 
+from .chromatogram import extract_chromatogram_from_ms1, Chromatogram
+from .io import ms_file_to_df
 from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
-from .tools import get_mz_mean_from_formulas, df_diff
+from .tools import formula_to_mass, df_diff
 
 
 def read_targets(fns, ms_mode="negative"):
@@ -56,25 +60,53 @@ def standardize_targets(targets, ms_mode="neutral"):
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
     if "formula" in targets.columns and not "mz_mean" in targets.columns:
-        targets["mz_mean"] = get_mz_mean_from_formulas(targets["formula"], ms_mode)
+        targets["mz_mean"] = formula_to_mass(targets["formula"], ms_mode)
     if "intensity_threshold" not in cols:
         targets["intensity_threshold"] = 0
     if "mz_width" not in cols:
         targets["mz_width"] = 10
     if "target_filename" not in cols:
         targets["target_filename"] = "unknown"
+    if "rt_unit" not in targets.columns:
+        targets["rt_unit"] = "min"
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
             targets[c] = None
+            targets[c] = targets[c].astype(float)
     del c
     if "peak_label" not in cols:
         targets["peak_label"] = [f"C_{i}" for i in range(len(targets))]
     targets["intensity_threshold"] = targets["intensity_threshold"].fillna(0)
     targets["peak_label"] = targets["peak_label"].astype(str)
+
     targets.index = range(len(targets))
     targets = targets[targets.mz_mean.notna()]
     targets = targets.replace(np.NaN, None)
+    fill_missing_rt_values(targets)
+    convert_to_seconds(targets)
     return targets[TARGETS_COLUMNS]
+
+
+def convert_to_seconds(targets):
+    for ndx, row in targets.iterrows():
+        if row.rt_unit == "min":
+            targets.loc[ndx, "rt_unit"] = "s"
+            if targets.loc[ndx, "rt"]:
+                targets.loc[ndx, "rt"] *= 60.0
+            if targets.loc[ndx, "rt_min"]:
+                targets.loc[ndx, "rt_min"] *= 60.0
+            if targets.loc[ndx, "rt_max"]:
+                targets.loc[ndx, "rt_max"] *= 60.0
+
+
+def fill_missing_rt_values(targets):
+    for ndx, row in targets.iterrows():
+        if (
+            (row.rt is None)
+            and (row.rt_min is not None)
+            and (not row.rt_max is not None)
+        ):
+            targets.loc[ndx, "rt"] = np.mean(row.rt_min, row.rt_max)
 
 
 def check_targets(targets):
@@ -91,8 +123,10 @@ def check_targets(targets):
         _check_target_list_columns_(targets),
         _check_labels_are_strings_(targets),
         _check_duplicated_labels_(targets),
-        _check_targets_rt_values_(targets),
     )
+    result = all(results)
+    if not result:
+        print(results)
     return all(results)
 
 
@@ -114,14 +148,6 @@ def _check_duplicated_labels_(targets):
 def _check_target_list_columns_(targets):
     if targets.columns.to_list() != TARGETS_COLUMNS:
         logging.warning("Target columns are wrong.")
-        return False
-    return True
-
-
-def _check_targets_rt_values_(targets):
-    missing_rt = targets.loc[targets[["rt_min", "rt_max"]].isna().max(axis=1)]
-    if len(missing_rt) != 0:
-        logging.warning("Some targets have missing rt_min or rt_max.")
         return False
     return True
 
@@ -165,3 +191,67 @@ def diff_targets(old_pklist, new_pklist):
     df = df_diff(old_pklist, new_pklist)
     df = df[df["_merge"] == "right_only"]
     return df.drop("_merge", axis=1)
+
+
+class TargetOptimizer:
+    def __init__(self, fns, targets):
+        self.ms1 = pd.concat([ms_file_to_df(fn) for fn in fns]).sort_values(
+            ["scan_time", "mz"]
+        )
+        self.targets = targets
+
+    def find_rt_min_max(
+        self, minimum_intensity=1e4, plot=True, sigma=20, window=20, filters=None
+    ):
+
+        targets = self.targets
+        _targets = self.targets.set_index("peak_label")
+
+        if plot:
+            fig = plt.figure(figsize=(30, 20))
+
+        i = 0
+        for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
+
+            mz = row.mz_mean
+            rt = row.rt
+
+            _slice = extract_chromatogram_from_ms1(self.ms1, mz)
+
+            chrom = Chromatogram(
+                _slice.index, _slice.values, expected_rt=rt, filters=filters
+            )
+
+            if chrom.x.max() < minimum_intensity:
+                continue
+
+            chrom.apply_filter()
+            chrom.find_peaks()
+            chrom.select_peak_method1(rt, sigma)
+            chrom.optimise_peak_times_with_diff(window)
+
+            ndx = chrom.selected_peak_ndxs[0]
+            rt_min = chrom.peaks.at[ndx, "rt_min"]
+            rt_max = chrom.peaks.at[ndx, "rt_max"]
+
+            _targets.loc[peak_label, ["rt_min", "rt_max"]] = rt_min, rt_max
+
+            if plot:
+                i += 1
+
+                if i <= 100:
+                    plt.subplot(10, 10, i)
+                    chrom.plot()
+                    plt.gca().get_legend().remove()
+                    plt.title(f"{peak_label}\nm/z={mz:.3f}")
+
+                if i == 100:
+                    plt.show()
+
+        targets = _targets.reset_index()
+        self.targets = targets
+
+        if plot:
+            return self, fig
+        else:
+            return self

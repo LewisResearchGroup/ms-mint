@@ -132,8 +132,8 @@ def plot_peak_shapes(
     mint_results,
     ms_files=None,
     peak_labels=None,
-    height=4,
-    aspect=1,
+    height=2,
+    aspect=1.5,
     legend=False,
     col_wrap=4,
     hue="ms_file",
@@ -177,6 +177,8 @@ def plot_peak_shapes(
     # fig = plt.figure(dpi=dpi)
 
     R = mint_results.copy()
+    R = R[R.peak_area > 0]
+    R['peak_label'] = R['peak_label']
 
     if peak_labels is not None:
         if isinstance(peak_labels, str):
@@ -196,12 +198,15 @@ def plot_peak_shapes(
             peak_rt = [float(i) for i in row.peak_shape_rt.split(",")]
             peak_int = [float(i) for i in row.peak_shape_int.split(",")]
             ms_file = row.ms_file
+            mz = row.mz_mean
+            rt = row.rt
             df = pd.DataFrame(
                 {
-                    "Retention Time [min]": peak_rt,
-                    "MS-Intensity": peak_int,
+                    "Scan time [s]": peak_rt,
+                    "Intensity": peak_int,
                     "ms_file": ms_file,
-                    "peak_label": peak_label,
+                    "peak_label": peak_label + f'\nm/z={mz:.3f}',
+                    "Expected Scan Time": rt
                 }
             )
             dfs.append(df)
@@ -210,8 +215,8 @@ def plot_peak_shapes(
 
     g = sns.relplot(
         data=df,
-        x="Retention Time [min]",
-        y="MS-Intensity",
+        x="Scan time [s]",
+        y="Intensity",
         hue=hue,
         col="peak_label",
         kind="line",
@@ -232,3 +237,42 @@ def plot_peak_shapes(
         g.fig.suptitle(title, y=1.01)
 
     return g
+
+
+def plot_peaks(
+    series, peaks, highlight=None, expected_rt=None, weights=None, legend=True
+):
+    if highlight is None:
+        highlight = []
+    ax = plt.gca()
+    series.plot(ax=ax, color="black", label="Intensity")
+    if peaks is not None:
+        series.iloc[peaks.ndxs].plot(
+            label="Peaks", marker="x", y="intensity", lw=0, ax=ax
+        )
+        for i, (
+            ndx,
+            (_, rt, rt_span, peak_base_height, peak_height, rt_min, rt_max),
+        ) in enumerate(peaks.iterrows()):
+            if ndx in highlight:
+                plt.axvspan(rt_min, rt_max, color="green", alpha=0.25, label="Selected")
+            plt.hlines(
+                peak_base_height,
+                rt_min,
+                rt_max,
+                color="orange",
+                label="Peak width" if i == 0 else None,
+            )
+    if expected_rt is not None:
+        plt.axvspan(
+            expected_rt, expected_rt + 1, color="blue", alpha=1, label="Expected Rt"
+        )
+    if weights is not None:
+        plt.plot(weights, linestyle="--", label="Gaussian weight")
+    plt.ylabel("Intensity")
+    plt.xlabel("Scan Time [s]")
+    ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+    plt.ylim((0.1, None))
+    if not legend:
+        ax.get_legend().remove()
+    return plt.gcf()
