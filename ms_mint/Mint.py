@@ -9,6 +9,7 @@ import time
 import logging
 
 from pathlib import Path as P
+from tqdm import tqdm
 
 from sklearn.decomposition import PCA
 
@@ -19,7 +20,7 @@ from ms_mint.PlotGenerator import PlotGenerator
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
-from .targets import read_targets, check_targets, standardize_targets
+from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
 from .tools import scale_dataframe, is_ms_file, get_ms_files_from_results
 
 
@@ -522,3 +523,13 @@ class Mint(object):
             "feature_contributions": dfc,
             "class": pca,
         }
+
+    def find_rtmin_rtmax(self, fns=None, targets=None, **kwargs):
+        if fns is None:
+            fns = self.ms_files
+        if targets is None:
+            targets = self.targets
+        opt = TargetOptimizer(fns=fns, targets=targets)
+        opt.find_rt_min_max(**kwargs)
+        self.targets = opt.targets
+        return self
