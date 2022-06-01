@@ -132,8 +132,8 @@ def plot_peak_shapes(
     mint_results,
     ms_files=None,
     peak_labels=None,
-    height=4,
-    aspect=1,
+    height=2,
+    aspect=1.5,
     legend=False,
     col_wrap=4,
     hue="ms_file",
@@ -199,8 +199,8 @@ def plot_peak_shapes(
             ms_file = row.ms_file
             df = pd.DataFrame(
                 {
-                    "Retention Time [min]": peak_rt,
-                    "MS-Intensity": peak_int,
+                    "Scan time [s]": peak_rt,
+                    "Intensity": peak_int,
                     "ms_file": ms_file,
                     "peak_label": peak_label,
                 }
@@ -211,8 +211,8 @@ def plot_peak_shapes(
 
     g = sns.relplot(
         data=df,
-        x="Retention Time [min]",
-        y="MS-Intensity",
+        x="Scan time [s]",
+        y="Intensity",
         hue=hue,
         col="peak_label",
         kind="line",

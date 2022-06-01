@@ -6,6 +6,7 @@ import logging
 
 from pathlib import Path as P
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 from .chromatogram import extract_chromatogram_from_ms1, Chromatogram
 from .io import ms_file_to_df
@@ -236,10 +237,10 @@ class TargetOptimizer():
                 i += 1
 
                 if i<=100:
-                    subplot(10, 10, i)                       
+                    plt.subplot(10, 10, i)                       
                     chrom.plot()
-                    gca().get_legend().remove()
-                    title(f'{peak_label}\nm/z={mz:.3f}')
+                    plt.gca().get_legend().remove()
+                    plt.title(f'{peak_label}\nm/z={mz:.3f}')
 
                 if i == 100:
                     plt.show()
