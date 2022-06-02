@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy.ndimage import gaussian_filter1d
 
 
 class Resampler:
@@ -27,3 +28,13 @@ class Smoother:
         new_t = tranformed.index
         new_x = tranformed.values
         return new_t, new_x
+
+
+class GaussFilter():
+    def __init__(self, sigma=5):
+        self.sigma = sigma
+        
+    def transform(self, t, x):
+        new_x = gaussian_filter1d(x, sigma=self.sigma)
+        return t, new_x
+     
