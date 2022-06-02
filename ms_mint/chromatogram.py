@@ -22,7 +22,7 @@ class Chromatogram:
             self.x = np.append(self.x, intensities)
         self.noise_level = None
         if filter is None:
-            self.filter = [Resampler(), GaussFilter()]
+            self.filter = [Resampler(), GaussFilter(), Smoother()]
         else:
             self.filter = filter
         self.peaks = None
