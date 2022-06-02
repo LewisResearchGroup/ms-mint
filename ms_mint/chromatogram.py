@@ -6,25 +6,25 @@ from matplotlib import pyplot as plt
 
 from .tools import find_peaks_in_timeseries, gaussian
 from .io import ms_file_to_df
-from .filter import Resampler, Smoother
+from .filter import Resampler, Smoother, GaussFilter
 from .matplotlib_tools import plot_peaks
 
 
 class Chromatogram:
     def __init__(
-        self, scan_times=None, intensities=None, filters=None, expected_rt=None
+        self, scan_times=None, intensities=None, filter=None, expected_rt=None
     ):
-        self.t = None
-        self.x = None
+        self.t = np.array([0])
+        self.x = np.array([0])
         if scan_times is not None:
-            self.t = np.array(scan_times)
+            self.t = np.append(self.t, scan_times)
         if intensities is not None:
-            self.x = intensities
+            self.x = np.append(self.x, intensities)
         self.noise_level = None
-        if filters is None:
-            self.filters = [Resampler(), Smoother()]
+        if filter is None:
+            self.filter = [Resampler(), GaussFilter()]
         else:
-            self.filters = filters
+            self.filter = filter
         self.peaks = None
         self.selected_peak_ndxs = None
         self.expected_rt = expected_rt
@@ -32,8 +32,8 @@ class Chromatogram:
 
     def from_file(self, fn, mz_mean, mz_width=10, expected_rt=None):
         chrom = get_chromatogram_from_ms_file(fn, mz_mean=mz_mean, mz_width=mz_width)
-        self.t = chrom.index
-        self.x = chrom.values
+        self.t = np.append(self.t, chrom.index)
+        self.x = np.append(self.x, chrom.values)
         if expected_rt is not None:
             self.expected_rt = expected_rt
 
@@ -42,7 +42,7 @@ class Chromatogram:
         self.noise_level = data.rolling(window, center=True).std().median()
 
     def apply_filter(self):
-        for filt in self.filters:
+        for filt in self.filter:
             self.t, self.x = filt.transform(self.t, self.x)
 
     def find_peaks(self, prominence=None):

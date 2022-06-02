@@ -194,18 +194,58 @@ def diff_targets(old_pklist, new_pklist):
 
 
 class TargetOptimizer:
+    """
+    Optimizer for target lists.
+
+    :param fns: Names of filen to use for optimization.
+    :type fns: List[str or PosixPath]
+    :param targets: MINT target list.
+    :type targets: pandas.DataFrame
+    """
     def __init__(self, fns, targets):
+        """
+        Optimizer for target lists.
+
+        :param fns: Names of filen to use for optimization.
+        :type fns: List[str or PosixPath]
+        :param targets: MINT target list.
+        :type targets: pandas.DataFrame
+        """
         self.ms1 = pd.concat([ms_file_to_df(fn) for fn in fns]).sort_values(
             ["scan_time", "mz"]
         )
         self.targets = targets
 
     def find_rt_min_max(
-        self, minimum_intensity=1e4, plot=True, sigma=20, window=20, filters=None
+        self, peak_labels=None, minimum_intensity=1e4, plot=True, sigma=20, filter=None, post_opt=False, post_opt_kwargs=None, **kwargs,
     ):
+        """
+        Optimize rt_min and rt_max values based on expected retention times (rt).
+        For this optimization all rt values in the target list must be present.
+
+        :param peak_labels: Subset of peak_labels to optimize, defaults to None
+        :type peak_labels: List[str or PosixPath], optional
+        :param minimum_intensity: Minimum intensity required, otherwise skip target, defaults to 1e4
+        :type minimum_intensity: float, optional
+        :param plot: Whether or not to plot first 100 optimizations, defaults to True
+        :type plot: bool, optional
+        :param sigma: Sigma value for peak selection, defaults to 20
+        :type sigma: float, optional
+        :param filter: Filter instances to apply in respective order, defaults to None
+        :type filter: ms_mint.filter.Filter, optional
+        :param post_opt: Optimize retention times after peak selection, defaults to False
+        :type post_opt: bool, optional
+        :param post_opt_kwargs: _description_, defaults to 20
+        :type post_opt_kwargs: int, optional
+        :return: (self, None) or (self, matplotlib.pyplot.Figure) if plot==True 
+        :rtype: tuple
+        """
 
         targets = self.targets
         _targets = self.targets.set_index("peak_label")
+
+        if peak_labels is not None:
+            _targets = _targets.loc[peak_labels]
 
         if plot:
             fig = plt.figure(figsize=(60, 30))
@@ -219,7 +259,7 @@ class TargetOptimizer:
             _slice = extract_chromatogram_from_ms1(self.ms1, mz)
 
             chrom = Chromatogram(
-                _slice.index, _slice.values, expected_rt=rt, filters=filters
+                _slice.index, _slice.values, expected_rt=rt, filter=filter
             )
 
             if chrom.x.max() < minimum_intensity:
@@ -228,7 +268,9 @@ class TargetOptimizer:
             chrom.apply_filter()
             chrom.find_peaks()
             chrom.select_peak_with_gaussian_weight(rt, sigma)
-            chrom.optimise_peak_times_with_diff(window)
+            
+            if post_opt:
+                chrom.optimise_peak_times_with_diff(**post_opt_kwargs)
 
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
@@ -247,7 +289,6 @@ class TargetOptimizer:
 
                 if i == 100:
                     plt.tight_layout()
-                    plt.show()
 
         targets = _targets.reset_index()
         self.targets = targets
@@ -255,4 +296,4 @@ class TargetOptimizer:
         if plot:
             return self, fig
         else:
-            return self
+            return self, None

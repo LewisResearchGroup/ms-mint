@@ -132,7 +132,7 @@ def plot_peak_shapes(
     mint_results,
     ms_files=None,
     peak_labels=None,
-    height=2,
+    height=3,
     aspect=1.5,
     legend=False,
     col_wrap=4,
