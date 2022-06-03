@@ -202,6 +202,7 @@ class TargetOptimizer:
     :param targets: MINT target list.
     :type targets: pandas.DataFrame
     """
+
     def __init__(self, fns, targets):
         """
         Optimizer for target lists.
@@ -211,13 +212,23 @@ class TargetOptimizer:
         :param targets: MINT target list.
         :type targets: pandas.DataFrame
         """
-        self.ms1 = pd.concat([ms_file_to_df(fn) for fn in fns]).sort_values(
-            ["scan_time", "mz"]
+        self.ms1 = (
+            pd.concat([ms_file_to_df(fn) for fn in fns])
+            .sort_values(["scan_time", "mz"])
         )
         self.targets = targets
 
     def find_rt_min_max(
-        self, peak_labels=None, minimum_intensity=1e4, plot=True, sigma=20, filter=None, post_opt=False, post_opt_kwargs=None, **kwargs,
+        self,
+        peak_labels=None,
+        minimum_intensity=1e4,
+        plot=True,
+        sigma=20,
+        filter=None,
+        post_opt=False,
+        post_opt_kwargs=None,
+        rel_height=0.9,
+        **kwargs,
     ):
         """
         Optimize rt_min and rt_max values based on expected retention times (rt).
@@ -237,7 +248,7 @@ class TargetOptimizer:
         :type post_opt: bool, optional
         :param post_opt_kwargs: _description_, defaults to 20
         :type post_opt_kwargs: int, optional
-        :return: (self, None) or (self, matplotlib.pyplot.Figure) if plot==True 
+        :return: (self, None) or (self, matplotlib.pyplot.Figure) if plot==True
         :rtype: tuple
         """
 
@@ -256,7 +267,7 @@ class TargetOptimizer:
             mz = row.mz_mean
             rt = row.rt
 
-            _slice = extract_chromatogram_from_ms1(self.ms1, mz)
+            _slice = extract_chromatogram_from_ms1(self.ms1, mz).groupby("scan_time").sum()
 
             chrom = Chromatogram(
                 _slice.index, _slice.values, expected_rt=rt, filter=filter
@@ -266,10 +277,12 @@ class TargetOptimizer:
                 continue
 
             chrom.apply_filter()
-            chrom.find_peaks()
+            chrom.find_peaks(rel_height=rel_height)
             chrom.select_peak_with_gaussian_weight(rt, sigma)
-            
+
             if post_opt:
+                if post_opt_kwargs is None: 
+                    post_opt_kwargs = {}
                 chrom.optimise_peak_times_with_diff(**post_opt_kwargs)
 
             ndx = chrom.selected_peak_ndxs[0]

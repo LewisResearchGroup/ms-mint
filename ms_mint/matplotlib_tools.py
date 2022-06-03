@@ -141,7 +141,7 @@ def plot_peak_shapes(
     dpi=None,
     sharex=False,
     sharey=False,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot peak shapes of mint results.
@@ -178,7 +178,7 @@ def plot_peak_shapes(
 
     R = mint_results.copy()
     R = R[R.peak_area > 0]
-    R['peak_label'] = R['peak_label']
+    R["peak_label"] = R["peak_label"]
 
     if peak_labels is not None:
         if isinstance(peak_labels, str):
@@ -205,8 +205,8 @@ def plot_peak_shapes(
                     "Scan time [s]": peak_rt,
                     "Intensity": peak_int,
                     "ms_file": ms_file,
-                    "peak_label": peak_label + f'\nm/z={mz:.3f}',
-                    "Expected Scan Time": rt
+                    "peak_label": peak_label + f"\nm/z={mz:.3f}",
+                    "Expected Scan Time": rt,
                 }
             )
             dfs.append(df)
@@ -225,7 +225,7 @@ def plot_peak_shapes(
         aspect=aspect,
         facet_kws=dict(sharex=sharex, sharey=sharey),
         legend=legend,
-        **kwargs
+        **kwargs,
     )
 
     g.set_titles(row_template="{row_name}", col_template="{col_name}")

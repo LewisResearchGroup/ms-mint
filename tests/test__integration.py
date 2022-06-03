@@ -3,7 +3,13 @@ import pandas as pd
 from ms_mint.Mint import Mint
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 
-from paths import TEST_MZML, TEST_MZXML, TEST_TARGETS_FN_V2_CSV_SEC, TEST_TARGETS_FN_V0, TEST_TARGETS_FN_V1
+from paths import (
+    TEST_MZML,
+    TEST_MZXML,
+    TEST_TARGETS_FN_V2_CSV_SEC,
+    TEST_TARGETS_FN_V0,
+    TEST_TARGETS_FN_V1,
+)
 
 
 mint = Mint(verbose=True)

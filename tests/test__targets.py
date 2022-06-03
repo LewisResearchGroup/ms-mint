@@ -9,7 +9,12 @@ from ms_mint.targets import (
 from ms_mint.standards import TARGETS_COLUMNS
 from ms_mint import Mint
 
-from paths import TEST_TARGETS_FN_V2_CSV_SEC, TEST_TARGETS_FN_V0_XLSX, TEST_TARGETS_FN_V0, TEST_TARGETS_FN_V1
+from paths import (
+    TEST_TARGETS_FN_V2_CSV_SEC,
+    TEST_TARGETS_FN_V0_XLSX,
+    TEST_TARGETS_FN_V0,
+    TEST_TARGETS_FN_V1,
+)
 
 
 def test__read_targets():
@@ -73,7 +78,9 @@ def test__check_targets_labels_duplictated():
 
 
 def test__check_targets_wrong_column_names():
-    targets = read_targets(TEST_TARGETS_FN_V1).rename(columns={"peak_label": "paek_label"})
+    targets = read_targets(TEST_TARGETS_FN_V1).rename(
+        columns={"peak_label": "paek_label"}
+    )
     targets.loc[0, "peak_label"] = "A"
     targets.loc[1, "peak_label"] = "A"
     result = check_targets(targets)
