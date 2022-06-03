@@ -271,6 +271,7 @@
 <span class="sd">    :param targets: MINT target list.</span>
 <span class="sd">    :type targets: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="TargetOptimizer.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Optimizer for target lists.</span>
@@ -280,13 +281,23 @@
 <span class="sd">        :param targets: MINT target list.</span>
 <span class="sd">        :type targets: pandas.DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ms1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
-            <span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span> <span class="s2">&quot;mz&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ms1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span> <span class="s2">&quot;mz&quot;</span><span class="p">])</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span></div>
 
 <div class="viewcode-block" id="TargetOptimizer.find_rt_min_max"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.find_rt_min_max">[docs]</a>    <span class="k">def</span> <span class="nf">find_rt_min_max</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minimum_intensity</span><span class="o">=</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">post_opt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">post_opt_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">minimum_intensity</span><span class="o">=</span><span class="mf">1e4</span><span class="p">,</span>
+        <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">post_opt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">post_opt_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">rel_height</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Optimize rt_min and rt_max values based on expected retention times (rt).</span>
@@ -306,7 +317,7 @@
 <span class="sd">        :type post_opt: bool, optional</span>
 <span class="sd">        :param post_opt_kwargs: _description_, defaults to 20</span>
 <span class="sd">        :type post_opt_kwargs: int, optional</span>
-<span class="sd">        :return: (self, None) or (self, matplotlib.pyplot.Figure) if plot==True </span>
+<span class="sd">        :return: (self, None) or (self, matplotlib.pyplot.Figure) if plot==True</span>
 <span class="sd">        :rtype: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -325,7 +336,7 @@
             <span class="n">mz</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mz_mean</span>
             <span class="n">rt</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt</span>
 
-            <span class="n">_slice</span> <span class="o">=</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms1</span><span class="p">,</span> <span class="n">mz</span><span class="p">)</span>
+            <span class="n">_slice</span> <span class="o">=</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms1</span><span class="p">,</span> <span class="n">mz</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;scan_time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
             <span class="n">chrom</span> <span class="o">=</span> <span class="n">Chromatogram</span><span class="p">(</span>
                 <span class="n">_slice</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_slice</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="n">rt</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span>
@@ -335,10 +346,12 @@
                 <span class="k">continue</span>
 
             <span class="n">chrom</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">()</span>
-            <span class="n">chrom</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">()</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">rel_height</span><span class="o">=</span><span class="n">rel_height</span><span class="p">)</span>
             <span class="n">chrom</span><span class="o">.</span><span class="n">select_peak_with_gaussian_weight</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
-            
+
             <span class="k">if</span> <span class="n">post_opt</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">post_opt_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+                    <span class="n">post_opt_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">chrom</span><span class="o">.</span><span class="n">optimise_peak_times_with_diff</span><span class="p">(</span><span class="o">**</span><span class="n">post_opt_kwargs</span><span class="p">)</span>
 
             <span class="n">ndx</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
