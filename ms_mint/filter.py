@@ -30,11 +30,10 @@ class Smoother:
         return new_t, new_x
 
 
-class GaussFilter():
+class GaussFilter:
     def __init__(self, sigma=5):
         self.sigma = sigma
-        
+
     def transform(self, t, x):
         new_x = gaussian_filter1d(x, sigma=self.sigma)
         return t, new_x
-     

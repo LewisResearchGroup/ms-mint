@@ -40,7 +40,7 @@ def test__Chromatogram__with_filters_identifies_peaks_correctly():
     chrom.apply_filter()
     chrom.find_peaks()
     rt_peak_1_pred, rt_peak_2_pred = chrom.peaks.rt.values
-    
+
     max_diff = max(abs(rt_peak_1 - rt_peak_1_pred), abs(rt_peak_2 - rt_peak_2_pred))
 
     assert max_diff < 1
@@ -73,7 +73,9 @@ def test__Chromatogram__select_peak_by_rt():
     x = np.arange(0, 1000)
     y = gaussian(x, rt_peak_1, 20) * 5e6 + gaussian(x, rt_peak_2, 100) * 5e5
 
-    chrom = Chromatogram(scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_1)
+    chrom = Chromatogram(
+        scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_1
+    )
     chrom.find_peaks()
     chrom.select_peak_by_rt()
     selected_ndx = chrom.selected_peak_ndxs
@@ -91,7 +93,9 @@ def test__Chromatogram__select_peak_by_rt():
     x = np.arange(0, 1000)
     y = gaussian(x, rt_peak_1, 20) * 5e6 + gaussian(x, rt_peak_2, 100) * 5e5
 
-    chrom = Chromatogram(scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_1)
+    chrom = Chromatogram(
+        scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_1
+    )
     chrom.find_peaks()
     chrom.select_peak_by_rt(rt_peak_2)
     selected_ndx = chrom.selected_peak_ndxs
@@ -109,7 +113,9 @@ def test__Chromatogram__select_highest():
     x = np.arange(0, 1000)
     y = gaussian(x, rt_peak_1, 20) * 5e6 + gaussian(x, rt_peak_1, 100) * 5e5
 
-    chrom = Chromatogram(scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_2)
+    chrom = Chromatogram(
+        scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_2
+    )
     chrom.find_peaks()
     chrom.select_peak_by_highest_intensity()
     selected_ndx = chrom.selected_peak_ndxs
@@ -117,7 +123,6 @@ def test__Chromatogram__select_highest():
     expected_ndx = [0]
 
     assert selected_ndx == expected_ndx, selected_ndx
-
 
 
 def test__Chromatogram__select_peak_with_gaussian_prefers_higher_peak():
@@ -132,9 +137,14 @@ def test__Chromatogram__select_peak_with_gaussian_prefers_higher_peak():
 
     # Gaussian mixture
     x = np.arange(0, 1000)
-    y = gaussian(x, higher_peak_rt, 200) * higher_peak_in + gaussian(x, lower__peak_rt, 100) * lower__peak_in
+    y = (
+        gaussian(x, higher_peak_rt, 200) * higher_peak_in
+        + gaussian(x, lower__peak_rt, 100) * lower__peak_in
+    )
 
-    chrom = Chromatogram(scan_times=x, intensities=y, filters=None, expected_rt=expected_rt)
+    chrom = Chromatogram(
+        scan_times=x, intensities=y, filters=None, expected_rt=expected_rt
+    )
     chrom.find_peaks()
     chrom.select_peak_with_gaussian_weight()
     selected_ndx = chrom.selected_peak_ndxs
@@ -144,18 +154,17 @@ def test__Chromatogram__select_peak_with_gaussian_prefers_higher_peak():
     assert selected_ndx == expected_ndx, selected_ndx
 
 
-
 def test__Chromatogram__plot_runs_without_error_return_figure():
 
     peak_rt = 400
     peak_in = 5e6
-   
+
     x = np.arange(0, 1000)
-    y = gaussian(x, peak_rt, 200) * peak_in 
+    y = gaussian(x, peak_rt, 200) * peak_in
 
     chrom = Chromatogram(scan_times=x, intensities=y, filters=None)
     chrom.find_peaks()
-    
+
     fig = chrom.plot()
 
     assert isinstance(fig, plt.Figure), type(fig)
@@ -173,7 +182,7 @@ def test__Chromatogram_from_files_runs_through():
     print(chrom.data)
     print(peaks)
 
-    assert len(peaks) != 0 
+    assert len(peaks) != 0
 
 
 def test__Chromatogram__optimise_peak_times_with_diff_with_plot():
@@ -184,20 +193,24 @@ def test__Chromatogram__optimise_peak_times_with_diff_with_plot():
     x = np.arange(0, 1000)
     y = gaussian(x, rt_peak_1, 20) * 5e6 + gaussian(x, rt_peak_1, 100) * 5e5
 
-    chrom = Chromatogram(scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_2)
+    chrom = Chromatogram(
+        scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_2
+    )
     chrom.find_peaks()
     chrom.optimise_peak_times_with_diff(plot=True)
 
 
 def test__Chromatogram__data():
-    
+
     rt_peak_1 = 200
     rt_peak_2 = 500
 
     x = np.arange(0, 1000)
     y = gaussian(x, rt_peak_1, 20) * 5e6 + gaussian(x, rt_peak_1, 100) * 5e5
 
-    chrom = Chromatogram(scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_2)
+    chrom = Chromatogram(
+        scan_times=x, intensities=y, filters=None, expected_rt=rt_peak_2
+    )
 
     data = chrom.data
 

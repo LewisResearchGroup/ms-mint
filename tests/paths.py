@@ -2,9 +2,13 @@ import os
 from pathlib import Path as P
 
 
-TEST_MZXML = os.path.abspath(os.path.join("tests", "data", "ms_files", "HILICNeg15_StdH1.mzXML"))
+TEST_MZXML = os.path.abspath(
+    os.path.join("tests", "data", "ms_files", "HILICNeg15_StdH1.mzXML")
+)
 
-TEST_MZML = os.path.abspath(os.path.join("tests", "data", "ms_files", "HILICNeg15_StdH1.mzML"))
+TEST_MZML = os.path.abspath(
+    os.path.join("tests", "data", "ms_files", "HILICNeg15_StdH1.mzML")
+)
 
 
 TEST_MZML_POS = os.path.abspath(
@@ -27,17 +31,13 @@ TEST_MZMLB_POS = os.path.abspath(
     os.path.join("tests", "data", "ms_files", "test-pos.mzMLb")
 )
 
-TEST_TARGETS_FN_V0 = os.path.abspath(
-    os.path.join("tests", "data", "targets", "v0.csv")
-)
+TEST_TARGETS_FN_V0 = os.path.abspath(os.path.join("tests", "data", "targets", "v0.csv"))
 
 TEST_TARGETS_FN_V0_XLSX = os.path.abspath(
     os.path.join("tests", "data", "targets", "v0.xlsx")
 )
 
-TEST_TARGETS_FN_V1 = os.path.abspath(
-    os.path.join("tests", "data", "targets", "v1.csv")
-)
+TEST_TARGETS_FN_V1 = os.path.abspath(os.path.join("tests", "data", "targets", "v1.csv"))
 
 TEST_TARGETS_FN_V2_CSV_MIN = os.path.abspath(
     os.path.join("tests", "data", "targets", "v2__HILICNeg15_StdH1_min.csv")

@@ -45,12 +45,12 @@ class Chromatogram:
         for filt in self.filter:
             self.t, self.x = filt.transform(self.t, self.x)
 
-    def find_peaks(self, prominence=None):
+    def find_peaks(self, prominence=None, rel_height=0.9):
         self.estimate_noise_level()
         if prominence is None:
             prominence = self.noise_level * 3
         self.peaks = find_peaks_in_timeseries(
-            self.data.intensity, prominence=prominence
+            self.data.intensity, prominence=prominence, rel_height=rel_height,
         )
 
     def optimise_peak_times_with_diff(self, rolling_window=20, plot=False):
@@ -112,7 +112,7 @@ class Chromatogram:
         if expected_rt is None:
             expected_rt = self.expected_rt
         else:
-            self.expected_rt = expected_rt        
+            self.expected_rt = expected_rt
         if peaks is None or len(peaks) == 0:
             logging.warning("No peaks available to select.")
             return None
