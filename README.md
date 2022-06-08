@@ -87,13 +87,13 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
     mint.run()
 
-![](notebooks/peak-shapes-after-opt.png =100x100)
+![](notebooks/peak-shapes-after-opt.png=100x100)
 
 ## Hierarchical clustering
 
     mint.plot.hierarchical_clustering()
 
-![](notebooks/hierarchical_clustering.png =1000x1000)
+![](notebooks/hierarchical_clustering.png)
 
 ## Principal Components Analysis
 
