@@ -12,7 +12,7 @@ from .matplotlib_tools import plot_peak_shapes, hierarchical_clustering
 from .tools import scale_dataframe
 
 
-class PlotGenerator:
+class MintResultsPlotter:
     """Plot generator for mint.results.
 
     :param mint: Mint instance
@@ -172,48 +172,4 @@ class PlotGenerator:
                 correlation=correlation,
             )
 
-    def pca_cumulative_variance(self):
-        """After running mint.pca() this function can be used to plot the cumulative variance of the
-        principal components.
-
-        :return: Returns a matplotlib figure.
-        :rtype: plt.figure
-        """
-        n_vars = self.mint.decomposition_results["n_components"]
-        fig = plt.figure(figsize=(7, 3), dpi=300)
-        cum_expl_var = self.mint.decomposition_results["cum_expl_var"]
-        plt.bar(np.arange(n_vars) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
-        plt.xlabel("Principal Component")
-        plt.ylabel("Explained variance [%]")
-        plt.title("Cumulative explained variance")
-        plt.grid()
-        plt.xticks(range(1, len(cum_expl_var) + 1))
-        return fig
-
-    def pca_scatter_matrix(
-        self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
-    ):
-        """After running mint.pca() this function can be used to plot a scatter matrix of the
-        principal components.
-
-        """
-        df = self.mint.decomposition_results["df_projected"]
-        cols = df.columns.to_list()[:n_vars]
-        df = df[cols]
-
-        if color_groups is not None:
-            if group_name is None:
-                group_name = "Group"
-            df[group_name] = color_groups
-            df[group_name] = df[group_name].astype(str)
-
-        plt.figure(dpi=300)
-
-        if marker is None and len(df) > 20:
-            marker = "+"
-
-        g = sns.pairplot(
-            df, plot_kws={"s": 50, "marker": marker}, hue=group_name, **kwargs
-        )
-
-        return g
+   
