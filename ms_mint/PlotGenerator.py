@@ -13,7 +13,7 @@ from .tools import scale_dataframe
 
 
 class PlotGenerator:
-    """Plot generator for Mint instances.
+    """Plot generator for mint.results.
 
     :param mint: Mint instance
     :type mint: ms_mint.Mint.Mint
@@ -65,10 +65,10 @@ class PlotGenerator:
             if two values are provided e.g. ('cosine', 'euclidean') the first
             will be used to cluster the x-axis and the second for the y-axis.
 
-            ‘braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
-            ‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’,
-            ‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’,
-            ‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
+            'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine',
+            'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis',
+            'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean',
+            'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
             More information:
             https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
 

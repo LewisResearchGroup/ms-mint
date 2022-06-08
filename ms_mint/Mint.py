@@ -49,7 +49,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
-        self.plot = PlotGenerator(self)
+        self.plot = PlotGenerator(mint=self)
         self.opt = TargetOptimizer(mint=self)
 
     @property
