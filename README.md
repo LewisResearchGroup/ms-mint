@@ -87,7 +87,7 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
     mint.run()
 
-![](notebooks/peak-shapes-after-opt.png)
+![](notebooks/peak-shapes-after-opt.png =100x100)
 
 ## Hierarchical clustering
 
