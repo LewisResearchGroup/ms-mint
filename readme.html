@@ -47,6 +47,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#contributions">Contributions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-standards">Code standards</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-usage">Example usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot-peak-shapes">Plot peak shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optimize-retention-times">Optimize retention times</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hierarchical-clustering">Hierarchical clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#principal-components-analysis">Principal Components Analysis</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#faq">FAQ</a><ul>
@@ -152,10 +156,16 @@ mint.results
 &gt;&gt;&gt;
 </pre></div>
 </div>
+</section>
+<section id="plot-peak-shapes">
+<h2>Plot peak shapes<a class="headerlink" href="#plot-peak-shapes" title="Permalink to this heading"></a></h2>
 <p><img alt="" src="https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.plot.peak_shapes(col_wrap = 3)
 </pre></div>
 </div>
+</section>
+<section id="optimize-retention-times">
+<h2>Optimize retention times<a class="headerlink" href="#optimize-retention-times" title="Permalink to this heading"></a></h2>
 <p><img alt="" src="notebooks/peak-shapes-before-opt.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.opt.find_rt_min_max(
     peak_labels=[&#39;Xanthine&#39;, &#39;Succinate&#39;, &#39;Citrulline&#39;],
@@ -168,11 +178,17 @@ mint.results
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run()
 </pre></div>
 </div>
-<p><img alt="" src="notebooks/peak-shapes-before-opt.png" /></p>
+<p><img alt="" src="notebooks/peak-shapes-after-opt.png" /></p>
+</section>
+<section id="hierarchical-clustering">
+<h2>Hierarchical clustering<a class="headerlink" href="#hierarchical-clustering" title="Permalink to this heading"></a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.plot.hierarchical_clustering()
 </pre></div>
 </div>
 <p><img alt="" src="notebooks/hierarchical_clustering.png" /></p>
+</section>
+<section id="principal-components-analysis">
+<h2>Principal Components Analysis<a class="headerlink" href="#principal-components-analysis" title="Permalink to this heading"></a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.pca.run(5)
 mint.pca.plot.pairplot(5)
 </pre></div>
