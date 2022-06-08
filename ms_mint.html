@@ -46,7 +46,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ms_mint package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.Mint">ms_mint.Mint module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.MintResultsPlotter">ms_mint.MintResultsPlotter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-mintresultsplotter-module">ms_mint.MintResultsPlotter module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.chromatogram">ms_mint.chromatogram module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filelock">ms_mint.filelock module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filter">ms_mint.filter module</a></li>
@@ -396,90 +396,8 @@ The values in the cells are determined by <em>col_name</em>.</p>
 </dd></dl>
 
 </section>
-<section id="module-ms_mint.MintResultsPlotter">
-<span id="ms-mint-mintresultsplotter-module"></span><h2>ms_mint.MintResultsPlotter module<a class="headerlink" href="#module-ms_mint.MintResultsPlotter" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="ms_mint.MintResultsPlotter.MintResultsPlotter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.MintResultsPlotter.</span></span><span class="sig-name descname"><span class="pre">MintResultsPlotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/MintResultsPlotter.html#MintResultsPlotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.MintResultsPlotter.MintResultsPlotter" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Plot generator for mint.results.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="ms_mint.MintResultsPlotter.MintResultsPlotter.heatmap">
-<span class="sig-name descname"><span class="pre">heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normed_by_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clustered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_dendrogram</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/MintResultsPlotter.html#MintResultsPlotter.heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.MintResultsPlotter.MintResultsPlotter.heatmap" title="Permalink to this definition"></a></dt>
-<dd><p>Creates an interactive heatmap
-that can be used to explore the data interactively.
-<cite>mint.crosstab()</cite> is called and then subjected to
-the <cite>mint.vis.plotly.plotly_tools.plot_heatmap()</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>col_name</strong> – str, default=’peak_max’
-Name of the column in <cite>mint.results</cite> to be analysed.</p></li>
-<li><p><strong>normed_by_cols</strong> – bool, default=True
-Whether or not to normalize the columns in the crosstab.</p></li>
-<li><p><strong>clustered</strong> – bool, default=False
-Whether or not to cluster the rows.</p></li>
-<li><p><strong>add_dendrogram</strong> – bool, default=False
-Whether or not to replace row labels with a dendrogram.</p></li>
-<li><p><strong>transposed</strong> – bool, default=False
-If True transpose matrix before plotting.</p></li>
-<li><p><strong>correlation</strong> – bool, default=False
-If True convert data to correlation matrix before plotting.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ms_mint.MintResultsPlotter.MintResultsPlotter.hierarchical_clustering">
-<span class="sig-name descname"><span class="pre">hierarchical_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmaxticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymaxticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log2p1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler_ms_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler_peak_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_filenames_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'basename'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/MintResultsPlotter.html#MintResultsPlotter.hierarchical_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.MintResultsPlotter.MintResultsPlotter.hierarchical_clustering" title="Permalink to this definition"></a></dt>
-<dd><p>Performs a cluster analysis and plots a heatmap. If no data is provided,
-data is taken form self.mint.crosstab(targets_var).
-The clustered non-transformed non-scaled data is stored in <cite>self.mint.clustered</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>transform_func</strong> – default ‘log2p1’, values: [None, ‘log1p’, ‘log2p1’, ‘log10p1’]
-- None: no transformation
-- log1p: tranform data with lambda x: np.log1p(x)
-- log2p1: transform data with lambda x: log2(x+1)
-- log10p1: transform data with lambda x: log10(x+1)</p></li>
-<li><p><strong>scaler_ms_file</strong> – default None, values: [None, ‘standard’, ‘robust’]
-- scaler used to scale along ms_file axis
-- if None no scaling is applied
-- if ‘standard’ use scikit learn StandardScaler()
-- if ‘robust’ use scikit learn RobustScaler()</p></li>
-<li><p><strong>scaler_peak_label</strong> – default ‘standard’
-- like scaler_ms_file, but scaling along peak_label axis</p></li>
-<li><p><strong>metric</strong> – <p>default ‘euclidean’, can be string or a list of two values:
-if two values are provided e.g. (‘cosine’, ‘euclidean’) the first
-will be used to cluster the x-axis and the second for the y-axis.</p>
-<p>’braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
-‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’,
-‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’,
-‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
-More information:
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html</a></p>
-</p></li>
-<li><p><strong>transpose</strong> – bool, default False
-- True: transpose the figure</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ms_mint.MintResultsPlotter.MintResultsPlotter.peak_shapes">
-<span class="sig-name descname"><span class="pre">peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/MintResultsPlotter.html#MintResultsPlotter.peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.MintResultsPlotter.MintResultsPlotter.peak_shapes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="ms-mint-mintresultsplotter-module">
+<h2>ms_mint.MintResultsPlotter module<a class="headerlink" href="#ms-mint-mintresultsplotter-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-ms_mint.chromatogram">
 <span id="ms-mint-chromatogram-module"></span><h2>ms_mint.chromatogram module<a class="headerlink" href="#module-ms_mint.chromatogram" title="Permalink to this heading"></a></h2>
@@ -1061,7 +979,7 @@ using the pyteomics library.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.cumulative_variance">
-<span class="sig-name descname"><span class="pre">cumulative_variance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cumulative_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance" title="Permalink to this definition"></a></dt>
 <dd><p>After running mint.pca() this function can be used to plot the cumulative variance of the
 principal components.</p>
 <dl class="field-list simple">
@@ -1075,8 +993,8 @@ principal components.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.scatter_matrix">
-<span class="sig-name descname"><span class="pre">scatter_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.scatter_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.scatter_matrix" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.pairplot">
+<span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot" title="Permalink to this definition"></a></dt>
 <dd><p>After running mint.pca() this function can be used to plot a scatter matrix of the
 principal components.</p>
 </dd></dl>
@@ -1089,7 +1007,7 @@ principal components.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser.run" title="Permalink to this definition"></a></dt>
 <dd><p>Run Principal Component Analysis on current results. Results are stored in
 self.decomposition_results.</p>
 <dl class="field-list simple">
@@ -1343,7 +1261,7 @@ self.decomposition_results.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer.find_rt_min_max">
-<span class="sig-name descname"><span class="pre">find_rt_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_opt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer.find_rt_min_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer.find_rt_min_max" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">find_rt_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_opt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer.find_rt_min_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer.find_rt_min_max" title="Permalink to this definition"></a></dt>
 <dd><p>Optimize rt_min and rt_max values based on expected retention times (rt).
 For this optimization all rt values in the target list must be present.</p>
 <dl class="field-list simple">
