@@ -416,7 +416,7 @@ self.decomposition_results.</p>
 <dt class="sig sig-object py" id="ms_mint.PlotGenerator.PlotGenerator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.PlotGenerator.</span></span><span class="sig-name descname"><span class="pre">PlotGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/PlotGenerator.html#PlotGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.PlotGenerator.PlotGenerator" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Plot generator for Mint instances.</p>
+<p>Plot generator for mint.results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance</p>
@@ -473,7 +473,7 @@ The clustered non-transformed non-scaled data is stored in <cite>self.mint.clust
 <li><p><strong>metric</strong> – <p>default ‘euclidean’, can be string or a list of two values:
 if two values are provided e.g. (‘cosine’, ‘euclidean’) the first
 will be used to cluster the x-axis and the second for the y-axis.</p>
-<p>‘braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
+<p>’braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
 ‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’,
 ‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’,
 ‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
@@ -835,31 +835,6 @@ using the pyteomics library.</p>
 <li><p><strong>correlation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to convert the table to a correlation matrix, defaults to False</p></li>
 <li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to call fig.show() to show image in new browser tab, defaults to False</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to be loud, defaults to False</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Returns a plotly image object.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>plotly.Figure</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_peak_shapes">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'v'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_peak_shapes" title="Permalink to this definition"></a></dt>
-<dd><p>Plot peak shapes of selected peaks and MS-files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mint_results</strong> (<em>pandas.DataFrame</em>) – DataFrame in mint.results format</p></li>
-<li><p><strong>n_cols</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of columns for sub-plots, defaults to 1</p></li>
-<li><p><strong>peak_labels</strong> (<em>list</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – List of peak-labels to plot, defaults to None</p></li>
-<li><p><strong>legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to add a legend, defaults to True</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to be loud, defaults to False</p></li>
-<li><p><strong>legend_orientation</strong> (<em>str</em><em>, </em><em>optional</em>) – Wether or not to show the legend in horizontal (‘h’) or vertical (‘v’) format, defaults to “v”</p></li>
-<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to call fig.show() to show image in new browser tab, defaults to False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
