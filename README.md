@@ -72,7 +72,7 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
     mint.plot.peak_shapes(col_wrap = 3)
 
 
-![](notebook/peak-shapes-before-opt.png)
+![](notebooks/peak-shapes-before-opt.png)
 
 
     mint.plot.hierarchical_clustering()
