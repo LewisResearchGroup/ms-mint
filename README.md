@@ -75,11 +75,27 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 ![](notebooks/peak-shapes-before-opt.png)
 
 
+    mint.opt.find_rt_min_max(
+        peak_labels=['Xanthine', 'Succinate', 'Citrulline'], 
+        plot=True, rel_height=0.7, sigma=50, col_wrap=1, aspect=3,
+        height=4
+    )
+    
+    
+![](notebooks/opt-rt.png)
+
+    mint.run()
+
+![](notebooks/peak-shapes-before-opt.png)
+
     mint.plot.hierarchical_clustering()
 
-![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/hierarchical-clustering.png)
+![](notebooks/hierarchical_clustering.png)
 
-
+    mint.pca.run(5)
+    mint.pca.plot.pairplot(5)
+    
+![](notebooks/pca-pairplot.png)
 
 
 # FAQ
