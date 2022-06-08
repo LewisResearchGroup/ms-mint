@@ -197,32 +197,31 @@ class TargetOptimizer:
     """
     Optimizer for target lists.
 
-    :param fns: Names of filen to use for optimization.
-    :type fns: List[str or PosixPath]
-    :param targets: MINT target list.
-    :type targets: pandas.DataFrame
+    :param mint: Mint instance to optimize
+    :type mint: ms_mint.Mint.Mint
     """
 
-    def __init__(self, fns, targets):
+    def __init__(self, mint=None):
         """
         Optimizer for target lists.
 
-        :param fns: Names of filen to use for optimization.
-        :type fns: List[str or PosixPath]
-        :param targets: MINT target list.
-        :type targets: pandas.DataFrame
+        :param mint: Mint instance to optimize
+        :type mint: ms_mint.Mint.Mint
         """
-        self.ms1 = (
-            pd.concat([ms_file_to_df(fn) for fn in fns])
-            .sort_values(["scan_time", "mz"])
-        )
-        self.targets = targets
+        self.mint = mint
+        self.reset()
+
+    def reset(self):
+        self.results = None
+        return self
 
     def find_rt_min_max(
         self,
+        fns=None,
+        targets=None,
         peak_labels=None,
         minimum_intensity=1e4,
-        plot=True,
+        plot=False,
         sigma=20,
         filter=None,
         post_opt=False,
@@ -234,6 +233,10 @@ class TargetOptimizer:
         Optimize rt_min and rt_max values based on expected retention times (rt).
         For this optimization all rt values in the target list must be present.
 
+        :param fns: List of filenames to use for optimization
+        :type fns: List[str or PosixPath], optional
+        :param targets: Target list to optimize
+        :type targets: pandas.DataFrame in MINT target list format
         :param peak_labels: Subset of peak_labels to optimize, defaults to None
         :type peak_labels: List[str or PosixPath], optional
         :param minimum_intensity: Minimum intensity required, otherwise skip target, defaults to 1e4
@@ -252,11 +255,25 @@ class TargetOptimizer:
         :rtype: tuple
         """
 
-        targets = self.targets
-        _targets = self.targets.set_index("peak_label")
+        if targets is not None:
+            targets = targets
+        else:
+            targets = self.mint.targets
+
+        if fns is not None: 
+            fns = fns
+        else:
+            fns = self.mint.ms_files
+
+        _targets = targets.set_index("peak_label").copy()
 
         if peak_labels is not None:
             _targets = _targets.loc[peak_labels]
+
+        ms1 = (
+            pd.concat([ms_file_to_df(fn) for fn in fns])
+            .sort_values(["scan_time", "mz"])
+        )
 
         if plot:
             fig = plt.figure(figsize=(60, 30))
@@ -267,7 +284,7 @@ class TargetOptimizer:
             mz = row.mz_mean
             rt = row.rt
 
-            _slice = extract_chromatogram_from_ms1(self.ms1, mz).groupby("scan_time").sum()
+            _slice = extract_chromatogram_from_ms1(ms1, mz).groupby("scan_time").sum()
 
             chrom = Chromatogram(
                 _slice.index, _slice.values, expected_rt=rt, filter=filter
@@ -303,10 +320,12 @@ class TargetOptimizer:
                 if i == 100:
                     plt.tight_layout()
 
-        targets = _targets.reset_index()
-        self.targets = targets
+        self.results = _targets.reset_index()
+
+        if self.mint is not None:
+            self.mint.targets = self.results
 
         if plot:
             return self, fig
         else:
-            return self, None
+            return self
