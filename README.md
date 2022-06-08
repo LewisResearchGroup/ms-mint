@@ -66,11 +66,13 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
     mint.results
     >>>
 
+## Plot peak shapes
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png)
 
 
     mint.plot.peak_shapes(col_wrap = 3)
 
+## Optimize retention times
 
 ![](notebooks/peak-shapes-before-opt.png)
 
@@ -81,16 +83,19 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
         height=4
     )
     
-    
 ![](notebooks/opt-rt.png)
 
     mint.run()
 
-![](notebooks/peak-shapes-before-opt.png)
+![](notebooks/peak-shapes-after-opt.png)
+
+## Hierarchical clustering
 
     mint.plot.hierarchical_clustering()
 
 ![](notebooks/hierarchical_clustering.png)
+
+## Principal Components Analysis
 
     mint.pca.run(5)
     mint.pca.plot.pairplot(5)
