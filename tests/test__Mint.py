@@ -71,11 +71,11 @@ def test__pca_plots_are_working():
     mint.ms_files = [TEST_MZML, TEST_MZXML]
     mint.load_targets(TEST_TARGETS_FN_V2_CSV_SEC)
     mint.run()
-    mint.pca(fillna="mean")
-    mint.pca(fillna="zero")
-    mint.pca(fillna="median")
-    mint.plot.pca_cumulative_variance()
-    mint.plot.pca_scatter_matrix(color_groups="peak_label")
+    mint.pca.run(fillna="mean")
+    mint.pca.run(fillna="zero")
+    mint.pca.run(fillna="median")
+    mint.pca.plot.cumulative_variance()
+    mint.pca.plot.scatter_matrix(color_groups="peak_label")
 
 
 def test__progress_callback():

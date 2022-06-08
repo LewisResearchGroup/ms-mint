@@ -10,8 +10,6 @@ import logging
 
 from pathlib import Path as P
 
-from sklearn.decomposition import PCA
-
 from multiprocessing import Pool, Manager, cpu_count
 
 from ms_mint.PlotGenerator import PlotGenerator
@@ -21,7 +19,7 @@ from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
 from .tools import scale_dataframe, is_ms_file, get_ms_files_from_results
-
+from .pca import PrincipalComponentsAnalyser
 
 import ms_mint
 
@@ -51,6 +49,7 @@ class Mint(object):
             print("Mint Version:", self.version, "\n")
         self.plot = PlotGenerator(mint=self)
         self.opt = TargetOptimizer(mint=self)
+        self.pca = PrincipalComponentsAnalyser(self)
 
     @property
     def verbose(self):
@@ -463,75 +462,3 @@ class Mint(object):
         self.targets = self.results[
             [col for col in TARGETS_COLUMNS if col in self.results.columns]
         ].drop_duplicates()
-
-    def pca(
-        self, var_name="peak_max", n_components=3, fillna="median", scaler="standard"
-    ):
-        """
-        Run Principal Component Analysis on current results. Results are stored in
-        self.decomposition_results.
-
-        :param var_name: Column name to use for pca, defaults to "peak_max"
-        :type var_name: str, optional
-        :param n_components: Number of PCA components to return, defaults to 3
-        :type n_components: int, optional
-        :param fillna: Method to fill missing values, defaults to "median"
-        :type fillna: str, optional
-        :param scaler: Method to scale the columns, defaults to "standard"
-        :type scaler: str, optional
-        """
-
-        df = self.crosstab(var_name).fillna(fillna)
-
-        if fillna == "median":
-            fillna = df.median()
-        elif fillna == "mean":
-            fillna = df.mean()
-        elif fillna == "zero":
-            fillna = 0
-
-        df = df.fillna(fillna)
-        if scaler is not None:
-            df = scale_dataframe(df, scaler)
-
-        min_dim = min(df.shape)
-        n_components = min(n_components, min_dim)
-        pca = PCA(n_components)
-        X_projected = pca.fit_transform(df)
-        # Convert to dataframe
-        df_projected = pd.DataFrame(X_projected, index=df.index.get_level_values(0))
-        # Set columns to PC-1, PC-2, ...
-        df_projected.columns = [f"PC-{int(i)+1}" for i in df_projected.columns]
-
-        # Calculate cumulative explained variance in percent
-        explained_variance = pca.explained_variance_ratio_ * 100
-        cum_expl_var = np.cumsum(explained_variance)
-
-        # Create feature contributions
-        a = np.zeros((n_components, n_components), int)
-        np.fill_diagonal(a, 1)
-        dfc = pd.DataFrame(pca.inverse_transform(a))
-        dfc.columns = df.columns
-        dfc.index = [f"PC-{i+1}" for i in range(n_components)]
-        dfc.index.name = "PC"
-        # convert to long format
-        dfc = dfc.stack().reset_index().rename(columns={0: "Coefficient"})
-
-        self.decomposition_results = {
-            "df_projected": df_projected,
-            "cum_expl_var": cum_expl_var,
-            "n_components": n_components,
-            "type": "PCA",
-            "feature_contributions": dfc,
-            "class": pca,
-        }
-
-    def find_rtmin_rtmax(self, fns=None, targets=None, **kwargs):
-        if fns is None:
-            fns = self.ms_files
-        if targets is None:
-            targets = self.targets
-        opt = TargetOptimizer(fns=fns, targets=targets)
-        opt.find_rt_min_max(**kwargs)
-        self.targets = opt.targets
-        return self
