@@ -75,7 +75,7 @@ def test__pca_plots_are_working():
     mint.pca.run(fillna="zero")
     mint.pca.run(fillna="median")
     mint.pca.plot.cumulative_variance()
-    mint.pca.plot.scatter_matrix(color_groups="peak_label")
+    mint.pca.plot.pairplot(color_groups="peak_label")
 
 
 def test__progress_callback():

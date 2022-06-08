@@ -227,6 +227,9 @@ class TargetOptimizer:
         post_opt=False,
         post_opt_kwargs=None,
         rel_height=0.9,
+        height=3,
+        aspect=2,
+        col_wrap=3,
         **kwargs,
     ):
         """
@@ -265,21 +268,26 @@ class TargetOptimizer:
         else:
             fns = self.mint.ms_files
 
+        if peak_labels is None:
+            peak_labels = self.mint.targets.peak_label.values
+
         _targets = targets.set_index("peak_label").copy()
 
-        if peak_labels is not None:
-            _targets = _targets.loc[peak_labels]
-
+        print('Reading files...')
         ms1 = (
-            pd.concat([ms_file_to_df(fn) for fn in fns])
+            pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)])
             .sort_values(["scan_time", "mz"])
         )
 
         if plot:
-            fig = plt.figure(figsize=(60, 30))
+            n_rows = int( np.ceil(len(peak_labels) / col_wrap) )
+            fig = plt.figure(figsize=(col_wrap*height*aspect, n_rows*height))
 
         i = 0
         for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
+
+            if peak_label not in peak_labels:
+                continue
 
             mz = row.mz_mean
             rt = row.rt
@@ -312,7 +320,7 @@ class TargetOptimizer:
                 i += 1
 
                 if i <= 100:
-                    plt.subplot(10, 10, i)
+                    plt.subplot(n_rows, col_wrap, i)
                     chrom.plot()
                     plt.gca().get_legend().remove()
                     plt.title(f"{peak_label}\nm/z={mz:.3f}")

@@ -18,7 +18,7 @@ from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
 from .tools import scale_dataframe, is_ms_file, get_ms_files_from_results
 from .pca import PrincipalComponentsAnalyser
-from ms_mint.MintResultsPlotter import MintResultsPlotter
+from ms_mint.plotting import MintResultsPlotter
 
 import ms_mint
 

@@ -16,7 +16,7 @@ class PrincipalComponentsAnalyser():
         self.plot = PCA_Plotter(self)
     
 
-    def run(self, on="peak_max", n_components=3, fillna="median", scaler="standard"):
+    def run(self, n_components=3, on="peak_max", fillna="median", scaler="standard"):
         """
         Run Principal Component Analysis on current results. Results are stored in
         self.decomposition_results.
@@ -82,7 +82,7 @@ class PCA_Plotter():
     def __init__(self, pca):
         self.pca = pca
 
-    def cumulative_variance(self):
+    def cumulative_variance(self, height=4, aspect=2):
         """After running mint.pca() this function can be used to plot the cumulative variance of the
         principal components.
 
@@ -90,7 +90,7 @@ class PCA_Plotter():
         :rtype: plt.figure
         """
         n_vars = self.pca.results["n_components"]
-        fig = plt.figure(figsize=(7, 3), dpi=300)
+        fig = plt.figure(figsize=(height*aspect, height))
         cum_expl_var = self.pca.results["cum_expl_var"]
         plt.bar(np.arange(n_vars) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
         plt.xlabel("Principal Component")
@@ -100,7 +100,8 @@ class PCA_Plotter():
         plt.xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
-    def scatter_matrix(
+
+    def pairplot(
         self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
     ):
         """After running mint.pca() this function can be used to plot a scatter matrix of the
