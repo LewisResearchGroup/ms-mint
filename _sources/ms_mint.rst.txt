@@ -1,8 +1,10 @@
 ms\_mint package
 ================
 
+Submodules
+----------
 
-ms\_mint.Mint 
+ms\_mint.Mint module
 --------------------
 
 .. automodule:: ms_mint.Mint
@@ -10,15 +12,39 @@ ms\_mint.Mint
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.PlotGenerator 
------------------------------
+ms\_mint.MintResultsPlotter module
+----------------------------------
 
-.. automodule:: ms_mint.PlotGenerator
+.. automodule:: ms_mint.MintResultsPlotter
    :members:
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.io 
+ms\_mint.chromatogram module
+----------------------------
+
+.. automodule:: ms_mint.chromatogram
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.filelock module
+------------------------
+
+.. automodule:: ms_mint.filelock
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.filter module
+----------------------
+
+.. automodule:: ms_mint.filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.io module
 ------------------
 
 .. automodule:: ms_mint.io
@@ -26,7 +52,7 @@ ms\_mint.io
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.matplotlib\_tools 
+ms\_mint.matplotlib\_tools module
 ---------------------------------
 
 .. automodule:: ms_mint.matplotlib_tools
@@ -34,7 +60,7 @@ ms\_mint.matplotlib\_tools
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.notebook 
+ms\_mint.notebook module
 ------------------------
 
 .. automodule:: ms_mint.notebook
@@ -42,7 +68,15 @@ ms\_mint.notebook
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.plotly\_tools 
+ms\_mint.pca module
+-------------------
+
+.. automodule:: ms_mint.pca
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.plotly\_tools module
 -----------------------------
 
 .. automodule:: ms_mint.plotly_tools
@@ -50,7 +84,7 @@ ms\_mint.plotly\_tools
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.processing 
+ms\_mint.processing module
 --------------------------
 
 .. automodule:: ms_mint.processing
@@ -58,7 +92,7 @@ ms\_mint.processing
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.standards 
+ms\_mint.standards module
 -------------------------
 
 .. automodule:: ms_mint.standards
@@ -66,7 +100,7 @@ ms\_mint.standards
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.targets 
+ms\_mint.targets module
 -----------------------
 
 .. automodule:: ms_mint.targets
@@ -74,7 +108,7 @@ ms\_mint.targets
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.tools 
+ms\_mint.tools module
 ---------------------
 
 .. automodule:: ms_mint.tools
@@ -82,4 +116,10 @@ ms\_mint.tools
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
 
+.. automodule:: ms_mint
+   :members:
+   :undoc-members:
+   :show-inheritance:
