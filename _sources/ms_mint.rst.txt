@@ -58,14 +58,6 @@ ms\_mint.processing
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.resampling 
---------------------------
-
-.. automodule:: ms_mint.resampling
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ms\_mint.standards 
 -------------------------
 
