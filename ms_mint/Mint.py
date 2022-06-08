@@ -12,14 +12,13 @@ from pathlib import Path as P
 
 from multiprocessing import Pool, Manager, cpu_count
 
-from ms_mint.PlotGenerator import PlotGenerator
-
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
 from .tools import scale_dataframe, is_ms_file, get_ms_files_from_results
 from .pca import PrincipalComponentsAnalyser
+from ms_mint.MintResultsPlotter import MintResultsPlotter
 
 import ms_mint
 
@@ -47,7 +46,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
-        self.plot = PlotGenerator(mint=self)
+        self.plot = MintResultsPlotter(mint=self)
         self.opt = TargetOptimizer(mint=self)
         self.pca = PrincipalComponentsAnalyser(self)
 
