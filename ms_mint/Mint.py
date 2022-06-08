@@ -50,6 +50,7 @@ class Mint(object):
         if self.verbose:
             print("Mint Version:", self.version, "\n")
         self.plot = PlotGenerator(self)
+        self.opt = TargetOptimizer(mint=self)
 
     @property
     def verbose(self):
