@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -266,32 +267,31 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizer for target lists.</span>
 
-<span class="sd">    :param fns: Names of filen to use for optimization.</span>
-<span class="sd">    :type fns: List[str or PosixPath]</span>
-<span class="sd">    :param targets: MINT target list.</span>
-<span class="sd">    :type targets: pandas.DataFrame</span>
+<span class="sd">    :param mint: Mint instance to optimize</span>
+<span class="sd">    :type mint: ms_mint.Mint.Mint</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TargetOptimizer.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+<div class="viewcode-block" id="TargetOptimizer.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Optimizer for target lists.</span>
 
-<span class="sd">        :param fns: Names of filen to use for optimization.</span>
-<span class="sd">        :type fns: List[str or PosixPath]</span>
-<span class="sd">        :param targets: MINT target list.</span>
-<span class="sd">        :type targets: pandas.DataFrame</span>
+<span class="sd">        :param mint: Mint instance to optimize</span>
+<span class="sd">        :type mint: ms_mint.Mint.Mint</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ms1</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">])</span>
-            <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span> <span class="s2">&quot;mz&quot;</span><span class="p">])</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mint</span> <span class="o">=</span> <span class="n">mint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TargetOptimizer.reset"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="TargetOptimizer.find_rt_min_max"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.find_rt_min_max">[docs]</a>    <span class="k">def</span> <span class="nf">find_rt_min_max</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">minimum_intensity</span><span class="o">=</span><span class="mf">1e4</span><span class="p">,</span>
-        <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
         <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">post_opt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -303,6 +303,10 @@
 <span class="sd">        Optimize rt_min and rt_max values based on expected retention times (rt).</span>
 <span class="sd">        For this optimization all rt values in the target list must be present.</span>
 
+<span class="sd">        :param fns: List of filenames to use for optimization</span>
+<span class="sd">        :type fns: List[str or PosixPath], optional</span>
+<span class="sd">        :param targets: Target list to optimize</span>
+<span class="sd">        :type targets: pandas.DataFrame in MINT target list format</span>
 <span class="sd">        :param peak_labels: Subset of peak_labels to optimize, defaults to None</span>
 <span class="sd">        :type peak_labels: List[str or PosixPath], optional</span>
 <span class="sd">        :param minimum_intensity: Minimum intensity required, otherwise skip target, defaults to 1e4</span>
@@ -321,11 +325,25 @@
 <span class="sd">        :rtype: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span>
-        <span class="n">_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;peak_label&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span>
+
+        <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="n">fns</span> <span class="o">=</span> <span class="n">fns</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">ms_files</span>
+
+        <span class="n">_targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;peak_label&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">_targets</span> <span class="o">=</span> <span class="n">_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_labels</span><span class="p">]</span>
+
+        <span class="n">ms1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span> <span class="s2">&quot;mz&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
@@ -336,7 +354,7 @@
             <span class="n">mz</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mz_mean</span>
             <span class="n">rt</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt</span>
 
-            <span class="n">_slice</span> <span class="o">=</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms1</span><span class="p">,</span> <span class="n">mz</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;scan_time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">_slice</span> <span class="o">=</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">ms1</span><span class="p">,</span> <span class="n">mz</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;scan_time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
             <span class="n">chrom</span> <span class="o">=</span> <span class="n">Chromatogram</span><span class="p">(</span>
                 <span class="n">_slice</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_slice</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="n">rt</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span>
@@ -372,13 +390,15 @@
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">_targets</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">_targets</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span>
 
         <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fig</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="kc">None</span></div></div>
+            <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 
            </div>
