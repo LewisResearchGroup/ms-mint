@@ -12,14 +12,6 @@ ms\_mint.Mint module
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.MintResultsPlotter module
-----------------------------------
-
-.. automodule:: ms_mint.MintResultsPlotter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ms\_mint.chromatogram module
 ----------------------------
 
