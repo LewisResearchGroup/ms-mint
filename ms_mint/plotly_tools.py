@@ -1,13 +1,8 @@
 import numpy as np
-import colorlover as cl
-
-from os.path import basename
-from collections.abc import Iterable
 
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.io as pio
-from plotly.subplots import make_subplots
 
 
 def set_template():
@@ -208,6 +203,7 @@ def plotly_heatmap(
 
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)
+
 
     if call_show:
         fig.show(config={"displaylogo": False})
