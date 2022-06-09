@@ -32,7 +32,7 @@ class Resampler:
         :return: Resampled time series (x, t)
         :rtype: tuple
         """
-        ndx = pd.to_timedelta(t, unit=unit)
+        ndx = pd.to_timedelta(t, unit=self.unit)
         chrom = pd.Series(index=ndx, data=x)
         resampled = chrom.resample(self.tau).nearest()
         new_t = resampled.index.seconds + (resampled.index.microseconds / 1e6)

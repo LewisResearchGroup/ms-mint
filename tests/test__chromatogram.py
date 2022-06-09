@@ -8,16 +8,27 @@ from ms_mint.tools import gaussian
 
 from paths import TEST_MZML
 
+def create_chromatogram(mus=None, sigmas=None, ys=None, x_min=0, x_max=1000):
+    if mus is None:
+        mus = [200, 500]
+    if sigmas is None:
+        sigmas = [20, 100]
+    if ys is None:
+        ys = [5e6, 5e5]
+
+    x = np.arange(x_min, x_max)
+    y = sum([gaussian(x, mu, sigma) * y for (mu, sigma, y) in zip(mus, sigmas, ys)])
+
+    chrom = Chromatogram(scan_times=x, intensities=y, filter=None, expected_rt=2)
+    return chrom
+
 
 def test__Chromatogram_without_filter_identifies_peaks_correctly():
 
     rt_peak_1 = 200
     rt_peak_2 = 500
 
-    x = np.arange(1000)
-    y = gaussian(x, rt_peak_1, 20) * 5e6 + gaussian(x, rt_peak_2, 100) * 5e5
-
-    chrom = Chromatogram(scan_times=x, intensities=y, filter=None, expected_rt=2)
+    chrom = create_chromatogram([rt_peak_1, rt_peak_2])
     chrom.find_peaks()
 
     rt_peak_1_pred, rt_peak_2_pred = chrom.peaks.rt.values
