@@ -9,8 +9,17 @@ from .tools import scale_dataframe
 
 
 class PrincipalComponentsAnalyser():
+    """
+    Class for applying PCA to Mint instance.
+    """
 
     def __init__(self, mint=None):
+        """
+        Class for applying PCA to Mint instance.
+
+        :param mint: Mint instance, defaults to None
+        :type mint: ms_mint.Mint.Mint, optional
+        """
         self.mint = mint
         self.results = None
         self.plot = PCA_Plotter(self)
@@ -78,12 +87,22 @@ class PrincipalComponentsAnalyser():
 
 
 class PCA_Plotter():
+    """
+    Class for plotting Mint PCA results.
+    """
 
     def __init__(self, pca):
+        """
+        Class for plotting Mint PCA results.
+
+        :param pca: PrincipalComponentsAnalyser instance
+        :type pca: ms_mint.pca.PrincipalComponentsAnalyser
+        """
         self.pca = pca
 
     def cumulative_variance(self, height=4, aspect=2):
-        """After running mint.pca() this function can be used to plot the cumulative variance of the
+        """
+        After running mint.pca() this function can be used to plot the cumulative variance of the
         principal components.
 
         :return: Returns a matplotlib figure.
@@ -102,11 +121,22 @@ class PCA_Plotter():
 
 
     def pairplot(
-        self, n_vars=3, color_groups=None, group_name=None, marker=None, **kwargs
+        self, n_vars=3, color_groups=None, group_name=None, fig_kws=None, **kwargs
     ):
-        """After running mint.pca() this function can be used to plot a scatter matrix of the
+        """
+        After running mint.pca() this function can be used to plot a scatter matrix of the
         principal components.
 
+        :param n_vars: Number of principal components to plot, defaults to 3.
+        :type n_vars: int, optional
+        :param color_groups: Groups used for hue.
+        :type color_groups: List[str], optional
+        :param group_name: Names of color groups.
+        :type group_name: List[str], optional
+        :param marker: 
+        :type marker:
+        :return: Returns a matplotlib figure.
+        :rtype: plt.figure
         """
         df = self.pca.results["df_projected"]
         cols = df.columns.to_list()[:n_vars]
@@ -118,13 +148,13 @@ class PCA_Plotter():
             df[group_name] = color_groups
             df[group_name] = df[group_name].astype(str)
 
-        plt.figure(dpi=300)
+        if fig_kws is None:
+            fig_kws = {}
 
-        if marker is None and len(df) > 20:
-            marker = "+"
+        plt.figure(**fig_kws)
 
         g = sns.pairplot(
-            df, plot_kws={"s": 50, "marker": marker}, hue=group_name, **kwargs
+            df, hue=group_name, **kwargs
         )
 
         return g        
