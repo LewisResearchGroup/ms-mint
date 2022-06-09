@@ -96,7 +96,6 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
     
 ![](notebooks/pca-pairplot.png)
 
-
 # FAQ
 ## What is a target list
 A target list is a pandas dataframe with specific columns. 
