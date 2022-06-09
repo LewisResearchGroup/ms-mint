@@ -11,13 +11,20 @@ from .tools import scale_dataframe
 
 
 class MintResultsPlotter:
-    """Plot generator for mint.results.
+    """
+    Plot generator for mint.results.
 
     :param mint: Mint instance
     :type mint: ms_mint.Mint.Mint
     """
 
     def __init__(self, mint):
+        """
+        Plot generator for mint.results.
+
+        :param mint: Mint instance
+        :type mint: ms_mint.Mint.Mint
+        """        
         self.mint = mint
 
     def hierarchical_clustering(
@@ -42,7 +49,6 @@ class MintResultsPlotter:
         Performs a cluster analysis and plots a heatmap. If no data is provided,
         data is taken form self.mint.crosstab(targets_var).
         The clustered non-transformed non-scaled data is stored in `self.mint.clustered`.
-
 
         :param transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
             - None: no transformation
@@ -73,7 +79,6 @@ class MintResultsPlotter:
         :param transpose: bool, default False
             - True: transpose the figure
         """
-
         if len(self.mint.results) == 0:
             return None
 
@@ -141,7 +146,8 @@ class MintResultsPlotter:
         correlation=False,
         **kwargs
     ):
-        """Creates an interactive heatmap
+        """
+        Creates an interactive heatmap
         that can be used to explore the data interactively.
         `mint.crosstab()` is called and then subjected to
         the `mint.vis.plotly.plotly_tools.plot_heatmap()`.
@@ -158,7 +164,6 @@ class MintResultsPlotter:
             If True transpose matrix before plotting.
         :param correlation: bool, default=False
             If True convert data to correlation matrix before plotting.
-
         """
         if len(self.mint.results) > 0:
             return plotly_heatmap(
