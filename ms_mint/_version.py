@@ -17,7 +17,9 @@ import sys
 
 
 def get_keywords():
-    """Get the keywords needed to look up the version information."""
+    """
+    Get the keywords needed to look up the version information.
+    """
     # these strings will be replaced by git during git-archive.
     # setup.py/versioneer.py will grep for the variable names, so they must
     # each be defined on a line of their own. _version.py will just call
@@ -30,11 +32,15 @@ def get_keywords():
 
 
 class VersioneerConfig:
-    """Container for Versioneer configuration parameters."""
+    """
+    Container for Versioneer configuration parameters.
+    """
 
 
 def get_config():
-    """Create, populate and return the VersioneerConfig() object."""
+    """
+    Create, populate and return the VersioneerConfig() object.
+    """
     # these strings are filled in when 'setup.py versioneer' creates
     # _version.py
     cfg = VersioneerConfig()
@@ -48,7 +54,9 @@ def get_config():
 
 
 class NotThisMethod(Exception):
-    """Exception raised if a method is not valid for the current scenario."""
+    """
+    Exception raised if a method is not valid for the current scenario.
+    """
 
 
 LONG_VERSION_PY = {}
@@ -56,10 +64,14 @@ HANDLERS = {}
 
 
 def register_vcs_handler(vcs, method):  # decorator
-    """Decorator to mark a method as the handler for a particular VCS."""
+    """
+    Decorator to mark a method as the handler for a particular VCS.
+    """
 
     def decorate(f):
-        """Store f in HANDLERS[vcs][method]."""
+        """
+        Store f in HANDLERS[vcs][method].
+        """
         if vcs not in HANDLERS:
             HANDLERS[vcs] = {}
         HANDLERS[vcs][method] = f
@@ -69,7 +81,9 @@ def register_vcs_handler(vcs, method):  # decorator
 
 
 def run_command(commands, args, cwd=None, verbose=False, hide_stderr=False, env=None):
-    """Call the given command(s)."""
+    """
+    Call the given command(s).
+    """
     assert isinstance(commands, list)
     p = None
     for c in commands:
@@ -82,6 +96,7 @@ def run_command(commands, args, cwd=None, verbose=False, hide_stderr=False, env=
                 env=env,
                 stdout=subprocess.PIPE,
                 stderr=(subprocess.PIPE if hide_stderr else None),
+                shell=False,
             )
             break
         except EnvironmentError:
@@ -108,7 +123,8 @@ def run_command(commands, args, cwd=None, verbose=False, hide_stderr=False, env=
 
 
 def versions_from_parentdir(parentdir_prefix, root, verbose):
-    """Try to determine the version from the parent directory name.
+    """
+    Try to determine the version from the parent directory name.
 
     Source tarballs conventionally unpack into a directory that includes both
     the project name and a version string. We will also support searching up
@@ -140,7 +156,9 @@ def versions_from_parentdir(parentdir_prefix, root, verbose):
 
 @register_vcs_handler("git", "get_keywords")
 def git_get_keywords(versionfile_abs):
-    """Extract version information from the given file."""
+    """
+    Extract version information from the given file.
+    """
     # the code embedded in _version.py can just fetch the value of these
     # keywords. When used from setup.py, we don't want to import _version.py,
     # so we do it with a regexp instead. This function is not used from
@@ -169,7 +187,9 @@ def git_get_keywords(versionfile_abs):
 
 @register_vcs_handler("git", "keywords")
 def git_versions_from_keywords(keywords, tag_prefix, verbose):
-    """Get version information from git keywords."""
+    """
+    Get version information from git keywords.
+    """
     if not keywords:
         raise NotThisMethod("no keywords at all, weird")
     date = keywords.get("date")
@@ -231,7 +251,8 @@ def git_versions_from_keywords(keywords, tag_prefix, verbose):
 
 @register_vcs_handler("git", "pieces_from_vcs")
 def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
-    """Get version from 'git describe' in the root of the source tree.
+    """
+    Get version from 'git describe' in the root of the source tree.
 
     This only gets called if the git-archive 'subst' keywords were *not*
     expanded, and _version.py hasn't already been rewritten with a short
@@ -331,14 +352,17 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
 
 
 def plus_or_dot(pieces):
-    """Return a + if we don't already have one, else return a ."""
+    """
+    Return a + if we don't already have one, else return a .
+    """
     if "+" in pieces.get("closest-tag", ""):
         return "."
     return "+"
 
 
 def render_pep440(pieces):
-    """Build up version string, with post-release "local version identifier".
+    """
+    Build up version string, with post-release "local version identifier".
 
     Our goal: TAG[+DISTANCE.gHEX[.dirty]] . Note that if you
     get a tagged build and then dirty it, you'll get TAG+0.gHEX.dirty
@@ -362,7 +386,8 @@ def render_pep440(pieces):
 
 
 def render_pep440_pre(pieces):
-    """TAG[.post.devDISTANCE] -- No -dirty.
+    """
+    TAG[.post.devDISTANCE] -- No -dirty.
 
     Exceptions:
     1: no tags. 0.post.devDISTANCE
@@ -378,7 +403,8 @@ def render_pep440_pre(pieces):
 
 
 def render_pep440_post(pieces):
-    """TAG[.postDISTANCE[.dev0]+gHEX] .
+    """
+    TAG[.postDISTANCE[.dev0]+gHEX] .
 
     The ".dev0" means dirty. Note that .dev0 sorts backwards
     (a dirty tree will appear "older" than the corresponding clean one),
@@ -405,7 +431,8 @@ def render_pep440_post(pieces):
 
 
 def render_pep440_old(pieces):
-    """TAG[.postDISTANCE[.dev0]] .
+    """
+    TAG[.postDISTANCE[.dev0]] .
 
     The ".dev0" means dirty.
 
@@ -427,7 +454,8 @@ def render_pep440_old(pieces):
 
 
 def render_git_describe(pieces):
-    """TAG[-DISTANCE-gHEX][-dirty].
+    """
+    TAG[-DISTANCE-gHEX][-dirty].
 
     Like 'git describe --tags --dirty --always'.
 
@@ -447,7 +475,8 @@ def render_git_describe(pieces):
 
 
 def render_git_describe_long(pieces):
-    """TAG-DISTANCE-gHEX[-dirty].
+    """
+    TAG-DISTANCE-gHEX[-dirty].
 
     Like 'git describe --tags --dirty --always -long'.
     The distance/hash is unconditional.
@@ -467,7 +496,9 @@ def render_git_describe_long(pieces):
 
 
 def render(pieces, style):
-    """Render the given version pieces into the requested style."""
+    """
+    Render the given version pieces into the requested style.
+    """
     if pieces["error"]:
         return {
             "version": "unknown",
@@ -505,7 +536,9 @@ def render(pieces, style):
 
 
 def get_versions():
-    """Get version information or return default if unable to do so."""
+    """
+    Get version information or return default if unable to do so.
+    """
     # I am in _version.py, which lives at ROOT/VERSIONFILE_SOURCE. If we have
     # __file__, we can work backwards from there to the root. Some
     # py2exe/bbfreeze/non-CPython implementations don't do __file__, in which

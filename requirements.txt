@@ -25,5 +25,6 @@ tables
 h5py
 hdf5plugin
 
+sphinx
 sphinx-rtd-theme
 myst-parser

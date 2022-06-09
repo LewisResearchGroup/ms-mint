@@ -13,7 +13,8 @@ from .standards import RESULTS_COLUMNS, MINT_RESULTS_COLUMNS
 
 
 def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
-    """Extract single chromatogram of specific m/z value from MS-data.
+    """
+    Extract single chromatogram of specific m/z value from MS-data.
 
     :param df: MS-data
     :type df: pandas.DataFrame with columns ['rt', 'm/z', 'intensity']
@@ -28,8 +29,8 @@ def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
     """
     dmz = mz_mean * 1e-6 * mz_width
     chrom = df[(df["mz"] - mz_mean).abs() <= dmz].copy()
-    chrom["scan_time_min"] = chrom["scan_time_min"].round(3)
-    chrom = chrom.groupby("scan_time_min").max()
+    chrom["scan_time"] = chrom["scan_time"].round(3)
+    chrom = chrom.groupby("scan_time").max()
     return chrom["intensity"]
 
 
@@ -59,7 +60,8 @@ def process_ms1_files_in_parallel(args):
 
 
 def append_results(results, fn):
-    """Appends results to file.
+    """
+    Appends results to file.
 
     :param results: New results.
     :type results: pandas.DataFrame
@@ -92,7 +94,8 @@ def process_ms1_file(filename, targets):
 
 
 def process_ms1(df, targets):
-    """Process MS-1 data with a target list.
+    """
+    Process MS-1 data with a target list.
 
     :param df: MS-1 data.
     :type df: pandas.DataFrame
@@ -120,20 +123,21 @@ def _process_ms1_from_df_(df, targets):
     array_peaks = targets[peak_cols].values
     # if "ms_level" in df.columns:
     #    df = df[df.ms_level == 1]
-    array_data = df[["scan_time_min", "mz", "intensity"]].values
+    array_data = df[["scan_time", "mz", "intensity"]].values
     result = process_ms1_from_numpy(array_data, array_peaks)
     return result
 
 
 def process_ms1_from_numpy(array, peaks):
-    """Process MS1 data in numpy array format.
+    """
+    Process MS1 data in numpy array format.
 
-    :param array: _description_
-    :type array: _type_
-    :param peaks: _description_
-    :type peaks: _type_
-    :return: _description_
-    :rtype: _type_
+    :param array: Input data.
+    :type array: numpy.Array
+    :param peaks: Peak data np.array([[mz_mean_1, mz_width_1, rt_min_1, rt_max_1, intensity_threshold_1, peak_label_1], ...])
+    :type peaks: numpy.Array
+    :return: Extracted data.
+    :rtype: list
     """
     results = []
     for (mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label) in peaks:
@@ -172,14 +176,15 @@ def _process_ms1_from_numpy(
 
 
 def extract_ms1_properties(array, mz_mean):
-    """Process MS-1 data in array format.
+    """
+    Process MS-1 data in array format.
 
-    :param array: _description_
-    :type array: _type_
-    :param mz_mean: _description_
-    :type mz_mean: _type_
-    :return: _description_
-    :rtype: _type_
+    :param array: MS-1 data slice.
+    :type array: numpy.array
+    :param mz_mean: mz_mean value to calculate mass accuracy.
+    :type mz_mean: float
+    :return: Extracted data.
+    :rtype: dict
     """
 
     float_list_to_comma_sep_str = lambda x: ",".join([str(np.round(i, 4)) for i in x])
@@ -262,22 +267,23 @@ def extract_ms1_properties(array, mz_mean):
 def slice_ms1_array(
     array: np.array, rt_min, rt_max, mz_mean, mz_width, intensity_threshold
 ):
-    """Slice MS1 data by m/z, mz_width, rt_min, rt_max
+    """
+    Slice MS1 data by m/z, mz_width, rt_min, rt_max
 
-    :param array: _description_
+    :param array: Input MS-1 data.
     :type array: np.array
-    :param rt_min: _description_
-    :type rt_min: _type_
-    :param rt_max: _description_
-    :type rt_max: _type_
-    :param mz_mean: _description_
-    :type mz_mean: _type_
-    :param mz_width: _description_
-    :type mz_width: _type_
-    :param intensity_threshold: _description_
-    :type intensity_threshold: _type_
-    :return: _description_
-    :rtype: _type_
+    :param rt_min: Minimum retention time for slice
+    :type rt_min: float
+    :param rt_max: Maximum retention time for slice
+    :type rt_max: float
+    :param mz_mean: Mean m/z value for slice
+    :type mz_mean: float
+    :param mz_width: Width of slice in [ppm] of mz_mean
+    :type mz_width: float (>0)
+    :param intensity_threshold: Noise filter value
+    :type intensity_threshold: float (>0)
+    :return: Slice of numpy array
+    :rtype: np.Array
     """
     delta_mass = mz_width * mz_mean * 1e-6
     array = array[(array[:, 0] >= rt_min)]
@@ -288,12 +294,17 @@ def slice_ms1_array(
 
 
 def score_peaks(mint_results):
-    """Score the peak quality (experimental).
+    """
+    Score the peak quality (experimental).
 
-    :param mint_results: _description_
-    :type mint_results: _type_
-    :return: _description_
-    :rtype: _type_
+    1 - means a good shape
+
+    0 - means a bad shape
+
+    :param mint_results: DataFrame in ms_mint results format.
+    :type mint_results: pandas.DataFrame
+    :return: Score
+    :rtype: float
     """
     R = mint_results.copy()
     scores = (

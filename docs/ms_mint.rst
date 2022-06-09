@@ -12,10 +12,10 @@ ms\_mint.Mint module
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.PlotGenerator module
------------------------------
+ms\_mint.chromatogram module
+----------------------------
 
-.. automodule:: ms_mint.PlotGenerator
+.. automodule:: ms_mint.chromatogram
    :members:
    :undoc-members:
    :show-inheritance:
@@ -24,6 +24,14 @@ ms\_mint.filelock module
 ------------------------
 
 .. automodule:: ms_mint.filelock
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ms\_mint.filter module
+----------------------
+
+.. automodule:: ms_mint.filter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,6 +60,14 @@ ms\_mint.notebook module
    :undoc-members:
    :show-inheritance:
 
+ms\_mint.pca module
+-------------------
+
+.. automodule:: ms_mint.pca
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ms\_mint.plotly\_tools module
 -----------------------------
 
@@ -64,14 +80,6 @@ ms\_mint.processing module
 --------------------------
 
 .. automodule:: ms_mint.processing
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ms\_mint.resampling module
---------------------------
-
-.. automodule:: ms_mint.resampling
    :members:
    :undoc-members:
    :show-inheritance:
