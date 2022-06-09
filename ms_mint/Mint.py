@@ -7,8 +7,8 @@ import time
 import logging
 
 from pathlib import Path as P
-
 from multiprocessing import Pool, Manager, cpu_count
+from glob import glob
 
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
@@ -273,7 +273,7 @@ class Mint(object):
         """
         return len(self.ms_files)
 
-    def load_ms_files(self, list_of_files):
+    def load_files(self, obj):
         """
         Load ms_files as a function that returns the Mint instance for chaining.
 
@@ -282,10 +282,13 @@ class Mint(object):
         :return: self
         :rtype: ms_mint.Mint.Mint
         """
-        self.ms_files = list_of_files
+        if isinstance(obj, str):
+            self.ms_files = glob(obj, recursive=True)
+        elif isinstance(obj, list):
+            self.ms_files = obj
         return self
 
-    def load_files(self, list_of_files):
+    def load_targets(self, list_of_files):
         """
         Load targets from a file (csv, xslx)
 
