@@ -68,7 +68,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for ms_mint.targets</h1><div class="highlight"><pre>
-<span></span><span class="c1"># ms_mint/targets.py</span>
+<span></span><span class="sd">&quot;&quot;&quot;Everything related to target lists.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -87,7 +87,6 @@
 <div class="viewcode-block" id="read_targets"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.read_targets">[docs]</a><span class="k">def</span> <span class="nf">read_targets</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;negative&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts peak data from csv files that contain peak definitions.</span>
-<span class="sd">    CSV files must contain columns:</span>
 
 <span class="sd">    :param fns: List of filenames of target lists.</span>
 <span class="sd">    :param ms_mode: &quot;negative&quot; or &quot;positive&quot;</span>
@@ -114,9 +113,7 @@
 <span class="sd">    Standardize target list.</span>
 
 <span class="sd">    - updates the target lists to newest format</span>
-
 <span class="sd">    - ensures peak labels are strings</span>
-
 <span class="sd">    - replaces np.NaN with None</span>
 
 <span class="sd">    :param targets: DataFrame in target-list format.</span>
@@ -158,6 +155,12 @@
 
 
 <div class="viewcode-block" id="convert_to_seconds"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.convert_to_seconds">[docs]</a><span class="k">def</span> <span class="nf">convert_to_seconds</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert time units to seconds.</span>
+
+<span class="sd">    :param targets: Mint target list to modify.</span>
+<span class="sd">    :type targets: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">rt_unit</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
             <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
@@ -170,6 +173,12 @@
 
 
 <div class="viewcode-block" id="fill_missing_rt_values"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.fill_missing_rt_values">[docs]</a><span class="k">def</span> <span class="nf">fill_missing_rt_values</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If rt values are missing fill with mean of rt_min, rt_max.</span>
+
+<span class="sd">    :param targets: Mint target list to modify.</span>
+<span class="sd">    :type targets: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">rt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>

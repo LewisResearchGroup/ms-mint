@@ -1364,6 +1364,7 @@ self.decomposition_results.</p>
 </section>
 <section id="module-ms_mint.targets">
 <span id="ms-mint-targets-module"></span><h2>ms_mint.targets module<a class="headerlink" href="#module-ms_mint.targets" title="Permalink to this heading"></a></h2>
+<p>Everything related to target lists.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">TargetOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer" title="Permalink to this definition"></a></dt>
@@ -1440,7 +1441,13 @@ For this optimization all rt values in the target list must be present.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.targets.convert_to_seconds">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">convert_to_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#convert_to_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.convert_to_seconds" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Convert time units to seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Mint target list to modify.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.targets.diff_targets">
@@ -1465,7 +1472,13 @@ For this optimization all rt values in the target list must be present.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.targets.fill_missing_rt_values">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">fill_missing_rt_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#fill_missing_rt_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.fill_missing_rt_values" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>If rt values are missing fill with mean of rt_min, rt_max.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Mint target list to modify.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.targets.gen_target_grid">
@@ -1486,8 +1499,7 @@ For this optimization all rt values in the target list must be present.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.targets.read_targets">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">read_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'negative'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#read_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.read_targets" title="Permalink to this definition"></a></dt>
-<dd><p>Extracts peak data from csv files that contain peak definitions.
-CSV files must contain columns:</p>
+<dd><p>Extracts peak data from csv files that contain peak definitions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
