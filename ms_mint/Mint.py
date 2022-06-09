@@ -16,7 +16,7 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
-from .tools import scale_dataframe, is_ms_file, get_ms_files_from_results
+from .tools import is_ms_file, get_ms_files_from_results
 from .pca import PrincipalComponentsAnalyser
 from ms_mint.plotting import MintResultsPlotter
 

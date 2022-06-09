@@ -8,8 +8,6 @@ import logging
 
 from molmass import Formula, FormulaError
 
-from matplotlib import pyplot as plt
-
 from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from scipy.signal import find_peaks, peak_widths

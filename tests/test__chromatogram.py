@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from ms_mint.chromatogram import Chromatogram
 from ms_mint.tools import gaussian
 
-from paths import TEST_MZML, TEST_MZXML
+from paths import TEST_MZML
 
 
 def test__Chromatogram_without_filter_identifies_peaks_correctly():
@@ -87,7 +87,7 @@ def test__Chromatogram__select_peak_by_rt():
     assert selected_ndx == expected_ndx, selected_ndx
 
 
-def test__Chromatogram__select_peak_by_rt():
+def test__Chromatogram__select_peak_by_rt_as_argument():
 
     rt_peak_1 = 200
     rt_peak_2 = 500
