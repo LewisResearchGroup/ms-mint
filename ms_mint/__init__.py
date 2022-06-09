@@ -1,4 +1,4 @@
-"A Python library for targetd metabolomics."
+"""A Python library for targetd metabolomics."""
 
 import os
 import logging
