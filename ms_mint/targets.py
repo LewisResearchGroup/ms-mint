@@ -267,9 +267,7 @@ class TargetOptimizer:
         :rtype: tuple
         """
 
-        if targets is not None:
-            targets = targets
-        else:
+        if targets is None:
             targets = self.mint.targets
 
         if fns is not None: 
