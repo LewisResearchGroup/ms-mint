@@ -1102,30 +1102,28 @@ principal components.</p>
 <dd class="field-odd"><p>Returns a matplotlib figure.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>plt.figure</p>
+<dd class="field-even"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.pairplot">
-<span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot" title="Permalink to this definition"></a></dt>
 <dd><p>After running mint.pca() this function can be used to plot a scatter matrix of the
 principal components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_vars</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of principal components to plot, defaults to 3.</p></li>
-<li><p><strong>color_groups</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Groups used for hue.</p></li>
-<li><p><strong>group_name</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Names of color groups.</p></li>
-<li><p><strong>marker</strong> – </p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Labels used for hue.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Returns a matplotlib figure.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>plt.figure</p>
+<dd class="field-odd"><p>seaborn.axisgrid.PairGrid</p>
 </dd>
 </dl>
 </dd></dl>
