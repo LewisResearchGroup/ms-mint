@@ -1,2 +1,2 @@
-.ipynb linguist-documentation
+notebooks/* linguist-documentation=false
 *.py linguist-language=python
