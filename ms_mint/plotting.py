@@ -17,7 +17,6 @@ class MintResultsPlotter:
     :param mint: Mint instance
     :type mint: ms_mint.Mint.Mint
     """
-
     def __init__(self, mint):
         """
         Plot generator for mint.results.
@@ -132,6 +131,11 @@ class MintResultsPlotter:
         return fig
 
     def peak_shapes(self, **kwargs):
+        """Plot peak shapes.
+
+        :return: Figure with peak shapes.
+        :rtype: seaborn.axisgrid.FacetGrid
+        """
         if len(self.mint.results) > 0:
             return plot_peak_shapes(self.mint.results, **kwargs)
 
@@ -164,6 +168,9 @@ class MintResultsPlotter:
             If True transpose matrix before plotting.
         :param correlation: bool, default=False
             If True convert data to correlation matrix before plotting.
+
+        :return: Interactive heatmap.
+        :rtype: plotly.graph_objs._figure.Figure            
         """
         if len(self.mint.results) > 0:
             return plotly_heatmap(
