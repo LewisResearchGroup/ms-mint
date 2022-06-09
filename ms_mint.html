@@ -640,21 +640,80 @@ windows systems.</p>
 <dt class="sig sig-object py" id="ms_mint.filter.GaussFilter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.filter.</span></span><span class="sig-name descname"><span class="pre">GaussFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#GaussFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.GaussFilter" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Filter for time series that applies a Gaussian filter.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.filter.GaussFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#GaussFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.GaussFilter.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Filter for time series that applies a Gaussian filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sigma</strong> (<em>int</em><em>, </em><em>optional</em>) – Sigma value for Gaussian function, defaults to 5</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.filter.GaussFilter.transform">
 <span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#GaussFilter.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.GaussFilter.transform" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Transformation method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Array</em><em> or </em><em>List</em>) – Time points of series</p></li>
+<li><p><strong>x</strong> (<em>Array</em><em> or </em><em>List</em>) – Data points of series</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resampled time series (x, t)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.filter.Resampler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.filter.</span></span><span class="sig-name descname"><span class="pre">Resampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500ms'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Resampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Resampler" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.filter.</span></span><span class="sig-name descname"><span class="pre">Resampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500ms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'seconds'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Resampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Resampler" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Filter for time series that resamples the data in
+a certain frequency.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.filter.Resampler.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500ms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'seconds'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Resampler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Resampler.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Filter for time series that resamples the data in
+a certain frequency. The default is 500ms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau</strong> (<em>str</em><em>, </em><em>optional</em>) – Sampling frequency, defaults to “500ms”</p></li>
+<li><p><strong>unit</strong> – Time unit of input series (t)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.filter.Resampler.transform">
 <span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Resampler.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Resampler.transform" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Transformation method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Array</em><em> or </em><em>List</em>) – Time points of series</p></li>
+<li><p><strong>x</strong> (<em>Array</em><em> or </em><em>List</em>) – Data points of series</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resampled time series (x, t)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -662,10 +721,41 @@ windows systems.</p>
 <dt class="sig sig-object py" id="ms_mint.filter.Smoother">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.filter.</span></span><span class="sig-name descname"><span class="pre">Smoother</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">windows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[30,</span> <span class="pre">20]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Smoother"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Smoother" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Filter for time series that smoothes the
+x values by running one or more rolling
+averages.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.filter.Smoother.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">windows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[30,</span> <span class="pre">20]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Smoother.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Smoother.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Filter for time series that smoothes the
+x values by running one or more rolling
+averages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>windows</strong> (<em>: List</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Window sizes of rolling averages applied to time series, defaults to [30, 20]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.filter.Smoother.transform">
 <span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filter.html#Smoother.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filter.Smoother.transform" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Transformation method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Array</em><em> or </em><em>List</em>) – Time points of series</p></li>
+<li><p><strong>x</strong> (<em>Array</em><em> or </em><em>List</em>) – Data points of series</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resampled time series (x, t)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
