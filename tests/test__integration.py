@@ -134,3 +134,5 @@ def test__optimize_targets_find_min_max__returns_figure():
     assert mint.opt is result_1
     assert isinstance(result_2, plt.Figure), type(result_2)
 
+
+
