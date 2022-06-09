@@ -78,6 +78,7 @@ exclude_patterns = [
     "versioneer.py",
     "setup.py",
     "ms_mint/filelock.py",
+    "notebooks",
 ]
 
 
