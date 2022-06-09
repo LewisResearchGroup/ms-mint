@@ -1,4 +1,5 @@
-""" Experimental module to run Mint interactively inside the Jupyter notebook.
+"""
+Experimental module to run Mint interactively inside the Jupyter notebook.
 
 
 code-block::
@@ -28,9 +29,10 @@ HOME = str(P.home())
 
 
 class Mint(_Mint_):
-    """MINT with added functions for interactive use in Jupyter Notebook (experimental).
-
     """
+    MINT with added functions for interactive use in Jupyter Notebook (experimental).
+    """
+
     def __init__(self, *args, **kwargs):
 
         self.progress_callback = self._set_progress_
@@ -106,7 +108,7 @@ class Mint(_Mint_):
 
     @property
     def messages(self):
-       return self._messages
+        return self._messages
 
     def _message_(self, text):
         self.message_box.value = f"{text}\n" + self.message_box.value
@@ -126,7 +128,8 @@ class Mint(_Mint_):
         self.message(f"{self.n_files} MS-files loaded.")
 
     def display(self):
-        """Display control elements in Jupyter notebook.
+        """
+        Display control elements in Jupyter notebook.
 
         :return: IPython Widgets elements.
         """
@@ -150,4 +153,3 @@ class Mint(_Mint_):
             filename = os.path.join(os.getcwd(), filename)
         self.export(filename)
         self.message(f"/nExported results to: {filename}")
-

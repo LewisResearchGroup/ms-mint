@@ -24,7 +24,7 @@ copyright = "2022, Soren Wacker"
 author = "Soren Wacker"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.5.1"
+release = "0.1.6"
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,23 +32,23 @@ release = "0.1.5.1"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-#extensions = [
+# extensions = [
 #    "sphinx.ext.autodoc",
 #    "sphinx.ext.githubpages",
-#]
+# ]
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon',
-    'myst_parser',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.napoleon",
+    "myst_parser",
 ]
 
 # Napoleon settings
@@ -78,6 +78,7 @@ exclude_patterns = [
     "versioneer.py",
     "setup.py",
     "ms_mint/filelock.py",
+    "notebooks",
 ]
 
 
@@ -88,7 +89,7 @@ exclude_patterns = [
 #
 
 html_theme = "sphinx_rtd_theme"
-#html_theme = "alabaster"
+# html_theme = "alabaster"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -97,7 +98,6 @@ html_static_path = ["_static"]
 
 source_suffix = [".rst"]
 
-html_baseurl = 'https://lewisresearchgroup.github.io/ms-mint'
+html_baseurl = "https://lewisresearchgroup.github.io/ms-mint"
 
-requirements_path = 'docs/requirements.txt'
-
+requirements_path = "docs/requirements.txt"

@@ -1,16 +1,22 @@
-import numpy as np
-import pandas as pd
+import seaborn as sns
 
-from ms_mint.matplotlib_tools import hierarchical_clustering
+import matplotlib as mpl
+
+from ms_mint import Mint
+
+from paths import RESULTS_FN
 
 
-def test__plotly_heatmap__call_show():
-    N = 10
-    data = np.random.uniform(size=(N, N)) + np.arange(N) - N / 2
-    df = pd.DataFrame(data)
-    df.index.name = "INDEX"
-    df.columns.name = "COLUMNS"
 
-    clustered, fig, ndx_leaves, col_leaves = hierarchical_clustering(df)
+def test__hierarchical_clustering():
+    mint = Mint()
+    mint.load(RESULTS_FN)
+    fig = mint.plot.hierarchical_clustering()
+    assert isinstance(fig, mpl.image.AxesImage), type(fig)    
 
-    assert True
+
+def test__plot_peak_shapes():
+    mint = Mint()
+    mint.load(RESULTS_FN)
+    fig = mint.plot.peak_shapes()
+    assert isinstance(fig, sns.axisgrid.FacetGrid), type(fig)

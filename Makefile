@@ -16,7 +16,8 @@ pyinstaller:
 	cd specfiles && pyinstaller --onedir --noconfirm Mint__onedir__.spec --additional-hooks-dir=hooks
 
 doc:
-	mkdocs build && mkdocs gh-deploy
+	cd docs
+	make html
 
 deploy:
 	rm dist/*
