@@ -1,6 +1,4 @@
-"""
-Main module of the ms-mint library.
-"""
+"""Main module of the ms-mint library."""
 
 import os
 import numpy as np
@@ -275,7 +273,19 @@ class Mint(object):
         """
         return len(self.ms_files)
 
-    def load_targets(self, list_of_files):
+    def load_ms_files(self, list_of_files):
+        """
+        Load ms_files as a function that returns the Mint instance for chaining.
+
+        :param list_of_files: Filename or list of file names.
+        :type list_of_files: str or list[str]
+        :return: self
+        :rtype: ms_mint.Mint.Mint
+        """
+        self.ms_files = list_of_files
+        return self
+
+    def load_files(self, list_of_files):
         """
         Load targets from a file (csv, xslx)
 
@@ -295,6 +305,8 @@ class Mint(object):
             print("Set targets files to:\n".join(self._targets_files) + "\n")
         self.targets = read_targets(list_of_files)
         return self
+
+
 
     @property
     def targets(self):
