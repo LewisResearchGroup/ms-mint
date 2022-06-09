@@ -2,7 +2,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5178/badge)](https://bestpractices.coreinfrastructure.org/projects/5178)
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svglogo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
 
 
 # Wecome to ms-mint 
@@ -98,7 +98,7 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 
 # FAQ
-## What is a target list?
+## What is a target list
 A target list is a pandas dataframe with specific columns. 
 
 -   **peak_label**: str, Label of the peak (must be unique).
@@ -112,10 +112,10 @@ A target list is a pandas dataframe with specific columns.
 
 The target list can be stored as csv or Excel file. 
 
-## What input files can be used?
+## What input files can be used
 `ms_mint` can be used with `mzXML`, `mzML`, `mzMLb` and experimental formats in `.feather` and `.parquet` format.
 
-## Which properties does ms-mint extract?
+## Which properties does ms-mint extract
 ### Parameters from target list
 -   **ms_file**: Filename of MS-file
 -   **peak_label**: From target list
