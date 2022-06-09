@@ -106,7 +106,7 @@ class PCA_Plotter():
         principal components.
 
         :return: Returns a matplotlib figure.
-        :rtype: plt.figure
+        :rtype: matplotlib.figure.Figure
         """
         n_vars = self.pca.results["n_components"]
         fig = plt.figure(figsize=(height*aspect, height))
@@ -121,7 +121,7 @@ class PCA_Plotter():
 
 
     def pairplot(
-        self, n_vars=3, color_groups=None, group_name=None, fig_kws=None, **kwargs
+        self, n_vars=3, labels=None, fig_kws=None, **kwargs
     ):
         """
         After running mint.pca() this function can be used to plot a scatter matrix of the
@@ -129,24 +129,21 @@ class PCA_Plotter():
 
         :param n_vars: Number of principal components to plot, defaults to 3.
         :type n_vars: int, optional
-        :param color_groups: Groups used for hue.
-        :type color_groups: List[str], optional
-        :param group_name: Names of color groups.
-        :type group_name: List[str], optional
-        :param marker: 
-        :type marker:
+        :param labels: Labels used for hue.
+        :type labels: List[str], optional
         :return: Returns a matplotlib figure.
-        :rtype: plt.figure
+        :rtype: seaborn.axisgrid.PairGrid
         """
         df = self.pca.results["df_projected"]
         cols = df.columns.to_list()[:n_vars]
         df = df[cols]
-
-        if color_groups is not None:
-            if group_name is None:
-                group_name = "Group"
-            df[group_name] = color_groups
+        
+        if labels is not None:
+            group_name = "Group"
+            df[group_name] = labels
             df[group_name] = df[group_name].astype(str)
+        else:
+            group_name = None
 
         if fig_kws is None:
             fig_kws = {}
