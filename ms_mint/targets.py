@@ -1,4 +1,4 @@
-# ms_mint/targets.py
+"""Everything related to target lists."""
 
 import pandas as pd
 import numpy as np
@@ -17,7 +17,6 @@ from .tools import formula_to_mass, df_diff
 def read_targets(fns, ms_mode="negative"):
     """
     Extracts peak data from csv files that contain peak definitions.
-    CSV files must contain columns:
 
     :param fns: List of filenames of target lists.
     :param ms_mode: "negative" or "positive"
@@ -44,9 +43,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     Standardize target list.
 
     - updates the target lists to newest format
-
     - ensures peak labels are strings
-
     - replaces np.NaN with None
 
     :param targets: DataFrame in target-list format.
@@ -88,6 +85,12 @@ def standardize_targets(targets, ms_mode="neutral"):
 
 
 def convert_to_seconds(targets):
+    """
+    Convert time units to seconds.
+
+    :param targets: Mint target list to modify.
+    :type targets: pandas.DataFrame
+    """
     for ndx, row in targets.iterrows():
         if row.rt_unit == "min":
             targets.loc[ndx, "rt_unit"] = "s"
@@ -100,6 +103,12 @@ def convert_to_seconds(targets):
 
 
 def fill_missing_rt_values(targets):
+    """
+    If rt values are missing fill with mean of rt_min, rt_max.
+
+    :param targets: Mint target list to modify.
+    :type targets: pandas.DataFrame
+    """
     for ndx, row in targets.iterrows():
         if (
             (row.rt is None)
