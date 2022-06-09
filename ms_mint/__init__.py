@@ -1,6 +1,4 @@
-"""
-A Python library for large-cohort metabolomics (MS1) processing.
-"""
+"A Python library for targetd metabolomics."
 
 import os
 from ._version import get_versions
