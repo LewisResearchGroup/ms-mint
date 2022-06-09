@@ -1063,6 +1063,18 @@ using the pyteomics library.</p>
 <dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.pca.</span></span><span class="sig-name descname"><span class="pre">PCA_Plotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for plotting Mint PCA results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Class for plotting Mint PCA results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pca</strong> (<a class="reference internal" href="#ms_mint.pca.PrincipalComponentsAnalyser" title="ms_mint.pca.PrincipalComponentsAnalyser"><em>ms_mint.pca.PrincipalComponentsAnalyser</em></a>) – PrincipalComponentsAnalyser instance</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.cumulative_variance">
 <span class="sig-name descname"><span class="pre">cumulative_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance" title="Permalink to this definition"></a></dt>
@@ -1080,9 +1092,25 @@ principal components.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.pairplot">
-<span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot" title="Permalink to this definition"></a></dt>
 <dd><p>After running mint.pca() this function can be used to plot a scatter matrix of the
 principal components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_vars</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of principal components to plot, defaults to 3.</p></li>
+<li><p><strong>color_groups</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Groups used for hue.</p></li>
+<li><p><strong>group_name</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Names of color groups.</p></li>
+<li><p><strong>marker</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a matplotlib figure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>plt.figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1091,6 +1119,18 @@ principal components.</p>
 <dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.pca.</span></span><span class="sig-name descname"><span class="pre">PrincipalComponentsAnalyser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for applying PCA to Mint instance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Class for applying PCA to Mint instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a><em>, </em><em>optional</em>) – Mint instance, defaults to None</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser.run" title="Permalink to this definition"></a></dt>

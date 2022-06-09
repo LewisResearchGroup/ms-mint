@@ -79,11 +79,20 @@
 
 
 <div class="viewcode-block" id="PrincipalComponentsAnalyser"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser">[docs]</a><span class="k">class</span> <span class="nc">PrincipalComponentsAnalyser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for applying PCA to Mint instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="PrincipalComponentsAnalyser.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class for applying PCA to Mint instance.</span>
+
+<span class="sd">        :param mint: Mint instance, defaults to None</span>
+<span class="sd">        :type mint: ms_mint.Mint.Mint, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mint</span> <span class="o">=</span> <span class="n">mint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">PCA_Plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">PCA_Plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
     
 
 <div class="viewcode-block" id="PrincipalComponentsAnalyser.run"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">):</span>
@@ -148,12 +157,22 @@
 
 
 <div class="viewcode-block" id="PCA_Plotter"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter">[docs]</a><span class="k">class</span> <span class="nc">PCA_Plotter</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for plotting Mint PCA results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pca</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pca</span> <span class="o">=</span> <span class="n">pca</span>
+<div class="viewcode-block" id="PCA_Plotter.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pca</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class for plotting Mint PCA results.</span>
+
+<span class="sd">        :param pca: PrincipalComponentsAnalyser instance</span>
+<span class="sd">        :type pca: ms_mint.pca.PrincipalComponentsAnalyser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pca</span> <span class="o">=</span> <span class="n">pca</span></div>
 
 <div class="viewcode-block" id="PCA_Plotter.cumulative_variance"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;After running mint.pca() this function can be used to plot the cumulative variance of the</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After running mint.pca() this function can be used to plot the cumulative variance of the</span>
 <span class="sd">        principal components.</span>
 
 <span class="sd">        :return: Returns a matplotlib figure.</span>
@@ -172,11 +191,22 @@
 
 
 <div class="viewcode-block" id="PCA_Plotter.pairplot"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot">[docs]</a>    <span class="k">def</span> <span class="nf">pairplot</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">n_vars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">n_vars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;After running mint.pca() this function can be used to plot a scatter matrix of the</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After running mint.pca() this function can be used to plot a scatter matrix of the</span>
 <span class="sd">        principal components.</span>
 
+<span class="sd">        :param n_vars: Number of principal components to plot, defaults to 3.</span>
+<span class="sd">        :type n_vars: int, optional</span>
+<span class="sd">        :param color_groups: Groups used for hue.</span>
+<span class="sd">        :type color_groups: List[str], optional</span>
+<span class="sd">        :param group_name: Names of color groups.</span>
+<span class="sd">        :type group_name: List[str], optional</span>
+<span class="sd">        :param marker: </span>
+<span class="sd">        :type marker:</span>
+<span class="sd">        :return: Returns a matplotlib figure.</span>
+<span class="sd">        :rtype: plt.figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;df_projected&quot;</span><span class="p">]</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()[:</span><span class="n">n_vars</span><span class="p">]</span>
@@ -188,13 +218,13 @@
             <span class="n">df</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">color_groups</span>
             <span class="n">df</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
-        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fig_kws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig_kws</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">if</span> <span class="n">marker</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
-            <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">fig_kws</span><span class="p">)</span>
 
         <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span> <span class="n">plot_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="n">marker</span><span class="p">},</span> <span class="n">hue</span><span class="o">=</span><span class="n">group_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">group_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">g</span>        </div></div>
