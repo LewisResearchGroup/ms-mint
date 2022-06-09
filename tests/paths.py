@@ -55,11 +55,13 @@ TEST_PEAK_AREA_RESULTS = os.path.abspath(
     os.path.join("tests", "data", "results", "test_peak_area_results.csv")
 )
 
-
 TEST_MZXML_BROKEN = os.path.abspath(
     os.path.join("tests", "data", "broken", "broken.mzXML")
 )
 
+RESULTS_FN = os.path.abspath(
+    os.path.join("tests", "data", "results", "example-results.csv")
+)
 
 assert P(TEST_MZXML).is_file(), TEST_MZXML
 assert P(TEST_MZML).is_file(), TEST_MZML
