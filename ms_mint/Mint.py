@@ -460,5 +460,5 @@ class Mint(object):
 
     def digest_results(self):
         self.ms_files = get_ms_files_from_results(self.results)
-        self.targets =  get_targets_from_results(self.targets)
+        self.targets = get_targets_from_results(self.results)
         

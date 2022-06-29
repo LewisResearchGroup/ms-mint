@@ -120,6 +120,7 @@ def is_ms_file(fn):
     :return: Whether or not the file is recognized as MS-file
     :rtype: bool
     """
+    fn = str(fn)
     if (
         (fn.lower().endswith(".mzxml"))
         or (fn.lower().endswith(".mzml"))
@@ -156,7 +157,7 @@ def get_targets_from_results(results):
     :rtype: pandas.DataFrame
     """
     return results[
-            [col for col in TARGETS_COLUMNS if col in self.results.columns]
+            [col for col in TARGETS_COLUMNS if col in results.columns]
         ].drop_duplicates()
 
 def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9):
