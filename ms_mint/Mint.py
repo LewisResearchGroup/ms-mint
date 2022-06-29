@@ -404,7 +404,7 @@ class Mint(object):
         if self.progress_callback is not None:
             self.progress_callback(value)
 
-    def export(self, fn=None, filename=None):
+    def export(self, fn=None):
         """
         Export current results to file.
 
@@ -415,10 +415,6 @@ class Mint(object):
         :return: file buffer if *filename* is None otherwise returns None
         :rtype: io.BytesIO
         """
-
-        if filename is not None:
-            fn = filename
-            raise DeprecationWarning("'filename' is deprecated use 'fn' instead")
         if fn is None:
             buffer = export_to_excel(self, fn=fn)
             return buffer

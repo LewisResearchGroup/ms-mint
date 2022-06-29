@@ -267,14 +267,10 @@ class TargetOptimizer:
         :rtype: tuple
         """
 
-        if targets is not None:
-            targets = targets
-        else:
+        if targets is None:
             targets = self.mint.targets
 
-        if fns is not None: 
-            fns = fns
-        else:
+        if fns is None: 
             fns = self.mint.ms_files
 
         if peak_labels is None:
