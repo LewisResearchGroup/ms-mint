@@ -1,21 +1,16 @@
 import os
-
-import numpy as np
-
-import pandas as pd
-
 import logging
 
+import numpy as np
+import pandas as pd
+
+from pathlib import Path as P
 from molmass import Formula, FormulaError
-
 from sklearn.preprocessing import StandardScaler, RobustScaler
-
 from scipy.signal import find_peaks, peak_widths
 
-from .standards import M_PROTON
-
+from .standards import M_PROTON, TARGETS_COLUMNS
 from .filelock import FileLock
-
 from .matplotlib_tools import plot_peaks
 
 
@@ -149,9 +144,20 @@ def get_ms_files_from_results(results):
     :rtype: list
     """
     ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
-    ms_files = [os.path.join(ms_path, ms_file) for ms_path, ms_file in ms_files.values]
+    ms_files = [P(ms_path)/ms_file for ms_path, ms_file in ms_files.values]
     return ms_files
 
+def get_targets_from_results(results):
+    """Extract targets dataframe from ms-mint results table.
+
+    :param results: Mint results table
+    :type results: pandas.DataFrame
+    :return: Mint targets table
+    :rtype: pandas.DataFrame
+    """
+    return results[
+            [col for col in TARGETS_COLUMNS if col in self.results.columns]
+        ].drop_duplicates()
 
 def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9):
     """_summary_
