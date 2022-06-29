@@ -69,23 +69,18 @@
              
   <h1>Source code for ms_mint.tools</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
 <span class="kn">import</span> <span class="nn">logging</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
 <span class="kn">from</span> <span class="nn">molmass</span> <span class="kn">import</span> <span class="n">Formula</span><span class="p">,</span> <span class="n">FormulaError</span>
-
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span>
-
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span><span class="p">,</span> <span class="n">peak_widths</span>
 
-<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">M_PROTON</span>
-
+<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">M_PROTON</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span>
 <span class="kn">from</span> <span class="nn">.filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
-
 <span class="kn">from</span> <span class="nn">.matplotlib_tools</span> <span class="kn">import</span> <span class="n">plot_peaks</span>
 
 
@@ -219,9 +214,20 @@
 <span class="sd">    :rtype: list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;ms_path&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
-    <span class="n">ms_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span><span class="p">)</span> <span class="k">for</span> <span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span> <span class="ow">in</span> <span class="n">ms_files</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="n">ms_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">ms_path</span><span class="p">)</span><span class="o">/</span><span class="n">ms_file</span> <span class="k">for</span> <span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span> <span class="ow">in</span> <span class="n">ms_files</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">ms_files</span></div>
 
+<div class="viewcode-block" id="get_targets_from_results"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.get_targets_from_results">[docs]</a><span class="k">def</span> <span class="nf">get_targets_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract targets dataframe from ms-mint results table.</span>
+
+<span class="sd">    :param results: Mint results table</span>
+<span class="sd">    :type results: pandas.DataFrame</span>
+<span class="sd">    :return: Mint targets table</span>
+<span class="sd">    :rtype: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">results</span><span class="p">[</span>
+            <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">TARGETS_COLUMNS</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="find_peaks_in_timeseries"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.find_peaks_in_timeseries">[docs]</a><span class="k">def</span> <span class="nf">find_peaks_in_timeseries</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;_summary_</span>
