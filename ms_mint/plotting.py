@@ -29,6 +29,8 @@ class MintResultsPlotter:
     def hierarchical_clustering(
         self,
         data=None,
+        peak_labels=None,
+        ms_files=None,
         title=None,
         figsize=(8, 8),
         targets_var="peak_max",
@@ -85,6 +87,12 @@ class MintResultsPlotter:
         if data is None:
             data = self.mint.crosstab(targets_var).copy()
 
+        if peak_labels is not None:
+            data = data[peak_labels]
+        
+        if ms_files is not None:
+            data = data.loc[ms_files]
+        
         tmp_data = data.copy()
 
         if transform_func == "log1p":
