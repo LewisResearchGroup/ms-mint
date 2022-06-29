@@ -316,7 +316,11 @@ class TargetOptimizer:
                 if post_opt_kwargs is None: 
                     post_opt_kwargs = {}
                 chrom.optimise_peak_times_with_diff(**post_opt_kwargs)
-
+            
+            if chrom.selected_peak_ndxs is None or len(chrom.selected_peak_ndxs) == 0:
+                logging.warning(f'No peaks detected for {peak_label}')
+                continue
+                
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]

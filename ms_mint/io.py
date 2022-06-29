@@ -43,23 +43,28 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     :return: MS data as DataFrame
     :rtype: pandas.DataFrame
     """
+    
     assert time_unit in ["minutes", "seconds"]
     fn = str(fn)
-    if fn.lower().endswith(".mzxml"):
-        df = mzxml_to_df(fn, read_only=read_only)
-    elif fn.lower().endswith(".mzml"):
-        df = mzml_to_df(fn, read_only=read_only, time_unit=time_unit)
-    elif fn.lower().endswith("hdf"):
-        df = pd.read_hdf(fn)
-    elif fn.lower().endswith(".feather"):
-        df = pd.read_feather(fn)
-    elif fn.lower().endswith(".parquet"):
-        df = read_parquet(fn, read_only=read_only)
-    elif fn.lower().endswith(".mzmlb"):
-        df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
-    else:
-        logging.error(f"Cannot read file {fn} of type {type(fn)}")
-
+    
+    try:
+        if fn.lower().endswith(".mzxml"):
+            df = mzxml_to_df(fn, read_only=read_only)
+        elif fn.lower().endswith(".mzml"):
+            df = mzml_to_df(fn, read_only=read_only, time_unit=time_unit)
+        elif fn.lower().endswith("hdf"):
+            df = pd.read_hdf(fn)
+        elif fn.lower().endswith(".feather"):
+            df = pd.read_feather(fn)
+        elif fn.lower().endswith(".parquet"):
+            df = read_parquet(fn, read_only=read_only)
+        elif fn.lower().endswith(".mzmlb"):
+            df = mzmlb_to_df__pyteomics(fn, read_only=read_only)
+        else:
+            logging.error(f"Cannot read file {fn} of type {type(fn)}")
+    except IndexError as e:
+        logging.warning(f'{e}: {fn}')
+        return None
     # Compatibility with old schema
     if not read_only:
         df = df.rename(
