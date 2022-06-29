@@ -1,6 +1,7 @@
 """Main module of the ms-mint library."""
 
 import os
+from matplotlib.pyplot import get
 import numpy as np
 import pandas as pd
 import time
@@ -14,7 +15,7 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
-from .tools import is_ms_file, get_ms_files_from_results
+from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results
 from .pca import PrincipalComponentsAnalyser
 from ms_mint.plotting import MintResultsPlotter
 
@@ -434,41 +435,30 @@ class Mint(object):
         :rtype: ms_mint.Mint.Mint
         """
         if self.verbose:
-            print("Loading MINT state")
+            print(f"Loading MINT results from {fn}")
 
         if isinstance(fn, str):
             if fn.endswith("xlsx"):
-                results = pd.read_excel(fn, sheet_name="Results").rename(
-                    columns=DEPRECATED_LABELS
-                )
+                results = pd.read_excel(fn, sheet_name="Results")
                 self.results = results
-                self.digest_results()
-                return None
 
             elif fn.endswith(".csv"):
-                results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
+                results = pd.read_csv(fn)
                 results["peak_shape_rt"] = results["peak_shape_rt"].fillna("")
                 results["peak_shape_int"] = results["peak_shape_int"].fillna("")
                 self.results = results
-                self.digest_results()
-                return None
-            elif fn.endswith(".parquet"):
-                results = pd.read_parquet(fn).rename(columns=DEPRECATED_LABELS)
 
+            elif fn.endswith(".parquet"):
+                results = pd.read_parquet(fn)
         else:
-            results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
-            if "ms_file" in results.columns:
-                ms_files = get_ms_files_from_results(results)
-                self.results = results
-                self.ms_files = ms_files
-            targets = results[
-                [col for col in TARGETS_COLUMNS if col in results.columns]
-            ].drop_duplicates()
-            self.targets = targets
-            return self
+            results = pd.read_csv(fn)
+        self.results = results.rename(
+            columns=DEPRECATED_LABELS
+        )
+        self.digest_results()
+        return self
 
     def digest_results(self):
-        self.ms_files = self.results.ms_file.unique()
-        self.targets = self.results[
-            [col for col in TARGETS_COLUMNS if col in self.results.columns]
-        ].drop_duplicates()
+        self.ms_files = get_ms_files_from_results(self.results)
+        self.targets =  get_targets_from_results(self.targets)
+        
