@@ -190,6 +190,7 @@
 <span class="sd">    :return: Whether or not the file is recognized as MS-file</span>
 <span class="sd">    :rtype: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzxml&quot;</span><span class="p">))</span>
         <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzml&quot;</span><span class="p">))</span>
@@ -226,7 +227,7 @@
 <span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">results</span><span class="p">[</span>
-            <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">TARGETS_COLUMNS</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">TARGETS_COLUMNS</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="find_peaks_in_timeseries"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.find_peaks_in_timeseries">[docs]</a><span class="k">def</span> <span class="nf">find_peaks_in_timeseries</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>

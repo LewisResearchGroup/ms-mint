@@ -384,7 +384,11 @@
                 <span class="k">if</span> <span class="n">post_opt_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
                     <span class="n">post_opt_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">chrom</span><span class="o">.</span><span class="n">optimise_peak_times_with_diff</span><span class="p">(</span><span class="o">**</span><span class="n">post_opt_kwargs</span><span class="p">)</span>
-
+            
+            <span class="k">if</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No peaks detected for </span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+                
             <span class="n">ndx</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">rt_min</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">]</span>
             <span class="n">rt_max</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
