@@ -5,7 +5,7 @@ from scipy.cluster.hierarchy import ClusterWarning
 
 from pathlib import Path as P
 
-from .plotly_tools import plotly_heatmap
+from .plotly_tools import plotly_heatmap, plotly_peak_shapes
 from .matplotlib_tools import plot_peak_shapes, hierarchical_clustering
 from .tools import scale_dataframe
 
@@ -138,14 +138,17 @@ class MintResultsPlotter:
             self.mint.clustered = data.iloc[ndx_y, ndx_x]
         return fig
 
-    def peak_shapes(self, **kwargs):
+    def peak_shapes(self, interactive=False, **kwargs):
         """Plot peak shapes.
 
         :return: Figure with peak shapes.
         :rtype: seaborn.axisgrid.FacetGrid
         """
         if len(self.mint.results) > 0:
-            return plot_peak_shapes(self.mint.results, **kwargs)
+            if not interactive:
+                return plot_peak_shapes(self.mint.results, **kwargs)
+            else:
+                return plotly_peak_shapes(self.mint.results, **kwargs)
 
     def heatmap(
         self,

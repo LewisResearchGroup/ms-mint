@@ -54,6 +54,8 @@ def standardize_targets(targets, ms_mode="neutral"):
     :rtype: pandas.DataFrame
     """
     targets = targets.rename(columns=DEPRECATED_LABELS)
+    if targets.index.name == 'peak_label':
+        targets = targets.reset_index()
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
     if "formula" in targets.columns and not "mz_mean" in targets.columns:
@@ -81,6 +83,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     targets = targets.replace(np.NaN, None)
     fill_missing_rt_values(targets)
     convert_to_seconds(targets)
+
     return targets[TARGETS_COLUMNS]
 
 
@@ -268,13 +271,13 @@ class TargetOptimizer:
         """
 
         if targets is None:
-            targets = self.mint.targets
+            targets = self.mint.targets.reset_index()
 
         if fns is None: 
             fns = self.mint.ms_files
 
         if peak_labels is None:
-            peak_labels = self.mint.targets.peak_label.values
+            peak_labels = targets.peak_label.values
 
         _targets = targets.set_index("peak_label").copy()
 
@@ -328,14 +331,11 @@ class TargetOptimizer:
             if plot:
                 i += 1
 
-                if i <= 100:
+                if i <= 1000:
                     plt.subplot(n_rows, col_wrap, i)
                     chrom.plot()
                     plt.gca().get_legend().remove()
                     plt.title(f"{peak_label}\nm/z={mz:.3f}")
-
-                if i == 100:
-                    plt.tight_layout()
 
         self.results = _targets.reset_index()
 
@@ -343,6 +343,7 @@ class TargetOptimizer:
             self.mint.targets = self.results
 
         if plot:
+            plt.tight_layout()
             return self, fig
         else:
             return self
