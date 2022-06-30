@@ -124,6 +124,8 @@
 <span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;peak_label&#39;</span><span class="p">:</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
     <span class="k">assert</span> <span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="n">cols</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span>
     <span class="k">if</span> <span class="s2">&quot;formula&quot;</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s2">&quot;mz_mean&quot;</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -151,6 +153,7 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">fill_missing_rt_values</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
     <span class="n">convert_to_seconds</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">targets</span><span class="p">[</span><span class="n">TARGETS_COLUMNS</span><span class="p">]</span></div>
 
 
@@ -338,13 +341,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
             <span class="n">fns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">ms_files</span>
 
         <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">peak_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">peak_labels</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">values</span>
 
         <span class="n">_targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;peak_label&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -398,14 +401,11 @@
             <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
-                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">1000</span><span class="p">:</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">col_wrap</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
                     <span class="n">chrom</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="se">\n</span><span class="s2">m/z=</span><span class="si">{</span><span class="n">mz</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">_targets</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
@@ -413,6 +413,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span>
 
         <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fig</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span></div></div>

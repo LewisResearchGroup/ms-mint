@@ -319,7 +319,7 @@ The values in the cells are determined by <em>col_name</em>.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.Mint.Mint.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nthreads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nthreads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.run" title="Permalink to this definition"></a></dt>
 <dd><p>Main routine to run MINT and process MS-files with current target list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -331,6 +331,7 @@ The values in the cells are determined by <em>col_name</em>.</p>
 <li><p><strong>mode</strong> (<em>str</em>) – Compute mode (‘standard’ or ‘express’), defaults to ‘standard’
 * ‘standard’: calculates peak shaped projected to RT dimension
 * ‘express’: omits calculation of other features, only peak_areas</p></li>
+<li><p><strong>fn</strong> (<em>str</em>) – Output filename to not keep results in memory.</p></li>
 <li><p><strong>kwargs</strong> – Arguments passed to the procesing function.</p></li>
 </ul>
 </dd>
@@ -1196,6 +1197,13 @@ self.decomposition_results.</p>
 <dd class="field-odd"><p>plotly.Figure</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_peak_shapes">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'v'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_peak_shapes" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a plotly multiplost of all peak_shapes in mint.results
+grouped by peak_label.</p>
 </dd></dl>
 
 <dl class="py function">
