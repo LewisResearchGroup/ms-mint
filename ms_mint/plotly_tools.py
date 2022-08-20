@@ -294,7 +294,7 @@ def plotly_peak_shapes(
                     legendgroup=file_i,
                     showlegend=(label_i == 0),
                     marker_color=colors[file_i],
-                    text=file,
+                    text=fn,
                 ),
                 row=ndx_r,
                 col=ndx_c,
