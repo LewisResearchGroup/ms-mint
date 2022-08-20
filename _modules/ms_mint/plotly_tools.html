@@ -301,7 +301,7 @@
 <span class="sd">    grouped by peak_label.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">basename</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
+    <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 
