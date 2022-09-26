@@ -130,6 +130,7 @@ The target list can be stored as csv or Excel file.
 -   **rt**: From target list
 -   **rt_min**: From target list
 -   **rt_max**: From target list
+-   **rt_unit**: Unit of retention times, default is s (seconds), from [s, min]
 -   **intensity_threshold**: From target list
 -   **target_filename**: From target list
 
