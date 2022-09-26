@@ -68,6 +68,15 @@ def standardize_targets(targets, ms_mode="neutral"):
         targets["target_filename"] = "unknown"
     if "rt_unit" not in targets.columns:
         targets["rt_unit"] = "min"
+    
+    # Standardize time units
+    targets['rt_unit'] = targets['rt_unit'].replace('m', 'min')
+    targets['rt_unit'] = targets['rt_unit'].replace('minute', 'min')
+    targets['rt_unit'] = targets['rt_unit'].replace('minutes', 'min')
+    targets['rt_unit'] = targets['rt_unit'].replace('sec', 's')
+    targets['rt_unit'] = targets['rt_unit'].replace('second', 's')
+    targets['rt_unit'] = targets['rt_unit'].replace('seconds', 's')
+
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
             targets[c] = None
