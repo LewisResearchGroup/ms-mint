@@ -69,7 +69,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     if "rt_unit" not in targets.columns:
         targets["rt_unit"] = "min"
     
-    # Standardize time units
+    # Standardize time units use SI abbreviations
     targets['rt_unit'] = targets['rt_unit'].replace('m', 'min')
     targets['rt_unit'] = targets['rt_unit'].replace('minute', 'min')
     targets['rt_unit'] = targets['rt_unit'].replace('minutes', 'min')
