@@ -193,7 +193,7 @@ def test__run_parallel_with_output_filename(tmp_path):
     args_list = []
     # Create files in tmp_path and add
     # parameters to argument list.
-    for fn in fns:  
+    for fn in fns:
         os.symlink(TEST_MZXML, fn)
 
         args = {
