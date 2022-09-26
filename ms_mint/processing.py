@@ -46,6 +46,7 @@ def process_ms1_files_in_parallel(args):
     if "queue" in args.keys():
         q = args["queue"]
         q.put("filename")
+
     try:
         results = process_ms1_file(filename=filename, targets=targets)
     except Exception as e:
@@ -54,6 +55,7 @@ def process_ms1_files_in_parallel(args):
 
     if (output_fn is not None) and (len(results) > 0):
         append_results(results, output_fn)
+        print('return None')
         return None
 
     return results
@@ -285,8 +287,7 @@ def slice_ms1_array(
     :return: Slice of numpy array
     :rtype: np.Array
     """
-    assert isinstance(rt_min, float), type(rt_min)
-    assert isinstance(rt_max, float), type(rt_max)
+    
     delta_mass = mz_width * mz_mean * 1e-6
     array = array[(array[:, 0] >= rt_min)]
     array = array[(array[:, 0] <= rt_max)]
