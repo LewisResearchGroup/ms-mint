@@ -307,7 +307,7 @@
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
+    <span class="n">fns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">])</span>
@@ -325,19 +325,19 @@
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">col_wrap</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ms_files:&quot;</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ms_files:&quot;</span><span class="p">,</span> <span class="n">fns</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;peak_labels:&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data:&quot;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span> <span class="n">cols</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">col_wrap</span><span class="p">),</span> <span class="n">subplot_titles</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="p">:</span>
         <span class="n">colors</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">scales</span><span class="p">[</span><span class="s2">&quot;12&quot;</span><span class="p">][</span><span class="s2">&quot;qual&quot;</span><span class="p">][</span><span class="s2">&quot;Paired&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">colors</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">scales</span><span class="p">[</span><span class="s2">&quot;12&quot;</span><span class="p">][</span><span class="s2">&quot;qual&quot;</span><span class="p">][</span><span class="s2">&quot;Paired&quot;</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">scales</span><span class="p">[</span><span class="s2">&quot;12&quot;</span><span class="p">][</span><span class="s2">&quot;qual&quot;</span><span class="p">][</span><span class="s2">&quot;Paired&quot;</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">))</span>
 
     <span class="c1"># Create sub-plots</span>
     <span class="k">for</span> <span class="n">label_i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">file_i</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file_i</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fns</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">fn</span><span class="p">),</span> <span class="p">[</span><span class="s2">&quot;peak_shape_rt&quot;</span><span class="p">,</span> <span class="s2">&quot;peak_shape_int&quot;</span><span class="p">]]</span>
             <span class="k">except</span><span class="p">:</span>
