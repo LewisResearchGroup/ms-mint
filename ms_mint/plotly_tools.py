@@ -231,7 +231,7 @@ def plotly_peak_shapes(
     grouped by peak_label.
     """
     mint_results = mint_results.copy()
-    mint_results.ms_file = [P(i).name for i in mint_results.ms_file]
+    mint_results.ms_file = [P(fn).name for fn in mint_results.ms_file]
 
     res = mint_results[mint_results.peak_area > 0]
 
