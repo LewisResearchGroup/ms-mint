@@ -17,6 +17,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -41,24 +42,109 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Wecome to ms-mint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#plotting-and-data-exploration">Plotting and data exploration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#faq">FAQ</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">ms_mint</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ms_mint package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.Mint">ms_mint.Mint module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.chromatogram">ms_mint.chromatogram module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filelock">ms_mint.filelock module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filter">ms_mint.filter module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.io">ms_mint.io module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.matplotlib_tools">ms_mint.matplotlib_tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.notebook">ms_mint.notebook module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.pca">ms_mint.pca module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.plotly_tools">ms_mint.plotly_tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.processing">ms_mint.processing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.standards">ms_mint.standards module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.targets">ms_mint.targets module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.tools">ms_mint.tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-mint-module">ms_mint.Mint module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.Mint.Mint"><code class="docutils literal notranslate"><span class="pre">Mint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.chromatogram">ms_mint.chromatogram module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.Chromatogram"><code class="docutils literal notranslate"><span class="pre">Chromatogram</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.extract_chromatogram_from_ms1"><code class="docutils literal notranslate"><span class="pre">extract_chromatogram_from_ms1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.get_chromatogram_from_ms_file"><code class="docutils literal notranslate"><span class="pre">get_chromatogram_from_ms_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.mz_mean_width_to_mass_range"><code class="docutils literal notranslate"><span class="pre">mz_mean_width_to_mass_range()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-filelock-module">ms_mint.filelock module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.BaseFileLock"><code class="docutils literal notranslate"><span class="pre">BaseFileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.FileLock"><code class="docutils literal notranslate"><span class="pre">FileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.SoftFileLock"><code class="docutils literal notranslate"><span class="pre">SoftFileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.Timeout"><code class="docutils literal notranslate"><span class="pre">Timeout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.UnixFileLock"><code class="docutils literal notranslate"><span class="pre">UnixFileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.WindowsFileLock"><code class="docutils literal notranslate"><span class="pre">WindowsFileLock</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filter">ms_mint.filter module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filter.GaussFilter"><code class="docutils literal notranslate"><span class="pre">GaussFilter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filter.Resampler"><code class="docutils literal notranslate"><span class="pre">Resampler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.filter.Smoother"><code class="docutils literal notranslate"><span class="pre">Smoother</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-io-module">ms_mint.io module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.convert_ms_file_to_feather"><code class="docutils literal notranslate"><span class="pre">convert_ms_file_to_feather()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.convert_ms_file_to_parquet"><code class="docutils literal notranslate"><span class="pre">convert_ms_file_to_parquet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.df_to_numeric"><code class="docutils literal notranslate"><span class="pre">df_to_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.export_to_excel"><code class="docutils literal notranslate"><span class="pre">export_to_excel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.format_thermo_raw_file_reader_parquet"><code class="docutils literal notranslate"><span class="pre">format_thermo_raw_file_reader_parquet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.ms_file_to_df"><code class="docutils literal notranslate"><span class="pre">ms_file_to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.mzml_to_df"><code class="docutils literal notranslate"><span class="pre">mzml_to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.mzml_to_pandas_df_pyteomics"><code class="docutils literal notranslate"><span class="pre">mzml_to_pandas_df_pyteomics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.mzmlb_to_df__pyteomics"><code class="docutils literal notranslate"><span class="pre">mzmlb_to_df__pyteomics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.mzxml_to_df"><code class="docutils literal notranslate"><span class="pre">mzxml_to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.read_parquet"><code class="docutils literal notranslate"><span class="pre">read_parquet()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.matplotlib_tools">ms_mint.matplotlib_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.matplotlib_tools.hierarchical_clustering"><code class="docutils literal notranslate"><span class="pre">hierarchical_clustering()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.matplotlib_tools.plot_peak_shapes"><code class="docutils literal notranslate"><span class="pre">plot_peak_shapes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.matplotlib_tools.plot_peaks"><code class="docutils literal notranslate"><span class="pre">plot_peaks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-notebook-module">ms_mint.notebook module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.notebook.Mint"><code class="docutils literal notranslate"><span class="pre">Mint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.pca">ms_mint.pca module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.pca.PCA_Plotter"><code class="docutils literal notranslate"><span class="pre">PCA_Plotter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.pca.PrincipalComponentsAnalyser"><code class="docutils literal notranslate"><span class="pre">PrincipalComponentsAnalyser</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.plotly_tools">ms_mint.plotly_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.plotly_heatmap"><code class="docutils literal notranslate"><span class="pre">plotly_heatmap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.plotly_peak_shapes"><code class="docutils literal notranslate"><span class="pre">plotly_peak_shapes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.set_template"><code class="docutils literal notranslate"><span class="pre">set_template()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.processing">ms_mint.processing module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.append_results"><code class="docutils literal notranslate"><span class="pre">append_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.extract_chromatogram_from_ms1"><code class="docutils literal notranslate"><span class="pre">extract_chromatogram_from_ms1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.extract_ms1_properties"><code class="docutils literal notranslate"><span class="pre">extract_ms1_properties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.process_ms1"><code class="docutils literal notranslate"><span class="pre">process_ms1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.process_ms1_file"><code class="docutils literal notranslate"><span class="pre">process_ms1_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.process_ms1_files_in_parallel"><code class="docutils literal notranslate"><span class="pre">process_ms1_files_in_parallel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.process_ms1_from_numpy"><code class="docutils literal notranslate"><span class="pre">process_ms1_from_numpy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.score_peaks"><code class="docutils literal notranslate"><span class="pre">score_peaks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.slice_ms1_array"><code class="docutils literal notranslate"><span class="pre">slice_ms1_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-standards-module">ms_mint.standards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-targets-module">ms_mint.targets module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.TargetOptimizer"><code class="docutils literal notranslate"><span class="pre">TargetOptimizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.check_targets"><code class="docutils literal notranslate"><span class="pre">check_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.convert_to_seconds"><code class="docutils literal notranslate"><span class="pre">convert_to_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.diff_targets"><code class="docutils literal notranslate"><span class="pre">diff_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.fill_missing_rt_values"><code class="docutils literal notranslate"><span class="pre">fill_missing_rt_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.gen_target_grid"><code class="docutils literal notranslate"><span class="pre">gen_target_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.read_targets"><code class="docutils literal notranslate"><span class="pre">read_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.standardize_targets"><code class="docutils literal notranslate"><span class="pre">standardize_targets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.tools">ms_mint.tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.df_diff"><code class="docutils literal notranslate"><span class="pre">df_diff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.find_peaks_in_timeseries"><code class="docutils literal notranslate"><span class="pre">find_peaks_in_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.formula_to_mass"><code class="docutils literal notranslate"><span class="pre">formula_to_mass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.get_ms_files_from_results"><code class="docutils literal notranslate"><span class="pre">get_ms_files_from_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.get_targets_from_results"><code class="docutils literal notranslate"><span class="pre">get_targets_from_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.is_ms_file"><code class="docutils literal notranslate"><span class="pre">is_ms_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.lock"><code class="docutils literal notranslate"><span class="pre">lock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.scale_dataframe"><code class="docutils literal notranslate"><span class="pre">scale_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -95,10 +181,10 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
-<section id="module-ms_mint.Mint">
-<span id="ms-mint-mint-module"></span><h2>ms_mint.Mint module<a class="headerlink" href="#module-ms_mint.Mint" title="Permalink to this heading"></a></h2>
+<section id="ms-mint-mint-module">
+<h2>ms_mint.Mint module<a class="headerlink" href="#ms-mint-mint-module" title="Permalink to this heading"></a></h2>
 <p>Main module of the ms-mint library.</p>
-<dl class="py class">
+<span class="target" id="module-ms_mint.Mint"></span><dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.Mint.Mint">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.Mint.</span></span><span class="sig-name descname"><span class="pre">Mint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -492,10 +578,10 @@ The values in the cells are determined by <em>col_name</em>.</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-ms_mint.filelock">
-<span id="ms-mint-filelock-module"></span><h2>ms_mint.filelock module<a class="headerlink" href="#module-ms_mint.filelock" title="Permalink to this heading"></a></h2>
+<section id="ms-mint-filelock-module">
+<h2>ms_mint.filelock module<a class="headerlink" href="#ms-mint-filelock-module" title="Permalink to this heading"></a></h2>
 <p>A platform independent file lock that supports the with-statement.</p>
-<dl class="py class">
+<span class="target" id="module-ms_mint.filelock"></span><dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.filelock.BaseFileLock">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.filelock.</span></span><span class="sig-name descname"><span class="pre">BaseFileLock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/filelock.html#BaseFileLock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.filelock.BaseFileLock" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -778,10 +864,10 @@ averages.</p>
 </dd></dl>
 
 </section>
-<section id="module-ms_mint.io">
-<span id="ms-mint-io-module"></span><h2>ms_mint.io module<a class="headerlink" href="#module-ms_mint.io" title="Permalink to this heading"></a></h2>
+<section id="ms-mint-io-module">
+<h2>ms_mint.io module<a class="headerlink" href="#ms-mint-io-module" title="Permalink to this heading"></a></h2>
 <p>Funtions to read and write MINT files.</p>
-<dl class="py function">
+<span class="target" id="module-ms_mint.io"></span><dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.convert_ms_file_to_feather">
 <span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">convert_ms_file_to_feather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#convert_ms_file_to_feather"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.convert_ms_file_to_feather" title="Permalink to this definition"></a></dt>
 <dd><p>Convert MS file to feather format.</p>
@@ -1040,8 +1126,8 @@ using the pyteomics library.</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-ms_mint.notebook">
-<span id="ms-mint-notebook-module"></span><h2>ms_mint.notebook module<a class="headerlink" href="#module-ms_mint.notebook" title="Permalink to this heading"></a></h2>
+<section id="ms-mint-notebook-module">
+<h2>ms_mint.notebook module<a class="headerlink" href="#ms-mint-notebook-module" title="Permalink to this heading"></a></h2>
 <p>Experimental module to run Mint interactively inside the Jupyter notebook.</p>
 <p>code-block:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ms_mint.notebook</span> <span class="kn">import</span> <span class="n">Mint</span>
@@ -1051,7 +1137,7 @@ using the pyteomics library.</p>
 <span class="n">mint</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 </pre></div>
 </div>
-<dl class="py class">
+<span class="target" id="module-ms_mint.notebook"></span><dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.notebook.Mint">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.notebook.</span></span><span class="sig-name descname"><span class="pre">Mint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/notebook.html#Mint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.notebook.Mint" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mint</span></code></a></p>
@@ -1381,14 +1467,14 @@ grouped by peak_label.</p>
 </dd></dl>
 
 </section>
-<section id="module-ms_mint.standards">
-<span id="ms-mint-standards-module"></span><h2>ms_mint.standards module<a class="headerlink" href="#module-ms_mint.standards" title="Permalink to this heading"></a></h2>
+<section id="ms-mint-standards-module">
+<h2>ms_mint.standards module<a class="headerlink" href="#ms-mint-standards-module" title="Permalink to this heading"></a></h2>
 <p>Contains standard column names and other values.</p>
-</section>
-<section id="module-ms_mint.targets">
-<span id="ms-mint-targets-module"></span><h2>ms_mint.targets module<a class="headerlink" href="#module-ms_mint.targets" title="Permalink to this heading"></a></h2>
+<span class="target" id="module-ms_mint.standards"></span></section>
+<section id="ms-mint-targets-module">
+<h2>ms_mint.targets module<a class="headerlink" href="#ms-mint-targets-module" title="Permalink to this heading"></a></h2>
 <p>Everything related to target lists.</p>
-<dl class="py class">
+<span class="target" id="module-ms_mint.targets"></span><dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">TargetOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -1733,10 +1819,10 @@ For this optimization all rt values in the target list must be present.</p>
 </dd></dl>
 
 </section>
-<section id="module-ms_mint">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ms_mint" title="Permalink to this heading"></a></h2>
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <p>A Python library for targetd metabolomics.</p>
-</section>
+<span class="target" id="module-ms_mint"></span></section>
 </section>
 
 
