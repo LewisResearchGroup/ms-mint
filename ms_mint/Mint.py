@@ -1,7 +1,6 @@
 """Main module of the ms-mint library."""
 
 import os
-from matplotlib.pyplot import get
 import numpy as np
 import pandas as pd
 import time
