@@ -254,17 +254,17 @@ def plotly_peak_shapes(
     if verbose:
         print(n_rows, col_wrap)
         print("ms_files:", fns)
-        print("peak_labels:", labels)
+        print("peak_labels:", peak_labels)
         print("Data:", res)
 
-    fig = make_subplots(rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=labels)
+    fig = make_subplots(rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels)
     if len(fns) < 13:
         colors = cl.scales["12"]["qual"]["Paired"]
     else:
         colors = cl.interp(cl.scales["12"]["qual"]["Paired"], len(fns))
 
     # Create sub-plots
-    for label_i, label in enumerate(labels):
+    for label_i, label in enumerate(peak_labels):
         for file_i, fn in enumerate(fns):
             try:
                 x, y = res.loc[(label, fn), ["peak_shape_rt", "peak_shape_int"]]
