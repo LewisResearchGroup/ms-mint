@@ -287,7 +287,6 @@ def slice_ms1_array(
     :return: Slice of numpy array
     :rtype: np.Array
     """
-    
     delta_mass = mz_width * mz_mean * 1e-6
     array = array[(array[:, 0] >= rt_min)]
     array = array[(array[:, 0] <= rt_max)]
