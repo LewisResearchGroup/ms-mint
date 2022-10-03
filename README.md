@@ -11,7 +11,7 @@ The `ms-mint` library can be used for targeted metabolomics and large amounts of
 The metabolites can define biomarkers, which are used in medicine as indicators of disease or for the development of diagnostic tests. `ms-mint` contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. It uses a target list and the MS-filenames as input to extract peak intensities and other information. 
 
 ## Documentation
-The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/).
+The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/modules.html).
 
 ## News
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
