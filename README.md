@@ -112,10 +112,11 @@ A target list is a pandas dataframe with specific columns.
 
 -   **peak_label**: string, Label of the peak (must be unique).
 -   **mz_mean**: numeric value, theoretical m/z value of the target ion to extract.
--   **mz_width**: numeric value, width of the peak in [ppm] of the `mz_mean` value used to calculate the width of the mass window `Δm = m/z * 1e-6 * mz_width`.
+-   **mz_width**: numeric value, width of the peak in \[ppm\]. It is used to calculate the width of the mass window  according to the formula: `Δm = m/z * 1e-6 * mz_width`.
 -   **rt**: numeric value, (optional), expected time of the peak. This value is not used during processing, but it can inform the peak optimization procedure.
 -   **rt_min**: numeric value, starting time for peak integration.
 -   **rt_max**: numeric value, ending time for peak integration.
+-   **rt_unit**: one of `s` or `min` for seconds or minutes respectively.
 -   **intensity_threshold**: numeric value (>=0), minimum intensity value to include, serves as a noise filter. We recommend setting this to 0. 
 -   **target_filename**: string (optional), name of the target list file. It is not used for processing, just to keep track of what files were used.
 
