@@ -14,9 +14,9 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
-from .tools import is_ms_file, get_ms_files_from_results
+from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results
 from .pca import PrincipalComponentsAnalyser
-from ms_mint.plotting import MintResultsPlotter
+from .plotting import MintResultsPlotter
 
 import ms_mint
 
@@ -112,7 +112,7 @@ class Mint(object):
         """
         self.ms_files = []
 
-    def run(self, nthreads=None, rt_margin=0.5, mode="standard", **kwargs):
+    def run(self, nthreads=None, rt_margin=0.5, mode="standard", fn=None, **kwargs):
         """
         Main routine to run MINT and process MS-files with current target list.
 
@@ -124,6 +124,8 @@ class Mint(object):
         :param mode: Compute mode ('standard' or 'express'), defaults to 'standard'
                 * 'standard': calculates peak shaped projected to RT dimension
                 * 'express': omits calculation of other features, only peak_areas
+        :param fn: Output filename to not keep results in memory.
+        :type fn: str
         :type mode: str
         :param kwargs: Arguments passed to the procesing function.
         """
@@ -132,7 +134,8 @@ class Mint(object):
         if (self.n_files == 0) or (len(self.targets) == 0):
             return None
 
-        targets = self.targets
+        targets = self.targets.reset_index()
+
         if "rt" in targets.columns:
             ndx = (targets.rt_min.isna()) & (~targets.rt.isna())
             targets.loc[ndx, "rt_min"] = targets.loc[ndx, "rt"] - rt_margin
@@ -148,13 +151,13 @@ class Mint(object):
 
         start = time.time()
         if nthreads > 1:
-            self.__run_parallel__(nthreads=nthreads, mode=mode, **kwargs)
+            self.__run_parallel__(nthreads=nthreads, mode=mode, fn=fn, **kwargs)
         else:
             results = []
             for i, filename in enumerate(self.ms_files):
                 args = {
                     "filename": filename,
-                    "targets": self.targets,
+                    "targets": targets,
                     "q": None,
                     "mode": mode,
                     "output_fn": None,
@@ -183,7 +186,7 @@ class Mint(object):
         return self
 
     def __run_parallel__(
-        self, nthreads=1, mode="standard", maxtasksperchild=None, output_fn=None
+        self, nthreads=1, mode="standard", maxtasksperchild=None, fn=None
     ):
         print(f"maxtasksperchild: {maxtasksperchild}")
         pool = Pool(processes=nthreads, maxtasksperchild=maxtasksperchild)
@@ -191,18 +194,18 @@ class Mint(object):
         q = m.Queue()
         args = []
 
-        if output_fn is not None:
+        if fn is not None:
             # Prepare output file (only headers)
-            pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(output_fn, index=False)
+            pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(fn, index=False)
 
         for filename in self.ms_files:
             args.append(
                 {
                     "filename": filename,
-                    "targets": self.targets,
+                    "targets": self.targets.reset_index(),
                     "queue": q,
                     "mode": mode,
-                    "output_fn": output_fn,
+                    "output_fn": fn,
                 }
             )
 
@@ -222,7 +225,7 @@ class Mint(object):
         pool.close()
         pool.join()
 
-        if output_fn is None:
+        if fn is None:
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
 
@@ -330,7 +333,7 @@ class Mint(object):
     def targets(self, targets):
         targets = standardize_targets(targets)
         assert check_targets(targets), check_targets(targets)
-        self._targets = targets
+        self._targets = targets.set_index('peak_label')
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
 
@@ -434,41 +437,31 @@ class Mint(object):
         :rtype: ms_mint.Mint.Mint
         """
         if self.verbose:
-            print("Loading MINT state")
+            print(f"Loading MINT results from {fn}")
 
         if isinstance(fn, str):
             if fn.endswith("xlsx"):
-                results = pd.read_excel(fn, sheet_name="Results").rename(
-                    columns=DEPRECATED_LABELS
-                )
+                results = pd.read_excel(fn, sheet_name="Results")
                 self.results = results
-                self.digest_results()
-                return None
 
             elif fn.endswith(".csv"):
-                results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
+                results = pd.read_csv(fn)
                 results["peak_shape_rt"] = results["peak_shape_rt"].fillna("")
                 results["peak_shape_int"] = results["peak_shape_int"].fillna("")
                 self.results = results
-                self.digest_results()
-                return None
-            elif fn.endswith(".parquet"):
-                results = pd.read_parquet(fn).rename(columns=DEPRECATED_LABELS)
 
+            elif fn.endswith(".parquet"):
+                results = pd.read_parquet(fn)
         else:
-            results = pd.read_csv(fn).rename(columns=DEPRECATED_LABELS)
-            if "ms_file" in results.columns:
-                ms_files = get_ms_files_from_results(results)
-                self.results = results
-                self.ms_files = ms_files
-            targets = results[
-                [col for col in TARGETS_COLUMNS if col in results.columns]
-            ].drop_duplicates()
-            self.targets = targets
-            return self
+            results = pd.read_csv(fn)
+        self.results = results.rename(
+            columns=DEPRECATED_LABELS
+        )
+        self.digest_results()
+        return self
 
     def digest_results(self):
-        self.ms_files = self.results.ms_file.unique()
-        self.targets = self.results[
-            [col for col in TARGETS_COLUMNS if col in self.results.columns]
-        ].drop_duplicates()
+        self.ms_files = get_ms_files_from_results(self.results)
+        self.targets = get_targets_from_results(self.results)
+        
+

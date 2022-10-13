@@ -191,6 +191,8 @@ def test__run_parallel_with_output_filename(tmp_path):
     output_fn = P(tmp_path) / "results.csv"
 
     args_list = []
+    # Create files in tmp_path and add
+    # parameters to argument list.
     for fn in fns:
         os.symlink(TEST_MZXML, fn)
 
@@ -207,6 +209,7 @@ def test__run_parallel_with_output_filename(tmp_path):
     # Prepare output file (only headers)
     pd.DataFrame(columns=MINT_RESULTS_COLUMNS).to_csv(output_fn, index=False)
 
+    # Run async processing
     results = pool.map_async(processing.process_ms1_files_in_parallel, args_list)
 
     pool.close()
@@ -214,8 +217,11 @@ def test__run_parallel_with_output_filename(tmp_path):
 
     returned_results = results.get()
 
+    # Expect all returned results to be None
     assert all([i is None for i in returned_results]), returned_results
 
-    stored_results = pd.read_csv(output_fn)
+    # All results should be stored in the output file
+    assert output_fn.is_file()
 
+    stored_results = pd.read_csv(output_fn)
     assert len(stored_results) == N * len(targets)

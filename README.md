@@ -8,7 +8,10 @@
 
 ## A Python library for targeted metabolomics
 The `ms-mint` library can be used for targeted metabolomics and large amounts of files (1000+). Metabolomics is the study of all small chemical compounds (metabolites) in a biological sample. 
-The metabolites can define biomarkers, which are used in medicine as indicators of disease or for the development of diagnostic tests. `ms-mint` contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. It uses a target list and the MS-filenames as input to extract peak intensities and other information. The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/).
+The metabolites can define biomarkers, which are used in medicine as indicators of disease or for the development of diagnostic tests. `ms-mint` contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. It uses a target list and the MS-filenames as input to extract peak intensities and other information. 
+
+## Documentation
+The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/modules.html).
 
 ## News
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
@@ -41,6 +44,8 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
         './input/SA_B3.mzML'
     ]
 
+To load the target definitions from a file the `load_targets` method is used:    
+    
     mint.load_targets('targets.csv')
     
     mint.targets
@@ -53,12 +58,18 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
         5  Nicotinate  122.02455        10  3.05340    2.75    3.75                    0     targets.csv
         6  Citrulline  174.08810        10  8.40070    8.35    8.50                    0     targets.csv
 
-    mint.run()
+When filenames and targets are loaded, the processing can be started by calling the `run()` method:
 
-    # Use mint.run(output_fn='results') for many files to prevent memory issues.
+    mint.run()  # Use mint.run(output_fn='results') for many files to prevent memory issues.
 
+Then the results will be stored in the `results` attribute:
     mint.results
     >>>
+    ...
+
+# Plotting and data exploration
+
+The `Mint` class has a few convenient methods to visualize and explore the processed data.
 
 ## Plot peak shapes
 
@@ -122,6 +133,7 @@ The target list can be stored as csv or Excel file.
 -   **rt**: From target list
 -   **rt_min**: From target list
 -   **rt_max**: From target list
+-   **rt_unit**: Unit of retention times, default is s (seconds), from [s, min]
 -   **intensity_threshold**: From target list
 -   **target_filename**: From target list
 

@@ -54,6 +54,8 @@ def standardize_targets(targets, ms_mode="neutral"):
     :rtype: pandas.DataFrame
     """
     targets = targets.rename(columns=DEPRECATED_LABELS)
+    if targets.index.name == 'peak_label':
+        targets = targets.reset_index()
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
     if "formula" in targets.columns and not "mz_mean" in targets.columns:
@@ -66,6 +68,15 @@ def standardize_targets(targets, ms_mode="neutral"):
         targets["target_filename"] = "unknown"
     if "rt_unit" not in targets.columns:
         targets["rt_unit"] = "min"
+    
+    # Standardize time units use SI abbreviations
+    targets['rt_unit'] = targets['rt_unit'].replace('m', 'min')
+    targets['rt_unit'] = targets['rt_unit'].replace('minute', 'min')
+    targets['rt_unit'] = targets['rt_unit'].replace('minutes', 'min')
+    targets['rt_unit'] = targets['rt_unit'].replace('sec', 's')
+    targets['rt_unit'] = targets['rt_unit'].replace('second', 's')
+    targets['rt_unit'] = targets['rt_unit'].replace('seconds', 's')
+
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
             targets[c] = None
@@ -81,6 +92,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     targets = targets.replace(np.NaN, None)
     fill_missing_rt_values(targets)
     convert_to_seconds(targets)
+
     return targets[TARGETS_COLUMNS]
 
 
@@ -268,15 +280,13 @@ class TargetOptimizer:
         """
 
         if targets is None:
-            targets = self.mint.targets
+            targets = self.mint.targets.reset_index()
 
-        if fns is not None: 
-            fns = fns
-        else:
+        if fns is None: 
             fns = self.mint.ms_files
 
         if peak_labels is None:
-            peak_labels = self.mint.targets.peak_label.values
+            peak_labels = targets.peak_label.values
 
         _targets = targets.set_index("peak_label").copy()
 
@@ -316,7 +326,11 @@ class TargetOptimizer:
                 if post_opt_kwargs is None: 
                     post_opt_kwargs = {}
                 chrom.optimise_peak_times_with_diff(**post_opt_kwargs)
-
+            
+            if chrom.selected_peak_ndxs is None or len(chrom.selected_peak_ndxs) == 0:
+                logging.warning(f'No peaks detected for {peak_label}')
+                continue
+                
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]
@@ -326,14 +340,11 @@ class TargetOptimizer:
             if plot:
                 i += 1
 
-                if i <= 100:
+                if i <= 1000:
                     plt.subplot(n_rows, col_wrap, i)
                     chrom.plot()
                     plt.gca().get_legend().remove()
                     plt.title(f"{peak_label}\nm/z={mz:.3f}")
-
-                if i == 100:
-                    plt.tight_layout()
 
         self.results = _targets.reset_index()
 
@@ -341,6 +352,7 @@ class TargetOptimizer:
             self.mint.targets = self.results
 
         if plot:
+            plt.tight_layout()
             return self, fig
         else:
             return self
