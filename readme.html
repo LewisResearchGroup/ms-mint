@@ -220,10 +220,11 @@ mint.pca.plot.pairplot(5)
 <ul class="simple">
 <li><p><strong>peak_label</strong>: string, Label of the peak (must be unique).</p></li>
 <li><p><strong>mz_mean</strong>: numeric value, theoretical m/z value of the target ion to extract.</p></li>
-<li><p><strong>mz_width</strong>: numeric value, width of the peak in [ppm] of the <code class="docutils literal notranslate"><span class="pre">mz_mean</span></code> value used to calculate the width of the mass window <code class="docutils literal notranslate"><span class="pre">Δm</span> <span class="pre">=</span> <span class="pre">m/z</span> <span class="pre">*</span> <span class="pre">1e-6</span> <span class="pre">*</span> <span class="pre">mz_width</span></code>.</p></li>
+<li><p><strong>mz_width</strong>: numeric value, width of the peak in [ppm]. It is used to calculate the width of the mass window  according to the formula: <code class="docutils literal notranslate"><span class="pre">Δm</span> <span class="pre">=</span> <span class="pre">m/z</span> <span class="pre">*</span> <span class="pre">1e-6</span> <span class="pre">*</span> <span class="pre">mz_width</span></code>.</p></li>
 <li><p><strong>rt</strong>: numeric value, (optional), expected time of the peak. This value is not used during processing, but it can inform the peak optimization procedure.</p></li>
 <li><p><strong>rt_min</strong>: numeric value, starting time for peak integration.</p></li>
 <li><p><strong>rt_max</strong>: numeric value, ending time for peak integration.</p></li>
+<li><p><strong>rt_unit</strong>: one of <code class="docutils literal notranslate"><span class="pre">s</span></code> or <code class="docutils literal notranslate"><span class="pre">min</span></code> for seconds or minutes respectively.</p></li>
 <li><p><strong>intensity_threshold</strong>: numeric value (&gt;=0), minimum intensity value to include, serves as a noise filter. We recommend setting this to 0.</p></li>
 <li><p><strong>target_filename</strong>: string (optional), name of the target list file. It is not used for processing, just to keep track of what files were used.</p></li>
 </ul>
