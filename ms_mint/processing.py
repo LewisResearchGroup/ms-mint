@@ -42,18 +42,20 @@ def process_ms1_files_in_parallel(args):
     filename = args["filename"]
     targets = args["targets"]
     output_fn = args["output_fn"]
-
+    
     if "queue" in args.keys():
         q = args["queue"]
         q.put("filename")
+
     try:
         results = process_ms1_file(filename=filename, targets=targets)
     except Exception as e:
-        logging.error(e)
+        logging.error(f'process_ms1_files_in_parallel(): {e}')
         results = pd.DataFrame()
 
     if (output_fn is not None) and (len(results) > 0):
         append_results(results, output_fn)
+        print('return None')
         return None
 
     return results

@@ -7,7 +7,7 @@ pexpect
 decorator
 pillow
 lxml
-pandas
+pandas==1.4
 matplotlib
 seaborn
 pyteomics

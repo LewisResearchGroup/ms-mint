@@ -1,8 +1,13 @@
 import numpy as np
+import colorlover as cl
 
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.io as pio
+
+from pathlib import Path as P
+from collections.abc import Iterable
+from plotly.subplots import make_subplots
 
 
 def set_template():
@@ -210,3 +215,102 @@ def plotly_heatmap(
     else:
         return fig
 
+
+
+def plotly_peak_shapes(
+    mint_results,
+    col_wrap=1,
+    peak_labels=None,
+    legend=True,
+    verbose=False,
+    legend_orientation="v",
+    call_show=False,
+):
+    """
+    Returns a plotly multiplost of all peak_shapes in mint.results
+    grouped by peak_label.
+    """
+    mint_results = mint_results.copy()
+    mint_results.ms_file = [P(fn).name for fn in mint_results.ms_file]
+
+    res = mint_results[mint_results.peak_area > 0]
+
+    fns = list(res.ms_file.drop_duplicates())
+    labels = list(mint_results.peak_label.drop_duplicates())
+
+    res = res.set_index(["peak_label", "ms_file"])
+
+    if peak_labels is None:
+        peak_labels = []
+
+    if isinstance(peak_labels, str):
+        peak_labels = [peak_labels]
+
+    # Calculate neccessary number of rows
+    n_rows = len(labels) // col_wrap
+    if n_rows * col_wrap < len(labels):
+        n_rows += 1
+
+    if verbose:
+        print(n_rows, col_wrap)
+        print("ms_files:", fns)
+        print("peak_labels:", peak_labels)
+        print("Data:", res)
+
+    fig = make_subplots(rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels)
+    if len(fns) < 13:
+        colors = cl.scales["12"]["qual"]["Paired"]
+    else:
+        colors = cl.interp(cl.scales["12"]["qual"]["Paired"], len(fns))
+
+    # Create sub-plots
+    for label_i, label in enumerate(peak_labels):
+        for file_i, fn in enumerate(fns):
+            #try:
+            x, y = res.loc[(label, fn), ["peak_shape_rt", "peak_shape_int"]]
+            #except:
+            #    continue
+            if not isinstance(x, Iterable):
+                continue
+
+            if isinstance(x, str):
+                x = x.split(",")
+                y = y.split(",")
+
+            ndx_r = (label_i // col_wrap) + 1
+            ndx_c = label_i % col_wrap + 1
+
+            if len(x) == 1:
+                mode = "markers"
+            else:
+                mode = "lines"
+
+            fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y,
+                    name=P(fn).name,
+                    mode=mode,
+                    legendgroup=file_i,
+                    showlegend=(label_i == 0),
+                    marker_color=colors[file_i],
+                    text=fn,
+                ),
+                row=ndx_r,
+                col=ndx_c,
+            )
+
+            fig.update_xaxes(title_text="Scan Time", row=ndx_r, col=ndx_c)
+            fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
+
+    # Layout
+    if legend:
+        fig.update_layout(legend_orientation=legend_orientation)
+
+    fig.update_layout(showlegend=legend)
+    fig.update_layout(height=400 * n_rows, title_text="Peak Shapes")
+
+    if call_show:
+        fig.show(config={"displaylogo": False})
+    else:
+        return fig  
