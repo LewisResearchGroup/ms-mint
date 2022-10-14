@@ -55,7 +55,6 @@ def process_ms1_files_in_parallel(args):
 
     if (output_fn is not None) and (len(results) > 0):
         append_results(results, output_fn)
-        print('return None')
         return None
 
     return results
