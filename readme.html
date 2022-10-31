@@ -48,7 +48,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#news">News</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions">Contributions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-standards">Code standards</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#example-usage">Example usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook">ms-mint in JupyterLab, or the Jupyter Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-files">Load files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-target-list">Load target list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-data-extraction">Run data extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#processing-a-large-number-of-files">Processing a large number of files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#plotting-and-data-exploration">Plotting and data exploration</a><ul>
@@ -124,29 +131,44 @@ Before you modify the code please reach out to us using the <a class="reference 
 <h2>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this heading"></a></h2>
 <p>The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.</p>
 </section>
+</section>
 <section id="example-usage">
-<h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h2>
+<h1>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h1>
+<p>The main class of mint is can be in ported with <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ms_mint.Mint</span> <span class="pre">import</span> <span class="pre">Mint</span></code>. This command imports a lightweight version with essential functionality. If you aim to use the tool interactively in a Jupyter Notebook or JupyterLab, you can import <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ms_mint.notebook</span> <span class="pre">import</span> <span class="pre">Mint</span></code>. These class is made for Jupyter notebooks and provides more functions.</p>
+<section id="ms-mint-in-jupyterlab-or-the-jupyter-notebook">
+<h2>ms-mint in JupyterLab, or the Jupyter Notebook<a class="headerlink" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook" title="Permalink to this heading"></a></h2>
+<p>In the JupyterLab you would first instantiate the main class and then load a number of mass-spectrometry (MS) files and a target list.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>%pylab inline
 from ms_mint.notebook import Mint
 mint = Mint()
-
-mint.ms_files = [
-    &#39;./input/EC_B2.mzXML&#39;,
-    &#39;./input/EC_B1.mzXML&#39;,
-    &#39;./input/CA_B1.mzXML&#39;,
-    &#39;./input/CA_B4.mzXML&#39;,
-    &#39;./input/CA_B2.mzXML&#39;,
-    &#39;./input/CA_B3.mzXML&#39;,
-    &#39;./input/EC_B4.mzXML&#39;,
-    &#39;./input/EC_B3.mzXML&#39;,
-    &#39;./input/SA_B4.mzML&#39;,
-    &#39;./input/SA_B2.mzML&#39;,
-    &#39;./input/SA_B1.mzML&#39;,
-    &#39;./input/SA_B3.mzML&#39;
-]
 </pre></div>
 </div>
-<p>To load the target definitions from a file the <code class="docutils literal notranslate"><span class="pre">load_targets</span></code> method is used:</p>
+</section>
+<section id="load-files">
+<h2>Load files<a class="headerlink" href="#load-files" title="Permalink to this heading"></a></h2>
+<p>You can import files simply by assigning a list to the <code class="docutils literal notranslate"><span class="pre">Mint.ms_files</span></code> attribute.
+mint.ms_files = [
+‘./input/EC_B2.mzXML’,
+‘./input/EC_B1.mzXML’,
+‘./input/CA_B1.mzXML’,
+‘./input/CA_B4.mzXML’,
+‘./input/CA_B2.mzXML’,
+‘./input/CA_B3.mzXML’,
+‘./input/EC_B4.mzXML’,
+‘./input/EC_B3.mzXML’,
+‘./input/SA_B4.mzML’,
+‘./input/SA_B2.mzML’,
+‘./input/SA_B1.mzML’,
+‘./input/SA_B3.mzML’
+]</p>
+<p>Or you can use the <code class="docutils literal notranslate"><span class="pre">Mint.load_files()</span></code> method which supports a string with regular expressions. The files in the previous function you could load with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.load_files(&#39;./input/*.*&#39;)
+</pre></div>
+</div>
+</section>
+<section id="load-target-list">
+<h2>Load target list<a class="headerlink" href="#load-target-list" title="Permalink to this heading"></a></h2>
+<p>Then you load the target definitions from a file the <code class="docutils literal notranslate"><span class="pre">load_targets</span></code> method is used:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.load_targets(&#39;targets.csv&#39;)
 
 mint.targets
@@ -160,6 +182,13 @@ mint.targets
     6  Citrulline  174.08810        10  8.40070    8.35    8.50                    0     targets.csv
 </pre></div>
 </div>
+<p>You can also prepare a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> with the column names as shown above and assign it directly to the <code class="docutils literal notranslate"><span class="pre">Mint.targets</span></code> attribute:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.targets = my_targets_dataframe
+</pre></div>
+</div>
+</section>
+<section id="run-data-extraction">
+<h2>Run data extraction<a class="headerlink" href="#run-data-extraction" title="Permalink to this heading"></a></h2>
 <p>When filenames and targets are loaded, the processing can be started by calling the <code class="docutils literal notranslate"><span class="pre">run()</span></code> method:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run()  # Use mint.run(output_fn=&#39;results&#39;) for many files to prevent memory issues.
 </pre></div>
@@ -168,6 +197,11 @@ mint.targets
 mint.results
 &gt;&gt;&gt;
 …</p>
+</section>
+<section id="processing-a-large-number-of-files">
+<h2>Processing a large number of files<a class="headerlink" href="#processing-a-large-number-of-files" title="Permalink to this heading"></a></h2>
+<p>If you want to process a large number of files, you should provide an output filename. Then the results are written directly to that file instead of being stored in memory.</p>
+<p>mint.run(fn=’my-mint-output.csv’)</p>
 </section>
 </section>
 <section id="plotting-and-data-exploration">
