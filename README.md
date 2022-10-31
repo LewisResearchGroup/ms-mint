@@ -23,12 +23,19 @@ Before you modify the code please reach out to us using the [issues](https://git
 ## Code standards
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
 
-## Example usage
+# Example usage
+
+The main class of mint is can be in ported with `from ms_mint.Mint import Mint`. This command imports a lightweight version with essential functionality. If you aim to use the tool interactively in a Jupyter Notebook or JupyterLab, you can import `from ms_mint.notebook import Mint`. These class is made for Jupyter notebooks and provides more functions.
+
+### ms-mint in JupyterLab, or the Jupyter Notebook
+In the JupyterLab you would first instantiate the main class and then load a number of mass-spectrometry (MS) files and a target list.
 
     %pylab inline
     from ms_mint.notebook import Mint
     mint = Mint()
 
+### Load files
+You can import files simply by assigning a list to the `Mint.ms_files` attribute.
     mint.ms_files = [
         './input/EC_B2.mzXML',
         './input/EC_B1.mzXML',
@@ -44,7 +51,13 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
         './input/SA_B3.mzML'
     ]
 
-To load the target definitions from a file the `load_targets` method is used:    
+Or you can use the `Mint.load_files()` method which supports a string with regular expressions. The files in the previous function you could load with:
+
+    mint.load_files('./input/*.*')
+
+### Load target list
+
+Then you load the target definitions from a file the `load_targets` method is used:    
     
     mint.load_targets('targets.csv')
     
@@ -58,6 +71,11 @@ To load the target definitions from a file the `load_targets` method is used:
         5  Nicotinate  122.02455        10  3.05340    2.75    3.75                    0     targets.csv
         6  Citrulline  174.08810        10  8.40070    8.35    8.50                    0     targets.csv
 
+You can also prepare a `pandas.DataFrame` with the column names as shown above and assign it directly to the `Mint.targets` attribute:
+
+    mint.targets = my_targets_dataframe
+
+### Run data extraction
 When filenames and targets are loaded, the processing can be started by calling the `run()` method:
 
     mint.run()  # Use mint.run(output_fn='results') for many files to prevent memory issues.
@@ -66,6 +84,14 @@ Then the results will be stored in the `results` attribute:
     mint.results
     >>>
     ...
+
+### Processing a large number of files
+
+If you want to process a large number of files, you should provide an output filename. Then the results are written directly to that file instead of being stored in memory. 
+
+   mint.run(fn='my-mint-output.csv')
+   
+ 
 
 # Plotting and data exploration
 
