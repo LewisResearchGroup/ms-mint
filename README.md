@@ -34,8 +34,11 @@ In the JupyterLab you would first instantiate the main class and then load a num
     from ms_mint.notebook import Mint
     mint = Mint()
 
+## Data extraction
+
 ### Load files
 You can import files simply by assigning a list to the `Mint.ms_files` attribute.
+
     mint.ms_files = [
         './input/EC_B2.mzXML',
         './input/EC_B1.mzXML',
@@ -90,12 +93,30 @@ Then the results will be stored in the `results` attribute:
 If you want to process a large number of files, you should provide an output filename. Then the results are written directly to that file instead of being stored in memory. 
 
    mint.run(fn='my-mint-output.csv')
-   
- 
 
-# Plotting and data exploration
+## Optimize retention times
+In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function `mint.opt.rt_min_max()` for to generate better values for `rt_min` and `rt_max`. 
 
-The `Mint` class has a few convenient methods to visualize and explore the processed data.
+![](notebooks/peak-shapes-before-opt.png)
+
+    mint.opt.rt_min_max(
+        fns=[...]
+        peak_labels=['Xanthine', 'Succinate', 'Citrulline'],
+        plot=True, rel_height=0.7, sigma=50, col_wrap=1, aspect=3,
+        height=4
+    )
+
+If you do not provide a list for `peak_labels` the optimization will run for all metabolites. If no list with filenames is provided for `fn` all currently loaded files `mint.ms_files` are used. We usually use 20-40 files at maximum. If you run a set of standards with your samples (highly recommended) you can use the standard files to run the optimization. After optimization you should consider a manual fine tuning especially for complicated peaks (two or more peaks, noisy peaks, etc.). You can look at the peak shapes after you ran the main routine (`Mint.run()`) with the plotting tools (`Mint.plot.peak_shapes()`), explained further below.
+    
+![](notebooks/opt-rt.png)
+
+    mint.run()
+
+![](notebooks/peak-shapes-after-opt.png)
+
+## Plotting and data exploration
+
+The `Mint` class has a few convenient methods to visualize and explore the processed data. The results can be viewed directly in JupyterLab or stored to files using `matplotlib` and `seaborn` syntax. The figures are matplotlib objects and can be easily customised. 
 
 ## Plot peak shapes
 
@@ -103,21 +124,7 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 
     mint.plot.peak_shapes(col_wrap = 3)
 
-## Optimize retention times
 
-![](notebooks/peak-shapes-before-opt.png)
-
-    mint.opt.find_rt_min_max(
-        peak_labels=['Xanthine', 'Succinate', 'Citrulline'], 
-        plot=True, rel_height=0.7, sigma=50, col_wrap=1, aspect=3,
-        height=4
-    )
-    
-![](notebooks/opt-rt.png)
-
-    mint.run()
-
-![](notebooks/peak-shapes-after-opt.png)
 
 ## Hierarchical clustering
 
