@@ -20,8 +20,8 @@ from .plotting import MintResultsPlotter
 
 import ms_mint
 
-
 from typing import Callable
+
 
 
 class Mint(object):
@@ -360,7 +360,6 @@ class Mint(object):
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
         The values in the cells are determined by *col_name*.
-
 
         :param col_name: Name of the column from *mint.results* table that is used for the cell values.
         :type col_name: str
