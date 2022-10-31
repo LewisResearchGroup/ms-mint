@@ -427,7 +427,7 @@
     <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">df</span>
 
-<div class="viewcode-block" id="Mint.crosstab"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.crosstab">[docs]</a>    <span class="k">def</span> <span class="nf">crosstab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="s2">&quot;peak_area&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="Mint.crosstab"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.crosstab">[docs]</a>    <span class="k">def</span> <span class="nf">crosstab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create condensed representation of the results.</span>
 <span class="sd">        More specifically, a cross-table with filenames as index and target labels.</span>
@@ -438,12 +438,17 @@
 
 <span class="sd">        cells of the returned table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">peak_label</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
             <span class="n">aggfunc</span><span class="o">=</span><span class="nb">sum</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">apply</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">apply</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">col_normalized</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span> <span class="o">/</span> <span class="n">df</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">df</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">progress_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
