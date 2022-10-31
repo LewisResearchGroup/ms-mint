@@ -355,7 +355,7 @@ class Mint(object):
     def results(self, df):
         self._results = df
 
-    def crosstab(self, col_name="peak_area"):
+    def crosstab(self, col_name="peak_max", apply=None, col_normalized=False):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
@@ -366,12 +366,17 @@ class Mint(object):
 
         cells of the returned table.
         """
-        return pd.crosstab(
+        df = pd.crosstab(
             self.results.ms_file,
             self.results.peak_label,
             self.results[col_name],
             aggfunc=sum,
         ).astype(np.float64)
+        if apply:
+            df = df.apply(apply)
+        if col_normalized:
+            df = df / df.max()
+        return df
 
     @property
     def progress_callback(self):
