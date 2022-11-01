@@ -5,7 +5,7 @@ import pandas as pd
 
 from pathlib import Path as P
 from molmass import Formula, FormulaError
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from scipy.signal import find_peaks, peak_widths
 
 from .standards import M_PROTON, TARGETS_COLUMNS
@@ -88,6 +88,8 @@ def scale_dataframe(df, scaler="standard", **kwargs):
         scaler = StandardScaler(**kwargs)
     elif scaler == "robust":
         scaler = RobustScaler(**kwargs)
+    elif scaler == "minmax":
+        scaler = MinMaxScaler(**kwargs)
     df.loc[:, :] = scaler.fit_transform(df)
     return df
 
