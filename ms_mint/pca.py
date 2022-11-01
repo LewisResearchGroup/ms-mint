@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.express as px
 import plotly.figure_factory as ff
 
 from sklearn.decomposition import PCA
@@ -126,13 +125,10 @@ class PCA_Plotter():
         df = self.pca.results["df_projected"].copy()
         cols = df.columns.to_list()[:n_vars]
         df = df[cols]
-        
         if labels is not None:
             group_name = "Label"
             df[group_name] = labels
             df[group_name] = df[group_name].astype(str)
-        else:
-            group_name = None
         return df
 
 
@@ -166,9 +162,9 @@ class PCA_Plotter():
         g = sns.pairplot(
             df, hue='Label' if 'Label' in df.columns else None, **kwargs
         )
+        return g
 
     
     def pairplot_plotly(self, df, **kwargs):
         color_col = 'Label' if 'Label' in df.columns else None
-        dimensions = df.filter(regex='PC').columns.to_list()
         return ff.create_scatterplotmatrix(df, index=color_col, **kwargs)
