@@ -293,7 +293,7 @@
         <span class="p">)</span>
 
     <span class="n">peak_area</span> <span class="o">=</span> <span class="n">intensities</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">peak_area_top3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">intensities</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">peak_area_top3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">intensities</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">peak_mean</span> <span class="o">=</span> <span class="n">intensities</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">peak_max</span> <span class="o">=</span> <span class="n">intensities</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="n">peak_min</span> <span class="o">=</span> <span class="n">intensities</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
