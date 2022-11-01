@@ -134,6 +134,9 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 
     mint.plot.peak_shapes(col_wrap = 3)
 
+The method uses seaborns relplot [sns.relplot()](https://seaborn.pydata.org/generated/seaborn.relplot.html) and keyword arguments are passed on. 
+
+
 ## Hierarchical clustering
 
     mint.plot.hierarchical_clustering()
