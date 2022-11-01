@@ -180,8 +180,8 @@ The target list can be stored as csv or Excel file.
 ---
 
 ### Results columns
--   **peak_area**: The sum of all intensities
--   **peak_area_top3**: The sum of the 3 largest intensities
+-   **peak_area**: The sum of all intensities in the extraction window
+-   **peak_area_top3**: The average of the 3 largest intensities in the extraction window
 -   **peak_n_datapoints**: Number of datapoints
 -   **peak_max**: Intensity of peak maximum
 -   **peak_rt_of_max**: Retentiontime of peak maximum
