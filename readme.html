@@ -206,13 +206,16 @@ mint.results
 <section id="processing-a-large-number-of-files">
 <h3>Processing a large number of files<a class="headerlink" href="#processing-a-large-number-of-files" title="Permalink to this heading"></a></h3>
 <p>If you want to process a large number of files, you should provide an output filename. Then the results are written directly to that file instead of being stored in memory.</p>
-<p>mint.run(fn=’my-mint-output.csv’)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run(fn=&#39;my-mint-output.csv&#39;)
+</pre></div>
+</div>
 </section>
 </section>
 <section id="optimize-retention-times">
 <h2>Optimize retention times<a class="headerlink" href="#optimize-retention-times" title="Permalink to this heading"></a></h2>
-<p>In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> for to generate better values for <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code>.</p>
+<p>In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> for to generate better values for <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code>. In the current example the peaks look like this:</p>
 <p><img alt="" src="notebooks/peak-shapes-before-opt.png" /></p>
+<p>Now we can run the peak optimization with:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.opt.rt_min_max(
     fns=[...]
     peak_labels=[&#39;Xanthine&#39;, &#39;Succinate&#39;, &#39;Citrulline&#39;],
@@ -224,9 +227,12 @@ mint.results
 <p>If you do not provide a list for <code class="docutils literal notranslate"><span class="pre">peak_labels</span></code> the optimization will run for all metabolites. If no list with filenames is provided for <code class="docutils literal notranslate"><span class="pre">fn</span></code> all currently loaded files <code class="docutils literal notranslate"><span class="pre">mint.ms_files</span></code> are used. We usually use 20-40 files at maximum. If you run a set of standards with your samples (highly recommended) you can use the standard files to run the optimization. After optimization you should consider a manual fine tuning especially for complicated peaks (two or more peaks, noisy peaks, etc.). You can look at the peak shapes after you ran the main routine (<code class="docutils literal notranslate"><span class="pre">Mint.run()</span></code>) with the plotting tools (<code class="docutils literal notranslate"><span class="pre">Mint.plot.peak_shapes()</span></code>), explained further below.</p>
 <p><img alt="" src="notebooks/opt-rt.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run()
+
+mint.plot.peak_shapes(col_wrap=3)
 </pre></div>
 </div>
 <p><img alt="" src="notebooks/peak-shapes-after-opt.png" /></p>
+<p>As you can see the shapes of Xanthine, Succinate, Citrulline look much better.</p>
 </section>
 <section id="plotting-and-data-exploration">
 <h2>Plotting and data exploration<a class="headerlink" href="#plotting-and-data-exploration" title="Permalink to this heading"></a></h2>
@@ -234,7 +240,7 @@ mint.results
 </section>
 <section id="plot-peak-shapes">
 <h2>Plot peak shapes<a class="headerlink" href="#plot-peak-shapes" title="Permalink to this heading"></a></h2>
-<p><img alt="" src="https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png" /></p>
+<p><img alt="" src="notebooks/peak-shapes-after-opt.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.plot.peak_shapes(col_wrap = 3)
 </pre></div>
 </div>
