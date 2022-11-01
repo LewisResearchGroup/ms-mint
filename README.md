@@ -112,6 +112,8 @@ If you do not provide a list for `peak_labels` the optimization will run for all
     
 ![](notebooks/opt-rt.png)
 
+The black line indicates the average intensity across all files used for the optimization. The orange dotted line shows the shape of the gaussian weight used. The orange horizontal lines indicate the peak width and the blue `x` show the identified peaks. The green shaded area show the Rt range that is was selected by the algorithm.
+
 Then we apply the changes and plot the new peak shapes:
 
     mint.run()
