@@ -14,7 +14,7 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
-from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results
+from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results, scale_dataframe
 from .pca import PrincipalComponentsAnalyser
 from .plotting import MintResultsPlotter
 
@@ -355,7 +355,7 @@ class Mint(object):
     def results(self, df):
         self._results = df
 
-    def crosstab(self, col_name="peak_max", apply=None, col_normalized=False):
+    def crosstab(self, col_name="peak_max", apply=None, scaler=None):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
@@ -374,8 +374,8 @@ class Mint(object):
         ).astype(np.float64)
         if apply:
             df = df.apply(apply)
-        if col_normalized:
-            df = df / df.max()
+        if scaler:
+            df = scale_dataframe(df, scaler=scaler)
         return df
 
     @property
