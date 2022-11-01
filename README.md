@@ -92,12 +92,14 @@ Then the results will be stored in the `results` attribute:
 
 If you want to process a large number of files, you should provide an output filename. Then the results are written directly to that file instead of being stored in memory. 
 
-   mint.run(fn='my-mint-output.csv')
+    mint.run(fn='my-mint-output.csv')
 
 ## Optimize retention times
-In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function `mint.opt.rt_min_max()` for to generate better values for `rt_min` and `rt_max`. 
+In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function `mint.opt.rt_min_max()` for to generate better values for `rt_min` and `rt_max`. In the current example the peaks look like this:
 
 ![](notebooks/peak-shapes-before-opt.png)
+
+Now we can run the peak optimization with:
 
     mint.opt.rt_min_max(
         fns=[...]
@@ -112,7 +114,11 @@ If you do not provide a list for `peak_labels` the optimization will run for all
 
     mint.run()
 
+    mint.plot.peak_shapes(col_wrap=3)
+
 ![](notebooks/peak-shapes-after-opt.png)
+
+As you can see the shapes of Xanthine, Succinate, Citrulline look much better.
 
 ## Plotting and data exploration
 
@@ -120,11 +126,9 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 
 ## Plot peak shapes
 
-![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/results-example.png)
+![](notebooks/peak-shapes-after-opt.png)
 
     mint.plot.peak_shapes(col_wrap = 3)
-
-
 
 ## Hierarchical clustering
 
