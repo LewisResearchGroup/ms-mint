@@ -99,7 +99,7 @@ In case you have only Rt values for your targets, or it turns out that the value
 
 ![](notebooks/peak-shapes-before-opt.png)
 
-Now we can run the peak optimization with:
+Now, we can run the peak optimization with:
 
     mint.opt.rt_min_max(
         fns=[...]
@@ -112,13 +112,15 @@ If you do not provide a list for `peak_labels` the optimization will run for all
     
 ![](notebooks/opt-rt.png)
 
-    mint.run()
+Then we apply the changes and plot the new peak shapes:
 
+    mint.run()
     mint.plot.peak_shapes(col_wrap=3)
 
 ![](notebooks/peak-shapes-after-opt.png)
 
-As you can see the shapes of Xanthine, Succinate, Citrulline look much better.
+As you can see, the shapes of Xanthine, Succinate, Citrulline look much better.
+
 
 ## Plotting and data exploration
 
