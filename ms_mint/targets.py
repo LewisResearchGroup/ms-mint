@@ -236,7 +236,11 @@ class TargetOptimizer:
         self.results = None
         return self
 
-    def find_rt_min_max(
+    def find_rt_min_max(self, **kwargs):
+        logging.warning('Mint.opt.find_rt_min_max() is depricated and will be removed in the next release. Please, update your code and use Mint.opt.rt_min_max() instead.', DeprecationWarning)
+        self.rt_min_max(**kwargs)
+
+    def rt_min_max(
         self,
         fns=None,
         targets=None,
@@ -353,6 +357,6 @@ class TargetOptimizer:
 
         if plot:
             plt.tight_layout()
-            return self, fig
+            return self.mint, fig
         else:
-            return self
+            return self.mint
