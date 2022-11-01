@@ -309,7 +309,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="TargetOptimizer.find_rt_min_max"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.find_rt_min_max">[docs]</a>    <span class="k">def</span> <span class="nf">find_rt_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Mint.opt.find_rt_min_max() is depricated and will be removed in the next release. Please, update your code and use Mint.opt.rt_min_max() instead.&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Mint.opt.find_rt_min_max() is depricated and will be removed in the next release. Please, update your code and use Mint.opt.rt_min_max() instead.&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rt_min_max</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TargetOptimizer.rt_min_max"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.TargetOptimizer.rt_min_max">[docs]</a>    <span class="k">def</span> <span class="nf">rt_min_max</span><span class="p">(</span>
@@ -429,9 +429,9 @@
 
         <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fig</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="p">,</span> <span class="n">fig</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span></div></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span></div></div>
 </pre></div>
 
            </div>
