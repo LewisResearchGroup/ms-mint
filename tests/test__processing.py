@@ -42,7 +42,7 @@ def test__process_ms1():
             "rt_max": {0: 10},
             "targets_filename": {0: "unknown"},
             "peak_area": {0: 3},
-            "peak_area_top3": {0: 3},
+            "peak_area_top3": {0: 3.0},
             "peak_n_datapoints": {0: 1},
             "peak_max": {0: 3},
             "peak_rt_of_max": {0: 2},
@@ -58,7 +58,7 @@ def test__process_ms1():
             "peak_score": {0: None},
         }
     )
-
+ 
     print("Result:")
     print(result.T)
 
