@@ -14,14 +14,14 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
-from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results
+from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results, scale_dataframe
 from .pca import PrincipalComponentsAnalyser
 from .plotting import MintResultsPlotter
 
 import ms_mint
 
-
 from typing import Callable
+
 
 
 class Mint(object):
@@ -355,24 +355,28 @@ class Mint(object):
     def results(self, df):
         self._results = df
 
-    def crosstab(self, col_name="peak_area"):
+    def crosstab(self, col_name="peak_max", apply=None, scaler=None):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
         The values in the cells are determined by *col_name*.
-
 
         :param col_name: Name of the column from *mint.results* table that is used for the cell values.
         :type col_name: str
 
         cells of the returned table.
         """
-        return pd.crosstab(
+        df = pd.crosstab(
             self.results.ms_file,
             self.results.peak_label,
             self.results[col_name],
             aggfunc=sum,
         ).astype(np.float64)
+        if apply:
+            df = df.apply(apply)
+        if scaler:
+            df = scale_dataframe(df, scaler=scaler)
+        return df
 
     @property
     def progress_callback(self):
