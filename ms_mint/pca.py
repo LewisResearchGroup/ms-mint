@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.figure_factory as ff
 
 from sklearn.decomposition import PCA
 from .tools import scale_dataframe
@@ -120,8 +121,19 @@ class PCA_Plotter():
         return fig
 
 
+    def _prepare_data(self, n_vars=3, labels=None):
+        df = self.pca.results["df_projected"].copy()
+        cols = df.columns.to_list()[:n_vars]
+        df = df[cols]
+        if labels is not None:
+            group_name = "Label"
+            df[group_name] = labels
+            df[group_name] = df[group_name].astype(str)
+        return df
+
+
     def pairplot(
-        self, n_vars=3, labels=None, fig_kws=None, **kwargs
+        self, n_vars=3, labels=None, fig_kws=None, interactive=False, **kwargs
     ):
         """
         After running mint.pca() this function can be used to plot a scatter matrix of the
@@ -134,24 +146,25 @@ class PCA_Plotter():
         :return: Returns a matplotlib figure.
         :rtype: seaborn.axisgrid.PairGrid
         """
-        df = self.pca.results["df_projected"]
-        cols = df.columns.to_list()[:n_vars]
-        df = df[cols]
-        
-        if labels is not None:
-            group_name = "Group"
-            df[group_name] = labels
-            df[group_name] = df[group_name].astype(str)
-        else:
-            group_name = None
 
+        df = self._prepare_data(n_vars=n_vars, labels=labels)
+
+        if interactive:
+            return self.pairplot_plotly(df, **kwargs)
+        else:
+            return self.pairplot_sns(df, **kwargs)
+
+
+    def pairplot_sns(self, df, fig_kws=None, **kwargs):
         if fig_kws is None:
             fig_kws = {}
-
         plt.figure(**fig_kws)
-
         g = sns.pairplot(
-            df, hue=group_name, **kwargs
+            df, hue='Label' if 'Label' in df.columns else None, **kwargs
         )
+        return g
 
-        return g        
+    
+    def pairplot_plotly(self, df, **kwargs):
+        color_col = 'Label' if 'Label' in df.columns else None
+        return ff.create_scatterplotmatrix(df, index=color_col, **kwargs)
