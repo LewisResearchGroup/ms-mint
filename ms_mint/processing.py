@@ -221,7 +221,10 @@ def extract_ms1_properties(array, mz_mean):
         )
 
     peak_area = intensities.sum()
-    peak_area_top3 = np.sort(intensities)[-3:].sum()
+
+    ndx_max = np.argmax(intensities)
+    peak_area_top3 = intensities[max(0, ndx_max-1):ndx_max+2].mean()
+
     peak_mean = intensities.mean()
     peak_max = intensities.max()
     peak_min = intensities.min()
