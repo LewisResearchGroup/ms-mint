@@ -42,7 +42,7 @@ def test__process_ms1():
             "rt_max": {0: 10},
             "targets_filename": {0: "unknown"},
             "peak_area": {0: 3},
-            "peak_area_top3": {0: 3.0},
+            "peak_area_top3": {0: 1},  # The only value in the extraction window is 3, therefore the expected value is 1
             "peak_n_datapoints": {0: 1},
             "peak_max": {0: 3},
             "peak_rt_of_max": {0: 2},
@@ -80,7 +80,7 @@ def test__process_ms1_from_df():
         }
     )
     result = processing._process_ms1_from_df_(df, peaklist)
-    expect = [["A", 3, 3, 1, 3, 2, 3, 3.0, 3.0, 0, "2", "3", 0.0, 0.0, 0.0, None]]
+    expect = [["A", 3, 1, 1, 3, 2, 3, 3.0, 3.0, 0, "2", "3", 0.0, 0.0, 0.0, None]]
     print(result)
     print(expect)
     assert result == expect
@@ -100,13 +100,13 @@ def test__slice_ms1_array():
 def test__process_ms1_from_numpy():
     array = np.array([[1, 100, 2], [2, 200, 3], [3, 300, 7]])
 
-    peaks = [(100, 10, 0.5, 1.5, 0, "A"), (200, 10, 1.5, 2.5, 0, "B")]
+    targets = [(100, 10, 0.5, 1.5, 0, "A"), (200, 10, 1.5, 2.5, 0, "B")]
 
-    result = processing.process_ms1_from_numpy(array, peaks)
+    result = processing.process_ms1_from_numpy(array, targets)
 
     expect = [
-        ["A", 2, 2, 1, 2, 1, 2, 2.0, 2.0, 0, "1", "2", 0.0, 0.0, 0.0, None],
-        ["B", 3, 3, 1, 3, 2, 3, 3.0, 3.0, 0, "2", "3", 0.0, 0.0, 0.0, None],
+        ["A", 2, 0, 1, 2, 1, 2, 2.0, 2.0, 0, "1", "2", 0.0, 0.0, 0.0, None],
+        ["B", 3, 1, 1, 3, 2, 3, 3.0, 3.0, 0, "2", "3", 0.0, 0.0, 0.0, None],
     ]
 
     print("Expected:")
