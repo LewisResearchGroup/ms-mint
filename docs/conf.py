@@ -79,6 +79,7 @@ exclude_patterns = [
     "setup.py",
     "ms_mint/filelock.py",
     "notebooks",
+    "**.ipynb_checkpoints"
 ]
 
 
