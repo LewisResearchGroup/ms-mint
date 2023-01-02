@@ -210,7 +210,7 @@ class MintPlotter:
                 **kwargs,
             )
 
-    def histogram_2d(self, fn, peak_label=None, rt_margin=0, mz_margin=0):
+    def histogram_2d(self, fn, peak_label=None, rt_margin=0, mz_margin=0, **kwargs):
         """2D histogram of a ms file.
 
         :param fn: File name
@@ -225,7 +225,7 @@ class MintPlotter:
         :rtype: matplotlib.Figure
         """
         df = ms_file_to_df(fn)
-        mz_range, rt_range = None, None
+        mz_range, rt_range, rt_min, rt_max = None, None, None, None
         if peak_label is not None:
             target_data = self.mint.targets.loc[peak_label]
             mz_mean, mz_width, rt_min, rt_max = target_data[
@@ -234,14 +234,23 @@ class MintPlotter:
             mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
             mz_range = (mz_min - mz_margin, mz_max + mz_margin)
             rt_range = (rt_min - rt_margin, rt_max + rt_margin)
-        fig = plot_metabolomics_hist2d(df, mz_range=mz_range, rt_range=rt_range)
-        plt.plot(
-            [rt_min, rt_max, rt_max, rt_min, rt_min],
-            [mz_min, mz_min, mz_max, mz_max, mz_min],
-            color="w",
-            ls="--",
-            lw=0.5,
+
+        fig = plot_metabolomics_hist2d(
+            df, mz_range=mz_range, rt_range=rt_range, **kwargs
         )
+
+        if rt_min is not None:
+            plt.plot(
+                [rt_min, rt_max, rt_max, rt_min, rt_min],
+                [mz_min, mz_min, mz_max, mz_max, mz_min],
+                color="w",
+                ls="--",
+                lw=0.5,
+            )
+        if peak_label is None:
+            plt.title(f'{P(fn).with_suffix("").name}')        
+        else:
+            plt.title(f'{P(fn).with_suffix("").name}\n{peak_label}')
         return fig
 
     def chromatogram(self, fns=None, peak_labels=None, interactive=False, **kwargs):
@@ -281,7 +290,7 @@ class MintPlotter:
                 facet_kws=dict(sharey=False),
                 marker=".",
                 linewidth=0,
-                row_order=peak_labels
+                row_order=peak_labels,
             )
             params.update(kwargs)
             g = sns.relplot(data=data, **params)
@@ -292,8 +301,10 @@ class MintPlotter:
                 )
                 if rt_min is not None and rt_max is not None:
                     ax.axvspan(rt_min, rt_max, color="lightgreen", alpha=0.5, zorder=-1)
-                ax.ticklabel_format(style='sci', axis='y', useOffset=False, scilimits=(0,0))
-            g.set_titles(template='{row_name}')
+                ax.ticklabel_format(
+                    style="sci", axis="y", useOffset=False, scilimits=(0, 0)
+                )
+            g.set_titles(template="{row_name}")
             return g
 
         else:
