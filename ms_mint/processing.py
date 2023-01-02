@@ -253,7 +253,6 @@ def extract_ms1_properties(array, mz_mean):
     peak_shape_rt = float_list_to_comma_sep_str(projection[:, 0])
     peak_shape_int = int_list_to_comma_sep_str(projection[:, 1])
 
-
     return dict(
         peak_area=peak_area,
         peak_area_top3=peak_area_top3,

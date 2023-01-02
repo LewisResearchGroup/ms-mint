@@ -4,7 +4,7 @@ import logging
 
 from matplotlib import pyplot as plt
 
-from .tools import find_peaks_in_timeseries, gaussian
+from .tools import find_peaks_in_timeseries, gaussian, mz_mean_width_to_min_max
 from .io import ms_file_to_df
 from .filter import Resampler, Smoother, GaussFilter
 from .matplotlib_tools import plot_peaks
@@ -159,15 +159,8 @@ def get_chromatogram_from_ms_file(ms_file, mz_mean, mz_width=20):
     return chrom
 
 
-def extract_chromatogram_from_ms1(ms1, mz_mean, mz_width=10, unit="minutes"):
-    mz_min, mz_max = mz_mean_width_to_mass_range(mz_mean, mz_width)
+def extract_chromatogram_from_ms1(ms1, mz_mean, mz_width=10):
+    mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
     chrom = ms1[(ms1["mz"] >= mz_min) & (ms1["mz"] <= mz_max)].copy()
     chrom = chrom.groupby("scan_time", as_index=False).sum(numeric_only=True)
     return chrom.set_index("scan_time")["intensity"]
-
-
-def mz_mean_width_to_mass_range(mz_mean, mz_width_ppm=10):
-    dmz = mz_mean * 10e-6 * mz_width_ppm
-    mz_min = mz_mean - dmz
-    mz_max = mz_mean + dmz
-    return mz_min, mz_max
