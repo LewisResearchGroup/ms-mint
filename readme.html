@@ -331,7 +331,7 @@ mint.results
 <p>The <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function in the ms-mint library allows you to optimize the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values for your analysis. These values define the range of retention times within which ms-mint will search for peaks corresponding to your targets. By optimizing these values, you can improve the accuracy and reliability of your results.</p>
 <p>If you do not provide a list of peak_labels to the <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function, it will run the optimization for all metabolites. Similarly, if you do not provide a list of filenames for the fn parameter, the function will use all of the files currently loaded into mint.ms_files. It is generally recommended to use a maximum of 20-40 files for the optimization process. If you have run a set of standards along with your samples (which is highly recommended), you can use the standard files to perform the optimization.</p>
 <p>After running the optimization, it is a good idea to perform a manual fine-tuning of the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the <code class="docutils literal notranslate"><span class="pre">mint.plot.peak_shapes()</span></code> function to visualize the peak shapes and identify any areas that may require further attention.</p>
-<p><img alt="" src="notebooks/opt-rt.png" /></p>
+<p><img alt="" src="notebooks/optimize-rt_min_max.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run()
 
 mint.plot.peak_shapes(col_wrap=3)
@@ -356,7 +356,7 @@ mint.plot.peak_shapes(col_wrap=3)
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.plot.hierarchical_clustering()
 </pre></div>
 </div>
-<p><img alt="" src="notebooks/hierarchical_clustering_1.png" /></p>
+<p><img alt="" src="notebooks/hierarchical_clustering.png" /></p>
 </section>
 <section id="principal-components-analysis">
 <h2>Principal Components Analysis<a class="headerlink" href="#principal-components-analysis" title="Permalink to this heading">¶</a></h2>
