@@ -209,12 +209,10 @@ def plotly_heatmap(
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)
 
-
     if call_show:
         fig.show(config={"displaylogo": False})
     else:
         return fig
-
 
 
 def plotly_peak_shapes(
@@ -257,7 +255,9 @@ def plotly_peak_shapes(
         print("peak_labels:", peak_labels)
         print("Data:", res)
 
-    fig = make_subplots(rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels)
+    fig = make_subplots(
+        rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels
+    )
     if len(fns) < 13:
         colors = cl.scales["12"]["qual"]["Paired"]
     else:
@@ -266,9 +266,9 @@ def plotly_peak_shapes(
     # Create sub-plots
     for label_i, label in enumerate(peak_labels):
         for file_i, fn in enumerate(fns):
-            #try:
+            # try:
             x, y = res.loc[(label, fn), ["peak_shape_rt", "peak_shape_int"]]
-            #except:
+            # except:
             #    continue
             if not isinstance(x, Iterable):
                 continue
@@ -313,4 +313,4 @@ def plotly_peak_shapes(
     if call_show:
         fig.show(config={"displaylogo": False})
     else:
-        return fig  
+        return fig

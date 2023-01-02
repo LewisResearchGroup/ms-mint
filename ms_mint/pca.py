@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,7 +8,7 @@ from sklearn.decomposition import PCA
 from .tools import scale_dataframe
 
 
-class PrincipalComponentsAnalyser():
+class PrincipalComponentsAnalyser:
     """
     Class for applying PCA to Mint instance.
     """
@@ -24,7 +23,6 @@ class PrincipalComponentsAnalyser():
         self.mint = mint
         self.results = None
         self.plot = PCA_Plotter(self)
-    
 
     def run(self, n_components=3, on="peak_max", fillna="median", scaler="standard"):
         """
@@ -87,7 +85,7 @@ class PrincipalComponentsAnalyser():
         }
 
 
-class PCA_Plotter():
+class PCA_Plotter:
     """
     Class for plotting Mint PCA results.
     """
@@ -110,7 +108,7 @@ class PCA_Plotter():
         :rtype: matplotlib.figure.Figure
         """
         n_vars = self.pca.results["n_components"]
-        fig = plt.figure(figsize=(height*aspect, height))
+        fig = plt.figure(figsize=(height * aspect, height))
         cum_expl_var = self.pca.results["cum_expl_var"]
         plt.bar(np.arange(n_vars) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
         plt.xlabel("Principal Component")
@@ -119,7 +117,6 @@ class PCA_Plotter():
         plt.grid()
         plt.xticks(range(1, len(cum_expl_var) + 1))
         return fig
-
 
     def _prepare_data(self, n_vars=3, labels=None):
         df = self.pca.results["df_projected"].copy()
@@ -130,7 +127,6 @@ class PCA_Plotter():
             df[group_name] = labels
             df[group_name] = df[group_name].astype(str)
         return df
-
 
     def pairplot(
         self, n_vars=3, labels=None, fig_kws=None, interactive=False, **kwargs
@@ -154,17 +150,13 @@ class PCA_Plotter():
         else:
             return self.pairplot_sns(df, **kwargs)
 
-
     def pairplot_sns(self, df, fig_kws=None, **kwargs):
         if fig_kws is None:
             fig_kws = {}
         plt.figure(**fig_kws)
-        g = sns.pairplot(
-            df, hue='Label' if 'Label' in df.columns else None, **kwargs
-        )
+        g = sns.pairplot(df, hue="Label" if "Label" in df.columns else None, **kwargs)
         return g
 
-    
     def pairplot_plotly(self, df, **kwargs):
-        color_col = 'Label' if 'Label' in df.columns else None
+        color_col = "Label" if "Label" in df.columns else None
         return ff.create_scatterplotmatrix(df, index=color_col, **kwargs)

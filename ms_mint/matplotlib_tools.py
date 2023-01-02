@@ -240,12 +240,21 @@ def plot_peak_shapes(
 
 
 def plot_peaks(
-    series, peaks, highlight=None, expected_rt=None, weights=None, legend=True
+    series,
+    peaks,
+    highlight=None,
+    expected_rt=None,
+    weights=None,
+    legend=True,
+    label=None,
+    **kwargs
 ):
     if highlight is None:
         highlight = []
     ax = plt.gca()
-    series.plot(ax=ax, color="black", label="Intensity")
+    ax.plot(
+        series.index, series.values, label=label if label is not None else "Intensity", **kwargs
+    )
     if peaks is not None:
         series.iloc[peaks.ndxs].plot(
             label="Peaks", marker="x", y="intensity", lw=0, ax=ax
@@ -276,3 +285,43 @@ def plot_peaks(
     if not legend:
         ax.get_legend().remove()
     return plt.gcf()
+
+
+def plot_metabolomics_hist2d(
+    df,
+    figsize=(4, 2.5),
+    dpi=300,
+    set_dim=True,
+    cmap="jet",
+    rt_range=None,
+    mz_range=None,
+):
+
+    if set_dim:
+        plt.figure(figsize=figsize, dpi=dpi)
+
+    if mz_range is None:
+        mz_range = (df.mz.min(), df.mz.max())
+
+    if rt_range is None:
+        rt_range = (df.scan_time.min(), df.scan_time.max())
+
+    rt_bins = int((rt_range[1] - rt_range[0]) / 2)
+
+    fig = plt.hist2d(
+        df["scan_time"],
+        df["mz"],
+        weights=df["intensity"].apply(np.log1p),
+        bins=[rt_bins, 100],
+        vmin=1,
+        vmax=15,
+        cmap=cmap,
+        range=(rt_range, mz_range),
+    )
+
+    plt.xlabel("Rt [s]")
+    plt.ylabel("m/z")
+    plt.grid()
+    plt.gca().ticklabel_format(useOffset=False, style="plain")
+
+    return fig
