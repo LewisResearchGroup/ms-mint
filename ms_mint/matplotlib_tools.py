@@ -324,7 +324,7 @@ def plot_metabolomics_hist2d(
         **params,
     )
 
-    plt.xlabel("Rt [s]")
+    plt.xlabel("Scan Time [s]")
     plt.ylabel("m/z")
     #plt.grid()
     plt.gca().ticklabel_format(useOffset=False, style="plain")
