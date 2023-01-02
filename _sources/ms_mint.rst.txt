@@ -76,6 +76,14 @@ ms\_mint.plotly\_tools module
    :undoc-members:
    :show-inheritance:
 
+ms\_mint.plotting module
+-----------------------------
+
+.. automodule:: ms_mint.plotting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ms\_mint.processing module
 --------------------------
 

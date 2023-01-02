@@ -1,0 +1,479 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>ms_mint.plotting &mdash; ms-mint 0.1.6 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+    <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/_modules/ms_mint/plotting.html" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ms-mint
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Wecome to ms-mint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#faq">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#release-notes">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ms_mint</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ms-mint</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ms_mint.plotting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ms_mint.plotting</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">simplefilter</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">ClusterWarning</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">.plotly_tools</span> <span class="kn">import</span> <span class="n">plotly_heatmap</span><span class="p">,</span> <span class="n">plotly_peak_shapes</span>
+<span class="kn">from</span> <span class="nn">.matplotlib_tools</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">plot_peak_shapes</span><span class="p">,</span>
+    <span class="n">hierarchical_clustering</span><span class="p">,</span>
+    <span class="n">plot_metabolomics_hist2d</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">scale_dataframe</span><span class="p">,</span> <span class="n">mz_mean_width_to_min_max</span>
+<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
+<span class="kn">from</span> <span class="nn">.chromatogram</span> <span class="kn">import</span> <span class="n">Chromatogram</span>
+
+
+<div class="viewcode-block" id="MintPlotter"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter">[docs]</a><span class="k">class</span> <span class="nc">MintPlotter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot generator for mint.results.</span>
+
+<span class="sd">    :param mint: Mint instance</span>
+<span class="sd">    :type mint: ms_mint.Mint.Mint</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MintPlotter.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mint</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot generator for mint.results.</span>
+
+<span class="sd">        :param mint: Mint instance</span>
+<span class="sd">        :type mint: ms_mint.Mint.Mint</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mint</span> <span class="o">=</span> <span class="n">mint</span></div>
+
+<div class="viewcode-block" id="MintPlotter.hierarchical_clustering"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.hierarchical_clustering">[docs]</a>    <span class="k">def</span> <span class="nf">hierarchical_clustering</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ms_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="n">targets_var</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">xmaxticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ymaxticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">transform_func</span><span class="o">=</span><span class="s2">&quot;log2p1&quot;</span><span class="p">,</span>
+        <span class="n">scaler_ms_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scaler_peak_label</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+        <span class="n">transform_filenames_func</span><span class="o">=</span><span class="s2">&quot;basename&quot;</span><span class="p">,</span>
+        <span class="n">transposed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a cluster analysis and plots a heatmap. If no data is provided,</span>
+<span class="sd">        data is taken form self.mint.crosstab(targets_var).</span>
+<span class="sd">        The clustered non-transformed non-scaled data is stored in `self.mint.clustered`.</span>
+
+<span class="sd">        :param transform_func: default &#39;log2p1&#39;, values: [None, &#39;log1p&#39;, &#39;log2p1&#39;, &#39;log10p1&#39;]</span>
+<span class="sd">            - None: no transformation</span>
+<span class="sd">            - log1p: tranform data with lambda x: np.log1p(x)</span>
+<span class="sd">            - log2p1: transform data with lambda x: log2(x+1)</span>
+<span class="sd">            - log10p1: transform data with lambda x: log10(x+1)</span>
+
+<span class="sd">        :param scaler_ms_file: default None, values: [None, &#39;standard&#39;, &#39;robust&#39;]</span>
+<span class="sd">            - scaler used to scale along ms_file axis</span>
+<span class="sd">            - if None no scaling is applied</span>
+<span class="sd">            - if &#39;standard&#39; use scikit learn StandardScaler()</span>
+<span class="sd">            - if &#39;robust&#39; use scikit learn RobustScaler()</span>
+
+<span class="sd">        :param scaler_peak_label: default &#39;standard&#39;</span>
+<span class="sd">            - like scaler_ms_file, but scaling along peak_label axis</span>
+
+<span class="sd">        :param metric: default &#39;euclidean&#39;, can be string or a list of two values:</span>
+<span class="sd">            if two values are provided e.g. (&#39;cosine&#39;, &#39;euclidean&#39;) the first</span>
+<span class="sd">            will be used to cluster the x-axis and the second for the y-axis.</span>
+
+<span class="sd">            &#39;braycurtis&#39;, &#39;canberra&#39;, &#39;chebyshev&#39;, &#39;cityblock&#39;, &#39;correlation&#39;, &#39;cosine&#39;,</span>
+<span class="sd">            &#39;dice&#39;, &#39;euclidean&#39;, &#39;hamming&#39;, &#39;jaccard&#39;, &#39;jensenshannon&#39;, &#39;kulsinski&#39;, &#39;mahalanobis&#39;,</span>
+<span class="sd">            &#39;matching&#39;, &#39;minkowski&#39;, &#39;rogerstanimoto&#39;, &#39;russellrao&#39;, &#39;seuclidean&#39;,</span>
+<span class="sd">            &#39;sokalmichener&#39;, &#39;sokalsneath&#39;, &#39;sqeuclidean&#39;, &#39;yule&#39;.</span>
+<span class="sd">            More information:</span>
+<span class="sd">            https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html</span>
+
+<span class="sd">        :param transpose: bool, default False</span>
+<span class="sd">            - True: transpose the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">ClusterWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">targets_var</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">peak_labels</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ms_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ms_files</span><span class="p">]</span>
+
+        <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">transform_func</span> <span class="o">==</span> <span class="s2">&quot;log1p&quot;</span><span class="p">:</span>
+            <span class="n">transform_func</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span>
+        <span class="k">if</span> <span class="n">transform_func</span> <span class="o">==</span> <span class="s2">&quot;log2p1&quot;</span><span class="p">:</span>
+            <span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">transform_func</span> <span class="o">==</span> <span class="s2">&quot;log10p1&quot;</span><span class="p">:</span>
+            <span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">transform_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">tmp_data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">transform_func</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">transform_filenames_func</span> <span class="o">==</span> <span class="s2">&quot;basename&quot;</span><span class="p">:</span>
+            <span class="n">transform_filenames_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">elif</span> <span class="n">transform_filenames_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmp_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">transform_filenames_func</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tmp_data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+        <span class="c1"># Scale along ms-files</span>
+        <span class="k">if</span> <span class="n">scaler_ms_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">scale_dataframe</span><span class="p">(</span><span class="n">tmp_data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">scaler_ms_file</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># Scale along peak_labels</span>
+        <span class="k">if</span> <span class="n">scaler_peak_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">scale_dataframe</span><span class="p">(</span><span class="n">tmp_data</span><span class="p">,</span> <span class="n">scaler_peak_label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">transposed</span><span class="p">:</span>
+            <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">tmp_data</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">clustered</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ndx_x</span><span class="p">,</span> <span class="n">ndx_y</span> <span class="o">=</span> <span class="n">hierarchical_clustering</span><span class="p">(</span>
+            <span class="n">tmp_data</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
+            <span class="n">xmaxticks</span><span class="o">=</span><span class="n">xmaxticks</span><span class="p">,</span>
+            <span class="n">ymaxticks</span><span class="o">=</span><span class="n">ymaxticks</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">transposed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">clustered</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ndx_x</span><span class="p">,</span> <span class="n">ndx_y</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">clustered</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ndx_y</span><span class="p">,</span> <span class="n">ndx_x</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="MintPlotter.peak_shapes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.peak_shapes">[docs]</a>    <span class="k">def</span> <span class="nf">peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot peak shapes.</span>
+
+<span class="sd">        :return: Figure with peak shapes.</span>
+<span class="sd">        :rtype: seaborn.axisgrid.FacetGrid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">interactive</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">plot_peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">plotly_peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MintPlotter.heatmap"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.heatmap">[docs]</a>    <span class="k">def</span> <span class="nf">heatmap</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">col_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span>
+        <span class="n">normed_by_cols</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">transposed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">clustered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">add_dendrogram</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">correlation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an interactive heatmap</span>
+<span class="sd">        that can be used to explore the data interactively.</span>
+<span class="sd">        `mint.crosstab()` is called and then subjected to</span>
+<span class="sd">        the `mint.vis.plotly.plotly_tools.plot_heatmap()`.</span>
+
+<span class="sd">        :param col_name: str, default=&#39;peak_max&#39;</span>
+<span class="sd">            Name of the column in `mint.results` to be analysed.</span>
+<span class="sd">        :param normed_by_cols: bool, default=True</span>
+<span class="sd">            Whether or not to normalize the columns in the crosstab.</span>
+<span class="sd">        :param clustered: bool, default=False</span>
+<span class="sd">            Whether or not to cluster the rows.</span>
+<span class="sd">        :param add_dendrogram: bool, default=False</span>
+<span class="sd">            Whether or not to replace row labels with a dendrogram.</span>
+<span class="sd">        :param transposed: bool, default=False</span>
+<span class="sd">            If True transpose matrix before plotting.</span>
+<span class="sd">        :param correlation: bool, default=False</span>
+<span class="sd">            If True convert data to correlation matrix before plotting.</span>
+
+<span class="sd">        :return: Interactive heatmap.</span>
+<span class="sd">        :rtype: plotly.graph_objs._figure.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">plotly_heatmap</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">col_name</span><span class="p">),</span>
+                <span class="n">normed_by_cols</span><span class="o">=</span><span class="n">normed_by_cols</span><span class="p">,</span>
+                <span class="n">transposed</span><span class="o">=</span><span class="n">transposed</span><span class="p">,</span>
+                <span class="n">clustered</span><span class="o">=</span><span class="n">clustered</span><span class="p">,</span>
+                <span class="n">add_dendrogram</span><span class="o">=</span><span class="n">add_dendrogram</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">col_name</span><span class="p">,</span>
+                <span class="n">correlation</span><span class="o">=</span><span class="n">correlation</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MintPlotter.histogram_2d"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.histogram_2d">[docs]</a>    <span class="k">def</span> <span class="nf">histogram_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">peak_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rt_margin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mz_margin</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;2D histogram of a ms file.</span>
+
+<span class="sd">        :param fn: File name</span>
+<span class="sd">        :type fn: str, optional</span>
+<span class="sd">        :param peak_label: Target to focus, defaults to None</span>
+<span class="sd">        :type peak_label: str, optional</span>
+<span class="sd">        :param rt_margin: Margin in Rt dimension, defaults to 0</span>
+<span class="sd">        :type rt_margin: int, optional</span>
+<span class="sd">        :param mz_margin: Margin in mz dimension, defaults to 0</span>
+<span class="sd">        :type mz_margin: int, optional</span>
+<span class="sd">        :return: Figure object</span>
+<span class="sd">        :rtype: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="n">mz_range</span><span class="p">,</span> <span class="n">rt_range</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">peak_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_label</span><span class="p">]</span>
+            <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span> <span class="o">=</span> <span class="n">target_data</span><span class="p">[</span>
+                <span class="p">[</span><span class="s2">&quot;mz_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;mz_width&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_max</span> <span class="o">=</span> <span class="n">mz_mean_width_to_min_max</span><span class="p">(</span><span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">)</span>
+            <span class="n">mz_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">mz_min</span> <span class="o">-</span> <span class="n">mz_margin</span><span class="p">,</span> <span class="n">mz_max</span> <span class="o">+</span> <span class="n">mz_margin</span><span class="p">)</span>
+            <span class="n">rt_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">rt_min</span> <span class="o">-</span> <span class="n">rt_margin</span><span class="p">,</span> <span class="n">rt_max</span> <span class="o">+</span> <span class="n">rt_margin</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_metabolomics_hist2d</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_range</span><span class="o">=</span><span class="n">mz_range</span><span class="p">,</span> <span class="n">rt_range</span><span class="o">=</span><span class="n">rt_range</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_max</span><span class="p">,</span> <span class="n">mz_max</span><span class="p">,</span> <span class="n">mz_min</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+            <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+            <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="MintPlotter.chromatogram"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.chromatogram">[docs]</a>    <span class="k">def</span> <span class="nf">chromatogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="p">,</span> <span class="n">peak_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mz_mean</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the chromatogram extracted from one or more files.</span>
+
+<span class="sd">        :param fns: File names to extract chromatogram from.</span>
+<span class="sd">        :type fns: str or List[str]</span>
+<span class="sd">        :param peak_label: Target from Mint.targets.peak_label to take mz</span>
+<span class="sd">        parameters, defaults to None. If None `mz_mean and mz_width are used`.</span>
+<span class="sd">        :type peak_label: str, optional</span>
+<span class="sd">        :param mz_mean: m/z value for chromatogram, defaults to None</span>
+<span class="sd">        :type mz_mean: float, optional</span>
+<span class="sd">        :param mz_width: mz_width, defaults to None</span>
+<span class="sd">        :type mz_width: int&gt;0, optional</span>
+<span class="sd">        :return: Plot of chromatogram(s)</span>
+<span class="sd">        :rtype: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">fns</span> <span class="o">=</span> <span class="p">[</span><span class="n">fns</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">peak_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_label</span><span class="p">]</span>
+            <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span> <span class="o">=</span> <span class="n">target_data</span><span class="p">[</span>
+                <span class="p">[</span><span class="s2">&quot;mz_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;mz_width&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">:</span>
+            <span class="n">chrom</span> <span class="o">=</span> <span class="n">Chromatogram</span><span class="p">()</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">)</span>
+            <span class="n">chrom</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Soren Wacker.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
