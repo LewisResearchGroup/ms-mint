@@ -126,7 +126,7 @@ If you do not provide a list of peak_labels to the `mint.opt.rt_min_max()` funct
 
 After running the optimization, it is a good idea to perform a manual fine-tuning of the `rt_min` and `rt_max` values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the `mint.plot.peak_shapes()` function to visualize the peak shapes and identify any areas that may require further attention.
     
-![](notebooks/opt-rt.png)
+![](notebooks/optimize-rt_min_max.png)
 
     mint.run()
 
@@ -150,7 +150,7 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 
     mint.plot.hierarchical_clustering()
 
-![](notebooks/hierarchical_clustering_1.png)
+![](notebooks/hierarchical_clustering.png)
 
 ## Principal Components Analysis
 
