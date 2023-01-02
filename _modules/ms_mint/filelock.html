@@ -1,34 +1,74 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>ms_mint.filelock &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
     <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/_modules/ms_mint/filelock.html" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../index.html" class="icon icon-home"> ms-mint
+          
+
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,7 +76,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">Wecome to ms-mint</a></li>
@@ -45,30 +96,69 @@
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">ms_mint</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">ms-mint</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">ms_mint.filelock</li>
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ms_mint.filelock</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for ms_mint.filelock</h1><div class="highlight"><pre>
 <span></span><span class="c1"># This is free and unencumbered software released into the public domain.</span>
 <span class="c1">#</span>
@@ -149,7 +239,7 @@
 
 
 <span class="k">def</span> <span class="nf">logger</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns the logger instance used in this module.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the logger instance used in this module.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_logger</span>
     <span class="n">_logger</span> <span class="o">=</span> <span class="n">_logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_logger</span>
@@ -158,13 +248,13 @@
 <span class="c1"># Exceptions</span>
 <span class="c1"># ------------------------------------------------</span>
 <div class="viewcode-block" id="Timeout"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.Timeout">[docs]</a><span class="k">class</span> <span class="nc">Timeout</span><span class="p">(</span><span class="ne">TimeoutError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raised when the lock could not be acquired in *timeout*</span>
 <span class="sd">    seconds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Timeout.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.Timeout.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock_file</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
         <span class="c1">#: The path of the file lock.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lock_file</span> <span class="o">=</span> <span class="n">lock_file</span>
         <span class="k">return</span> <span class="kc">None</span></div>
@@ -199,12 +289,12 @@
 
 
 <div class="viewcode-block" id="BaseFileLock"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.BaseFileLock">[docs]</a><span class="k">class</span> <span class="nc">BaseFileLock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements the base class of a file lock.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BaseFileLock.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.BaseFileLock.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock_file</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
         <span class="c1"># The path to the lock file.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lock_file</span> <span class="o">=</span> <span class="n">lock_file</span>
 
@@ -228,14 +318,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">lock_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The path to the lock file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_file</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        You can set a default timeout for the filelock. It will be used as</span>
 <span class="sd">        fallback value in the acquire method, if no timeout value (*None*) is</span>
 <span class="sd">        given.</span>
@@ -251,7 +341,7 @@
 
     <span class="nd">@timeout</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
@@ -259,7 +349,7 @@
     <span class="c1"># --------------------------------------------</span>
 
 <div class="viewcode-block" id="BaseFileLock._acquire"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.BaseFileLock._acquire">[docs]</a>    <span class="k">def</span> <span class="nf">_acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Platform dependent. If the file lock could be</span>
 <span class="sd">        acquired, self._lock_file_fd holds the file descriptor</span>
 <span class="sd">        of the lock file.</span>
@@ -267,7 +357,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BaseFileLock._release"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.BaseFileLock._release">[docs]</a>    <span class="k">def</span> <span class="nf">_release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Releases the lock and sets self._lock_file_fd to None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
@@ -277,7 +367,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_locked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        True, if the object holds the file lock.</span>
 
 <span class="sd">        .. versionchanged:: 2.0.0</span>
@@ -287,7 +377,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_file_fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="BaseFileLock.acquire"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.BaseFileLock.acquire">[docs]</a>    <span class="k">def</span> <span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">poll_intervall</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Acquires the file lock or fails with a :exc:`Timeout` error.</span>
 
 <span class="sd">        .. code-block:: python</span>
@@ -369,7 +459,7 @@
         <span class="k">return</span> <span class="n">_Acquire_ReturnProxy</span><span class="p">(</span><span class="n">lock</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseFileLock.release"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.BaseFileLock.release">[docs]</a>    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Releases the file lock.</span>
 
 <span class="sd">        Please note, that the lock is only completly released, if the lock</span>
@@ -417,7 +507,7 @@
 
 
 <div class="viewcode-block" id="WindowsFileLock"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.WindowsFileLock">[docs]</a><span class="k">class</span> <span class="nc">WindowsFileLock</span><span class="p">(</span><span class="n">BaseFileLock</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Uses the :func:`msvcrt.locking` function to hard lock the lock file on</span>
 <span class="sd">    windows systems.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -458,7 +548,7 @@
 
 
 <div class="viewcode-block" id="UnixFileLock"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.UnixFileLock">[docs]</a><span class="k">class</span> <span class="nc">UnixFileLock</span><span class="p">(</span><span class="n">BaseFileLock</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Uses the :func:`fcntl.flock` to hard lock the lock file on unix systems.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -491,7 +581,7 @@
 
 
 <div class="viewcode-block" id="SoftFileLock"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filelock.SoftFileLock">[docs]</a><span class="k">class</span> <span class="nc">SoftFileLock</span><span class="p">(</span><span class="n">BaseFileLock</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simply watches the existence of the lock file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -537,30 +627,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Soren Wacker.</p>
-  </div>
+    <p>
+        &#169; Copyright 2022, Soren Wacker.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
