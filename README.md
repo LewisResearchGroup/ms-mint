@@ -22,7 +22,9 @@ Before you modify the code please reach out to us using the [issues](https://git
 ## Code standards
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
 
-# Example usage
+---
+
+# Usage
 
 To use the main class of the ms-mint library, you can import it into your code with the following command:
 
