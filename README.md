@@ -34,14 +34,6 @@ This will import a lightweight version of the class with the essential functiona
 
     from ms_mint.notebook import Mint
 
-To use the main class of the ms-mint library, you can import it into your code with the following command:
-
-    from ms_mint.Mint import Mint
-
-This will import a lightweight version of the class with the essential functionality. If you want to use the ms-mint tool interactively in a Jupyter Notebook or JupyterLab, you can import the class with the following command:
-
-    from ms_mint.notebook import Mint
-
 This version of the class is designed specifically for use in Jupyter notebooks and includes additional functions. Once you have imported the appropriate version of the class, you can create an instance of the Mint class and use its methods to process your data.
 
 ### ms-mint in JupyterLab, or the Jupyter Notebook
