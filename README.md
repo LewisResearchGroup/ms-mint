@@ -213,3 +213,10 @@ The target list can be stored as csv or Excel file.
 -   **ms_path**: Path of the MS-file
 -   **ms_file_size**: Size of the MS-file in MB
 ---
+
+
+# Release Notes
+
+## 0.1.9 Milestones
+    - peak_area_top3 comparable to El-Maven PeakAreaTop values
+    
