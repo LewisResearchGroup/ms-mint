@@ -14,14 +14,18 @@ from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
 from .io import export_to_excel
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
-from .tools import is_ms_file, get_ms_files_from_results, get_targets_from_results, scale_dataframe
+from .tools import (
+    is_ms_file,
+    get_ms_files_from_results,
+    get_targets_from_results,
+    scale_dataframe,
+)
 from .pca import PrincipalComponentsAnalyser
-from .plotting import MintResultsPlotter
+from .plotting import MintPlotter
 
 import ms_mint
 
 from typing import Callable
-
 
 
 class Mint(object):
@@ -44,7 +48,7 @@ class Mint(object):
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
-        self.plot = MintResultsPlotter(mint=self)
+        self.plot = MintPlotter(mint=self)
         self.opt = TargetOptimizer(mint=self)
         self.pca = PrincipalComponentsAnalyser(self)
 
@@ -312,8 +316,6 @@ class Mint(object):
         self.targets = read_targets(list_of_files)
         return self
 
-
-
     @property
     def targets(self):
         """
@@ -333,7 +335,7 @@ class Mint(object):
     def targets(self, targets):
         targets = standardize_targets(targets)
         assert check_targets(targets), check_targets(targets)
-        self._targets = targets.set_index('peak_label')
+        self._targets = targets.set_index("peak_label")
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
 
@@ -458,14 +460,10 @@ class Mint(object):
                 results = pd.read_parquet(fn)
         else:
             results = pd.read_csv(fn)
-        self.results = results.rename(
-            columns=DEPRECATED_LABELS
-        )
+        self.results = results.rename(columns=DEPRECATED_LABELS)
         self.digest_results()
         return self
 
     def digest_results(self):
         self.ms_files = get_ms_files_from_results(self.results)
         self.targets = get_targets_from_results(self.results)
-        
-

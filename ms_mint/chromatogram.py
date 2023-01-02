@@ -50,7 +50,9 @@ class Chromatogram:
         if prominence is None:
             prominence = self.noise_level * 3
         self.peaks = find_peaks_in_timeseries(
-            self.data.intensity, prominence=prominence, rel_height=rel_height,
+            self.data.intensity,
+            prominence=prominence,
+            rel_height=rel_height,
         )
 
     def optimise_peak_times_with_diff(self, rolling_window=20, plot=False):
@@ -134,7 +136,7 @@ class Chromatogram:
         df.index.name = "scan_time"
         return df
 
-    def plot(self, **kwargs):
+    def plot(self, label=None, **kwargs):
         series = self.data
         peaks = self.peaks
         selected_peak_ndxs = self.selected_peak_ndxs
@@ -142,6 +144,7 @@ class Chromatogram:
         fig = plot_peaks(
             series,
             peaks,
+            label=label,
             highlight=selected_peak_ndxs,
             expected_rt=self.expected_rt,
             weights=weights,
@@ -159,7 +162,7 @@ def get_chromatogram_from_ms_file(ms_file, mz_mean, mz_width=20):
 def extract_chromatogram_from_ms1(ms1, mz_mean, mz_width=10, unit="minutes"):
     mz_min, mz_max = mz_mean_width_to_mass_range(mz_mean, mz_width)
     chrom = ms1[(ms1["mz"] >= mz_min) & (ms1["mz"] <= mz_max)].copy()
-    chrom = chrom.groupby("scan_time", as_index=False).sum()
+    chrom = chrom.groupby("scan_time", as_index=False).sum(numeric_only=True)
     return chrom.set_index("scan_time")["intensity"]
 
 

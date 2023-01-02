@@ -4,12 +4,13 @@ from scipy.ndimage import gaussian_filter1d
 
 class Resampler:
     """
-    Filter for time series that resamples the data in 
+    Filter for time series that resamples the data in
     a certain frequency.
     """
+
     def __init__(self, tau="500ms", input_unit="seconds"):
         """
-        Filter for time series that resamples the data in 
+        Filter for time series that resamples the data in
         a certain frequency. The default is 500ms.
 
         :param tau: Sampling frequency, defaults to "500ms"
@@ -34,8 +35,8 @@ class Resampler:
         """
         ndx = pd.to_timedelta(t, unit=self.unit)
         chrom = pd.Series(index=ndx, data=x)
-        #resampled = chrom.resample(self.tau).nearest()
-        resampled = chrom.resample(self.tau).fillna('nearest', limit=10)
+        # resampled = chrom.resample(self.tau).nearest()
+        resampled = chrom.resample(self.tau).fillna("nearest", limit=10)
         new_t = resampled.index.seconds + (resampled.index.microseconds / 1e6)
         new_x = resampled.values
         return new_t, new_x
@@ -47,6 +48,7 @@ class Smoother:
     x values by running one or more rolling
     averages.
     """
+
     def __init__(self, windows=[30, 20]):
         """
         Filter for time series that smoothes the
@@ -82,6 +84,7 @@ class GaussFilter:
     """
     Filter for time series that applies a Gaussian filter.
     """
+
     def __init__(self, sigma=5):
         """
         Filter for time series that applies a Gaussian filter.

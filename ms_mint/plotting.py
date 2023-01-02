@@ -4,26 +4,34 @@ from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
 
 from pathlib import Path as P
+from matplotlib import pyplot as plt
 
 from .plotly_tools import plotly_heatmap, plotly_peak_shapes
-from .matplotlib_tools import plot_peak_shapes, hierarchical_clustering
-from .tools import scale_dataframe
+from .matplotlib_tools import (
+    plot_peak_shapes,
+    hierarchical_clustering,
+    plot_metabolomics_hist2d,
+)
+from .tools import scale_dataframe, mz_mean_width_to_min_max
+from .io import ms_file_to_df
+from .chromatogram import Chromatogram
 
 
-class MintResultsPlotter:
+class MintPlotter:
     """
     Plot generator for mint.results.
 
     :param mint: Mint instance
     :type mint: ms_mint.Mint.Mint
     """
+
     def __init__(self, mint):
         """
         Plot generator for mint.results.
 
         :param mint: Mint instance
         :type mint: ms_mint.Mint.Mint
-        """        
+        """
         self.mint = mint
 
     def hierarchical_clustering(
@@ -89,10 +97,10 @@ class MintResultsPlotter:
 
         if peak_labels is not None:
             data = data[peak_labels]
-        
+
         if ms_files is not None:
             data = data.loc[ms_files]
-        
+
         tmp_data = data.copy()
 
         if transform_func == "log1p":
@@ -159,7 +167,7 @@ class MintResultsPlotter:
         add_dendrogram=False,
         name="",
         correlation=False,
-        **kwargs
+        **kwargs,
     ):
         """
         Creates an interactive heatmap
@@ -181,7 +189,7 @@ class MintResultsPlotter:
             If True convert data to correlation matrix before plotting.
 
         :return: Interactive heatmap.
-        :rtype: plotly.graph_objs._figure.Figure            
+        :rtype: plotly.graph_objs._figure.Figure
         """
         if len(self.mint.results) > 0:
             return plotly_heatmap(
@@ -192,7 +200,71 @@ class MintResultsPlotter:
                 add_dendrogram=add_dendrogram,
                 name=col_name,
                 correlation=correlation,
-                **kwargs
+                **kwargs,
             )
 
-   
+    def histogram_2d(self, fn, peak_label=None, rt_margin=0, mz_margin=0):
+        """2D histogram of a ms file.
+
+        :param fn: File name
+        :type fn: str, optional
+        :param peak_label: Target to focus, defaults to None
+        :type peak_label: str, optional
+        :param rt_margin: Margin in Rt dimension, defaults to 0
+        :type rt_margin: int, optional
+        :param mz_margin: Margin in mz dimension, defaults to 0
+        :type mz_margin: int, optional
+        :return: Figure object
+        :rtype: matplotlib.Figure
+        """
+        df = ms_file_to_df(fn)
+        mz_range, rt_range = None, None
+        if peak_label is not None:
+            target_data = self.mint.targets.loc[peak_label]
+            mz_mean, mz_width, rt_min, rt_max = target_data[
+                ["mz_mean", "mz_width", "rt_min", "rt_max"]
+            ]
+            mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
+            mz_range = (mz_min - mz_margin, mz_max + mz_margin)
+            rt_range = (rt_min - rt_margin, rt_max + rt_margin)
+        fig = plot_metabolomics_hist2d(df, mz_range=mz_range, rt_range=rt_range)
+        plt.plot(
+            [rt_min, rt_max, rt_max, rt_min, rt_min],
+            [mz_min, mz_min, mz_max, mz_max, mz_min],
+            color="w",
+            ls="--",
+            lw=0.5,
+        )
+        return fig
+
+    def chromatogram(self, fns, peak_label=None, mz_mean=None, mz_width=None, **kwargs):
+        """Plot the chromatogram extracted from one or more files.
+
+        :param fns: File names to extract chromatogram from.
+        :type fns: str or List[str]
+        :param peak_label: Target from Mint.targets.peak_label to take mz
+        parameters, defaults to None. If None `mz_mean and mz_width are used`.
+        :type peak_label: str, optional
+        :param mz_mean: m/z value for chromatogram, defaults to None
+        :type mz_mean: float, optional
+        :param mz_width: mz_width, defaults to None
+        :type mz_width: int>0, optional
+        :return: Plot of chromatogram(s)
+        :rtype: matplotlib.Figure
+        """
+        if not isinstance(fns, list):
+            fns = [fns]
+
+        if peak_label is not None:
+            target_data = self.mint.targets.loc[peak_label]
+            mz_mean, mz_width, rt_min, rt_max = target_data[
+                ["mz_mean", "mz_width", "rt_min", "rt_max"]
+            ]
+            plt.gca().axvspan(rt_min, rt_max, color="lightgreen", alpha=0.5)
+
+        for fn in fns:
+            chrom = Chromatogram()
+            chrom.from_file(fn, mz_mean, mz_width)
+            chrom.plot(label=P(fn).with_suffix("").name, **kwargs)
+
+        return plt.gcf()
