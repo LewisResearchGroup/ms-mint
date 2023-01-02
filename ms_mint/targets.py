@@ -236,13 +236,6 @@ class TargetOptimizer:
         self.results = None
         return self
 
-    def find_rt_min_max(self, **kwargs):
-        logging.warning(
-            "Mint.opt.find_rt_min_max() is depricated and will be removed in the next release. Please, update your code and use Mint.opt.rt_min_max() instead.",
-            DeprecationWarning,
-        )
-        self.rt_min_max(**kwargs)
-
     def rt_min_max(
         self,
         fns=None,
@@ -258,6 +251,7 @@ class TargetOptimizer:
         height=3,
         aspect=2,
         col_wrap=3,
+        verbose=False,
         **kwargs,
     ):
         """
@@ -295,7 +289,15 @@ class TargetOptimizer:
         if peak_labels is None:
             peak_labels = targets.peak_label.values
 
+        if verbose:
+            print(targets)
+            print(fns)
+            print(peak_labels)
+
         _targets = targets.set_index("peak_label").copy()
+
+        if verbose:
+            print(_targets)
 
         print("Reading files...")
         ms1 = pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)]).sort_values(
@@ -308,8 +310,10 @@ class TargetOptimizer:
 
         i = 0
         for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
-
+            
+            print(peak_label)
             if peak_label not in peak_labels:
+                logging.warning(f'{peak_label} not in {peak_labels}')
                 continue
 
             mz = row.mz_mean
@@ -322,6 +326,7 @@ class TargetOptimizer:
             )
 
             if chrom.x.max() < minimum_intensity:
+                logging.warning(f'Peak intensity for {peak_label} below threshold ({minimum_intensity})')
                 continue
 
             chrom.apply_filter()
@@ -336,10 +341,12 @@ class TargetOptimizer:
             if chrom.selected_peak_ndxs is None or len(chrom.selected_peak_ndxs) == 0:
                 logging.warning(f"No peaks detected for {peak_label}")
                 continue
-
+            
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]
+
+            if verbose: print(ndx, peak_label, rt_min, rt_max)
 
             _targets.loc[peak_label, ["rt_min", "rt_max"]] = rt_min, rt_max
 

@@ -153,7 +153,7 @@ class Chromatogram:
         return fig
 
 
-def get_chromatogram_from_ms_file(ms_file, mz_mean, mz_width=20):
+def get_chromatogram_from_ms_file(ms_file, mz_mean, mz_width=10):
     df = ms_file_to_df(ms_file)
     chrom = extract_chromatogram_from_ms1(df, mz_mean, mz_width=mz_width)
     return chrom
