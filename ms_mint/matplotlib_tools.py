@@ -298,6 +298,7 @@ def plot_metabolomics_hist2d(
     cmap="jet",
     rt_range=None,
     mz_range=None,
+    mz_bins=100,
     **kwargs,
 ):
 
@@ -319,7 +320,7 @@ def plot_metabolomics_hist2d(
         df["scan_time"],
         df["mz"],
         weights=df["intensity"].apply(np.log1p),
-        bins=[rt_bins, 100],
+        bins=[rt_bins, mz_bins],
         **params,
     )
 

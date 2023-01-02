@@ -116,15 +116,14 @@ class MintPlotter:
             transform_func = lambda x: np.log2(x + 1)
         if transform_func == "log10p1":
             transform_func = lambda x: np.log10(x + 1)
-
         if transform_func is not None:
             tmp_data = tmp_data.apply(transform_func)
 
         if transform_filenames_func == "basename":
             transform_filenames_func = lambda x: P(x).with_suffix("").name
-        elif transform_filenames_func is not None:
-            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns]
-
+        if transform_filenames_func is not None:
+            tmp_data.index = [transform_filenames_func(i) for i in tmp_data.index]
+        
         # Scale along ms-files
         if scaler_ms_file is not None:
             tmp_data = scale_dataframe(tmp_data.T, scaler_ms_file).T
@@ -153,17 +152,21 @@ class MintPlotter:
             self.mint.clustered = data.iloc[ndx_y, ndx_x]
         return fig
 
-    def peak_shapes(self, interactive=False, **kwargs):
+    def peak_shapes(self, peak_labels=None, interactive=False, **kwargs):
         """Plot peak shapes.
 
         :return: Figure with peak shapes.
         :rtype: seaborn.axisgrid.FacetGrid
         """
+
+        if peak_labels is None:
+            peak_labels = self.mint.peak_labels
+
         if len(self.mint.results) > 0:
             if not interactive:
-                return plot_peak_shapes(self.mint.results, **kwargs)
+                return plot_peak_shapes(self.mint.results, peak_labels=peak_labels, **kwargs)
             else:
-                return plotly_peak_shapes(self.mint.results, **kwargs)
+                return plotly_peak_shapes(self.mint.results, peak_labels=peak_labels, **kwargs)
 
     def heatmap(
         self,
@@ -198,9 +201,16 @@ class MintPlotter:
         :return: Interactive heatmap.
         :rtype: plotly.graph_objs._figure.Figure
         """
+
+        data = self.mint.crosstab(col_name)
+
+        # Remove path and suffix from file name.
+        transform_filenames_func = lambda x: P(x).with_suffix("").name
+        data.index = [transform_filenames_func(i) for i in data.index]
+
         if len(self.mint.results) > 0:
             return plotly_heatmap(
-                self.mint.crosstab(col_name),
+                data,
                 normed_by_cols=normed_by_cols,
                 transposed=transposed,
                 clustered=clustered,

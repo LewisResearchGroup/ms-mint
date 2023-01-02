@@ -2,6 +2,6 @@ peak_label,mz_mean,mz_width,rt,rt_min,rt_max,rt_unit,intensity_threshold,target_
 Arabitol,151.0605,10,295.50000000000006,279.0,312.0,s,0,targets.csv
 Mevalonate,147.0657,10,180.0,102.0,258.0,s,0,targets.csv
 Nicotinate,122.02455,10,183.204,165.0,225.0,s,0,targets.csv
-Succinate,117.01905,10,122.634,52.2,150.0,s,0,targets.csv
+Succinate,117.01905,10,122.634,100.2,150.0,s,0,targets.csv
 Urocanate,137.0354,10,264.9,258.0,276.0,s,0,targets.csv
 Xanthine,151.02585,10,250,210.8,271.8,s,0,targets.csv
