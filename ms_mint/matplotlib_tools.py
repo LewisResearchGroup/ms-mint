@@ -247,13 +247,16 @@ def plot_peaks(
     weights=None,
     legend=True,
     label=None,
-    **kwargs
+    **kwargs,
 ):
     if highlight is None:
         highlight = []
     ax = plt.gca()
     ax.plot(
-        series.index, series.values, label=label if label is not None else "Intensity", **kwargs
+        series.index,
+        series.values,
+        label=label if label is not None else "Intensity",
+        **kwargs,
     )
     if peaks is not None:
         series.iloc[peaks.ndxs].plot(
