@@ -1,14 +1,13 @@
 [![Python package](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml)
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/ms-mint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/ms-mint/context:python)
- 
+
 # Wecome to ms-mint 
 
 ## A Python library for targeted metabolomics
-The `ms-mint` library can be used for targeted metabolomics and large amounts of files (1000+). Metabolomics is the study of all small chemical compounds (metabolites) in a biological sample. 
-The metabolites can define biomarkers, which are used in medicine as indicators of disease or for the development of diagnostic tests. `ms-mint` contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. It uses a target list and the MS-filenames as input to extract peak intensities and other information. 
+The `ms-mint` library is a tool designed to assist with targeted metabolomics studies, which involves the systematic analysis of small chemical compounds called metabolites that are present in biological samples. These metabolites can provide valuable information about the state of an organism, including indicators of disease or other physiological changes. In order to perform a targeted metabolomics study, researchers typically use liquid chromatography-mass spectrometry (LCMS) to identify and quantify specific metabolites of interest.
+
+The `ms-mint` library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling large amounts of data (10,000+ files). To use `ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications.
 
 ## Documentation
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/readme.html).
@@ -23,9 +22,19 @@ Before you modify the code please reach out to us using the [issues](https://git
 ## Code standards
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
 
-# Example usage
+---
 
-The main class of mint is can be in ported with `from ms_mint.Mint import Mint`. This command imports a lightweight version with essential functionality. If you aim to use the tool interactively in a Jupyter Notebook or JupyterLab, you can import `from ms_mint.notebook import Mint`. These class is made for Jupyter notebooks and provides more functions.
+# Usage
+
+To use the main class of the ms-mint library, you can import it into your code with the following command:
+
+    from ms_mint.Mint import Mint
+
+This will import a lightweight version of the class with the essential functionality. If you want to use the ms-mint tool interactively in a Jupyter Notebook or JupyterLab, you can import the class with the following command:
+
+    from ms_mint.notebook import Mint
+
+This version of the class is designed specifically for use in Jupyter notebooks and includes additional functions. Once you have imported the appropriate version of the class, you can create an instance of the Mint class and use its methods to process your data.
 
 ### ms-mint in JupyterLab, or the Jupyter Notebook
 In the JupyterLab you would first instantiate the main class and then load a number of mass-spectrometry (MS) files and a target list.
@@ -95,7 +104,10 @@ If you want to process a large number of files, you should provide an output fil
     mint.run(fn='my-mint-output.csv')
 
 ## Optimize retention times
-In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function `mint.opt.rt_min_max()` for to generate better values for `rt_min` and `rt_max`. In the current example the peaks look like this:
+
+If you only have retention time (Rt) values for your targets, or if the Rt values you have are not accurate, you can use the `mint.opt.rt_min_max()` function from the ms-mint library to generate better values for the `rt_min` and `rt_max` parameters. These parameters define the range of retention times within which `ms-mint` will search for peaks corresponding to your targets. By optimizing these values, you can improve the accuracy and reliability of your results.
+
+To use the `mint.opt.rt_min_max()` function, you will need to provide it with a list of retention times for your targets and the names of the mass spectrometry files containing your data. The function will then search through the data to find the optimal `rt_min` and `rt_max` values, which you can use to refine your analysis. You can then use these optimized values in conjunction with the other functions and methods of the `Mint` class to process and analyze your data.
 
 ![](notebooks/peak-shapes-before-opt.png)
 
@@ -108,7 +120,11 @@ Now we can run the peak optimization with:
         height=4
     )
 
-If you do not provide a list for `peak_labels` the optimization will run for all metabolites. If no list with filenames is provided for `fn` all currently loaded files `mint.ms_files` are used. We usually use 20-40 files at maximum. If you run a set of standards with your samples (highly recommended) you can use the standard files to run the optimization. After optimization you should consider a manual fine tuning especially for complicated peaks (two or more peaks, noisy peaks, etc.). You can look at the peak shapes after you ran the main routine (`Mint.run()`) with the plotting tools (`Mint.plot.peak_shapes()`), explained further below.
+The `mint.opt.rt_min_max()` function in the ms-mint library allows you to optimize the `rt_min` and `rt_max` values for your analysis. These values define the range of retention times within which ms-mint will search for peaks corresponding to your targets. By optimizing these values, you can improve the accuracy and reliability of your results.
+
+If you do not provide a list of peak_labels to the `mint.opt.rt_min_max()` function, it will run the optimization for all metabolites. Similarly, if you do not provide a list of filenames for the fn parameter, the function will use all of the files currently loaded into mint.ms_files. It is generally recommended to use a maximum of 20-40 files for the optimization process. If you have run a set of standards along with your samples (which is highly recommended), you can use the standard files to perform the optimization.
+
+After running the optimization, it is a good idea to perform a manual fine-tuning of the `rt_min` and `rt_max` values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the `mint.plot.peak_shapes()` function to visualize the peak shapes and identify any areas that may require further attention.
     
 ![](notebooks/opt-rt.png)
 
@@ -197,3 +213,10 @@ The target list can be stored as csv or Excel file.
 -   **ms_path**: Path of the MS-file
 -   **ms_file_size**: Size of the MS-file in MB
 ---
+
+
+# Release Notes
+
+## 0.1.9 Milestones
+    - peak_area_top3 comparable to El-Maven PeakAreaTop values
+    
