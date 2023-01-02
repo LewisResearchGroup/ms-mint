@@ -54,7 +54,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     :rtype: pandas.DataFrame
     """
     targets = targets.rename(columns=DEPRECATED_LABELS)
-    if targets.index.name == 'peak_label':
+    if targets.index.name == "peak_label":
         targets = targets.reset_index()
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
@@ -68,14 +68,14 @@ def standardize_targets(targets, ms_mode="neutral"):
         targets["target_filename"] = "unknown"
     if "rt_unit" not in targets.columns:
         targets["rt_unit"] = "min"
-    
+
     # Standardize time units use SI abbreviations
-    targets['rt_unit'] = targets['rt_unit'].replace('m', 'min')
-    targets['rt_unit'] = targets['rt_unit'].replace('minute', 'min')
-    targets['rt_unit'] = targets['rt_unit'].replace('minutes', 'min')
-    targets['rt_unit'] = targets['rt_unit'].replace('sec', 's')
-    targets['rt_unit'] = targets['rt_unit'].replace('second', 's')
-    targets['rt_unit'] = targets['rt_unit'].replace('seconds', 's')
+    targets["rt_unit"] = targets["rt_unit"].replace("m", "min")
+    targets["rt_unit"] = targets["rt_unit"].replace("minute", "min")
+    targets["rt_unit"] = targets["rt_unit"].replace("minutes", "min")
+    targets["rt_unit"] = targets["rt_unit"].replace("sec", "s")
+    targets["rt_unit"] = targets["rt_unit"].replace("second", "s")
+    targets["rt_unit"] = targets["rt_unit"].replace("seconds", "s")
 
     for c in ["rt", "rt_min", "rt_max"]:
         if c not in cols:
@@ -237,7 +237,10 @@ class TargetOptimizer:
         return self
 
     def find_rt_min_max(self, **kwargs):
-        logging.warning('Mint.opt.find_rt_min_max() is depricated and will be removed in the next release. Please, update your code and use Mint.opt.rt_min_max() instead.', DeprecationWarning)
+        logging.warning(
+            "Mint.opt.find_rt_min_max() is depricated and will be removed in the next release. Please, update your code and use Mint.opt.rt_min_max() instead.",
+            DeprecationWarning,
+        )
         self.rt_min_max(**kwargs)
 
     def rt_min_max(
@@ -286,7 +289,7 @@ class TargetOptimizer:
         if targets is None:
             targets = self.mint.targets.reset_index()
 
-        if fns is None: 
+        if fns is None:
             fns = self.mint.ms_files
 
         if peak_labels is None:
@@ -294,15 +297,14 @@ class TargetOptimizer:
 
         _targets = targets.set_index("peak_label").copy()
 
-        print('Reading files...')
-        ms1 = (
-            pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)])
-            .sort_values(["scan_time", "mz"])
+        print("Reading files...")
+        ms1 = pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)]).sort_values(
+            ["scan_time", "mz"]
         )
 
         if plot:
-            n_rows = int( np.ceil(len(peak_labels) / col_wrap) )
-            fig = plt.figure(figsize=(col_wrap*height*aspect, n_rows*height))
+            n_rows = int(np.ceil(len(peak_labels) / col_wrap))
+            fig = plt.figure(figsize=(col_wrap * height * aspect, n_rows * height))
 
         i = 0
         for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
@@ -327,14 +329,14 @@ class TargetOptimizer:
             chrom.select_peak_with_gaussian_weight(rt, sigma)
 
             if post_opt:
-                if post_opt_kwargs is None: 
+                if post_opt_kwargs is None:
                     post_opt_kwargs = {}
                 chrom.optimise_peak_times_with_diff(**post_opt_kwargs)
-            
+
             if chrom.selected_peak_ndxs is None or len(chrom.selected_peak_ndxs) == 0:
-                logging.warning(f'No peaks detected for {peak_label}')
+                logging.warning(f"No peaks detected for {peak_label}")
                 continue
-                
+
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]
