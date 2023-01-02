@@ -1,2 +1,0 @@
-- name: Git Quality Check
-  uses: gcattan/git-quality-check@v0.1.2
