@@ -146,8 +146,9 @@ def get_ms_files_from_results(results):
     :rtype: list
     """
     ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
-    ms_files = [P(ms_path)/ms_file for ms_path, ms_file in ms_files.values]
+    ms_files = [P(ms_path) / ms_file for ms_path, ms_file in ms_files.values]
     return ms_files
+
 
 def get_targets_from_results(results):
     """Extract targets dataframe from ms-mint results table.
@@ -158,8 +159,9 @@ def get_targets_from_results(results):
     :rtype: pandas.DataFrame
     """
     return results[
-            [col for col in TARGETS_COLUMNS if col in results.columns]
-        ].drop_duplicates()
+        [col for col in TARGETS_COLUMNS if col in results.columns]
+    ].drop_duplicates()
+
 
 def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9):
     """_summary_
@@ -176,7 +178,9 @@ def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9
     t = series.index
     x = series.values
     peak_ndxs, _ = find_peaks(x, prominence=prominence)
-    widths, heights, left_ips, right_ips = peak_widths(x, peak_ndxs, rel_height=rel_height)
+    widths, heights, left_ips, right_ips = peak_widths(
+        x, peak_ndxs, rel_height=rel_height
+    )
     times = series.iloc[peak_ndxs].index
 
     t_start = _map_ndxs_to_time(left_ips, min(t), max(t), 0, len(t))
@@ -210,3 +214,10 @@ def _map_ndxs_to_time(x, t_min, t_max, x_min, x_max):
     x = np.array(x)
     result = (m * x + b).flatten()
     return result
+
+
+def mz_mean_width_to_min_max(mz_mean, mz_width):
+    delta_mass = mz_width * mz_mean * 1e-6
+    mz_min = mz_mean - delta_mass
+    mz_max = mz_mean + delta_mass
+    return mz_min, mz_max

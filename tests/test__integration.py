@@ -102,22 +102,19 @@ def test__optimize_min_max():
     mint = Mint()
     mint.ms_files = [TEST_MZXML]
     mint.load_targets(TEST_TARGETS_FN_V0)
-    mint.targets.rt = mint.targets[['rt_min', 'rt_max']].mean(axis=1)
-    mint.targets['rt_min'] = None
-    mint.targets['rt_max'] = None
-    result = mint.opt.rt_min_max()    
-    n_missing_values_in_rt_cols = mint.targets[['rt_min', 'rt_max']].isna().sum().sum()
-    assert n_missing_values_in_rt_cols== 0, mint.targets.filter(regex='rt')
+    mint.targets.rt = mint.targets[["rt_min", "rt_max"]].mean(axis=1)
+    mint.targets["rt_min"] = None
+    mint.targets["rt_max"] = None
+    result = mint.opt.rt_min_max()
+    n_missing_values_in_rt_cols = mint.targets[["rt_min", "rt_max"]].isna().sum().sum()
+    assert n_missing_values_in_rt_cols == 0, mint.targets.filter(regex="rt")
 
 
 def test__optimize_min_max__returns_figure():
     mint = Mint()
     mint.ms_files = [TEST_MZXML]
     mint.load_targets(TEST_TARGETS_FN_V0)
-    mint.targets.rt = mint.targets[['rt_min', 'rt_max']].mean(axis=1)
-    result_1, result_2 = mint.opt.rt_min_max(plot=True)    
+    mint.targets.rt = mint.targets[["rt_min", "rt_max"]].mean(axis=1)
+    result_1, result_2 = mint.opt.rt_min_max(plot=True)
     assert result_1 is mint
     assert isinstance(result_2, plt.Figure), type(result_2)
-
-
-

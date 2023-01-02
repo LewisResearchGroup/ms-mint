@@ -14,6 +14,7 @@ from pyteomics import mzxml, mzml
 
 try:
     from pyteomics import mzmlb
+
     MZMLB_AVAILABLE = True
 except ImportError:
     logging.warning("Cound not import pyteomics.mzmlb")
@@ -43,10 +44,10 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     :return: MS data as DataFrame
     :rtype: pandas.DataFrame
     """
-    
+
     assert time_unit in ["minutes", "seconds"]
     fn = str(fn)
-    
+
     try:
         if fn.lower().endswith(".mzxml"):
             df = mzxml_to_df(fn, read_only=read_only)
@@ -63,7 +64,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
         else:
             logging.error(f"Cannot read file {fn} of type {type(fn)}")
     except IndexError as e:
-        logging.warning(f'{e}: {fn}')
+        logging.warning(f"{e}: {fn}")
         return None
     # Compatibility with old schema
     if not read_only:

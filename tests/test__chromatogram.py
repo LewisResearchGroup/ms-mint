@@ -223,6 +223,6 @@ def test__Chromatogram__data():
     data = chrom.data
 
     assert isinstance(data, pd.DataFrame), type(data)
-    assert len(chrom.data) == len(x)+1
-    #assert all(data.index == x), data.index
-    #assert all(data.intensity.values == [0]+y), data.values
+    assert len(chrom.data) == len(x) + 1
+    # assert all(data.index == x), data.index
+    # assert all(data.intensity.values == [0]+y), data.values

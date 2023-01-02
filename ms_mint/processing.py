@@ -42,7 +42,7 @@ def process_ms1_files_in_parallel(args):
     filename = args["filename"]
     targets = args["targets"]
     output_fn = args["output_fn"]
-    
+
     if "queue" in args.keys():
         q = args["queue"]
         q.put("filename")
@@ -50,7 +50,7 @@ def process_ms1_files_in_parallel(args):
     try:
         results = process_ms1_file(filename=filename, targets=targets)
     except Exception as e:
-        logging.error(f'process_ms1_files_in_parallel(): {e}')
+        logging.error(f"process_ms1_files_in_parallel(): {e}")
         results = pd.DataFrame()
 
     if (output_fn is not None) and (len(results) > 0):
@@ -223,8 +223,11 @@ def extract_ms1_properties(array, mz_mean):
     peak_area = intensities.sum()
 
     # Like El-Maven peakAreaTop
-    ndx_max = np.argmax(intensities)
-    peak_area_top3 = intensities[max(0, ndx_max-1):ndx_max+2].mean()
+    # ndx_max = np.argmax(intensities)
+    # peak_area_top3 = intensities[max(0, ndx_max - 1) : ndx_max + 2].mean()
+    # Try an alternative apporach to calculate peak_area_top3
+    ndx_max = np.argmax(projection[:, 1])
+    peak_area_top3 = projection[:, 1][max(0, ndx_max - 1) : ndx_max + 2].sum() // 3
 
     peak_mean = intensities.mean()
     peak_max = intensities.max()
@@ -249,6 +252,7 @@ def extract_ms1_properties(array, mz_mean):
 
     peak_shape_rt = float_list_to_comma_sep_str(projection[:, 0])
     peak_shape_int = int_list_to_comma_sep_str(projection[:, 1])
+
 
     return dict(
         peak_area=peak_area,
