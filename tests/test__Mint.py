@@ -62,7 +62,6 @@ def test__hierarchical_clustering():
     mint.plot.hierarchical_clustering(transform_func="log1p")
     mint.plot.hierarchical_clustering(transform_func="log2p1")
     mint.plot.hierarchical_clustering(transform_func="log10p1")
-    mint.plot.hierarchical_clustering(transform_func="log10p1")
     mint.plot.hierarchical_clustering(transform_filenames_func=lambda x: x[:3])
 
 
