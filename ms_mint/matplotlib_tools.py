@@ -298,6 +298,7 @@ def plot_metabolomics_hist2d(
     cmap="jet",
     rt_range=None,
     mz_range=None,
+    **kwargs,
 ):
 
     if set_dim:
@@ -311,20 +312,19 @@ def plot_metabolomics_hist2d(
 
     rt_bins = int((rt_range[1] - rt_range[0]) / 2)
 
+    params = dict(vmin=1, vmax=1e3, cmap=cmap, range=(rt_range, mz_range))
+    params.update(kwargs)
+
     fig = plt.hist2d(
         df["scan_time"],
         df["mz"],
         weights=df["intensity"].apply(np.log1p),
         bins=[rt_bins, 100],
-        vmin=1,
-        vmax=15,
-        cmap=cmap,
-        range=(rt_range, mz_range),
+        **params,
     )
 
     plt.xlabel("Rt [s]")
     plt.ylabel("m/z")
-    plt.grid()
+    #plt.grid()
     plt.gca().ticklabel_format(useOffset=False, style="plain")
-
     return fig
