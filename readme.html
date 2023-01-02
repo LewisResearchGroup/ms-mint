@@ -202,8 +202,8 @@
 <h1>Wecome to ms-mint<a class="headerlink" href="#wecome-to-ms-mint" title="Permalink to this heading">¶</a></h1>
 <section id="a-python-library-for-targeted-metabolomics">
 <h2>A Python library for targeted metabolomics<a class="headerlink" href="#a-python-library-for-targeted-metabolomics" title="Permalink to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> library can be used for targeted metabolomics and large amounts of files (1000+). Metabolomics is the study of all small chemical compounds (metabolites) in a biological sample.
-The metabolites can define biomarkers, which are used in medicine as indicators of disease or for the development of diagnostic tests. <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> contains functions to process liquid chromatography-mass spectrometry (LCMS) based metabolomics data in various formats. It uses a target list and the MS-filenames as input to extract peak intensities and other information.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> library is a tool designed to assist with targeted metabolomics studies, which involve the systematic analysis of small chemical compounds called metabolites that are present in biological samples. These metabolites can provide valuable information about the state of an organism, including indicators of disease or other physiological changes. In order to perform a targeted metabolomics study, researchers typically use liquid chromatography-mass spectrometry (LCMS) to identify and quantify specific metabolites of interest.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling large amounts of data (10,000+ files). To use ms-mint, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications.</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h2>
@@ -225,7 +225,23 @@ Before you modify the code please reach out to us using the <a class="reference 
 </section>
 <section id="example-usage">
 <h1>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this heading">¶</a></h1>
-<p>The main class of mint is can be in ported with <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ms_mint.Mint</span> <span class="pre">import</span> <span class="pre">Mint</span></code>. This command imports a lightweight version with essential functionality. If you aim to use the tool interactively in a Jupyter Notebook or JupyterLab, you can import <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ms_mint.notebook</span> <span class="pre">import</span> <span class="pre">Mint</span></code>. These class is made for Jupyter notebooks and provides more functions.</p>
+<p>To use the main class of the ms-mint library, you can import it into your code with the following command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>from ms_mint.Mint import Mint
+</pre></div>
+</div>
+<p>This will import a lightweight version of the class with the essential functionality. If you want to use the ms-mint tool interactively in a Jupyter Notebook or JupyterLab, you can import the class with the following command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>from ms_mint.notebook import Mint
+</pre></div>
+</div>
+<p>To use the main class of the ms-mint library, you can import it into your code with the following command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>from ms_mint.Mint import Mint
+</pre></div>
+</div>
+<p>This will import a lightweight version of the class with the essential functionality. If you want to use the ms-mint tool interactively in a Jupyter Notebook or JupyterLab, you can import the class with the following command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>from ms_mint.notebook import Mint
+</pre></div>
+</div>
+<p>This version of the class is designed specifically for use in Jupyter notebooks and includes additional functions. Once you have imported the appropriate version of the class, you can create an instance of the Mint class and use its methods to process your data.</p>
 <section id="ms-mint-in-jupyterlab-or-the-jupyter-notebook">
 <h2>ms-mint in JupyterLab, or the Jupyter Notebook<a class="headerlink" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook" title="Permalink to this heading">¶</a></h2>
 <p>In the JupyterLab you would first instantiate the main class and then load a number of mass-spectrometry (MS) files and a target list.</p>
@@ -303,7 +319,8 @@ mint.results
 </section>
 <section id="optimize-retention-times">
 <h2>Optimize retention times<a class="headerlink" href="#optimize-retention-times" title="Permalink to this heading">¶</a></h2>
-<p>In case you have only Rt values for your targets, or it turns out that the values are somewhat off, you can use the optimization function <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> for to generate better values for <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code>. In the current example the peaks look like this:</p>
+<p>If you only have retention time (Rt) values for your targets, or if the Rt values you have are not accurate, you can use the <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function from the ms-mint library to generate better values for the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> parameters. These parameters define the range of retention times within which <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> will search for peaks corresponding to your targets. By optimizing these values, you can improve the accuracy and reliability of your results.</p>
+<p>To use the <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function, you will need to provide it with a list of retention times for your targets and the names of the mass spectrometry files containing your data. The function will then search through the data to find the optimal <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values, which you can use to refine your analysis. You can then use these optimized values in conjunction with the other functions and methods of the <code class="docutils literal notranslate"><span class="pre">Mint</span></code> class to process and analyze your data.</p>
 <p><img alt="" src="notebooks/peak-shapes-before-opt.png" /></p>
 <p>Now we can run the peak optimization with:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.opt.rt_min_max(
@@ -314,7 +331,9 @@ mint.results
 )
 </pre></div>
 </div>
-<p>If you do not provide a list for <code class="docutils literal notranslate"><span class="pre">peak_labels</span></code> the optimization will run for all metabolites. If no list with filenames is provided for <code class="docutils literal notranslate"><span class="pre">fn</span></code> all currently loaded files <code class="docutils literal notranslate"><span class="pre">mint.ms_files</span></code> are used. We usually use 20-40 files at maximum. If you run a set of standards with your samples (highly recommended) you can use the standard files to run the optimization. After optimization you should consider a manual fine tuning especially for complicated peaks (two or more peaks, noisy peaks, etc.). You can look at the peak shapes after you ran the main routine (<code class="docutils literal notranslate"><span class="pre">Mint.run()</span></code>) with the plotting tools (<code class="docutils literal notranslate"><span class="pre">Mint.plot.peak_shapes()</span></code>), explained further below.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function in the ms-mint library allows you to optimize the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values for your analysis. These values define the range of retention times within which ms-mint will search for peaks corresponding to your targets. By optimizing these values, you can improve the accuracy and reliability of your results.</p>
+<p>If you do not provide a list of peak_labels to the <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function, it will run the optimization for all metabolites. Similarly, if you do not provide a list of filenames for the fn parameter, the function will use all of the files currently loaded into mint.ms_files. It is generally recommended to use a maximum of 20-40 files for the optimization process. If you have run a set of standards along with your samples (which is highly recommended), you can use the standard files to perform the optimization.</p>
+<p>After running the optimization, it is a good idea to perform a manual fine-tuning of the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the <code class="docutils literal notranslate"><span class="pre">mint.plot.peak_shapes()</span></code> function to visualize the peak shapes and identify any areas that may require further attention.</p>
 <p><img alt="" src="notebooks/opt-rt.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run()
 
