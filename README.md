@@ -78,14 +78,16 @@ Then you load the target definitions from a file the `load_targets` method is us
     mint.load_targets('targets.csv')
     
     mint.targets
-    >>>    peak_label    mz_mean  mz_width       rt  rt_min  rt_max  intensity_threshold target_filename
-        0    Arabitol  151.06050        10  4.92500    4.65    5.20                    0     targets.csv
-        1    Xanthine  151.02585        10  4.37265    4.18    4.53                    0     targets.csv
-        2   Succinate  117.01905        10  2.04390    0.87    2.50                    0     targets.csv
-        3   Urocanate  137.03540        10  4.41500    4.30    4.60                    0     targets.csv
-        4  Mevalonate  147.06570        10  3.00000    1.70    4.30                    0     targets.csv
-        5  Nicotinate  122.02455        10  3.05340    2.75    3.75                    0     targets.csv
-        6  Citrulline  174.08810        10  8.40070    8.35    8.50                    0     targets.csv
+    >>>    peak_label    mz_mean  mz_width       rt  rt_min  rt_max  rt_unit  intensity_threshold target_filename
+        0    Arabitol  151.06050        10  4.92500    4.65    5.20      min                    0     targets.csv
+        1    Xanthine  151.02585        10  4.37265    4.18    4.53      min                    0     targets.csv
+        2   Succinate  117.01905        10  2.04390    0.87    2.50      min                    0     targets.csv
+        3   Urocanate  137.03540        10  4.41500    4.30    4.60      min                    0     targets.csv
+        4  Mevalonate  147.06570        10  3.00000    1.70    4.30      min                    0     targets.csv
+        5  Nicotinate  122.02455        10  3.05340    2.75    3.75      min                    0     targets.csv
+        6  Citrulline  174.08810        10  8.40070    8.35    8.50      min                    0     targets.csv
+        
+The retention time can be specified in minutes (rt_unit = 'min') or seconds (rt_unit = 's'). Mint will convert the values to SI unit seconds.
 
 You can also prepare a `pandas.DataFrame` with the column names as shown above and assign it directly to the `Mint.targets` attribute:
 
@@ -203,7 +205,7 @@ The target list can be stored as csv or Excel file.
 -   **peak_n_datapoints**: Number of datapoints
 -   **peak_max**: Intensity of peak maximum
 -   **peak_rt_of_max**: Retentiontime of peak maximum
--   **peak_min**: Minimm peak intensity (offset)
+-   **peak_min**: Minimum peak intensity (offset)
 -   **peak_median**: Median of all intensities 
 -   **peak_mean**: Average of all intensities
 -   **peak_delta_int**: Difference between first and last intensity
