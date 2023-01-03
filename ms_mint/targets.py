@@ -311,7 +311,7 @@ class TargetOptimizer:
         i = 0
         for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
             
-            print(peak_label)
+            if verbose: print(peak_label)
             if peak_label not in peak_labels:
                 logging.warning(f'{peak_label} not in {peak_labels}')
                 continue

@@ -485,7 +485,7 @@ class Mint(object):
         self.ms_files = get_ms_files_from_results(self.results)
         self.targets = get_targets_from_results(self.results)
 
-    @lru_cache(10)
+    @lru_cache(1)
     def get_chromatograms(self, fns=None, peak_label=None, **kwargs):
         if fns is None:
             fns = self.ms_files

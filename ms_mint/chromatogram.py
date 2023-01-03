@@ -27,6 +27,8 @@ class Chromatogram:
             self.filter = filter
         self.peaks = None
         self.selected_peak_ndxs = None
+        if expected_rt is None:
+            expected_rt = max(scan_times) // 2 
         self.expected_rt = expected_rt
         self.weights = None
 
