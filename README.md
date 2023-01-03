@@ -67,6 +67,10 @@ Or you can use the `Mint.load_files()` method which supports a string with regul
 
     mint.load_files('./input/*.*')
 
+This has the advantage that you can wildcards and you can chain your commands. For examle like this:
+
+    mint.load_files('./input/*.*').load_targets('targets.csv').run()
+    
 ### Load target list
 
 Then you load the target definitions from a file the `load_targets` method is used:    
