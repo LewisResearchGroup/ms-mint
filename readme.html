@@ -273,6 +273,10 @@ mint = Mint()
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.load_files(&#39;./input/*.*&#39;)
 </pre></div>
 </div>
+<p>This has the advantage that you can wildcards and you can chain your commands. For examle like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.load_files(&#39;./input/*.*&#39;).load_targets(&#39;targets.csv&#39;).run()
+</pre></div>
+</div>
 </section>
 <section id="load-target-list">
 <h3>Load target list<a class="headerlink" href="#load-target-list" title="Permalink to this heading">¶</a></h3>
