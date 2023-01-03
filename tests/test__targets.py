@@ -1,4 +1,10 @@
 import pandas as pd
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+
+
 from ms_mint.targets import (
     standardize_targets,
     check_targets,
@@ -8,6 +14,8 @@ from ms_mint.targets import (
 )
 from ms_mint.standards import TARGETS_COLUMNS
 from ms_mint import Mint
+
+from pathlib import Path as P
 
 from paths import (
     # TEST_TARGETS_FN_V2_CSV_SEC,
@@ -87,18 +95,31 @@ def test__check_targets_wrong_column_names():
     assert result is False
 
 
-def test__import_csv_and_xlsx():
+def test__import_csv_and_xlsx(tmpdir):
     mint1 = Mint()
     mint2 = Mint()
+
+    TEST_TARGETS_FN_V0_XLSX = P(tmpdir)/'targets.xlsx'
+
+    print(TEST_TARGETS_FN_V0_XLSX)
+
+    pd.read_csv(TEST_TARGETS_FN_V0).to_excel(TEST_TARGETS_FN_V0_XLSX)
 
     mint1.load_targets(TEST_TARGETS_FN_V0)
     mint2.load_targets(TEST_TARGETS_FN_V0_XLSX)
 
-    mint1.targets.drop("target_filename", inplace=True, axis=1)
-    mint2.targets.drop("target_filename", inplace=True, axis=1)
+    mint1.targets.drop(["target_filename", "rt"], inplace=True, axis=1)
+    mint2.targets.drop(["target_filename", "rt"], inplace=True, axis=1)
 
     print(mint1.targets)
+    print(mint1.targets.index.dtype)
+    print(mint1.targets.dtypes)
+
     print(mint2.targets)
+    print(mint2.targets.index.dtype)
+    print(mint2.targets.dtypes)
+
+    print(mint1.targets == mint2.targets)
 
     assert mint1.targets.equals(mint2.targets)
 

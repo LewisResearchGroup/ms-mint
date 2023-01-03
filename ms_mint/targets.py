@@ -21,11 +21,13 @@ def read_targets(fns, ms_mode="negative"):
     :param fns: List of filenames of target lists.
     :param ms_mode: "negative" or "positive"
     """
+
     if isinstance(fns, str):
         fns = [fns]
     targets = []
 
     for fn in fns:
+        fn = str(fn)
         if fn.endswith(".csv"):
             df = pd.read_csv(fn)
         elif fn.endswith(".xlsx"):

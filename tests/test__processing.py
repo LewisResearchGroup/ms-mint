@@ -122,7 +122,7 @@ def test__extract_chromatogram_from_ms1():
     df = pd.DataFrame(
         {"scan_time": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
     )
-    result = processing.extract_chromatogram_from_ms1(df, 200, 10, "minutes")
+    result = processing.extract_chromatogram_from_ms1(df, 200, 10)
     expected = pd.Series([3], index=[2])
     assert result.equals(expected)
 
