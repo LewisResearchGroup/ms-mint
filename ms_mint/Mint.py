@@ -310,7 +310,7 @@ class Mint(object):
         :return: self
         :rtype: ms_mint.Mint.Mint
         """
-        if isinstance(list_of_files, str):
+        if isinstance(list_of_files, str) or isinstance(list_of_files, P):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
             raise ValueError("Input should be a list of files.")

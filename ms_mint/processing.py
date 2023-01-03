@@ -5,14 +5,14 @@ import pandas as pd
 import numpy as np
 import logging
 
-from .tools import lock
+from .tools import lock, mz_mean_width_to_min_max
 
 from .io import ms_file_to_df
 
 from .standards import RESULTS_COLUMNS, MINT_RESULTS_COLUMNS
 
 
-def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
+def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10):
     """
     Extract single chromatogram of specific m/z value from MS-data.
 
@@ -22,13 +22,11 @@ def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10, unit="minutes"):
     :type mz_mean: float
     :param mz_width: m/z width in ppm, defaults to 10
     :type mz_width: float
-    :param unit: Time unit used in MS-data, defaults to "minutes"
-    :type unit: str, optional
     :return: Chromatogram
     :rtype: pandas.DataFrame
     """
-    dmz = mz_mean * 1e-6 * mz_width
-    chrom = df[(df["mz"] - mz_mean).abs() <= dmz].copy()
+    mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
+    chrom = df[(df.mz >= mz_min) & (df.mz <=mz_max)].copy()
     chrom["scan_time"] = chrom["scan_time"].round(3)
     chrom = chrom.groupby("scan_time").max()
     return chrom["intensity"]
@@ -321,3 +319,5 @@ def score_peaks(mint_results):
         * (1 / (1 + abs(R.peak_rt_of_max - R[["rt_min", "rt_max"]].mean(axis=1))))
     )
     return scores
+
+

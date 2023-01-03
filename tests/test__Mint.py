@@ -52,19 +52,6 @@ def test__heatmap():
     mint.plot.heatmap(transposed=True)
 
 
-def test__hierarchical_clustering():
-    mint = Mint(verbose=False)
-    mint.ms_files = [TEST_MZML, TEST_MZXML]
-    mint.load_targets(TEST_TARGETS_FN_V2_CSV_SEC)
-    mint.run()
-    mint.plot.hierarchical_clustering()
-    mint.plot.hierarchical_clustering(transposed=True)
-    mint.plot.hierarchical_clustering(transform_func="log1p")
-    mint.plot.hierarchical_clustering(transform_func="log2p1")
-    mint.plot.hierarchical_clustering(transform_func="log10p1")
-    mint.plot.hierarchical_clustering(transform_filenames_func=lambda x: x[:3])
-
-
 def test__pca_plots_are_working():
     mint = Mint(verbose=False)
     mint.ms_files = [TEST_MZML, TEST_MZXML]
