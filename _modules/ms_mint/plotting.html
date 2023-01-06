@@ -162,6 +162,8 @@
             
   <h1>Source code for ms_mint.plotting</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">simplefilter</span>
 <span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">ClusterWarning</span>
@@ -175,9 +177,14 @@
     <span class="n">hierarchical_clustering</span><span class="p">,</span>
     <span class="n">plot_metabolomics_hist2d</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+
+<span class="kn">from</span> <span class="nn">.filter</span> <span class="kn">import</span> <span class="n">Resampler</span>
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">scale_dataframe</span><span class="p">,</span> <span class="n">mz_mean_width_to_min_max</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
-<span class="kn">from</span> <span class="nn">.chromatogram</span> <span class="kn">import</span> <span class="n">Chromatogram</span>
 
 
 <div class="viewcode-block" id="MintPlotter"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter">[docs]</a><span class="k">class</span> <span class="nc">MintPlotter</span><span class="p">:</span>
@@ -212,7 +219,7 @@
         <span class="n">transform_func</span><span class="o">=</span><span class="s2">&quot;log2p1&quot;</span><span class="p">,</span>
         <span class="n">scaler_ms_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">scaler_peak_label</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span>
-        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
         <span class="n">transform_filenames_func</span><span class="o">=</span><span class="s2">&quot;basename&quot;</span><span class="p">,</span>
         <span class="n">transposed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -237,7 +244,7 @@
 <span class="sd">        :param scaler_peak_label: default &#39;standard&#39;</span>
 <span class="sd">            - like scaler_ms_file, but scaling along peak_label axis</span>
 
-<span class="sd">        :param metric: default &#39;euclidean&#39;, can be string or a list of two values:</span>
+<span class="sd">        :param metric: default &#39;cosine&#39;, can be string or a list of two values:</span>
 <span class="sd">            if two values are provided e.g. (&#39;cosine&#39;, &#39;euclidean&#39;) the first</span>
 <span class="sd">            will be used to cluster the x-axis and the second for the y-axis.</span>
 
@@ -400,7 +407,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
-<div class="viewcode-block" id="MintPlotter.chromatogram"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.chromatogram">[docs]</a>    <span class="k">def</span> <span class="nf">chromatogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="p">,</span> <span class="n">peak_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mz_mean</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MintPlotter.chromatogram"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.chromatogram">[docs]</a>    <span class="k">def</span> <span class="nf">chromatogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the chromatogram extracted from one or more files.</span>
 
 <span class="sd">        :param fns: File names to extract chromatogram from.</span>
@@ -415,22 +422,56 @@
 <span class="sd">        :return: Plot of chromatogram(s)</span>
 <span class="sd">        :rtype: matplotlib.Figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="p">[</span><span class="n">fns</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">peak_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">target_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_label</span><span class="p">]</span>
-            <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span> <span class="o">=</span> <span class="n">target_data</span><span class="p">[</span>
-                <span class="p">[</span><span class="s2">&quot;mz_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;mz_width&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
-            <span class="p">]</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">peak_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">peak_labels</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">:</span>
-            <span class="n">chrom</span> <span class="o">=</span> <span class="n">Chromatogram</span><span class="p">()</span>
-            <span class="n">chrom</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">)</span>
-            <span class="n">chrom</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">peak_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">peak_labels</span>
 
-        <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span></div></div>
+        <span class="n">peak_labels</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">get_chromatograms</span><span class="p">(</span><span class="n">fns</span><span class="o">=</span><span class="n">fns</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="n">peak_labels</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">interactive</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
+                <span class="n">row</span><span class="o">=</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                <span class="n">aspect</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;ms_file&quot;</span><span class="p">,</span>
+                <span class="n">facet_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+                <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">row_order</span><span class="o">=</span><span class="n">peak_labels</span>
+            <span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">peak_label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+                <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">get_target_params</span><span class="p">(</span>
+                    <span class="n">peak_label</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">rt_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rt_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;sci&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">useOffset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">set_titles</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{row_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">g</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                <span class="n">data_frame</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="s2">&quot;scan_time&quot;</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
+                <span class="n">facet_col</span><span class="o">=</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;ms_file&quot;</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span>
+                <span class="n">facet_col_wrap</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">matches</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">matches</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">g</span></div></div>
 </pre></div>
 
            </div>
