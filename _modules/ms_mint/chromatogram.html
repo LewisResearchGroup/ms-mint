@@ -316,7 +316,7 @@
         <span class="k">return</span> <span class="n">fig</span></div></div>
 
 
-<div class="viewcode-block" id="get_chromatogram_from_ms_file"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.chromatogram.get_chromatogram_from_ms_file">[docs]</a><span class="k">def</span> <span class="nf">get_chromatogram_from_ms_file</span><span class="p">(</span><span class="n">ms_file</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<div class="viewcode-block" id="get_chromatogram_from_ms_file"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.chromatogram.get_chromatogram_from_ms_file">[docs]</a><span class="k">def</span> <span class="nf">get_chromatogram_from_ms_file</span><span class="p">(</span><span class="n">ms_file</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">ms_file</span><span class="p">)</span>
     <span class="n">chrom</span> <span class="o">=</span> <span class="n">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="n">mz_width</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">chrom</span></div>
