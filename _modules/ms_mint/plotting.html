@@ -279,15 +279,14 @@
             <span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">transform_func</span> <span class="o">==</span> <span class="s2">&quot;log10p1&quot;</span><span class="p">:</span>
             <span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">transform_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">tmp_data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">transform_func</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">transform_filenames_func</span> <span class="o">==</span> <span class="s2">&quot;basename&quot;</span><span class="p">:</span>
             <span class="n">transform_filenames_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">elif</span> <span class="n">transform_filenames_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tmp_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">transform_filenames_func</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tmp_data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-
+        <span class="k">if</span> <span class="n">transform_filenames_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmp_data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">transform_filenames_func</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tmp_data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        
         <span class="c1"># Scale along ms-files</span>
         <span class="k">if</span> <span class="n">scaler_ms_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">scale_dataframe</span><span class="p">(</span><span class="n">tmp_data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">scaler_ms_file</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
@@ -316,17 +315,21 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">clustered</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ndx_y</span><span class="p">,</span> <span class="n">ndx_x</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
-<div class="viewcode-block" id="MintPlotter.peak_shapes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.peak_shapes">[docs]</a>    <span class="k">def</span> <span class="nf">peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MintPlotter.peak_shapes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.peak_shapes">[docs]</a>    <span class="k">def</span> <span class="nf">peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot peak shapes.</span>
 
 <span class="sd">        :return: Figure with peak shapes.</span>
 <span class="sd">        :rtype: seaborn.axisgrid.FacetGrid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">peak_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">peak_labels</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">interactive</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">plot_peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plot_peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="n">peak_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">plotly_peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+                <span class="k">return</span> <span class="n">plotly_peak_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="n">peak_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MintPlotter.heatmap"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotting.MintPlotter.heatmap">[docs]</a>    <span class="k">def</span> <span class="nf">heatmap</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -361,9 +364,16 @@
 <span class="sd">        :return: Interactive heatmap.</span>
 <span class="sd">        :rtype: plotly.graph_objs._figure.Figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+
+        <span class="c1"># Remove path and suffix from file name.</span>
+        <span class="n">transform_filenames_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">transform_filenames_func</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">plotly_heatmap</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">mint</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">col_name</span><span class="p">),</span>
+                <span class="n">data</span><span class="p">,</span>
                 <span class="n">normed_by_cols</span><span class="o">=</span><span class="n">normed_by_cols</span><span class="p">,</span>
                 <span class="n">transposed</span><span class="o">=</span><span class="n">transposed</span><span class="p">,</span>
                 <span class="n">clustered</span><span class="o">=</span><span class="n">clustered</span><span class="p">,</span>
