@@ -1596,7 +1596,7 @@ More information:
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.processing.extract_chromatogram_from_ms1">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.processing.</span></span><span class="sig-name descname"><span class="pre">extract_chromatogram_from_ms1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'minutes'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/processing.html#extract_chromatogram_from_ms1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.processing.extract_chromatogram_from_ms1" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.processing.</span></span><span class="sig-name descname"><span class="pre">extract_chromatogram_from_ms1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/processing.html#extract_chromatogram_from_ms1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.processing.extract_chromatogram_from_ms1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract single chromatogram of specific m/z value from MS-data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1604,7 +1604,6 @@ More information:
 <li><p><strong>df</strong> (<em>pandas.DataFrame with columns</em><em> [</em><em>'rt'</em><em>, </em><em>'m/z'</em><em>, </em><em>'intensity'</em><em>]</em>) – MS-data</p></li>
 <li><p><strong>mz_mean</strong> (<em>float</em>) – Target m/z value</p></li>
 <li><p><strong>mz_width</strong> (<em>float</em>) – m/z width in ppm, defaults to 10</p></li>
-<li><p><strong>unit</strong> (<em>str</em><em>, </em><em>optional</em>) – Time unit used in MS-data, defaults to “minutes”</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

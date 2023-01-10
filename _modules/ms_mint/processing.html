@@ -168,14 +168,14 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">lock</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">lock</span><span class="p">,</span> <span class="n">mz_mean_width_to_min_max</span>
 
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
 
 <span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">MINT_RESULTS_COLUMNS</span>
 
 
-<div class="viewcode-block" id="extract_chromatogram_from_ms1"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_chromatogram_from_ms1">[docs]</a><span class="k">def</span> <span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;minutes&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="extract_chromatogram_from_ms1"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_chromatogram_from_ms1">[docs]</a><span class="k">def</span> <span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract single chromatogram of specific m/z value from MS-data.</span>
 
@@ -185,13 +185,11 @@
 <span class="sd">    :type mz_mean: float</span>
 <span class="sd">    :param mz_width: m/z width in ppm, defaults to 10</span>
 <span class="sd">    :type mz_width: float</span>
-<span class="sd">    :param unit: Time unit used in MS-data, defaults to &quot;minutes&quot;</span>
-<span class="sd">    :type unit: str, optional</span>
 <span class="sd">    :return: Chromatogram</span>
 <span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dmz</span> <span class="o">=</span> <span class="n">mz_mean</span> <span class="o">*</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">mz_width</span>
-    <span class="n">chrom</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;mz&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">mz_mean</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">dmz</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_max</span> <span class="o">=</span> <span class="n">mz_mean_width_to_min_max</span><span class="p">(</span><span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">)</span>
+    <span class="n">chrom</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">mz</span> <span class="o">&gt;=</span> <span class="n">mz_min</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">mz</span> <span class="o">&lt;=</span><span class="n">mz_max</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">chrom</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chrom</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">chrom</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;scan_time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">chrom</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span></div>
@@ -484,6 +482,8 @@
         <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">peak_rt_of_max</span> <span class="o">-</span> <span class="n">R</span><span class="p">[[</span><span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))))</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">scores</span></div>
+
+
 </pre></div>
 
            </div>

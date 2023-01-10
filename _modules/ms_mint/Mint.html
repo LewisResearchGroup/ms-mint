@@ -473,7 +473,7 @@
 <span class="sd">        :return: self</span>
 <span class="sd">        :rtype: ms_mint.Mint.Mint</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_of_files</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_of_files</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_of_files</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
             <span class="n">list_of_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_of_files</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_of_files</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input should be a list of files.&quot;</span><span class="p">)</span>
@@ -648,7 +648,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span> <span class="o">=</span> <span class="n">get_ms_files_from_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">get_targets_from_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mint.get_chromatograms"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.get_chromatograms">[docs]</a>    <span class="nd">@lru_cache</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<div class="viewcode-block" id="Mint.get_chromatograms"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.get_chromatograms">[docs]</a>    <span class="nd">@lru_cache</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_chromatograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span>
