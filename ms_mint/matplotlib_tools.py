@@ -16,7 +16,7 @@ def hierarchical_clustering(
     left_width=2,
     xmaxticks=None,
     ymaxticks=None,
-    metric="euclidean",
+    metric="cosine",
     cmap=None,
 ):
     """
@@ -38,7 +38,7 @@ def hierarchical_clustering(
     :type xmaxticks: int, optional
     :param ymaxticks: Maxiumum number of y-ticks to display, defaults to None
     :type ymaxticks: int, optional
-    :param metric: Metric to be used for distance calculation (both axes), defaults to "euclidean"
+    :param metric: Metric to be used for distance calculation (both axes), defaults to "cosine"
     :type metric: str, optional
     :param cmap: Matplotlib color map name, defaults to None
     :type cmap: str, optional
