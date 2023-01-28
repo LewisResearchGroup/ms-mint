@@ -26,7 +26,7 @@ def extract_chromatogram_from_ms1(df, mz_mean, mz_width=10):
     :rtype: pandas.DataFrame
     """
     mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
-    chrom = df[(df.mz >= mz_min) & (df.mz <=mz_max)].copy()
+    chrom = df[(df.mz >= mz_min) & (df.mz <= mz_max)].copy()
     chrom["scan_time"] = chrom["scan_time"].round(3)
     chrom = chrom.groupby("scan_time").max()
     return chrom["intensity"]
@@ -319,5 +319,3 @@ def score_peaks(mint_results):
         * (1 / (1 + abs(R.peak_rt_of_max - R[["rt_min", "rt_max"]].mean(axis=1))))
     )
     return scores
-
-

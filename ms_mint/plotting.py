@@ -123,7 +123,7 @@ class MintPlotter:
             transform_filenames_func = lambda x: P(x).with_suffix("").name
         if transform_filenames_func is not None:
             tmp_data.index = [transform_filenames_func(i) for i in tmp_data.index]
-        
+
         # Scale along ms-files
         if scaler_ms_file is not None:
             tmp_data = scale_dataframe(tmp_data.T, scaler_ms_file).T
@@ -164,9 +164,13 @@ class MintPlotter:
 
         if len(self.mint.results) > 0:
             if not interactive:
-                return plot_peak_shapes(self.mint.results, peak_labels=peak_labels, **kwargs)
+                return plot_peak_shapes(
+                    self.mint.results, peak_labels=peak_labels, **kwargs
+                )
             else:
-                return plotly_peak_shapes(self.mint.results, peak_labels=peak_labels, **kwargs)
+                return plotly_peak_shapes(
+                    self.mint.results, peak_labels=peak_labels, **kwargs
+                )
 
     def heatmap(
         self,
@@ -258,7 +262,7 @@ class MintPlotter:
                 lw=0.5,
             )
         if peak_label is None:
-            plt.title(f'{P(fn).with_suffix("").name}')        
+            plt.title(f'{P(fn).with_suffix("").name}')
         else:
             plt.title(f'{P(fn).with_suffix("").name}\n{peak_label}')
         return fig

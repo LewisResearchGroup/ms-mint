@@ -1,8 +1,8 @@
 import pandas as pd
 
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
+pd.set_option("display.max_rows", 500)
+pd.set_option("display.max_columns", 500)
+pd.set_option("display.width", 1000)
 
 
 from ms_mint.targets import (
@@ -99,7 +99,7 @@ def test__import_csv_and_xlsx(tmpdir):
     mint1 = Mint()
     mint2 = Mint()
 
-    TEST_TARGETS_FN_V0_XLSX = P(tmpdir)/'targets.xlsx'
+    TEST_TARGETS_FN_V0_XLSX = P(tmpdir) / "targets.xlsx"
 
     print(TEST_TARGETS_FN_V0_XLSX)
 
