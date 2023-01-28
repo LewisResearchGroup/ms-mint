@@ -107,10 +107,10 @@ class PCA_Plotter:
         :return: Returns a matplotlib figure.
         :rtype: matplotlib.figure.Figure
         """
-        n_vars = self.pca.results["n_components"]
+        n_components = self.pca.results["n_components"]
         fig = plt.figure(figsize=(height * aspect, height))
         cum_expl_var = self.pca.results["cum_expl_var"]
-        plt.bar(np.arange(n_vars) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
+        plt.bar(np.arange(n_components) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
         plt.xlabel("Principal Component")
         plt.ylabel("Explained variance [%]")
         plt.title("Cumulative explained variance")
@@ -118,9 +118,9 @@ class PCA_Plotter:
         plt.xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
-    def _prepare_data(self, n_vars=3, labels=None):
+    def _prepare_data(self, n_components=3, labels=None):
         df = self.pca.results["df_projected"].copy()
-        cols = df.columns.to_list()[:n_vars]
+        cols = df.columns.to_list()[:n_components]
         df = df[cols]
         if labels is not None:
             group_name = "Label"
@@ -129,26 +129,26 @@ class PCA_Plotter:
         return df
 
     def pairplot(
-        self, n_vars=3, labels=None, fig_kws=None, interactive=False, **kwargs
+        self, n_components=3, labels=None, fig_kws=None, interactive=False, **kwargs
     ):
         """
         After running mint.pca() this function can be used to plot a scatter matrix of the
         principal components.
 
-        :param n_vars: Number of principal components to plot, defaults to 3.
-        :type n_vars: int, optional
+        :param n_components: Number of principal components to plot, defaults to 3.
+        :type n_components: int, optional
         :param labels: Labels used for hue.
         :type labels: List[str], optional
         :return: Returns a matplotlib figure.
         :rtype: seaborn.axisgrid.PairGrid
         """
 
-        df = self._prepare_data(n_vars=n_vars, labels=labels)
+        df = self._prepare_data(n_components=n_components, labels=labels)
 
         if interactive:
             return self.pairplot_plotly(df, **kwargs)
         else:
-            return self.pairplot_sns(df, **kwargs)
+            return self.pairplot_sns(df, fig_kws=fig_kws, **kwargs)
 
     def pairplot_sns(self, df, fig_kws=None, **kwargs):
         if fig_kws is None:

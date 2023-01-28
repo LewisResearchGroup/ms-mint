@@ -153,15 +153,48 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
     mint.plot.peak_shapes(col_wrap = 3)
 
 ## Hierarchical clustering
+Mint ca be used to cluster the extracted data. An agglomerative hierarchical clustering is a bottom-up clustering technique where each data point starts as its own cluster and then are merged with other clusters in a hierarchical manner based on their proximity or similarity until a single cluster is formed or a specified stopping criteria is met. The proximity is usually determined by a distance metric, such as Euclidean distance, and the similarity is usually determined by a linkage function, such as ward linkage or complete linkage. The result is a tree-like representation called a dendrogram, which can be used to determine the number of clusters and the cluster assignments of the data points.
 
-    mint.plot.hierarchical_clustering()
+Mint uses `scipy.spartial.distance` to generate the distance matrix and `scipy.cluster.hierarchy.linkage` to perform the clustering. By default a 'cosine' metric is used to calculate the distances. Distances between row vectors and column vectors respectively can also be done using different metrics for each set. To do so a tuple with the names of the metrics has to be provided: `mint.hierarchical_clustering(metric=("euclidean", "cosine")`.
+
+Before clustering the data can be transformed and scaled. By default `log2p1(x) = log_2(x+1)` is used to transform the data and the standard scaler (z-scores) is used to normalize the variables for each target.
+
+    mint.plot.hierarchical_clustering(
+        data=None,  # Optional, dataframe. if None, mint.crosstab(targets_var) is executed to generate the data.
+        peak_labels=None,  # List of targets to include
+        ms_files=None,  # List of filenames to include
+        title=None,  # Title to add to the figure
+        figsize=(8, 8),  # Figure size
+        targets_var="peak_max",  # Data variable to plot if data is None.
+        vmin=-3,  # Minimum value for color bar
+        vmax=3,  # Maximum value for color bar
+        xmaxticks=None,  # Maximum number of x-ticks to display
+        ymaxticks=None,  # Maximum number of y-ticks to display
+        transform_func="log2p1",  # Transformation to use before scaling and clustering
+        scaler_ms_file=None,  # Experimental
+        scaler_peak_label="standard",  # Scaler to use to normalize the data before clustering
+        metric="cosine",  # Metric either a string or a 2-tuple of strings
+        transform_filenames_func="basename",  # Transformation function to shorten filenames
+        transposed=False,  # Transpose the plot     
+        top_height=2,  # Height of the top-dendrogram
+        left_width=2,  # Width of the left-dendrogram
+        cmap=None  # Name of a matplotlib color map                
+    )
+
 
 ![](notebooks/hierarchical_clustering.png)
 
 ## Principal Components Analysis
 
-    mint.pca.run(5)
-    mint.pca.plot.pairplot(5)
+Principal Component Analysis (PCA) is a widely used statistical technique for dimensionality reduction. It transforms the original high-dimensional data into a new set of linearly uncorrelated variables, called Principal Components (PCs), that capture the maximum variance in the data. The first PC accounts for the largest variance in the data, the second PC for the second largest variance, and so on. PCA is commonly used for data visualization, data compression, and noise reduction. By reducing the number of dimensions in the data, PCA allows us to more easily identify patterns and relationships in the data.
+
+Before clustering the data can be transformed and scaled. By default log2p1(x) = log_2(x+1) is used to transform the data and the standard scaler (z-scores) is used to normalize the variables for each target.
+
+    mint.pca.run(n_components=5)
+    
+After running the PCA the results can be plotted with:    
+    
+    mint.pca.plot.pairplot(n_components=5, interactive=False)
     
 ![](notebooks/pca-pairplot.png)
 
@@ -225,4 +258,3 @@ The target list can be stored as csv or Excel file.
 
 ## 0.1.9 Milestones
     - peak_area_top3 comparable to El-Maven PeakAreaTop values
-    
