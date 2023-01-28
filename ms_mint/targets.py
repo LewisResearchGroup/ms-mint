@@ -312,10 +312,11 @@ class TargetOptimizer:
 
         i = 0
         for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
-            
-            if verbose: print(peak_label)
+
+            if verbose:
+                print(peak_label)
             if peak_label not in peak_labels:
-                logging.warning(f'{peak_label} not in {peak_labels}')
+                logging.warning(f"{peak_label} not in {peak_labels}")
                 continue
 
             mz = row.mz_mean
@@ -328,7 +329,9 @@ class TargetOptimizer:
             )
 
             if chrom.x.max() < minimum_intensity:
-                logging.warning(f'Peak intensity for {peak_label} below threshold ({minimum_intensity})')
+                logging.warning(
+                    f"Peak intensity for {peak_label} below threshold ({minimum_intensity})"
+                )
                 continue
 
             chrom.apply_filter()
@@ -343,12 +346,13 @@ class TargetOptimizer:
             if chrom.selected_peak_ndxs is None or len(chrom.selected_peak_ndxs) == 0:
                 logging.warning(f"No peaks detected for {peak_label}")
                 continue
-            
+
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]
 
-            if verbose: print(ndx, peak_label, rt_min, rt_max)
+            if verbose:
+                print(ndx, peak_label, rt_min, rt_max)
 
             _targets.loc[peak_label, ["rt_min", "rt_max"]] = rt_min, rt_max
 

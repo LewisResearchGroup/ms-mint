@@ -28,7 +28,7 @@ class Chromatogram:
         self.peaks = None
         self.selected_peak_ndxs = None
         if expected_rt is None and scan_times is not None:
-            expected_rt = max(scan_times) // 2 
+            expected_rt = max(scan_times) // 2
         self.expected_rt = expected_rt
         self.weights = None
 
