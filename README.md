@@ -188,8 +188,13 @@ Before clustering the data can be transformed and scaled. By default `log2p1(x) 
 
 Principal Component Analysis (PCA) is a widely used statistical technique for dimensionality reduction. It transforms the original high-dimensional data into a new set of linearly uncorrelated variables, called Principal Components (PCs), that capture the maximum variance in the data. The first PC accounts for the largest variance in the data, the second PC for the second largest variance, and so on. PCA is commonly used for data visualization, data compression, and noise reduction. By reducing the number of dimensions in the data, PCA allows us to more easily identify patterns and relationships in the data.
 
-    mint.pca.run(5)
-    mint.pca.plot.pairplot(5)
+Before clustering the data can be transformed and scaled. By default log2p1(x) = log_2(x+1) is used to transform the data and the standard scaler (z-scores) is used to normalize the variables for each target.
+
+    mint.pca.run(n_vars=5)
+    
+After running the PCA the results can be plotted with:    
+    
+    mint.pca.plot.pairplot(5, interactive=False)
     
 ![](notebooks/pca-pairplot.png)
 
