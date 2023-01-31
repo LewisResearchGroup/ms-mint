@@ -20,3 +20,4 @@ ChEBI.tsv
 data.sqlite
 app.db
 docs/_*
+HILICNeg15_StdH1.feather
