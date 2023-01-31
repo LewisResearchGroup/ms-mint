@@ -86,7 +86,7 @@ Then you load the target definitions from a file the `load_targets` method is us
         4  Mevalonate  147.06570        10  3.00000    1.70    4.30      min                    0     targets.csv
         5  Nicotinate  122.02455        10  3.05340    2.75    3.75      min                    0     targets.csv
         6  Citrulline  174.08810        10  8.40070    8.35    8.50      min                    0     targets.csv
-        
+
 The retention time can be specified in minutes (rt_unit = 'min') or seconds (rt_unit = 's'). Mint will convert the values to SI unit seconds.
 
 You can also prepare a `pandas.DataFrame` with the column names as shown above and assign it directly to the `Mint.targets` attribute:
