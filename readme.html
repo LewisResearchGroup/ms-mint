@@ -390,11 +390,11 @@ mint.plot.peak_shapes(col_wrap=3)
 <h2>Principal Components Analysis<a class="headerlink" href="#principal-components-analysis" title="Permalink to this heading">¶</a></h2>
 <p>Principal Component Analysis (PCA) is a widely used statistical technique for dimensionality reduction. It transforms the original high-dimensional data into a new set of linearly uncorrelated variables, called Principal Components (PCs), that capture the maximum variance in the data. The first PC accounts for the largest variance in the data, the second PC for the second largest variance, and so on. PCA is commonly used for data visualization, data compression, and noise reduction. By reducing the number of dimensions in the data, PCA allows us to more easily identify patterns and relationships in the data.</p>
 <p>Before clustering the data can be transformed and scaled. By default log2p1(x) = log_2(x+1) is used to transform the data and the standard scaler (z-scores) is used to normalize the variables for each target.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.pca.run(n_vars=5)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.pca.run(n_components=5)
 </pre></div>
 </div>
 <p>After running the PCA the results can be plotted with:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.pca.plot.pairplot(5, interactive=False)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.pca.plot.pairplot(n_components=5, interactive=False)
 </pre></div>
 </div>
 <p><img alt="" src="notebooks/pca-pairplot.png" /></p>
