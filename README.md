@@ -190,11 +190,11 @@ Principal Component Analysis (PCA) is a widely used statistical technique for di
 
 Before clustering the data can be transformed and scaled. By default log2p1(x) = log_2(x+1) is used to transform the data and the standard scaler (z-scores) is used to normalize the variables for each target.
 
-    mint.pca.run(n_vars=5)
+    mint.pca.run(n_components=5)
     
 After running the PCA the results can be plotted with:    
     
-    mint.pca.plot.pairplot(5, interactive=False)
+    mint.pca.plot.pairplot(n_components=5, interactive=False)
     
 ![](notebooks/pca-pairplot.png)
 
