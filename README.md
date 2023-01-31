@@ -258,4 +258,3 @@ The target list can be stored as csv or Excel file.
 
 ## 0.1.9 Milestones
     - peak_area_top3 comparable to El-Maven PeakAreaTop values
-    
