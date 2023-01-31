@@ -156,7 +156,9 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 Mint ca be used to cluster the extracted data. An agglomerative hierarchical clustering is a bottom-up clustering technique where each data point starts as its own cluster and then are merged with other clusters in a hierarchical manner based on their proximity or similarity until a single cluster is formed or a specified stopping criteria is met. The proximity is usually determined by a distance metric, such as Euclidean distance, and the similarity is usually determined by a linkage function, such as ward linkage or complete linkage. The result is a tree-like representation called a dendrogram, which can be used to determine the number of clusters and the cluster assignments of the data points.
 
 Mint uses `scipy.spartial.distance` to generate the distance matrix and `scipy.cluster.hierarchy.linkage` to perform the clustering. By default a 'cosine' metric is used to calculate the distances. Distances between row vectors and column vectors respectively can also be done using different metrics for each set. To do so a tuple with the names of the metrics has to be provided: `mint.hierarchical_clustering(metric=("euclidean", "cosine")`.
-    
+
+Before clustering the data can be transformed and scaled. By default `log2p1(x) = log_2(x+1)` is used to transform the data and the standard scaler (z-scores) is used to normalize the variables for each target.
+
     mint.plot.hierarchical_clustering(
         data=None,  # Optional, dataframe. if None, mint.crosstab(targets_var) is executed to generate the data.
         peak_labels=None,  # List of targets to include
@@ -183,6 +185,8 @@ Mint uses `scipy.spartial.distance` to generate the distance matrix and `scipy.c
 ![](notebooks/hierarchical_clustering.png)
 
 ## Principal Components Analysis
+
+Principal Component Analysis (PCA) is a widely used statistical technique for dimensionality reduction. It transforms the original high-dimensional data into a new set of linearly uncorrelated variables, called Principal Components (PCs), that capture the maximum variance in the data. The first PC accounts for the largest variance in the data, the second PC for the second largest variance, and so on. PCA is commonly used for data visualization, data compression, and noise reduction. By reducing the number of dimensions in the data, PCA allows us to more easily identify patterns and relationships in the data.
 
     mint.pca.run(5)
     mint.pca.plot.pairplot(5)
