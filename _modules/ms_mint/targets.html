@@ -475,10 +475,11 @@
 
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">peak_label</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">_targets</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)):</span>
-            
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">peak_label</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">peak_label</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">peak_label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">peak_labels</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="s1"> not in </span><span class="si">{</span><span class="n">peak_labels</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="s2"> not in </span><span class="si">{</span><span class="n">peak_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="n">mz</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mz_mean</span>
@@ -491,7 +492,9 @@
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">chrom</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">minimum_intensity</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Peak intensity for </span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="s1"> below threshold (</span><span class="si">{</span><span class="n">minimum_intensity</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Peak intensity for </span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="s2"> below threshold (</span><span class="si">{</span><span class="n">minimum_intensity</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="n">chrom</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">()</span>
@@ -506,12 +509,13 @@
             <span class="k">if</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No peaks detected for </span><span class="si">{</span><span class="n">peak_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
-            
+
             <span class="n">ndx</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">rt_min</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">]</span>
             <span class="n">rt_max</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">ndx</span><span class="p">,</span> <span class="n">peak_label</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">ndx</span><span class="p">,</span> <span class="n">peak_label</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">)</span>
 
             <span class="n">_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_label</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span>
 
