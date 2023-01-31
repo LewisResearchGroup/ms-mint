@@ -153,8 +153,22 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
     mint.plot.peak_shapes(col_wrap = 3)
 
 ## Hierarchical clustering
+Mint ca be used to cluster the extracted data. An agglomerative hierarchical clustering is a bottom-up clustering technique where each data point starts as its own cluster and then are merged with other clusters in a hierarchical manner based on their proximity or similarity until a single cluster is formed or a specified stopping criteria is met. The proximity is usually determined by a distance metric, such as Euclidean distance, and the similarity is usually determined by a linkage function, such as ward linkage or complete linkage. The result is a tree-like representation called a dendrogram, which can be used to determine the number of clusters and the cluster assignments of the data points.
 
-    mint.plot.hierarchical_clustering()
+Mint uses `scipy.spartial.distance` to generate the distance matrix and `scipy.cluster.hierarchy.linkage` to perform the clustering. By default a 'cosine' metric is used to calculate the distances. Distances between row vectors and column vectors respectively can also be done using different metrics for each set. To do so a tuple with the names of the metrics has to be provided: `mint.hierarchical_clustering(metric=("euclidean", "cosine")`.
+    
+    mint.plot.hierarchical_clustering(
+        vmin=None,  # Minimum value for color bar
+        vmax=None,  # Maximum value for color bar
+        figsize=(8, 8),  # Size of the figure
+        top_height=2,  # Height of the top-dendrogram
+        left_width=2,  # Width of the left-dendrogram
+        xmaxticks=None,  # Maximum number of x-ticks to display
+        ymaxticks=None,  # Maximum number of y-ticks to display
+        metric="cosine",  # Metric either a string or a 2-tuple of strings
+        cmap=None  # Name of a matplotlib color map
+    )
+
 
 ![](notebooks/hierarchical_clustering.png)
 
