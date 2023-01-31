@@ -148,7 +148,7 @@ class PCA_Plotter:
         if interactive:
             return self.pairplot_plotly(df, **kwargs)
         else:
-            return self.pairplot_sns(df, **kwargs)
+            return self.pairplot_sns(df, fig_kws=fig_kws, **kwargs)
 
     def pairplot_sns(self, df, fig_kws=None, **kwargs):
         if fig_kws is None:
