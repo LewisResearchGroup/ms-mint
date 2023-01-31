@@ -57,6 +57,7 @@ class Mint(object):
         self.opt = TargetOptimizer(mint=self)
         self.pca = PrincipalComponentsAnalyser(self)
         self.tqdm = tqdm
+        self.meta = None
 
     @property
     def verbose(self):
