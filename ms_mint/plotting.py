@@ -1,6 +1,5 @@
 import numpy as np
 import seaborn as sns
-import pandas as pd
 
 from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
@@ -15,11 +14,8 @@ from .matplotlib_tools import (
     plot_metabolomics_hist2d,
 )
 
-from tqdm import tqdm
-
 import plotly.express as px
 
-from .filter import Resampler
 from .tools import scale_dataframe, mz_mean_width_to_min_max
 from .io import ms_file_to_df
 
