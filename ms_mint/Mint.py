@@ -22,7 +22,7 @@ from .tools import (
 )
 from .pca import PrincipalComponentsAnalyser
 from .plotting import MintPlotter
-from .filter import Resampler
+#from .filter import Resampler
 from .chromatogram import Chromatogram, extract_chromatogram_from_ms1
 
 import ms_mint
@@ -497,9 +497,8 @@ class Mint(object):
         if peak_label is None:
             peak_label = self.peak_labels
 
-        resampler = Resampler()
-
         data = []
+        
         for fn in self.tqdm(fns):
             df = ms_file_to_df(fn)
             for label in peak_label:
@@ -515,6 +514,7 @@ class Mint(object):
                 chrom_data["rt_min"] = rt_min
                 chrom_data["rt_max"] = rt_min
                 data.append(chrom_data)
+
         data = pd.concat(data).reset_index()
 
         data["ms_file"] = data["ms_file"].apply(lambda x: P(x).with_suffix("").name)

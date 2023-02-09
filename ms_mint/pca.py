@@ -110,7 +110,12 @@ class PCA_Plotter:
         n_components = self.pca.results["n_components"]
         fig = plt.figure(figsize=(height * aspect, height))
         cum_expl_var = self.pca.results["cum_expl_var"]
-        plt.bar(np.arange(n_components) + 1, cum_expl_var, facecolor="grey", edgecolor="none")
+        plt.bar(
+            np.arange(n_components) + 1,
+            cum_expl_var,
+            facecolor="grey",
+            edgecolor="none",
+        )
         plt.xlabel("Principal Component")
         plt.ylabel("Explained variance [%]")
         plt.title("Cumulative explained variance")
