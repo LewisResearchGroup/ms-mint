@@ -16,7 +16,7 @@ def hierarchical_clustering(
     left_width=2,
     xmaxticks=None,
     ymaxticks=None,
-    metric="euclidean",
+    metric="cosine",
     cmap=None,
 ):
     """
@@ -38,7 +38,7 @@ def hierarchical_clustering(
     :type xmaxticks: int, optional
     :param ymaxticks: Maxiumum number of y-ticks to display, defaults to None
     :type ymaxticks: int, optional
-    :param metric: Metric to be used for distance calculation (both axes), defaults to "euclidean"
+    :param metric: Metric to be used for distance calculation (both axes), defaults to "cosine"
     :type metric: str, optional
     :param cmap: Matplotlib color map name, defaults to None
     :type cmap: str, optional
@@ -247,13 +247,16 @@ def plot_peaks(
     weights=None,
     legend=True,
     label=None,
-    **kwargs
+    **kwargs,
 ):
     if highlight is None:
         highlight = []
     ax = plt.gca()
     ax.plot(
-        series.index, series.values, label=label if label is not None else "Intensity", **kwargs
+        series.index,
+        series.values,
+        label=label if label is not None else "Intensity",
+        **kwargs,
     )
     if peaks is not None:
         series.iloc[peaks.ndxs].plot(
@@ -295,6 +298,8 @@ def plot_metabolomics_hist2d(
     cmap="jet",
     rt_range=None,
     mz_range=None,
+    mz_bins=100,
+    **kwargs,
 ):
 
     if set_dim:
@@ -308,20 +313,19 @@ def plot_metabolomics_hist2d(
 
     rt_bins = int((rt_range[1] - rt_range[0]) / 2)
 
+    params = dict(vmin=1, vmax=1e3, cmap=cmap, range=(rt_range, mz_range))
+    params.update(kwargs)
+
     fig = plt.hist2d(
         df["scan_time"],
         df["mz"],
         weights=df["intensity"].apply(np.log1p),
-        bins=[rt_bins, 100],
-        vmin=1,
-        vmax=15,
-        cmap=cmap,
-        range=(rt_range, mz_range),
+        bins=[rt_bins, mz_bins],
+        **params,
     )
 
-    plt.xlabel("Rt [s]")
+    plt.xlabel("Scan Time [s]")
     plt.ylabel("m/z")
-    plt.grid()
+    # plt.grid()
     plt.gca().ticklabel_format(useOffset=False, style="plain")
-
     return fig

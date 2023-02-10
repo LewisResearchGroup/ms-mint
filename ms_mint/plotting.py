@@ -1,4 +1,6 @@
 import numpy as np
+import seaborn as sns
+import pandas as pd
 
 from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
@@ -12,9 +14,14 @@ from .matplotlib_tools import (
     hierarchical_clustering,
     plot_metabolomics_hist2d,
 )
+
+from tqdm import tqdm
+
+import plotly.express as px
+
+from .filter import Resampler
 from .tools import scale_dataframe, mz_mean_width_to_min_max
 from .io import ms_file_to_df
-from .chromatogram import Chromatogram
 
 
 class MintPlotter:
@@ -49,7 +56,7 @@ class MintPlotter:
         transform_func="log2p1",
         scaler_ms_file=None,
         scaler_peak_label="standard",
-        metric="euclidean",
+        metric="cosine",
         transform_filenames_func="basename",
         transposed=False,
         **kwargs,
@@ -74,7 +81,7 @@ class MintPlotter:
         :param scaler_peak_label: default 'standard'
             - like scaler_ms_file, but scaling along peak_label axis
 
-        :param metric: default 'euclidean', can be string or a list of two values:
+        :param metric: default 'cosine', can be string or a list of two values:
             if two values are provided e.g. ('cosine', 'euclidean') the first
             will be used to cluster the x-axis and the second for the y-axis.
 
@@ -109,14 +116,13 @@ class MintPlotter:
             transform_func = lambda x: np.log2(x + 1)
         if transform_func == "log10p1":
             transform_func = lambda x: np.log10(x + 1)
-
         if transform_func is not None:
             tmp_data = tmp_data.apply(transform_func)
 
         if transform_filenames_func == "basename":
             transform_filenames_func = lambda x: P(x).with_suffix("").name
-        elif transform_filenames_func is not None:
-            tmp_data.columns = [transform_filenames_func(i) for i in tmp_data.columns]
+        if transform_filenames_func is not None:
+            tmp_data.index = [transform_filenames_func(i) for i in tmp_data.index]
 
         # Scale along ms-files
         if scaler_ms_file is not None:
@@ -146,17 +152,25 @@ class MintPlotter:
             self.mint.clustered = data.iloc[ndx_y, ndx_x]
         return fig
 
-    def peak_shapes(self, interactive=False, **kwargs):
+    def peak_shapes(self, peak_labels=None, interactive=False, **kwargs):
         """Plot peak shapes.
 
         :return: Figure with peak shapes.
         :rtype: seaborn.axisgrid.FacetGrid
         """
+
+        if peak_labels is None:
+            peak_labels = self.mint.peak_labels
+
         if len(self.mint.results) > 0:
             if not interactive:
-                return plot_peak_shapes(self.mint.results, **kwargs)
+                return plot_peak_shapes(
+                    self.mint.results, peak_labels=peak_labels, **kwargs
+                )
             else:
-                return plotly_peak_shapes(self.mint.results, **kwargs)
+                return plotly_peak_shapes(
+                    self.mint.results, peak_labels=peak_labels, **kwargs
+                )
 
     def heatmap(
         self,
@@ -191,9 +205,16 @@ class MintPlotter:
         :return: Interactive heatmap.
         :rtype: plotly.graph_objs._figure.Figure
         """
+
+        data = self.mint.crosstab(col_name)
+
+        # Remove path and suffix from file name.
+        transform_filenames_func = lambda x: P(x).with_suffix("").name
+        data.index = [transform_filenames_func(i) for i in data.index]
+
         if len(self.mint.results) > 0:
             return plotly_heatmap(
-                self.mint.crosstab(col_name),
+                data,
                 normed_by_cols=normed_by_cols,
                 transposed=transposed,
                 clustered=clustered,
@@ -203,7 +224,7 @@ class MintPlotter:
                 **kwargs,
             )
 
-    def histogram_2d(self, fn, peak_label=None, rt_margin=0, mz_margin=0):
+    def histogram_2d(self, fn, peak_label=None, rt_margin=0, mz_margin=0, **kwargs):
         """2D histogram of a ms file.
 
         :param fn: File name
@@ -218,7 +239,7 @@ class MintPlotter:
         :rtype: matplotlib.Figure
         """
         df = ms_file_to_df(fn)
-        mz_range, rt_range = None, None
+        mz_range, rt_range, rt_min, rt_max = None, None, None, None
         if peak_label is not None:
             target_data = self.mint.targets.loc[peak_label]
             mz_mean, mz_width, rt_min, rt_max = target_data[
@@ -227,17 +248,26 @@ class MintPlotter:
             mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
             mz_range = (mz_min - mz_margin, mz_max + mz_margin)
             rt_range = (rt_min - rt_margin, rt_max + rt_margin)
-        fig = plot_metabolomics_hist2d(df, mz_range=mz_range, rt_range=rt_range)
-        plt.plot(
-            [rt_min, rt_max, rt_max, rt_min, rt_min],
-            [mz_min, mz_min, mz_max, mz_max, mz_min],
-            color="w",
-            ls="--",
-            lw=0.5,
+
+        fig = plot_metabolomics_hist2d(
+            df, mz_range=mz_range, rt_range=rt_range, **kwargs
         )
+
+        if rt_min is not None:
+            plt.plot(
+                [rt_min, rt_max, rt_max, rt_min, rt_min],
+                [mz_min, mz_min, mz_max, mz_max, mz_min],
+                color="w",
+                ls="--",
+                lw=0.5,
+            )
+        if peak_label is None:
+            plt.title(f'{P(fn).with_suffix("").name}')
+        else:
+            plt.title(f'{P(fn).with_suffix("").name}\n{peak_label}')
         return fig
 
-    def chromatogram(self, fns, peak_label=None, mz_mean=None, mz_width=None, **kwargs):
+    def chromatogram(self, fns=None, peak_labels=None, interactive=False, **kwargs):
         """Plot the chromatogram extracted from one or more files.
 
         :param fns: File names to extract chromatogram from.
@@ -252,19 +282,55 @@ class MintPlotter:
         :return: Plot of chromatogram(s)
         :rtype: matplotlib.Figure
         """
-        if not isinstance(fns, list):
-            fns = [fns]
 
-        if peak_label is not None:
-            target_data = self.mint.targets.loc[peak_label]
-            mz_mean, mz_width, rt_min, rt_max = target_data[
-                ["mz_mean", "mz_width", "rt_min", "rt_max"]
-            ]
-            plt.gca().axvspan(rt_min, rt_max, color="lightgreen", alpha=0.5)
+        if isinstance(peak_labels, str):
+            peak_labels = [peak_labels]
 
-        for fn in fns:
-            chrom = Chromatogram()
-            chrom.from_file(fn, mz_mean, mz_width)
-            chrom.plot(label=P(fn).with_suffix("").name, **kwargs)
+        if peak_labels is None:
+            peak_labels = self.mint.peak_labels
 
-        return plt.gcf()
+        peak_labels = tuple(peak_labels)
+
+        data = self.mint.get_chromatograms(fns=fns, peak_labels=peak_labels)
+
+        if not interactive:
+            params = dict(
+                x="scan_time",
+                y="intensity",
+                row="peak_label",
+                height=1.5,
+                aspect=5,
+                hue="ms_file",
+                facet_kws=dict(sharey=False),
+                marker=".",
+                linewidth=0,
+                row_order=peak_labels,
+            )
+            params.update(kwargs)
+            g = sns.relplot(data=data, **params)
+
+            for peak_label, ax in zip(peak_labels, g.axes.flatten()):
+                mz_mean, mz_width, rt_min, rt_max = self.mint.get_target_params(
+                    peak_label
+                )
+                if rt_min is not None and rt_max is not None:
+                    ax.axvspan(rt_min, rt_max, color="lightgreen", alpha=0.5, zorder=-1)
+                ax.ticklabel_format(
+                    style="sci", axis="y", useOffset=False, scilimits=(0, 0)
+                )
+            g.set_titles(template="{row_name}")
+            return g
+
+        else:
+            g = px.line(
+                data_frame=data,
+                x="scan_time",
+                y="intensity",
+                facet_col="peak_label",
+                color="ms_file",
+                height=700,
+                facet_col_wrap=1,
+            )
+            g.update_xaxes(matches=None)
+            g.update_yaxes(matches=None)
+            return g

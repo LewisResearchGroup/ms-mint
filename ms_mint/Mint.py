@@ -12,7 +12,7 @@ from glob import glob
 
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel
-from .io import export_to_excel
+from .io import export_to_excel, ms_file_to_df
 from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
 from .tools import (
     is_ms_file,
@@ -22,10 +22,15 @@ from .tools import (
 )
 from .pca import PrincipalComponentsAnalyser
 from .plotting import MintPlotter
+from .filter import Resampler
+from .chromatogram import Chromatogram, extract_chromatogram_from_ms1
 
 import ms_mint
 
+from tqdm import tqdm
+
 from typing import Callable
+from functools import lru_cache
 
 
 class Mint(object):
@@ -51,6 +56,8 @@ class Mint(object):
         self.plot = MintPlotter(mint=self)
         self.opt = TargetOptimizer(mint=self)
         self.pca = PrincipalComponentsAnalyser(self)
+        self.tqdm = tqdm
+        self.meta = None
 
     @property
     def verbose(self):
@@ -304,7 +311,7 @@ class Mint(object):
         :return: self
         :rtype: ms_mint.Mint.Mint
         """
-        if isinstance(list_of_files, str):
+        if isinstance(list_of_files, str) or isinstance(list_of_files, P):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
             raise ValueError("Input should be a list of files.")
@@ -338,6 +345,17 @@ class Mint(object):
         self._targets = targets.set_index("peak_label")
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
+
+    def get_target_params(self, peak_label):
+        target_data = self.targets.loc[peak_label]
+        mz_mean, mz_width, rt_min, rt_max = target_data[
+            ["mz_mean", "mz_width", "rt_min", "rt_max"]
+        ]
+        return mz_mean, mz_width, rt_min, rt_max
+
+    @property
+    def peak_labels(self):
+        return self.targets.index.to_list()
 
     @property
     def results(self):
@@ -467,3 +485,37 @@ class Mint(object):
     def digest_results(self):
         self.ms_files = get_ms_files_from_results(self.results)
         self.targets = get_targets_from_results(self.results)
+
+    @lru_cache(1)
+    def get_chromatograms(self, fns=None, peak_label=None, **kwargs):
+        if fns is None:
+            fns = self.ms_files
+
+        if not isinstance(fns, list):
+            fns = [fns]
+
+        if peak_label is None:
+            peak_label = self.peak_labels
+
+        resampler = Resampler()
+
+        data = []
+        for fn in self.tqdm(fns):
+            df = ms_file_to_df(fn)
+            for label in peak_label:
+                mz_mean, mz_width, rt_min, rt_max = self.get_target_params(label)
+                chrom_raw = extract_chromatogram_from_ms1(
+                    df, mz_mean=mz_mean, mz_width=mz_width
+                ).to_frame()
+                chrom = Chromatogram(chrom_raw.index, chrom_raw.values)
+                chrom.apply_filter()
+                chrom_data = chrom.data
+                chrom_data["ms_file"] = fn
+                chrom_data["peak_label"] = label
+                chrom_data["rt_min"] = rt_min
+                chrom_data["rt_max"] = rt_min
+                data.append(chrom_data)
+        data = pd.concat(data).reset_index()
+
+        data["ms_file"] = data["ms_file"].apply(lambda x: P(x).with_suffix("").name)
+        return data

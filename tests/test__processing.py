@@ -42,7 +42,9 @@ def test__process_ms1():
             "rt_max": {0: 10},
             "targets_filename": {0: "unknown"},
             "peak_area": {0: 3},
-            "peak_area_top3": {0: 1},  # The only value in the extraction window is 3, therefore the expected value is 1
+            "peak_area_top3": {
+                0: 1
+            },  # The only value in the extraction window is 3, therefore the expected value is 1
             "peak_n_datapoints": {0: 1},
             "peak_max": {0: 3},
             "peak_rt_of_max": {0: 2},
@@ -120,7 +122,7 @@ def test__extract_chromatogram_from_ms1():
     df = pd.DataFrame(
         {"scan_time": [1, 2, 3], "mz": [100, 200, 300], "intensity": [2, 3, 7]}
     )
-    result = processing.extract_chromatogram_from_ms1(df, 200, 10, "minutes")
+    result = processing.extract_chromatogram_from_ms1(df, 200, 10)
     expected = pd.Series([3], index=[2])
     assert result.equals(expected)
 
