@@ -105,7 +105,11 @@ def test__optimize_min_max():
     mint.targets.rt = mint.targets[["rt_min", "rt_max"]].mean(axis=1)
     mint.targets["rt_min"] = None
     mint.targets["rt_max"] = None
+    print("Before")
+    print(mint.targets[["rt", "rt_min", "rt_max"]])
     result = mint.opt.rt_min_max()
+    print("After")
+    print(mint.targets[["rt", "rt_min", "rt_max"]])
     n_missing_values_in_rt_cols = mint.targets[["rt_min", "rt_max"]].isna().sum().sum()
     assert n_missing_values_in_rt_cols == 0, mint.targets.filter(regex="rt")
 

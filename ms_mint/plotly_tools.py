@@ -238,9 +238,6 @@ def plotly_peak_shapes(
 
     res = res.set_index(["peak_label", "ms_file"])
 
-    if peak_labels is None:
-        peak_labels = []
-
     if isinstance(peak_labels, str):
         peak_labels = [peak_labels]
 

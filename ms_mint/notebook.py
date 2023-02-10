@@ -25,6 +25,9 @@ from IPython.core.display import HTML
 
 from .Mint import Mint as _Mint_
 
+from tqdm.notebook import tqdm
+
+
 HOME = str(P.home())
 
 
@@ -100,6 +103,8 @@ class Mint(_Mint_):
                 self.progress_bar,
             ]
         )
+
+        self.tqdm = tqdm
 
     def _load_target_from_bytes_(self, value):
         for fn, data in value["new"].items():
