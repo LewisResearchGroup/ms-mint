@@ -117,7 +117,7 @@ To use the `mint.opt.rt_min_max()` function, you will need to provide it with a 
 
 ![](notebooks/peak-shapes-before-opt.png)
 
-Now we can run the peak optimization with:
+Now, we can run the peak optimization with:
 
     mint.opt.rt_min_max(
         fns=[...]
@@ -134,13 +134,17 @@ After running the optimization, it is a good idea to perform a manual fine-tunin
     
 ![](notebooks/optimize-rt_min_max.png)
 
-    mint.run()
+The black lines indicates the average intensity across all files used for the optimization. The orange dotted lines show the shape of the gaussian function used to weight the mean intensities for peak selection. The orange horizontal lines indicate the peak width and the blue `x`s show the identified peak maxima. The green shaded areas show the Rt ranges which were selected by the algorithm.
 
+Then we apply the changes and plot the new peak shapes:
+
+    mint.run()
     mint.plot.peak_shapes(col_wrap=3)
 
 ![](notebooks/peak-shapes-after-opt.png)
 
-As you can see the shapes of Xanthine, Succinate, Citrulline look much better.
+As you can see, the shapes of Xanthine, Succinate, Citrulline look much better.
+
 
 ## Plotting and data exploration
 
@@ -151,6 +155,9 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 ![](notebooks/peak-shapes-after-opt.png)
 
     mint.plot.peak_shapes(col_wrap = 3)
+
+The method uses seaborn [sns.relplot()](https://seaborn.pydata.org/generated/seaborn.relplot.html) function and keyword arguments are passed on. 
+
 
 ## Hierarchical clustering
 Mint ca be used to cluster the extracted data. An agglomerative hierarchical clustering is a bottom-up clustering technique where each data point starts as its own cluster and then are merged with other clusters in a hierarchical manner based on their proximity or similarity until a single cluster is formed or a specified stopping criteria is met. The proximity is usually determined by a distance metric, such as Euclidean distance, and the similarity is usually determined by a linkage function, such as ward linkage or complete linkage. The result is a tree-like representation called a dendrogram, which can be used to determine the number of clusters and the cluster assignments of the data points.
@@ -233,8 +240,8 @@ The target list can be stored as csv or Excel file.
 ---
 
 ### Results columns
--   **peak_area**: The sum of all intensities
--   **peak_area_top3**: The sum of the 3 largest intensities
+-   **peak_area**: The sum of all intensities in the extraction window
+-   **peak_area_top3**: The average of the 3 largest intensities in the extraction window
 -   **peak_n_datapoints**: Number of datapoints
 -   **peak_max**: Intensity of peak maximum
 -   **peak_rt_of_max**: Retentiontime of peak maximum
