@@ -491,6 +491,9 @@ class Mint(object):
         if fns is None:
             fns = self.ms_files
 
+        if isinstance(fns, tuple):
+            fns = list(fns)
+
         if not isinstance(fns, list):
             fns = [fns]
 
@@ -506,6 +509,8 @@ class Mint(object):
                 chrom_raw = extract_chromatogram_from_ms1(
                     df, mz_mean=mz_mean, mz_width=mz_width
                 ).to_frame()
+                if len(chrom_raw) == 0:
+                    continue
                 chrom = Chromatogram(chrom_raw.index, chrom_raw.values)
                 chrom.apply_filter()
                 chrom_data = chrom.data

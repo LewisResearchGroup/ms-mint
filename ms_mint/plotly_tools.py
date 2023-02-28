@@ -297,7 +297,7 @@ def plotly_peak_shapes(
                 col=ndx_c,
             )
 
-            fig.update_xaxes(title_text="Scan Time", row=ndx_r, col=ndx_c)
+            fig.update_xaxes(title_text="Scan time [s]", row=ndx_r, col=ndx_c)
             fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
 
     # Layout
