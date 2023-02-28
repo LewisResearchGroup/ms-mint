@@ -207,7 +207,7 @@
 
 <div class="viewcode-block" id="plot_peak_shapes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_peak_shapes">[docs]</a><span class="k">def</span> <span class="nf">plot_peak_shapes</span><span class="p">(</span>
     <span class="n">mint_results</span><span class="p">,</span>
-    <span class="n">ms_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">aspect</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
@@ -225,8 +225,8 @@
 
 <span class="sd">    :param mint_results: DataFrame in Mint results format.</span>
 <span class="sd">    :type mint_results: pandas.DataFrame</span>
-<span class="sd">    :param ms_files: Filenames to include, defaults to None</span>
-<span class="sd">    :type ms_files: list, optional</span>
+<span class="sd">    :param fns: Filenames to include, defaults to None</span>
+<span class="sd">    :type fns: list, optional</span>
 <span class="sd">    :param peak_labels: Peak-labels to include, defaults to None</span>
 <span class="sd">    :type peak_labels: list, optional</span>
 <span class="sd">    :param height: Height of the figure facets, defaults to 4</span>
@@ -264,8 +264,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">peak_labels</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
 
-    <span class="k">if</span> <span class="n">ms_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ms_files</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">fns</span><span class="p">)]</span>
 
     <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">peak_label</span> <span class="ow">in</span> <span class="n">peak_labels</span><span class="p">:</span>
@@ -283,7 +283,7 @@
                     <span class="s2">&quot;Intensity&quot;</span><span class="p">:</span> <span class="n">peak_int</span><span class="p">,</span>
                     <span class="s2">&quot;ms_file&quot;</span><span class="p">:</span> <span class="n">ms_file</span><span class="p">,</span>
                     <span class="s2">&quot;peak_label&quot;</span><span class="p">:</span> <span class="n">peak_label</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">m/z=</span><span class="si">{</span><span class="n">mz</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Expected Scan Time&quot;</span><span class="p">:</span> <span class="n">rt</span><span class="p">,</span>
+                    <span class="s2">&quot;Expected Scan time [s]&quot;</span><span class="p">:</span> <span class="n">rt</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
             <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -359,7 +359,7 @@
     <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Gaussian weight&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan Time [s]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;sci&quot;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mf">0.1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">legend</span><span class="p">:</span>
@@ -401,7 +401,7 @@
         <span class="o">**</span><span class="n">params</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan Time [s]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;m/z&quot;</span><span class="p">)</span>
     <span class="c1"># plt.grid()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">useOffset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;plain&quot;</span><span class="p">)</span>
