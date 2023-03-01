@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import colorlover as cl
 
@@ -217,6 +219,7 @@ def plotly_heatmap(
 
 def plotly_peak_shapes(
     mint_results,
+    fns=None,
     col_wrap=1,
     peak_labels=None,
     legend=True,
@@ -230,6 +233,8 @@ def plotly_peak_shapes(
     """
     mint_results = mint_results.copy()
     mint_results.ms_file = [P(fn).name for fn in mint_results.ms_file]
+
+    logging.warning('TEST')
 
     res = mint_results[mint_results.peak_area > 0]
 
@@ -263,10 +268,11 @@ def plotly_peak_shapes(
     # Create sub-plots
     for label_i, label in enumerate(peak_labels):
         for file_i, fn in enumerate(fns):
-            # try:
-            x, y = res.loc[(label, fn), ["peak_shape_rt", "peak_shape_int"]]
-            # except:
-            #    continue
+            try:
+                x, y = res.loc[(label, fn), ["peak_shape_rt", "peak_shape_int"]]
+            except KeyError as e:
+                logging.warning(e)
+                continue
             if not isinstance(x, Iterable):
                 continue
 
