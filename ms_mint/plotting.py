@@ -1,6 +1,5 @@
 import numpy as np
 import seaborn as sns
-import pandas as pd
 
 from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
@@ -15,11 +14,8 @@ from .matplotlib_tools import (
     plot_metabolomics_hist2d,
 )
 
-from tqdm import tqdm
-
 import plotly.express as px
 
-from .filter import Resampler
 from .tools import scale_dataframe, mz_mean_width_to_min_max
 from .io import ms_file_to_df
 
@@ -152,7 +148,7 @@ class MintPlotter:
             self.mint.clustered = data.iloc[ndx_y, ndx_x]
         return fig
 
-    def peak_shapes(self, peak_labels=None, interactive=False, **kwargs):
+    def peak_shapes(self, fns=None, peak_labels=None, interactive=False, **kwargs):
         """Plot peak shapes.
 
         :return: Figure with peak shapes.
@@ -165,11 +161,11 @@ class MintPlotter:
         if len(self.mint.results) > 0:
             if not interactive:
                 return plot_peak_shapes(
-                    self.mint.results, peak_labels=peak_labels, **kwargs
+                    self.mint.results, fns=fns, peak_labels=peak_labels, **kwargs
                 )
             else:
                 return plotly_peak_shapes(
-                    self.mint.results, peak_labels=peak_labels, **kwargs
+                    self.mint.results, fns=fns, peak_labels=peak_labels, **kwargs
                 )
 
     def heatmap(
@@ -283,28 +279,36 @@ class MintPlotter:
         :rtype: matplotlib.Figure
         """
 
+        if isinstance(fns, str):
+            fns = [fns]
+        
+        if fns is not None:
+            fns = tuple(fns)
+
         if isinstance(peak_labels, str):
             peak_labels = [peak_labels]
 
         if peak_labels is None:
             peak_labels = self.mint.peak_labels
 
-        peak_labels = tuple(peak_labels)
-
+        if peak_labels is not None:
+            peak_labels = tuple(peak_labels)
+        
         data = self.mint.get_chromatograms(fns=fns, peak_labels=peak_labels)
 
         if not interactive:
             params = dict(
                 x="scan_time",
                 y="intensity",
-                row="peak_label",
+                col="peak_label",
+                col_wrap=1,
+                col_order=peak_labels,
                 height=1.5,
                 aspect=5,
                 hue="ms_file",
                 facet_kws=dict(sharey=False),
                 marker=".",
                 linewidth=0,
-                row_order=peak_labels,
             )
             params.update(kwargs)
             g = sns.relplot(data=data, **params)
@@ -318,7 +322,7 @@ class MintPlotter:
                 ax.ticklabel_format(
                     style="sci", axis="y", useOffset=False, scilimits=(0, 0)
                 )
-            g.set_titles(template="{row_name}")
+            g.set_titles(template="{col_name}")
             return g
 
         else:
