@@ -130,7 +130,7 @@ def hierarchical_clustering(
 
 def plot_peak_shapes(
     mint_results,
-    ms_files=None,
+    fns=None,
     peak_labels=None,
     height=3,
     aspect=1.5,
@@ -148,8 +148,8 @@ def plot_peak_shapes(
 
     :param mint_results: DataFrame in Mint results format.
     :type mint_results: pandas.DataFrame
-    :param ms_files: Filenames to include, defaults to None
-    :type ms_files: list, optional
+    :param fns: Filenames to include, defaults to None
+    :type fns: list, optional
     :param peak_labels: Peak-labels to include, defaults to None
     :type peak_labels: list, optional
     :param height: Height of the figure facets, defaults to 4
@@ -187,8 +187,8 @@ def plot_peak_shapes(
     else:
         peak_labels = R.peak_label.drop_duplicates().values
 
-    if ms_files is not None:
-        R = R[R.ms_file.isin(ms_files)]
+    if fns is not None:
+        R = R[R.ms_file.isin(fns)]
 
     dfs = []
     for peak_label in peak_labels:
@@ -206,7 +206,7 @@ def plot_peak_shapes(
                     "Intensity": peak_int,
                     "ms_file": ms_file,
                     "peak_label": peak_label + f"\nm/z={mz:.3f}",
-                    "Expected Scan Time": rt,
+                    "Expected Scan time [s]": rt,
                 }
             )
             dfs.append(df)
@@ -282,7 +282,7 @@ def plot_peaks(
     if weights is not None:
         plt.plot(weights, linestyle="--", label="Gaussian weight")
     plt.ylabel("Intensity")
-    plt.xlabel("Scan Time [s]")
+    plt.xlabel("Scan time [s]")
     ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
     plt.ylim((0.1, None))
     if not legend:
@@ -324,7 +324,7 @@ def plot_metabolomics_hist2d(
         **params,
     )
 
-    plt.xlabel("Scan Time [s]")
+    plt.xlabel("Scan time [s]")
     plt.ylabel("m/z")
     # plt.grid()
     plt.gca().ticklabel_format(useOffset=False, style="plain")

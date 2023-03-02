@@ -19,7 +19,7 @@ from pathlib import Path as P
 
 from paths import (
     # TEST_TARGETS_FN_V2_CSV_SEC,
-    TEST_TARGETS_FN_V0_XLSX,
+    #TEST_TARGETS_FN_V0_XLSX,
     TEST_TARGETS_FN_V0,
     TEST_TARGETS_FN_V1,
 )

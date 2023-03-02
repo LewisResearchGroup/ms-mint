@@ -107,7 +107,7 @@ def test__optimize_min_max():
     mint.targets["rt_max"] = None
     print("Before")
     print(mint.targets[["rt", "rt_min", "rt_max"]])
-    result = mint.opt.rt_min_max()
+    mint.opt.rt_min_max()
     print("After")
     print(mint.targets[["rt", "rt_min", "rt_max"]])
     n_missing_values_in_rt_cols = mint.targets[["rt_min", "rt_max"]].isna().sum().sum()
