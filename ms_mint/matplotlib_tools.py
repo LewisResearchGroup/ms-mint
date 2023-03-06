@@ -200,12 +200,7 @@ def plot_peak_shapes(
             ms_file = row.ms_file
             mz = row.mz_mean
             rt = row.rt
-
-            print(peak_rt)
-            print(peak_int)
-
-            print(len(peak_rt), len(peak_int), ms_file, peak_label, rt)
-
+            
             df = pd.DataFrame(
                 {
                     "Scan time [s]": peak_rt,
