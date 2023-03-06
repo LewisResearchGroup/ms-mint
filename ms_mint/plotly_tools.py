@@ -241,7 +241,7 @@ def plotly_peak_shapes(
     fns = list(res.ms_file.drop_duplicates())
     labels = list(mint_results.peak_label.drop_duplicates())
 
-    res = res.set_index(["peak_label", "ms_file"])
+    res = res.set_index(["peak_label", "ms_file"]).sort_index()
 
     if isinstance(peak_labels, str):
         peak_labels = [peak_labels]
