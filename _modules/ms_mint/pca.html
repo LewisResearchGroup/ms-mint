@@ -239,7 +239,11 @@
 
 <div class="viewcode-block" id="PCA_Plotter.pairplot_plotly"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot_plotly">[docs]</a>    <span class="k">def</span> <span class="nf">pairplot_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">color_col</span> <span class="o">=</span> <span class="s2">&quot;Label&quot;</span> <span class="k">if</span> <span class="s2">&quot;Label&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">ff</span><span class="o">.</span><span class="n">create_scatterplotmatrix</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">color_col</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">create_scatterplotmatrix</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">color_col</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># set the legendgroup equal to the marker color</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">legendgroup</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">color</span>
+        <span class="k">return</span> <span class="n">fig</span></div></div>
 </pre></div>
 
            </div>
