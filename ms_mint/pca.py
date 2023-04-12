@@ -164,4 +164,8 @@ class PCA_Plotter:
 
     def pairplot_plotly(self, df, **kwargs):
         color_col = "Label" if "Label" in df.columns else None
-        return ff.create_scatterplotmatrix(df, index=color_col, **kwargs)
+        fig = ff.create_scatterplotmatrix(df, index=color_col, **kwargs)
+        # set the legendgroup equal to the marker color
+        for t in fig.data:
+            t.legendgroup=t.marker.color
+        return fig

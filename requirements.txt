@@ -24,7 +24,7 @@ pyarrow
 tables
 h5py
 hdf5plugin
-
+nbformat>=4.2.0 
 sphinx
 sphinx-rtd-theme
 myst-parser
