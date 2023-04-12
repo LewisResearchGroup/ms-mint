@@ -11,7 +11,6 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
@@ -127,7 +126,7 @@
         <span class="k">if</span> <span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzxml&quot;</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">mzxml_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="n">read_only</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzml&quot;</span><span class="p">):</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">mzml_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="n">read_only</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">mzml_to_pandas_df_pyteomics</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;hdf&quot;</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.feather&quot;</span><span class="p">):</span>
@@ -214,67 +213,42 @@
 <span class="n">extract_mzxml</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">_extract_mzxml</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="mzml_to_pandas_df_pyteomics"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.io.mzml_to_pandas_df_pyteomics">[docs]</a><span class="k">def</span> <span class="nf">mzml_to_pandas_df_pyteomics</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="mzml_to_pandas_df_pyteomics"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.io.mzml_to_pandas_df_pyteomics">[docs]</a><span class="k">def</span> <span class="nf">mzml_to_pandas_df_pyteomics</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Reads mzML file and returns a pandas.DataFrame</span>
-<span class="sd">    using the pyteomics library.</span>
-
+<span class="sd">    Reads mzML file and returns a pandas.DataFrame using the pyteomics library.</span>
 <span class="sd">    :param fn: Filename</span>
 <span class="sd">    :type fn: str or PosixPath</span>
-<span class="sd">    :param read_only: Whether or not to convert to dataframe, defaults to False</span>
-<span class="sd">    :type read_only: bool, optional</span>
 <span class="sd">    :return: MS data</span>
 <span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">with</span> <span class="n">mzml</span><span class="o">.</span><span class="n">MzML</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">as</span> <span class="n">ms_data</span><span class="p">:</span>
+    <span class="c1"># Read mzML file using pyteomics</span>
+    <span class="k">with</span> <span class="n">mzml</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">))</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
 
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Initialize empty lists for the slices and the attributes</span>
+        <span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">ms_data</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">break</span>
+        <span class="c1"># Loop through the spectra and extract the data</span>
+        <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
 
-            <span class="n">scan</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">][</span><span class="s2">&quot;scan&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="s2">&quot;positive scan&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
-
-            <span class="k">elif</span> <span class="s2">&quot;negative scan&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+            <span class="c1"># Extract the scan ID, retention time, m/z values, and intensity values</span>
+            <span class="n">scan_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;scan=&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">rt</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">][</span><span class="s2">&quot;scan&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scan start time&quot;</span><span class="p">]</span>
+            <span class="n">mz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;m/z array&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;intensity array&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;positive scan&quot;</span> <span class="ow">in</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">polarity</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
+            <span class="k">elif</span> <span class="s2">&quot;negative scan&quot;</span> <span class="ow">in</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">polarity</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="k">if</span> <span class="s2">&quot;scan start time&quot;</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="p">[</span><span class="s2">&quot;scan start time&quot;</span><span class="p">]</span>
-
-            <span class="k">elif</span> <span class="s2">&quot;scan time&quot;</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="p">[</span><span class="s2">&quot;scan time&quot;</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No scan time identified </span><span class="se">\n</span><span class="si">{</span><span class="n">scan</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">break</span>
-
-            <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">]</span>
-            <span class="n">slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+                <span class="n">polarity</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">ms_level</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;ms level&quot;</span><span class="p">]</span>
+            <span class="n">slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;scan_id&quot;</span><span class="p">:</span> <span class="n">scan_id</span><span class="p">,</span> <span class="s2">&quot;mz&quot;</span><span class="p">:</span> <span class="n">mz</span><span class="p">,</span> <span class="s2">&quot;intensity&quot;</span><span class="p">:</span> <span class="n">intensity</span><span class="p">,</span> <span class="s2">&quot;polarity&quot;</span><span class="p">:</span> <span class="n">polarity</span><span class="p">,</span> <span class="s2">&quot;ms_level&quot;</span><span class="p">:</span> <span class="n">ms_level</span><span class="p">,</span> <span class="s2">&quot;scan_time&quot;</span><span class="p">:</span> <span class="n">rt</span><span class="p">}))</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
-
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;scan=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="n">df_to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity array&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity array&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
-    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;m/z array&quot;</span><span class="p">:</span> <span class="s2">&quot;mz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;intensity array&quot;</span><span class="p">:</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ms level&quot;</span><span class="p">:</span> <span class="s2">&quot;ms_level&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">mapping</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">df</span></div>
+
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="mzml_to_df"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.io.mzml_to_df">[docs]</a><span class="k">def</span> <span class="nf">mzml_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
