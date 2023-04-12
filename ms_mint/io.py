@@ -52,7 +52,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
         if fn.lower().endswith(".mzxml"):
             df = mzxml_to_df(fn, read_only=read_only)
         elif fn.lower().endswith(".mzml"):
-            df = mzml_to_df(fn, read_only=read_only, time_unit=time_unit)
+            df = mzml_to_pandas_df_pyteomics(fn, time_unit=time_unit)
         elif fn.lower().endswith("hdf"):
             df = pd.read_hdf(fn)
         elif fn.lower().endswith(".feather"):
@@ -139,67 +139,42 @@ def _extract_mzxml(data):
 extract_mzxml = np.vectorize(_extract_mzxml)
 
 
-def mzml_to_pandas_df_pyteomics(fn, read_only=False):
+def mzml_to_pandas_df_pyteomics(fn):
     """
-    Reads mzML file and returns a pandas.DataFrame
-    using the pyteomics library.
-
+    Reads mzML file and returns a pandas.DataFrame using the pyteomics library.
     :param fn: Filename
     :type fn: str or PosixPath
-    :param read_only: Whether or not to convert to dataframe, defaults to False
-    :type read_only: bool, optional
     :return: MS data
     :rtype: pandas.DataFrame
     """
-    slices = []
-    with mzml.MzML(fn) as ms_data:
+    # Read mzML file using pyteomics
+    with mzml.read(str(fn)) as reader:
 
-        while True:
+        # Initialize empty lists for the slices and the attributes
+        slices = []
 
-            try:
-                data = ms_data.next()
-            except Exception as e:
-                logging.warning(e)
-                break
+        # Loop through the spectra and extract the data
+        for spectrum in reader:
 
-            scan = data["scanList"]["scan"][0]
-
-            if "positive scan" in data.keys():
-                data["polarity"] = "+"
-
-            elif "negative scan" in data.keys():
-                data["polarity"] = "-"
+            # Extract the scan ID, retention time, m/z values, and intensity values
+            scan_id = int(spectrum["id"].split("scan=")[-1])
+            rt = spectrum["scanList"]["scan"][0]["scan start time"]
+            mz = np.array(spectrum["m/z array"], dtype=np.float64)
+            intensity = np.array(spectrum["intensity array"], dtype=np.float64)
+            if "positive scan" in spectrum.keys():
+                polarity = "+"
+            elif "negative scan" in spectrum.keys():
+                polarity = "-"
             else:
-                data["polarity"] = None
-
-            if "scan start time" in scan.keys():
-                data["scan_time"] = scan["scan start time"]
-
-            elif "scan time" in scan.keys():
-                data["scan_time"] = scan["scan time"]
-            else:
-                logging.error(f"No scan time identified \n{scan}")
-                break
-
-            del data["scanList"]
-            slices.append(pd.DataFrame(data))
+                polarity = None
+            ms_level = spectrum["ms level"]
+            slices.append(pd.DataFrame({"scan_id": scan_id, "mz": mz, "intensity": intensity, "polarity": polarity, "ms_level": ms_level, "scan_time": rt}))
 
     df = pd.concat(slices)
-
-    df["scan_id"] = df["id"].apply(lambda x: int(x.split("scan=")[1].split(" ")[0]))
-    df_to_numeric(df)
-    df["intensity array"] = df["intensity array"].astype(int)
-
-    mapping = {
-        "m/z array": "mz",
-        "intensity array": "intensity",
-        "ms level": "ms_level",
-    }
-
-    df = df.rename(columns=mapping)
-    df = df.reset_index(drop=True)
+    df["intensity"] = df["intensity"].astype(int)
     df = df[MS_FILE_COLUMNS]
-    return df
+
+    return df.reset_index(drop=True)
 
 
 def mzml_to_df(fn, time_unit="seconds", read_only=False):
