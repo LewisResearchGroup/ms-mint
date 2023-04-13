@@ -86,6 +86,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.mzmlb_to_df__pyteomics"><code class="docutils literal notranslate"><span class="pre">mzmlb_to_df__pyteomics()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.mzxml_to_df"><code class="docutils literal notranslate"><span class="pre">mzxml_to_df()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.read_parquet"><code class="docutils literal notranslate"><span class="pre">read_parquet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.io.set_dtypes"><code class="docutils literal notranslate"><span class="pre">set_dtypes()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.matplotlib_tools">ms_mint.matplotlib_tools module</a><ul>
@@ -954,14 +955,13 @@ averages.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.ms_file_to_df">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">ms_file_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'seconds'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#ms_file_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.ms_file_to_df" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">ms_file_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#ms_file_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.ms_file_to_df" title="Permalink to this definition"></a></dt>
 <dd><p>Read MS file and convert it to a pandas.DataFrame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fn</strong> (<em>str</em><em> or </em><em>PosixPath</em>) – Filename</p></li>
 <li><p><strong>read_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to apply convert to dataframe (for testing purposes), defaults to False</p></li>
-<li><p><strong>time_unit</strong> (<em>str</em><em>, </em><em>[</em><em>'seconds'</em><em>, </em><em>'minutes'</em><em>]</em>) – Time unit used in file, defaults to “seconds”</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -996,24 +996,8 @@ using the mzML library.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.mzml_to_pandas_df_pyteomics">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzml_to_pandas_df_pyteomics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzml_to_pandas_df_pyteomics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzml_to_pandas_df_pyteomics" title="Permalink to this definition"></a></dt>
-<dd><p>Reads mzML file and returns a pandas.DataFrame
-using the pyteomics library.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fn</strong> (<em>str</em><em> or </em><em>PosixPath</em>) – Filename</p></li>
-<li><p><strong>read_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to convert to dataframe, defaults to False</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>MS data</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzml_to_pandas_df_pyteomics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzml_to_pandas_df_pyteomics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzml_to_pandas_df_pyteomics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.mzmlb_to_df__pyteomics">
@@ -1038,20 +1022,21 @@ using the pyteomics library.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.mzxml_to_df">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzxml_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzxml_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzxml_to_df" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzxml_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit_in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'min'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ms_mint/io.html#mzxml_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzxml_to_df" title="Permalink to this definition"></a></dt>
 <dd><p>Read mzXML file and convert it to pandas.DataFrame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fn</strong> (<em>str</em><em> or </em><em>PosixPath</em>) – Filename</p></li>
+<li><p><strong>fn</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – Filename</p></li>
 <li><p><strong>read_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to convert to dataframe (for testing purposes), defaults to False</p></li>
+<li><p><strong>time_unit_in_file</strong> (<em>str</em><em>, </em><em>optional</em>) – The time unit used in the mzXML file (either ‘sec’ or ‘min’), defaults to ‘min’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>MS data</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
+<dd class="field-odd"><p>Optional[pd.DataFrame]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1075,6 +1060,11 @@ using the pyteomics library.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.io.set_dtypes">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">set_dtypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#set_dtypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.set_dtypes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-ms_mint.matplotlib_tools">
