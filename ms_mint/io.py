@@ -134,9 +134,6 @@ def mzxml_to_df(
     set_dtypes(df)
     return df.reset_index(drop=True)
 
-    if explode:
-        df = df.explode(["mz", "intensity"])
-
 
 def _extract_mzxml(data):
     return {
