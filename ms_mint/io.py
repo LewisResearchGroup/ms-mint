@@ -78,7 +78,7 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     return df
 
 
-def mzxml_to_df(fn, read_only=False):
+def mzxml_to_df(fn, read_only=False, explode=True):
     """
     Read mzXML file and convert it to pandas.DataFrame.
 
@@ -96,47 +96,38 @@ def mzxml_to_df(fn, read_only=False):
     if read_only:
         return None
 
-    data = list(extract_mzxml(data))
+    data = [_extract_mzxml(x) for x in data]
+    df = pd.json_normalize(data, sep="_")
 
-    df = (
-        pd.DataFrame.from_dict(data)
-        .set_index("retentionTime")
-        .apply(pd.Series.explode)
-        .reset_index()
-    )
-
+    # Convert retention time to seconds
     df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
-    df["m/z array"] = df["m/z array"].astype(np.float64)
-    df["intensity array"] = df["intensity array"].astype(np.float64)
 
+    # Rename columns and reorder
     df = df.rename(
         columns={
             "num": "scan_id",
             "msLevel": "ms_level",
             "retentionTime": "scan_time",
-            "m/z array": "mz",
-            "intensity array": "intensity",
+            "m_z_array": "mz",
+            "intensity_array": "intensity",
         }
-    )
+    )[MS_FILE_COLUMNS]
 
-    df = df.reset_index(drop=True)
-    df = df[MS_FILE_COLUMNS]
-    return df
+    if explode:
+        df = df.explode(["mz", "intensity"])
+
+    return df.reset_index(drop=True)
 
 
 def _extract_mzxml(data):
-    cols = [
-        "num",
-        "msLevel",
-        "polarity",
-        "retentionTime",
-        "m/z array",
-        "intensity array",
-    ]
-    return {c: data[c] for c in cols}
-
-
-extract_mzxml = np.vectorize(_extract_mzxml)
+    return {
+        "num": data["num"],
+        "msLevel": data["msLevel"],
+        "polarity": data["polarity"],
+        "retentionTime": data["retentionTime"],
+        "m_z_array": np.array(data["m/z array"]),
+        "intensity_array": np.array(data["intensity array"]),
+    }
 
 
 def mzml_to_pandas_df_pyteomics(fn):
@@ -144,6 +135,8 @@ def mzml_to_pandas_df_pyteomics(fn):
     Reads mzML file and returns a pandas.DataFrame using the pyteomics library.
     :param fn: Filename
     :type fn: str or PosixPath
+    :param explode: Whether to explode the DataFrame, defaults to True
+    :type explode: bool, optional
     :return: MS data
     :rtype: pandas.DataFrame
     """
@@ -160,7 +153,7 @@ def mzml_to_pandas_df_pyteomics(fn):
             scan_id = int(spectrum["id"].split("scan=")[-1])
             rt = spectrum["scanList"]["scan"][0]["scan start time"]
             mz = np.array(spectrum["m/z array"], dtype=np.float64)
-            intensity = np.array(spectrum["intensity array"], dtype=np.int64)
+            intensity = np.array(spectrum["intensity array"], dtype=np.float64)
             if "positive scan" in spectrum.keys():
                 polarity = "+"
             elif "negative scan" in spectrum.keys():
@@ -184,7 +177,6 @@ def mzml_to_pandas_df_pyteomics(fn):
     df = pd.concat(slices)
     df["intensity"] = df["intensity"].astype(int)
     df = df[MS_FILE_COLUMNS]
-
     return df.reset_index(drop=True)
 
 
