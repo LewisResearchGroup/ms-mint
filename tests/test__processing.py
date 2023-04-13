@@ -149,17 +149,19 @@ def test_run_parallel(tmp_path):
     """
 
     # Define test targets
-    targets = pd.DataFrame({
-        "peak_label": ["A"],
-        "mz_mean": [128.034],
-        "mz_width": [100],
-        "intensity_threshold": [0],
-        "rt_min": [0],
-        "rt_max": [700],
-        "rt": [150],
-        "rt_unit": ['s'],
-        "target_filename": ["unknown"]
-    })
+    targets = pd.DataFrame(
+        {
+            "peak_label": ["A"],
+            "mz_mean": [128.034],
+            "mz_width": [100],
+            "intensity_threshold": [0],
+            "rt_min": [0],
+            "rt_max": [700],
+            "rt": [150],
+            "rt_unit": ["s"],
+            "target_filename": ["unknown"],
+        }
+    )
 
     # Initialize multiprocessing pool
     pool = Pool(processes=2, maxtasksperchild=None)
@@ -178,7 +180,7 @@ def test_run_parallel(tmp_path):
             "targets": targets,
             "q": None,
             "mode": None,
-            "output_fn": None
+            "output_fn": None,
         }
         args_list.append(args)
 
@@ -196,10 +198,9 @@ def test_run_parallel(tmp_path):
     print(result)
     print(result.shape)
     print(ms_file_to_df(fn))
-    
+
     # Assert that the results have the expected length
     assert len(result) == n_files * len(targets)
-
 
 
 def test__run_parallel_with_output_filename(tmp_path):
@@ -249,7 +250,7 @@ def test__run_parallel_with_output_filename(tmp_path):
         print(fn)
         print(ms_file_to_df(fn).head())
         print(ms_file_to_df(fn).tail())
-        print('*'*80)
+        print("*" * 80)
         args_list.append(args)
 
     # Prepare output file (only headers)
@@ -272,7 +273,7 @@ def test__run_parallel_with_output_filename(tmp_path):
     assert output_fn.is_file()
 
     stored_results = pd.read_csv(output_fn)
-    print('='*80)
+    print("=" * 80)
     print(output_fn)
     print(stored_results)
     assert len(stored_results) == N * len(targets)

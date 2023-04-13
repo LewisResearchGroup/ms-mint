@@ -80,7 +80,6 @@ class Chromatogram:
             plt.show()
 
         for ndx, row in peaks.iterrows():
-
             new_rt_min = row.rt_min
             new_rt_max = row.rt_max
 

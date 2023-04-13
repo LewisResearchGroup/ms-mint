@@ -302,7 +302,6 @@ def plot_metabolomics_hist2d(
     mz_bins=100,
     **kwargs,
 ):
-
     if set_dim:
         plt.figure(figsize=figsize, dpi=dpi)
 

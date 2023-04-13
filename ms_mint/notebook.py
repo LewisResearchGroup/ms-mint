@@ -37,7 +37,6 @@ class Mint(_Mint_):
     """
 
     def __init__(self, *args, **kwargs):
-
         self.progress_callback = self._set_progress_
 
         super().__init__(progress_callback=self.progress_callback, *args, **kwargs)

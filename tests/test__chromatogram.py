@@ -10,7 +10,6 @@ from paths import TEST_MZML
 
 
 def test__Chromatogram_without_filter_identifies_peaks_correctly():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -29,7 +28,6 @@ def test__Chromatogram_without_filter_identifies_peaks_correctly():
 
 
 def test__Chromatogram__with_filter_identifies_peaks_correctly():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -47,7 +45,6 @@ def test__Chromatogram__with_filter_identifies_peaks_correctly():
 
 
 def test__Chromatogram__with_filter_and_opt_identifies_peaks_correctly():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -67,7 +64,6 @@ def test__Chromatogram__with_filter_and_opt_identifies_peaks_correctly():
 
 
 def test__Chromatogram__select_peak_by_rt():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -88,7 +84,6 @@ def test__Chromatogram__select_peak_by_rt():
 
 
 def test__Chromatogram__select_peak_by_rt_as_argument():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -109,7 +104,6 @@ def test__Chromatogram__select_peak_by_rt_as_argument():
 
 
 def test__Chromatogram__select_highest():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -130,7 +124,6 @@ def test__Chromatogram__select_highest():
 
 
 def test__Chromatogram__select_peak_with_gaussian_prefers_higher_peak():
-
     higher_peak_rt = 400
     higher_peak_in = 5e6
     lower__peak_rt = 600
@@ -160,7 +153,6 @@ def test__Chromatogram__select_peak_with_gaussian_prefers_higher_peak():
 
 
 def test__Chromatogram__plot_runs_without_error_return_figure():
-
     peak_rt = 400
     peak_in = 5e6
 
@@ -177,7 +169,6 @@ def test__Chromatogram__plot_runs_without_error_return_figure():
 
 
 def test__Chromatogram_from_files_runs_through():
-
     chrom = Chromatogram()
     chrom.from_file(TEST_MZML, mz_mean=101.024323, mz_width=10)
     chrom.apply_filter()
@@ -192,7 +183,6 @@ def test__Chromatogram_from_files_runs_through():
 
 
 def test__Chromatogram__optimise_peak_times_with_diff_with_plot():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
@@ -208,7 +198,6 @@ def test__Chromatogram__optimise_peak_times_with_diff_with_plot():
 
 
 def test__Chromatogram__data():
-
     rt_peak_1 = 200
     rt_peak_2 = 500
 
