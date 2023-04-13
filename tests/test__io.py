@@ -39,20 +39,6 @@ def test__ms_file_to_df__mzML():
     assert expected_cols == result.columns.to_list(), result.columns
 
 
-def test__ms_file_to_df__mzML_timeunit_minutes():
-    result = ms_file_to_df(TEST_MZML, time_unit="minutes")
-    expected_cols = [
-        "scan_id",
-        "ms_level",
-        "polarity",
-        "scan_time",
-        "mz",
-        "intensity",
-    ]
-    assert isinstance(result, pd.DataFrame), f"{type(result)} is not a dataframe"
-    assert expected_cols == result.columns.to_list(), result.columns
-
-
 def test__ms_file_to_df__mzXML():
     result = ms_file_to_df(TEST_MZXML)
     expected_cols = [
@@ -158,7 +144,7 @@ def test__convert_ms_file_to_feather(tmpdir):
     assert df_fea.equals(df), "DataFrames not equal"
 
 
-def test__convert_ms_file_to_parquet(tmpdir):
+def test__convert_mzml_file_to_parquet(tmpdir):
     print(tmpdir)
     shutil.copy(TEST_MZML, tmpdir)
     fn = P(tmpdir) / P(TEST_MZML).name
@@ -168,6 +154,19 @@ def test__convert_ms_file_to_parquet(tmpdir):
     assert fn_out.is_file(), f"File not generated {fn_out}"
     df = ms_file_to_df(fn)
     df_fea = ms_file_to_df(fn_out)
+
+
+    print(df)
+    print(df.dtypes)
+
+    print(df_fea)
+    print(df_fea.dtypes)
+
+    print(df == df_fea)
+
+    print(df.scan_time.values[0], df_fea.scan_time.values[0])
+    print(df.scan_time.values[-1], df_fea.scan_time.values[-1])
+
     assert df_fea.equals(df), "DataFrames not equal"
 
 
