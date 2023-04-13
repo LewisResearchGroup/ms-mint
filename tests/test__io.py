@@ -53,8 +53,17 @@ def test__ms_file_to_df__mzXML():
     assert expected_cols == result.columns.to_list(), result.columns
 
 
-def test__mzml_to_pandas_df_pyteomics_pos():
-    result = mzml_to_pandas_df_pyteomics(TEST_MZML_POS)
+def test__mzml_to_pandas_df_pyteomics_positive_mode():
+    """Test the mzml_to_pandas_df_pyteomics function with positive mode data.
+
+    This function tests the mzml_to_pandas_df_pyteomics function by checking the output
+    against expected values for positive mode data.
+
+    Raises:
+        AssertionError: If any of the assertions fail.
+
+    """
+    # Arrange
     expected_cols = [
         "scan_id",
         "ms_level",
@@ -63,6 +72,11 @@ def test__mzml_to_pandas_df_pyteomics_pos():
         "mz",
         "intensity",
     ]
+
+    # Act
+    result = mzml_to_pandas_df_pyteomics(TEST_MZML_POS)
+
+    # Assert
     assert isinstance(result, pd.DataFrame), f"{type(result)} is not a dataframe"
     assert expected_cols == result.columns.to_list(), result.columns
     assert all(result.polarity == "+"), f'Polarity should be "+"\n{result}'
