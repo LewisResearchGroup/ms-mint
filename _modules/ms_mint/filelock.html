@@ -179,6 +179,7 @@
 <span class="c1"># Classes</span>
 <span class="c1"># ------------------------------------------------</span>
 
+
 <span class="c1"># This is a helper class which is returned by :meth:`BaseFileLock.acquire`</span>
 <span class="c1"># and wraps the lock to make sure __enter__ is not called twice when entering</span>
 <span class="c1"># the with statement.</span>
@@ -384,7 +385,6 @@
 <span class="sd">            every case.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_lock</span><span class="p">:</span>
-
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_locked</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_lock_counter</span> <span class="o">-=</span> <span class="mi">1</span>
 
