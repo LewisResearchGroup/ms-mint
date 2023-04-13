@@ -47,7 +47,6 @@ class Mint(object):
     """
 
     def __init__(self, verbose: bool = False, progress_callback=None, time_unit="s"):
-
         self._verbose = verbose
         self._version = ms_mint.__version__
         self._progress_callback = progress_callback

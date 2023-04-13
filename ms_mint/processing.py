@@ -139,7 +139,7 @@ def process_ms1_from_numpy(array, peaks):
     :rtype: list
     """
     results = []
-    for (mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label) in peaks:
+    for mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label in peaks:
         props = _process_ms1_from_numpy(
             array,
             mz_mean=mz_mean,
@@ -191,7 +191,7 @@ def extract_ms1_properties(array, mz_mean):
 
     projection = pd.DataFrame(array[:, [0, 2]], columns=["rt", "int"])
 
-    print('DEBUG extract_ms1_properties')
+    print("DEBUG extract_ms1_properties")
     print(array)
     print(array.dtype)
     print(array.shape)

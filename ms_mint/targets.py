@@ -311,8 +311,7 @@ class TargetOptimizer:
             fig = plt.figure(figsize=(col_wrap * height * aspect, n_rows * height))
 
         i = 0
-        for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
-
+        for peak_label, row in tqdm(_targets.iterrows(), total=len(targets)):
             if verbose:
                 print(peak_label)
             if peak_label not in peak_labels:

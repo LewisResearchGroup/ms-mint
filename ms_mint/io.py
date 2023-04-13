@@ -87,7 +87,11 @@ def ms_file_to_df(fn, read_only: bool = False):
     return df
 
 
-def mzxml_to_df(fn: Union[str, pathlib.Path], read_only: bool = False, time_unit_in_file: str = 'min') -> Optional[pd.DataFrame]:
+def mzxml_to_df(
+    fn: Union[str, pathlib.Path],
+    read_only: bool = False,
+    time_unit_in_file: str = "min",
+) -> Optional[pd.DataFrame]:
     """
     Read mzXML file and convert it to pandas.DataFrame.
 
@@ -101,7 +105,7 @@ def mzxml_to_df(fn: Union[str, pathlib.Path], read_only: bool = False, time_unit
     :rtype: Optional[pd.DataFrame]
     """
 
-    assert str(fn).lower().endswith('.mzxml'), fn
+    assert str(fn).lower().endswith(".mzxml"), fn
 
     with mzxml.MzXML(fn) as ms_data:
         data = [x for x in ms_data]
@@ -113,7 +117,7 @@ def mzxml_to_df(fn: Union[str, pathlib.Path], read_only: bool = False, time_unit
     df = pd.json_normalize(data, sep="_")
 
     # Convert retention time to seconds
-    if time_unit_in_file == 'min':
+    if time_unit_in_file == "min":
         df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
 
     # Rename columns and reorder
@@ -133,9 +137,8 @@ def mzxml_to_df(fn: Union[str, pathlib.Path], read_only: bool = False, time_unit
     if explode:
         df = df.explode(["mz", "intensity"])
 
+
 def _extract_mzxml(data):
-
-
     return {
         "num": np.int64(data["num"]),
         "msLevel": data["msLevel"],
@@ -147,7 +150,7 @@ def _extract_mzxml(data):
 
 
 def mzml_to_pandas_df_pyteomics(fn, **kwargs):
-    #warnings.warn("mzml_to_pandas_df_pyteomics() is deprecated use mzxml_to_df() instead", DeprecationWarning)
+    # warnings.warn("mzml_to_pandas_df_pyteomics() is deprecated use mzxml_to_df() instead", DeprecationWarning)
     return mzml_to_df(fn, **kwargs)
 
 
@@ -164,17 +167,15 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
     :rtype: pandas.DataFrame
     """
 
-    assert str(fn).lower().endswith('.mzml'), fn
+    assert str(fn).lower().endswith(".mzml"), fn
 
     # Read mzML file using pyteomics
     with mzml.read(str(fn)) as reader:
-
         # Initialize empty lists for the slices and the attributes
         slices = []
 
         # Loop through the spectra and extract the data
         for spectrum in reader:
-
             # Extract the scan ID, retention time, m/z values, and intensity values
             scan_id = int(spectrum["id"].split("scan=")[-1])
             rt = spectrum["scanList"]["scan"][0]["scan start time"]
@@ -187,7 +188,18 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
             else:
                 polarity = None
             ms_level = spectrum["ms level"]
-            slices.append(pd.DataFrame({"scan_id": scan_id, "mz": mz, "intensity": intensity, "polarity": polarity, "ms_level": ms_level, "scan_time": rt}))
+            slices.append(
+                pd.DataFrame(
+                    {
+                        "scan_id": scan_id,
+                        "mz": mz,
+                        "intensity": intensity,
+                        "polarity": polarity,
+                        "ms_level": ms_level,
+                        "scan_time": rt,
+                    }
+                )
+            )
 
     df = pd.concat(slices)
     df["intensity"] = df["intensity"].astype(int)
@@ -201,7 +213,7 @@ def set_dtypes(df):
     df["scan_time"] = df["scan_time"].astype(np.float64)
     df["scan_time"] = df["scan_time"].astype(np.float64)
     df["intensity"] = df["intensity"].astype(np.int64)
-    
+
 
 def _extract_mzml(data, time_unit):
     try:
