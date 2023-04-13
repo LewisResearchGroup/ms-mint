@@ -281,7 +281,7 @@ class MintPlotter:
 
         if isinstance(fns, str):
             fns = [fns]
-        
+
         if fns is not None:
             fns = tuple(fns)
 
@@ -293,7 +293,7 @@ class MintPlotter:
 
         if peak_labels is not None:
             peak_labels = tuple(peak_labels)
-        
+
         data = self.mint.get_chromatograms(fns=fns, peak_labels=peak_labels)
 
         if not interactive:

@@ -160,7 +160,7 @@ def mzml_to_pandas_df_pyteomics(fn):
             scan_id = int(spectrum["id"].split("scan=")[-1])
             rt = spectrum["scanList"]["scan"][0]["scan start time"]
             mz = np.array(spectrum["m/z array"], dtype=np.float64)
-            intensity = np.array(spectrum["intensity array"], dtype=np.float64)
+            intensity = np.array(spectrum["intensity array"], dtype=np.int64)
             if "positive scan" in spectrum.keys():
                 polarity = "+"
             elif "negative scan" in spectrum.keys():
@@ -168,7 +168,18 @@ def mzml_to_pandas_df_pyteomics(fn):
             else:
                 polarity = None
             ms_level = spectrum["ms level"]
-            slices.append(pd.DataFrame({"scan_id": scan_id, "mz": mz, "intensity": intensity, "polarity": polarity, "ms_level": ms_level, "scan_time": rt}))
+            slices.append(
+                pd.DataFrame(
+                    {
+                        "scan_id": scan_id,
+                        "mz": mz,
+                        "intensity": intensity,
+                        "polarity": polarity,
+                        "ms_level": ms_level,
+                        "scan_time": rt,
+                    }
+                )
+            )
 
     df = pd.concat(slices)
     df["intensity"] = df["intensity"].astype(int)

@@ -252,7 +252,7 @@ def extract_ms1_properties(array, mz_mean):
     peak_shape_int = int_list_to_comma_sep_str(projection[:, 1])
 
     # Check that peak projection arrays (rt, int) have same number of elements
-    assert len(peak_shape_rt.split(',')) == len(peak_shape_int.split(','))
+    assert len(peak_shape_rt.split(",")) == len(peak_shape_int.split(","))
 
     return dict(
         peak_area=peak_area,
