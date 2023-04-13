@@ -202,8 +202,10 @@
     <span class="p">)[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s2">&quot;mz&quot;</span><span class="p">,</span> <span class="s2">&quot;intensity&quot;</span><span class="p">])</span>
     <span class="n">set_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">explode</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s2">&quot;mz&quot;</span><span class="p">,</span> <span class="s2">&quot;intensity&quot;</span><span class="p">])</span></div>
 
 <span class="k">def</span> <span class="nf">_extract_mzxml</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
 
@@ -230,8 +232,8 @@
 
 <span class="sd">    :param fn: Filename</span>
 <span class="sd">    :type fn: str or PosixPath</span>
-<span class="sd">    :param read_only: Whether or not to convert to dataframe, defaults to False</span>
-<span class="sd">    :type read_only: bool, optional</span>
+<span class="sd">    :param explode: Whether to explode the DataFrame, defaults to True</span>
+<span class="sd">    :type explode: bool, optional</span>
 <span class="sd">    :return: MS data</span>
 <span class="sd">    :rtype: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>

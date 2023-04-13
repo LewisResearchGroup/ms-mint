@@ -96,7 +96,8 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.pca</span> <span class="kn">import</span> <span class="n">PrincipalComponentsAnalyser</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="kn">import</span> <span class="n">MintPlotter</span>
-<span class="c1">#from .filter import Resampler</span>
+
+<span class="c1"># from .filter import Resampler</span>
 <span class="kn">from</span> <span class="nn">.chromatogram</span> <span class="kn">import</span> <span class="n">Chromatogram</span><span class="p">,</span> <span class="n">extract_chromatogram_from_ms1</span>
 
 <span class="kn">import</span> <span class="nn">ms_mint</span>
@@ -575,7 +576,7 @@
             <span class="n">peak_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_labels</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">fns</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">ms_file_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">peak_label</span><span class="p">:</span>
