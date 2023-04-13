@@ -306,6 +306,7 @@
 <span class="sd">    grouped by peak_label.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
 
     <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fns</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">]</span>
@@ -313,10 +314,10 @@
 
     <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;TEST&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;TEST&#39;</span><span class="p">)</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_max</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-
+    
     <span class="n">fns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
 

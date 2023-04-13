@@ -996,14 +996,23 @@ using the mzML library.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.mzml_to_pandas_df_pyteomics">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzml_to_pandas_df_pyteomics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzml_to_pandas_df_pyteomics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzml_to_pandas_df_pyteomics" title="Permalink to this definition"></a></dt>
-<dd><p>Reads mzML file and returns a pandas.DataFrame using the pyteomics library.
-:param fn: Filename
-:type fn: str or PosixPath
-:param explode: Whether to explode the DataFrame, defaults to True
-:type explode: bool, optional
-:return: MS data
-:rtype: pandas.DataFrame</p>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzml_to_pandas_df_pyteomics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzml_to_pandas_df_pyteomics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzml_to_pandas_df_pyteomics" title="Permalink to this definition"></a></dt>
+<dd><p>Reads mzML file and returns a pandas.DataFrame
+using the pyteomics library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> (<em>str</em><em> or </em><em>PosixPath</em>) – Filename</p></li>
+<li><p><strong>read_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to convert to dataframe, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MS data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1029,7 +1038,7 @@ using the pyteomics library.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ms_mint.io.mzxml_to_df">
-<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzxml_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzxml_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzxml_to_df" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ms_mint.io.</span></span><span class="sig-name descname"><span class="pre">mzxml_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/io.html#mzxml_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.io.mzxml_to_df" title="Permalink to this definition"></a></dt>
 <dd><p>Read mzXML file and convert it to pandas.DataFrame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
