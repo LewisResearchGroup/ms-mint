@@ -6,7 +6,11 @@ import pandas as pd
 import numpy as np
 import io
 import logging
+import warnings
+
 import pymzml
+import pathlib
+from typing import Union, List, Optional
 
 from pathlib import Path as P
 from datetime import date
@@ -31,7 +35,7 @@ MS_FILE_COLUMNS = [
 ]
 
 
-def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
+def ms_file_to_df(fn, read_only: bool = False):
     """
     Read MS file and convert it to a pandas.DataFrame.
 
@@ -39,20 +43,17 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
     :type fn: str or PosixPath
     :param read_only: Whether or not to apply convert to dataframe (for testing purposes), defaults to False
     :type read_only: bool, optional
-    :param time_unit: Time unit used in file, defaults to "seconds"
-    :type time_unit: str, ['seconds', 'minutes']
     :return: MS data as DataFrame
     :rtype: pandas.DataFrame
     """
 
-    assert time_unit in ["minutes", "seconds"]
     fn = str(fn)
 
     try:
         if fn.lower().endswith(".mzxml"):
             df = mzxml_to_df(fn, read_only=read_only)
         elif fn.lower().endswith(".mzml"):
-            df = mzml_to_pandas_df_pyteomics(fn, time_unit=time_unit)
+            df = mzml_to_df(fn, read_only=read_only)
         elif fn.lower().endswith("hdf"):
             df = pd.read_hdf(fn)
         elif fn.lower().endswith(".feather"):
@@ -75,20 +76,32 @@ def ms_file_to_df(fn, read_only: bool = False, time_unit="seconds"):
                 "m/z array": "mz",
             }
         )
+
+    set_dtypes(df)
+
+    assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype
+    assert df.intensity.dtype == np.int64, df.intensity.dtype
+    assert df.mz.dtype == np.float64, df.mz.dtype
+    assert df.scan_time.dtype == np.float64, df.scan_time.dtype
+
     return df
 
 
-def mzxml_to_df(fn, read_only=False, explode=True):
+def mzxml_to_df(fn: Union[str, pathlib.Path], read_only: bool = False, time_unit_in_file: str = 'min') -> Optional[pd.DataFrame]:
     """
     Read mzXML file and convert it to pandas.DataFrame.
 
     :param fn: Filename
-    :type fn: str or PosixPath
+    :type fn: Union[str, pathlib.Path]
     :param read_only: Whether or not to convert to dataframe (for testing purposes), defaults to False
     :type read_only: bool, optional
+    :param time_unit_in_file: The time unit used in the mzXML file (either 'sec' or 'min'), defaults to 'min'
+    :type time_unit_in_file: str, optional
     :return: MS data
-    :rtype: pandas.DataFrame
+    :rtype: Optional[pd.DataFrame]
     """
+
+    assert str(fn).lower().endswith('.mzxml'), fn
 
     with mzxml.MzXML(fn) as ms_data:
         data = [x for x in ms_data]
@@ -100,7 +113,8 @@ def mzxml_to_df(fn, read_only=False, explode=True):
     df = pd.json_normalize(data, sep="_")
 
     # Convert retention time to seconds
-    df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
+    if time_unit_in_file == 'min':
+        df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
 
     # Rename columns and reorder
     df = df.rename(
@@ -112,27 +126,36 @@ def mzxml_to_df(fn, read_only=False, explode=True):
             "intensity_array": "intensity",
         }
     )[MS_FILE_COLUMNS]
+    df = df.explode(["mz", "intensity"])
+    set_dtypes(df)
+    return df.reset_index(drop=True)
 
     if explode:
         df = df.explode(["mz", "intensity"])
 
-    return df.reset_index(drop=True)
-
-
 def _extract_mzxml(data):
+
+
     return {
-        "num": data["num"],
+        "num": np.int64(data["num"]),
         "msLevel": data["msLevel"],
         "polarity": data["polarity"],
-        "retentionTime": data["retentionTime"],
-        "m_z_array": np.array(data["m/z array"]),
-        "intensity_array": np.array(data["intensity array"]),
+        "retentionTime": np.float64(data["retentionTime"]),
+        "m_z_array": np.array(data["m/z array"], dtype=np.float64),
+        "intensity_array": np.array(data["intensity array"], dtype=np.int64),
     }
 
 
-def mzml_to_pandas_df_pyteomics(fn):
+def mzml_to_pandas_df_pyteomics(fn, **kwargs):
+    #warnings.warn("mzml_to_pandas_df_pyteomics() is deprecated use mzxml_to_df() instead", DeprecationWarning)
+    return mzml_to_df(fn, **kwargs)
+
+
+def mzml_to_df(fn, time_unit="seconds", read_only=False):
     """
-    Reads mzML file and returns a pandas.DataFrame using the pyteomics library.
+    Reads mzML file and returns a pandas.DataFrame
+    using the mzML library.
+
     :param fn: Filename
     :type fn: str or PosixPath
     :param explode: Whether to explode the DataFrame, defaults to True
@@ -140,6 +163,9 @@ def mzml_to_pandas_df_pyteomics(fn):
     :return: MS data
     :rtype: pandas.DataFrame
     """
+
+    assert str(fn).lower().endswith('.mzml'), fn
+
     # Read mzML file using pyteomics
     with mzml.read(str(fn)) as reader:
 
@@ -161,57 +187,21 @@ def mzml_to_pandas_df_pyteomics(fn):
             else:
                 polarity = None
             ms_level = spectrum["ms level"]
-            slices.append(
-                pd.DataFrame(
-                    {
-                        "scan_id": scan_id,
-                        "mz": mz,
-                        "intensity": intensity,
-                        "polarity": polarity,
-                        "ms_level": ms_level,
-                        "scan_time": rt,
-                    }
-                )
-            )
+            slices.append(pd.DataFrame({"scan_id": scan_id, "mz": mz, "intensity": intensity, "polarity": polarity, "ms_level": ms_level, "scan_time": rt}))
 
     df = pd.concat(slices)
     df["intensity"] = df["intensity"].astype(int)
-    df = df[MS_FILE_COLUMNS]
-    return df.reset_index(drop=True)
-
-
-def mzml_to_df(fn, time_unit="seconds", read_only=False):
-    """
-    Reads mzML file and returns a pandas.DataFrame
-    using the mzML library.
-
-    :param fn: Filename
-    :type fn: str or PosixPath
-    :param read_only: Whether or not to convert to dataframe, defaults to False
-    :type read_only: bool, optional
-    :return: MS data
-    :rtype: pandas.DataFrame
-    """
-    with pymzml.run.Reader(fn) as ms_data:
-        data = [x for x in ms_data]
-
-    if read_only:
-        return None
-
-    data = list(extract_mzml(data, time_unit=time_unit))
-
-    df = (
-        pd.DataFrame.from_dict(data)
-        .set_index(["scan_id", "ms_level", "polarity", "scan_time"])
-        .apply(pd.Series.explode)
-        .reset_index()
-    )
-
-    df["mz"] = df["mz"].astype("float64")
-    df["intensity"] = df["intensity"].astype("float64")
-    df["scan_time"] = df["scan_time"] * 60.0
+    df = df[MS_FILE_COLUMNS].reset_index(drop=True)
+    set_dtypes(df)
     return df
 
+
+def set_dtypes(df):
+    df["mz"] = df["mz"].astype(np.float64)
+    df["scan_time"] = df["scan_time"].astype(np.float64)
+    df["scan_time"] = df["scan_time"].astype(np.float64)
+    df["intensity"] = df["intensity"].astype(np.int64)
+    
 
 def _extract_mzml(data, time_unit):
     try:
@@ -228,7 +218,7 @@ def _extract_mzml(data, time_unit):
         "polarity": "+" if data["positive scan"] else "-",
         "scan_time": RT,
         "mz": peaks[:, 0].astype("float64"),
-        "intensity": peaks[:, 1].astype("float64"),
+        "intensity": peaks[:, 1].astype("int64"),
     }
 
 
