@@ -22,7 +22,8 @@ from .tools import (
 )
 from .pca import PrincipalComponentsAnalyser
 from .plotting import MintPlotter
-#from .filter import Resampler
+
+# from .filter import Resampler
 from .chromatogram import Chromatogram, extract_chromatogram_from_ms1
 
 import ms_mint
@@ -501,7 +502,7 @@ class Mint(object):
             peak_label = self.peak_labels
 
         data = []
-        
+
         for fn in self.tqdm(fns):
             df = ms_file_to_df(fn)
             for label in peak_label:

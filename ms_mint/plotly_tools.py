@@ -232,7 +232,6 @@ def plotly_peak_shapes(
     grouped by peak_label.
     """
     mint_results = mint_results.copy()
-    
 
     if fns is not None:
         fns = [P(fn).name for fn in fns]
@@ -240,10 +239,10 @@ def plotly_peak_shapes(
 
     mint_results.ms_file = [P(fn).name for fn in mint_results.ms_file]
 
-    logging.warning('TEST')
+    logging.warning("TEST")
 
     res = mint_results[mint_results.peak_max > 0]
-    
+
     fns = list(res.ms_file.drop_duplicates())
     labels = list(mint_results.peak_label.drop_duplicates())
 
