@@ -6,6 +6,10 @@ from ms_mint import Mint
 
 from paths import RESULTS_FN
 
+import matplotlib
+matplotlib.use("Agg")
+
+
 
 def test__hierarchical_clustering():
     mint = Mint()
