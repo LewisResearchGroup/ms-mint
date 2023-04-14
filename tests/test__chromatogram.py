@@ -2,11 +2,14 @@ import numpy as np
 import pandas as pd
 
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+mpl.use("Agg")
 
 from ms_mint.chromatogram import Chromatogram
 from ms_mint.tools import gaussian
 
 from paths import TEST_MZML
+
 
 
 def test__Chromatogram_without_filter_identifies_peaks_correctly():
