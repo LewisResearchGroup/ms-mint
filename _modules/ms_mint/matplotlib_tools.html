@@ -263,7 +263,7 @@
 
     <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">peak_label</span> <span class="ow">in</span> <span class="n">peak_labels</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">R</span><span class="p">[</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">R</span><span class="p">[</span>
             <span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">peak_label</span> <span class="o">==</span> <span class="n">peak_label</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">peak_n_datapoints</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
         <span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
             <span class="n">peak_rt</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">peak_shape_rt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
