@@ -46,8 +46,16 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">ms_mint</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ms_mint package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-mint-module">ms_mint.Mint module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-chromatogram-module">ms_mint.chromatogram module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.Mint">ms_mint.Mint module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.Mint.Mint"><code class="docutils literal notranslate"><span class="pre">Mint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.chromatogram">ms_mint.chromatogram module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.Chromatogram"><code class="docutils literal notranslate"><span class="pre">Chromatogram</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.extract_chromatogram_from_ms1"><code class="docutils literal notranslate"><span class="pre">extract_chromatogram_from_ms1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.chromatogram.get_chromatogram_from_ms_file"><code class="docutils literal notranslate"><span class="pre">get_chromatogram_from_ms_file()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.filelock">ms_mint.filelock module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.BaseFileLock"><code class="docutils literal notranslate"><span class="pre">BaseFileLock</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.filelock.FileLock"><code class="docutils literal notranslate"><span class="pre">FileLock</span></code></a></li>
@@ -80,10 +88,25 @@
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.matplotlib_tools.plot_peaks"><code class="docutils literal notranslate"><span class="pre">plot_peaks()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-notebook-module">ms_mint.notebook module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-pca-module">ms_mint.pca module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-plotly-tools-module">ms_mint.plotly_tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-plotting-module">ms_mint.plotting module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.notebook">ms_mint.notebook module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.notebook.Mint"><code class="docutils literal notranslate"><span class="pre">Mint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.pca">ms_mint.pca module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.pca.PCA_Plotter"><code class="docutils literal notranslate"><span class="pre">PCA_Plotter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.pca.PrincipalComponentsAnalyser"><code class="docutils literal notranslate"><span class="pre">PrincipalComponentsAnalyser</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.plotly_tools">ms_mint.plotly_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.plotly_heatmap"><code class="docutils literal notranslate"><span class="pre">plotly_heatmap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.plotly_peak_shapes"><code class="docutils literal notranslate"><span class="pre">plotly_peak_shapes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.set_template"><code class="docutils literal notranslate"><span class="pre">set_template()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.plotting">ms_mint.plotting module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotting.MintPlotter"><code class="docutils literal notranslate"><span class="pre">MintPlotter</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.processing">ms_mint.processing module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.append_results"><code class="docutils literal notranslate"><span class="pre">append_results()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.extract_chromatogram_from_ms1"><code class="docutils literal notranslate"><span class="pre">extract_chromatogram_from_ms1()</span></code></a></li>
@@ -97,7 +120,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.standards">ms_mint.standards module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ms-mint-targets-module">ms_mint.targets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.targets">ms_mint.targets module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.TargetOptimizer"><code class="docutils literal notranslate"><span class="pre">TargetOptimizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.check_targets"><code class="docutils literal notranslate"><span class="pre">check_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.convert_to_seconds"><code class="docutils literal notranslate"><span class="pre">convert_to_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.diff_targets"><code class="docutils literal notranslate"><span class="pre">diff_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.fill_missing_rt_values"><code class="docutils literal notranslate"><span class="pre">fill_missing_rt_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.gen_target_grid"><code class="docutils literal notranslate"><span class="pre">gen_target_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.read_targets"><code class="docutils literal notranslate"><span class="pre">read_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ms_mint.targets.standardize_targets"><code class="docutils literal notranslate"><span class="pre">standardize_targets()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.tools">ms_mint.tools module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.df_diff"><code class="docutils literal notranslate"><span class="pre">df_diff()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.find_peaks_in_timeseries"><code class="docutils literal notranslate"><span class="pre">find_peaks_in_timeseries()</span></code></a></li>
@@ -111,7 +144,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.tools.scale_dataframe"><code class="docutils literal notranslate"><span class="pre">scale_dataframe()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -148,11 +181,375 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
-<section id="ms-mint-mint-module">
-<h2>ms_mint.Mint module<a class="headerlink" href="#ms-mint-mint-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.Mint">
+<span id="ms-mint-mint-module"></span><h2>ms_mint.Mint module<a class="headerlink" href="#module-ms_mint.Mint" title="Permalink to this heading"></a></h2>
+<p>Main module of the ms-mint library.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.Mint.</span></span><span class="sig-name descname"><span class="pre">Mint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Main class of the ms_mint package, which processes metabolomics files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>verbose</strong> (<em>bool</em>) – Sets verbosity of the instance.</p></li>
+<li><p><strong>progress_callback</strong> (<em>Callable</em><em>[</em><em>]</em>) – A callback for a progress bar.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.clear_ms_files">
+<span class="sig-name descname"><span class="pre">clear_ms_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.clear_ms_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.clear_ms_files" title="Permalink to this definition"></a></dt>
+<dd><p>Reset ms files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.clear_results">
+<span class="sig-name descname"><span class="pre">clear_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.clear_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.clear_results" title="Permalink to this definition"></a></dt>
+<dd><p>Reset results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.clear_targets">
+<span class="sig-name descname"><span class="pre">clear_targets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.clear_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.clear_targets" title="Permalink to this definition"></a></dt>
+<dd><p>Reset target list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.crosstab">
+<span class="sig-name descname"><span class="pre">crosstab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.crosstab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.crosstab" title="Permalink to this definition"></a></dt>
+<dd><p>Create condensed representation of the results.
+More specifically, a cross-table with filenames as index and target labels.
+The values in the cells are determined by <em>col_name</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>col_name</strong> (<em>str</em>) – Name of the column from <em>mint.results</em> table that is used for the cell values.</p>
+</dd>
+</dl>
+<p>cells of the returned table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.digest_results">
+<span class="sig-name descname"><span class="pre">digest_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.digest_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.digest_results" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.export" title="Permalink to this definition"></a></dt>
+<dd><p>Export current results to file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename, defaults to None</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – <strong>deprecated</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>file buffer if <em>filename</em> is None otherwise returns None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>io.BytesIO</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.get_chromatograms">
+<span class="sig-name descname"><span class="pre">get_chromatograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.get_chromatograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.get_chromatograms" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.get_target_params">
+<span class="sig-name descname"><span class="pre">get_target_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peak_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.get_target_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.get_target_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load results into Mint instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em>) – Filename (csv, xlsx)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint">ms_mint.Mint.Mint</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.load_files">
+<span class="sig-name descname"><span class="pre">load_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.load_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.load_files" title="Permalink to this definition"></a></dt>
+<dd><p>Load ms_files as a function that returns the Mint instance for chaining.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>list_of_files</strong> (<em>str</em><em> or </em><em>list</em><em>[</em><em>str</em><em>]</em>) – Filename or list of file names.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint">ms_mint.Mint.Mint</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.load_targets">
+<span class="sig-name descname"><span class="pre">load_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.load_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.load_targets" title="Permalink to this definition"></a></dt>
+<dd><p>Load targets from a file (csv, xslx)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>list_of_files</strong> (<em>str</em><em> or </em><em>list</em><em>[</em><em>str</em><em>]</em>) – Filename or list of file names.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint">ms_mint.Mint.Mint</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.ms_files">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ms_files</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.ms_files" title="Permalink to this definition"></a></dt>
+<dd><p>Get/set ms-files to process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of filenames.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+<dt class="field-even">Setter<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>list_of_files</strong> (<em>str</em><em> or </em><em>list</em><em>[</em><em>str</em><em>]</em>) – Filename or list of file names of MS-files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.n_files">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_files</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.n_files" title="Permalink to this definition"></a></dt>
+<dd><p>Number of currently stored ms filenames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of files stored in self.ms_files</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.peak_labels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">peak_labels</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.peak_labels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.progress">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">progress</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.progress" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the current progress.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns the current progress value.</p>
+</dd>
+<dt class="field-even">Setter<span class="colon">:</span></dt>
+<dd class="field-even"><p>Set the progress to a value between 0 and 100 and calls the progress callback function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Reset Mint instance. Removes targets, MS-files and results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint">ms_mint.Mint.Mint</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.results">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.results" title="Permalink to this definition"></a></dt>
+<dd><p>Get/Set the Mint results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-even">Setter<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame with MINT results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nthreads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.run" title="Permalink to this definition"></a></dt>
+<dd><p>Main routine to run MINT and process MS-files with current target list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nthreads</strong> (<em>int
+* None - Run with min</em><em>(</em><em>n_cpus</em><em>, </em><em>c_files</em><em>) </em><em>CPUs
+* 1: Run without multiprocessing on one CPU
+* &gt;1: Run with multiprocessing enabled using nthreads threads.</em>) – Number of cores to use, defaults to None</p></li>
+<li><p><strong>mode</strong> (<em>str
+* 'standard': calculates peak shaped projected to RT dimension
+* 'express': omits calculation</em><em> of </em><em>other features</em><em>, </em><em>only peak_areas</em>) – Compute mode (‘standard’ or ‘express’), defaults to ‘standard’</p></li>
+<li><p><strong>fn</strong> (<em>str</em>) – Output filename to not keep results in memory.</p></li>
+<li><p><strong>kwargs</strong> – Arguments passed to the procesing function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.status">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.status" title="Permalink to this definition"></a></dt>
+<dd><p>Returns current status of Mint instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[‘waiting’, ‘running’, ‘done’]</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.targets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">targets</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.targets" title="Permalink to this definition"></a></dt>
+<dd><p>Set/get target list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Target list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-even">Setter<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Sets the target list of the instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.Mint.Mint.version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.version" title="Permalink to this definition"></a></dt>
+<dd><p>ms-mint version number.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Version string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="ms-mint-chromatogram-module">
-<h2>ms_mint.chromatogram module<a class="headerlink" href="#ms-mint-chromatogram-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.chromatogram">
+<span id="ms-mint-chromatogram-module"></span><h2>ms_mint.chromatogram module<a class="headerlink" href="#module-ms_mint.chromatogram" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.chromatogram.</span></span><span class="sig-name descname"><span class="pre">Chromatogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.apply_filters">
+<span class="sig-name descname"><span class="pre">apply_filters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.apply_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.apply_filters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.estimate_noise_level">
+<span class="sig-name descname"><span class="pre">estimate_noise_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.estimate_noise_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.estimate_noise_level" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.find_peaks">
+<span class="sig-name descname"><span class="pre">find_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.find_peaks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.find_peaks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.from_file">
+<span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.from_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.optimise_peak_times_with_diff">
+<span class="sig-name descname"><span class="pre">optimise_peak_times_with_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rolling_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.optimise_peak_times_with_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.optimise_peak_times_with_diff" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.select_peak_by_highest_intensity">
+<span class="sig-name descname"><span class="pre">select_peak_by_highest_intensity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.select_peak_by_highest_intensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.select_peak_by_highest_intensity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.select_peak_by_rt">
+<span class="sig-name descname"><span class="pre">select_peak_by_rt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.select_peak_by_rt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.select_peak_by_rt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.select_peak_with_gaussian_weight">
+<span class="sig-name descname"><span class="pre">select_peak_with_gaussian_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#Chromatogram.select_peak_with_gaussian_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.select_peak_with_gaussian_weight" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.Chromatogram.selected_peaks">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">selected_peaks</span></span><a class="headerlink" href="#ms_mint.chromatogram.Chromatogram.selected_peaks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.extract_chromatogram_from_ms1">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.chromatogram.</span></span><span class="sig-name descname"><span class="pre">extract_chromatogram_from_ms1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ms1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#extract_chromatogram_from_ms1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.extract_chromatogram_from_ms1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.chromatogram.get_chromatogram_from_ms_file">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.chromatogram.</span></span><span class="sig-name descname"><span class="pre">get_chromatogram_from_ms_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ms_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/chromatogram.html#get_chromatogram_from_ms_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.chromatogram.get_chromatogram_from_ms_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-ms_mint.filelock">
 <span id="ms-mint-filelock-module"></span><h2>ms_mint.filelock module<a class="headerlink" href="#module-ms_mint.filelock" title="Permalink to this heading"></a></h2>
@@ -372,7 +769,7 @@ windows systems.</p>
 <dd><p>Export MINT state to Excel file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mint</strong> (<em>ms_mint.Mint.Mint</em>) – Mint instance</p>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None, or file buffer (if fn is None)</p>
@@ -573,17 +970,343 @@ using the pyteomics library.</p>
 <dd></dd></dl>
 
 </section>
-<section id="ms-mint-notebook-module">
-<h2>ms_mint.notebook module<a class="headerlink" href="#ms-mint-notebook-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.notebook">
+<span id="ms-mint-notebook-module"></span><h2>ms_mint.notebook module<a class="headerlink" href="#module-ms_mint.notebook" title="Permalink to this heading"></a></h2>
+<p>Experimental module to run Mint interactively inside the Jupyter notebook.</p>
+<p>code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ms_mint.notebook</span> <span class="kn">import</span> <span class="n">Mint</span>
+
+<span class="n">mint</span> <span class="o">=</span> <span class="n">Mint</span><span class="p">()</span>
+
+<span class="n">mint</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.notebook.Mint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.notebook.</span></span><span class="sig-name descname"><span class="pre">Mint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/notebook.html#Mint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.notebook.Mint" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mint</span></code></a></p>
+<p>MINT with added functions for interactive use in Jupyter Notebook (experimental).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.notebook.Mint.display">
+<span class="sig-name descname"><span class="pre">display</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/notebook.html#Mint.display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.notebook.Mint.display" title="Permalink to this definition"></a></dt>
+<dd><p>Display control elements in Jupyter notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IPython Widgets elements.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ms_mint.notebook.Mint.messages">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#ms_mint.notebook.Mint.messages" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="ms-mint-pca-module">
-<h2>ms_mint.pca module<a class="headerlink" href="#ms-mint-pca-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.pca">
+<span id="ms-mint-pca-module"></span><h2>ms_mint.pca module<a class="headerlink" href="#module-ms_mint.pca" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.pca.</span></span><span class="sig-name descname"><span class="pre">PCA_Plotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for plotting Mint PCA results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Class for plotting Mint PCA results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pca</strong> (<a class="reference internal" href="#ms_mint.pca.PrincipalComponentsAnalyser" title="ms_mint.pca.PrincipalComponentsAnalyser"><em>ms_mint.pca.PrincipalComponentsAnalyser</em></a>) – PrincipalComponentsAnalyser instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.cumulative_variance">
+<span class="sig-name descname"><span class="pre">cumulative_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance" title="Permalink to this definition"></a></dt>
+<dd><p>After running mint.pca() this function can be used to plot the cumulative variance of the
+principal components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns a matplotlib figure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.pairplot">
+<span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot" title="Permalink to this definition"></a></dt>
+<dd><p>After running mint.pca() this function can be used to plot a scatter matrix of the
+principal components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of principal components to plot, defaults to 3.</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Labels used for hue.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns a matplotlib figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>seaborn.axisgrid.PairGrid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.pairplot_plotly">
+<span class="sig-name descname"><span class="pre">pairplot_plotly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot_plotly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot_plotly" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.pairplot_sns">
+<span class="sig-name descname"><span class="pre">pairplot_sns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.pairplot_sns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.pairplot_sns" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.pca.</span></span><span class="sig-name descname"><span class="pre">PrincipalComponentsAnalyser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for applying PCA to Mint instance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Class for applying PCA to Mint instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a><em>, </em><em>optional</em>) – Mint instance, defaults to None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PrincipalComponentsAnalyser.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PrincipalComponentsAnalyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PrincipalComponentsAnalyser.run" title="Permalink to this definition"></a></dt>
+<dd><p>Run Principal Component Analysis on current results. Results are stored in
+self.decomposition_results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>on</strong> (<em>str</em><em>, </em><em>optional</em>) – Column name to use for pca, defaults to “peak_max”</p></li>
+<li><p><strong>n_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of PCA components to return, defaults to 3</p></li>
+<li><p><strong>fillna</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to fill missing values, defaults to “median”</p></li>
+<li><p><strong>scaler</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to scale the columns, defaults to “standard”</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="ms-mint-plotly-tools-module">
-<h2>ms_mint.plotly_tools module<a class="headerlink" href="#ms-mint-plotly-tools-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.plotly_tools">
+<span id="ms-mint-plotly-tools-module"></span><h2>ms_mint.plotly_tools module<a class="headerlink" href="#module-ms_mint.plotly_tools" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_heatmap">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normed_by_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clustered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_dendrogram</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_tick_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_heatmap" title="Permalink to this definition"></a></dt>
+<dd><p>Creates an interactive heatmap from a dense-formated dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data</p></li>
+<li><p><strong>normed_by_cols</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to normalize column vectors, defaults to False</p></li>
+<li><p><strong>transposed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to transpose the generated image, defaults to False</p></li>
+<li><p><strong>clustered</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to apply hierarchical clustering or rows, defaults to False</p></li>
+<li><p><strong>add_dendrogram</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to show a dendrogram (only with <cite>clustered=True</cite>), defaults to False</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title for figure, defaults to “”</p></li>
+<li><p><strong>x_tick_colors</strong> (<em>str</em><em>, </em><em>optional</em>) – Color of x-ticks, defaults to None</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Image height in pixels, defaults to None</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Image width in pixels, defaults to None</p></li>
+<li><p><strong>correlation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to convert the table to a correlation matrix, defaults to False</p></li>
+<li><p><strong>call_show</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to call fig.show() to show image in new browser tab, defaults to False</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to be loud, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns a plotly image object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotly.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.plotly_tools.plotly_peak_shapes">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">plotly_peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'v'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#plotly_peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.plotly_peak_shapes" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a plotly multiplost of all peak_shapes in mint.results
+grouped by peak_label.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.plotly_tools.set_template">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.plotly_tools.</span></span><span class="sig-name descname"><span class="pre">set_template</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotly_tools.html#set_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotly_tools.set_template" title="Permalink to this definition"></a></dt>
+<dd><p>A function that sets a template for plotly figures.</p>
+</dd></dl>
+
 </section>
-<section id="ms-mint-plotting-module">
-<h2>ms_mint.plotting module<a class="headerlink" href="#ms-mint-plotting-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.plotting">
+<span id="ms-mint-plotting-module"></span><h2>ms_mint.plotting module<a class="headerlink" href="#module-ms_mint.plotting" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.plotting.</span></span><span class="sig-name descname"><span class="pre">MintPlotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Plot generator for mint.results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Plot generator for mint.results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter.chromatogram">
+<span class="sig-name descname"><span class="pre">chromatogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter.chromatogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter.chromatogram" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the chromatogram extracted from one or more files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fns</strong> (<em>str</em><em> or </em><em>List</em><em>[</em><em>str</em><em>]</em>) – File names to extract chromatogram from.</p></li>
+<li><p><strong>peak_label</strong> – Target from Mint.targets.peak_label to take mz</p></li>
+</ul>
+</dd>
+</dl>
+<p>parameters, defaults to None. If None <cite>mz_mean and mz_width are used</cite>.
+:type peak_label: str, optional
+:param mz_mean: m/z value for chromatogram, defaults to None
+:type mz_mean: float, optional
+:param mz_width: mz_width, defaults to None
+:type mz_width: int&gt;0, optional
+:return: Plot of chromatogram(s)
+:rtype: matplotlib.Figure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter.heatmap">
+<span class="sig-name descname"><span class="pre">heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normed_by_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clustered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_dendrogram</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter.heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter.heatmap" title="Permalink to this definition"></a></dt>
+<dd><p>Creates an interactive heatmap
+that can be used to explore the data interactively.
+<cite>mint.crosstab()</cite> is called and then subjected to
+the <cite>mint.vis.plotly.plotly_tools.plot_heatmap()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>col_name</strong> – str, default=’peak_max’
+Name of the column in <cite>mint.results</cite> to be analysed.</p></li>
+<li><p><strong>normed_by_cols</strong> – bool, default=True
+Whether or not to normalize the columns in the crosstab.</p></li>
+<li><p><strong>clustered</strong> – bool, default=False
+Whether or not to cluster the rows.</p></li>
+<li><p><strong>add_dendrogram</strong> – bool, default=False
+Whether or not to replace row labels with a dendrogram.</p></li>
+<li><p><strong>transposed</strong> – bool, default=False
+If True transpose matrix before plotting.</p></li>
+<li><p><strong>correlation</strong> – bool, default=False
+If True convert data to correlation matrix before plotting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interactive heatmap.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotly.graph_objs._figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter.hierarchical_clustering">
+<span class="sig-name descname"><span class="pre">hierarchical_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmaxticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymaxticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log2p1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler_ms_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler_peak_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cosine'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_filenames_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'basename'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter.hierarchical_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter.hierarchical_clustering" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a cluster analysis and plots a heatmap. If no data is provided,
+data is taken form self.mint.crosstab(targets_var).
+The clustered non-transformed non-scaled data is stored in <cite>self.mint.clustered</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transform_func</strong> – default ‘log2p1’, values: [None, ‘log1p’, ‘log2p1’, ‘log10p1’]
+- None: no transformation
+- log1p: tranform data with lambda x: np.log1p(x)
+- log2p1: transform data with lambda x: log2(x+1)
+- log10p1: transform data with lambda x: log10(x+1)</p></li>
+<li><p><strong>scaler_ms_file</strong> – default None, values: [None, ‘standard’, ‘robust’]
+- scaler used to scale along ms_file axis
+- if None no scaling is applied
+- if ‘standard’ use scikit learn StandardScaler()
+- if ‘robust’ use scikit learn RobustScaler()</p></li>
+<li><p><strong>scaler_peak_label</strong> – default ‘standard’
+- like scaler_ms_file, but scaling along peak_label axis</p></li>
+<li><p><strong>metric</strong> – <p>default ‘cosine’, can be string or a list of two values:
+if two values are provided e.g. (‘cosine’, ‘euclidean’) the first
+will be used to cluster the x-axis and the second for the y-axis.</p>
+<p>’braycurtis’, ‘canberra’, ‘chebyshev’, ‘cityblock’, ‘correlation’, ‘cosine’,
+‘dice’, ‘euclidean’, ‘hamming’, ‘jaccard’, ‘jensenshannon’, ‘kulsinski’, ‘mahalanobis’,
+‘matching’, ‘minkowski’, ‘rogerstanimoto’, ‘russellrao’, ‘seuclidean’,
+‘sokalmichener’, ‘sokalsneath’, ‘sqeuclidean’, ‘yule’.
+More information:
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html</a></p>
+</p></li>
+<li><p><strong>transpose</strong> – bool, default False
+- True: transpose the figure</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter.histogram_2d">
+<span class="sig-name descname"><span class="pre">histogram_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter.histogram_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter.histogram_2d" title="Permalink to this definition"></a></dt>
+<dd><p>2D histogram of a ms file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> (<em>str</em><em>, </em><em>optional</em>) – File name</p></li>
+<li><p><strong>peak_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Target to focus, defaults to None</p></li>
+<li><p><strong>rt_margin</strong> (<em>int</em><em>, </em><em>optional</em>) – Margin in Rt dimension, defaults to 0</p></li>
+<li><p><strong>mz_margin</strong> (<em>int</em><em>, </em><em>optional</em>) – Margin in mz dimension, defaults to 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.plotting.MintPlotter.peak_shapes">
+<span class="sig-name descname"><span class="pre">peak_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/plotting.html#MintPlotter.peak_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.plotting.MintPlotter.peak_shapes" title="Permalink to this definition"></a></dt>
+<dd><p>Plot peak shapes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure with peak shapes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>seaborn.axisgrid.FacetGrid</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-ms_mint.processing">
 <span id="ms-mint-processing-module"></span><h2>ms_mint.processing module<a class="headerlink" href="#module-ms_mint.processing" title="Permalink to this heading"></a></h2>
@@ -756,8 +1479,179 @@ using the pyteomics library.</p>
 <span id="ms-mint-standards-module"></span><h2>ms_mint.standards module<a class="headerlink" href="#module-ms_mint.standards" title="Permalink to this heading"></a></h2>
 <p>Contains standard column names and other values.</p>
 </section>
-<section id="ms-mint-targets-module">
-<h2>ms_mint.targets module<a class="headerlink" href="#ms-mint-targets-module" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint.targets">
+<span id="ms-mint-targets-module"></span><h2>ms_mint.targets module<a class="headerlink" href="#module-ms_mint.targets" title="Permalink to this heading"></a></h2>
+<p>Everything related to target lists.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">TargetOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Optimizer for target lists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance to optimize</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Optimizer for target lists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mint</strong> (<a class="reference internal" href="#ms_mint.Mint.Mint" title="ms_mint.Mint.Mint"><em>ms_mint.Mint.Mint</em></a>) – Mint instance to optimize</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.targets.TargetOptimizer.rt_min_max">
+<span class="sig-name descname"><span class="pre">rt_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_opt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#TargetOptimizer.rt_min_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.TargetOptimizer.rt_min_max" title="Permalink to this definition"></a></dt>
+<dd><p>Optimize rt_min and rt_max values based on expected retention times (rt).
+For this optimization all rt values in the target list must be present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fns</strong> (<em>List</em><em>[</em><em>str</em><em> or </em><em>PosixPath</em><em>]</em><em>, </em><em>optional</em>) – List of filenames to use for optimization</p></li>
+<li><p><strong>targets</strong> (<em>pandas.DataFrame in MINT target list format</em>) – Target list to optimize</p></li>
+<li><p><strong>peak_labels</strong> (<em>List</em><em>[</em><em>str</em><em> or </em><em>PosixPath</em><em>]</em><em>, </em><em>optional</em>) – Subset of peak_labels to optimize, defaults to None</p></li>
+<li><p><strong>minimum_intensity</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum intensity required, otherwise skip target, defaults to 1e4</p></li>
+<li><p><strong>plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to plot first 100 optimizations, defaults to True</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Sigma value for peak selection, defaults to 20</p></li>
+<li><p><strong>filters</strong> (<em>ms_mint.filters.Filter</em><em>, </em><em>optional</em>) – Filter instances to apply in respective order, defaults to None</p></li>
+<li><p><strong>post_opt</strong> (<em>bool</em><em>, </em><em>optional</em>) – Optimize retention times after peak selection, defaults to False</p></li>
+<li><p><strong>post_opt_kwargs</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 20</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(self, None) or (self, matplotlib.pyplot.Figure) if plot==True</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.check_targets">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">check_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#check_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.check_targets" title="Permalink to this definition"></a></dt>
+<dd><p>Check if targets are formated well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Target list</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns True if all checks pass, else False</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.convert_to_seconds">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">convert_to_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#convert_to_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.convert_to_seconds" title="Permalink to this definition"></a></dt>
+<dd><p>Convert time units to seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Mint target list to modify.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.diff_targets">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">diff_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_pklist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_pklist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#diff_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.diff_targets" title="Permalink to this definition"></a></dt>
+<dd><p>Get the difference between two target lists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_pklist</strong> (<em>pandas.DataFrame</em>) – Old target list</p></li>
+<li><p><strong>new_pklist</strong> (<em>pandas.DataFrame</em>) – New target list</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Target list with new/changed targets</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.fill_missing_rt_values">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">fill_missing_rt_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#fill_missing_rt_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.fill_missing_rt_values" title="Permalink to this definition"></a></dt>
+<dd><p>If rt values are missing fill with mean of rt_min, rt_max.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Mint target list to modify.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.gen_target_grid">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">gen_target_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">masses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_ppm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#gen_target_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.gen_target_grid" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a targets from a list of masses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masses</strong> – Target m/z values.</p></li>
+<li><p><strong>dt</strong> – Size of peak windows in time dimension [min]</p></li>
+<li><p><strong>rt_max</strong> – Maximum time</p></li>
+<li><p><strong>mz_ppm</strong> – Width of peak window in m/z dimension [ppm].</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.read_targets">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">read_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'negative'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#read_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.read_targets" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts peak data from csv files that contain peak definitions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fns</strong> – List of filenames of target lists.</p></li>
+<li><p><strong>ms_mode</strong> – “negative” or “positive”</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ms_mint.targets.standardize_targets">
+<span class="sig-prename descclassname"><span class="pre">ms_mint.targets.</span></span><span class="sig-name descname"><span class="pre">standardize_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'neutral'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/targets.html#standardize_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.targets.standardize_targets" title="Permalink to this definition"></a></dt>
+<dd><p>Standardize target list.</p>
+<ul class="simple">
+<li><p>updates the target lists to newest format</p></li>
+<li><p>ensures peak labels are strings</p></li>
+<li><p>replaces np.NaN with None</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – DataFrame in target-list format.</p></li>
+<li><p><strong>ms_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – Ionization mode, defaults to “neutral”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame in formated target-list format</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-ms_mint.tools">
 <span id="ms-mint-tools-module"></span><h2>ms_mint.tools module<a class="headerlink" href="#module-ms_mint.tools" title="Permalink to this heading"></a></h2>
@@ -938,8 +1832,9 @@ using the pyteomics library.</p>
 </dd></dl>
 
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<section id="module-ms_mint">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ms_mint" title="Permalink to this heading"></a></h2>
+<p>A Python library for targetd metabolomics.</p>
 </section>
 </section>
 
