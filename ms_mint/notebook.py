@@ -141,7 +141,7 @@ class Mint(_Mint_):
         return self.layout
 
     def _run_(self, b=None, **kwargs):
-        self.message(f"Start processing...")
+        self.message("Start processing...")
         self.progress = 0
         self.run(**kwargs)
         self.message("...finished processing.")
