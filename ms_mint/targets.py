@@ -253,7 +253,6 @@ class TargetOptimizer:
         height=3,
         aspect=2,
         col_wrap=3,
-        verbose=False,
         **kwargs,
     ):
         """
@@ -291,17 +290,8 @@ class TargetOptimizer:
         if peak_labels is None:
             peak_labels = targets.peak_label.values
 
-        if verbose:
-            print(targets)
-            print(fns)
-            print(peak_labels)
-
         _targets = targets.set_index("peak_label").copy()
 
-        if verbose:
-            print(_targets)
-
-        print("Reading files...")
         ms1 = pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)]).sort_values(
             ["scan_time", "mz"]
         )
@@ -312,8 +302,6 @@ class TargetOptimizer:
 
         i = 0
         for peak_label, row in tqdm(_targets.iterrows(), total=len(targets)):
-            if verbose:
-                print(peak_label)
             if peak_label not in peak_labels:
                 logging.warning(f"{peak_label} not in {peak_labels}")
                 continue
@@ -349,9 +337,6 @@ class TargetOptimizer:
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]
-
-            if verbose:
-                print(ndx, peak_label, rt_min, rt_max)
 
             _targets.loc[peak_label, ["rt_min", "rt_max"]] = rt_min, rt_max
 
