@@ -501,7 +501,7 @@ class Mint(object):
                 chrom_data["ms_file"] = fn
                 chrom_data["peak_label"] = label
                 chrom_data["rt_min"] = rt_min
-                chrom_data["rt_max"] = rt_min
+                chrom_data["rt_max"] = rt_max
                 data.append(chrom_data)
 
         data = pd.concat(data).reset_index()
