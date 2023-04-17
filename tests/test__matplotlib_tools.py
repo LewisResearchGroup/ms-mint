@@ -1,8 +1,7 @@
 import seaborn as sns
 
 import matplotlib as mpl
-
-# echo $mpl.use("Agg")
+mpl.use("Agg")
 
 from ms_mint import Mint
 
