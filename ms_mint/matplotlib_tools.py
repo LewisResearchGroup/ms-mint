@@ -265,7 +265,7 @@ def plot_peaks(
         )
         for i, (
             ndx,
-            (_, rt, rt_span, peak_base_height, peak_height, rt_min, rt_max),
+            (_, _, rt_span, peak_base_height, peak_height, rt_min, rt_max),
         ) in enumerate(peaks.iterrows()):
             if ndx in highlight:
                 plt.axvspan(rt_min, rt_max, color="green", alpha=0.25, label="Selected")
