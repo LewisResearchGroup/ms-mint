@@ -46,10 +46,15 @@ class Mint(object):
 
     """
 
-    def __init__(self, verbose: bool = False, progress_callback=None, time_unit="s"):
-        self._verbose = verbose
+    def __init__(
+        self,
+        verbose: bool = False,
+        progress_callback: Callable = None,
+        time_unit: str = "s",
+    ):
+        self.verbose = verbose
         self._version = ms_mint.__version__
-        self._progress_callback = progress_callback
+        self.progress_callback = progress_callback
         self.reset()
         if self.verbose:
             print("Mint Version:", self.version, "\n")
@@ -58,24 +63,6 @@ class Mint(object):
         self.pca = PrincipalComponentsAnalyser(self)
         self.tqdm = tqdm
         self.meta = None
-
-    @property
-    def verbose(self):
-        """
-        Get/set verbosity.
-
-        :getter: Get current verbosity.
-        :return: True or False
-        :rtype: bool
-        :setter: Sets verbosity.
-        :param value: True or False
-        :type value: bool
-        """
-        return self._verbose
-
-    @verbose.setter
-    def verbose(self, value: bool):
-        self._verbose = value
 
     @property
     def version(self):
@@ -133,11 +120,11 @@ class Mint(object):
                 * 1: Run without multiprocessing on one CPU
                 * >1: Run with multiprocessing enabled using nthreads threads.
         :param mode: Compute mode ('standard' or 'express'), defaults to 'standard'
+        :type mode: str
                 * 'standard': calculates peak shaped projected to RT dimension
                 * 'express': omits calculation of other features, only peak_areas
         :param fn: Output filename to not keep results in memory.
         :type fn: str
-        :type mode: str
         :param kwargs: Arguments passed to the procesing function.
         """
         self._status = "running"
@@ -146,39 +133,57 @@ class Mint(object):
             return None
 
         targets = self.targets.reset_index()
+        self._set_rt_min_max(targets, rt_margin)
 
-        if "rt" in targets.columns:
-            ndx = (targets.rt_min.isna()) & (~targets.rt.isna())
-            targets.loc[ndx, "rt_min"] = targets.loc[ndx, "rt"] - rt_margin
-            ndx = (targets.rt_max.isna()) & (~targets.rt.isna())
-            targets.loc[ndx, "rt_max"] = targets.loc[ndx, "rt"] + rt_margin
-            del ndx
-
-        if nthreads is None:
-            nthreads = min(cpu_count(), self.n_files)
+        nthreads = self._determine_nthreads(nthreads)
 
         if self.verbose:
             print(f"Run MINT with {nthreads} processes:")
 
         start = time.time()
         if nthreads > 1:
-            self.__run_parallel__(nthreads=nthreads, mode=mode, fn=fn, **kwargs)
+            self._run_parallel(nthreads=nthreads, mode=mode, fn=fn, **kwargs)
         else:
-            results = []
-            for i, filename in enumerate(self.ms_files):
-                args = {
-                    "filename": filename,
-                    "targets": targets,
-                    "q": None,
-                    "mode": mode,
-                    "output_fn": None,
-                }
-                results.append(process_ms1_files_in_parallel(args))
-                self.progress = int(100 * (i / self.n_files))
-            self.results = pd.concat(results).reset_index(drop=True)
+            self._run_sequential(mode=mode, fn=fn, targets=targets)
 
         self.progress = 100
+        self._report_runtime(start)
 
+        self._status = "done"
+        assert self.progress == 100
+        return self
+
+    def _set_rt_min_max(self, targets, rt_margin):
+        if "rt" in targets.columns:
+            update_rt_min = (targets.rt_min.isna()) & (~targets.rt.isna())
+            targets.loc[update_rt_min, "rt_min"] = (
+                targets.loc[update_rt_min, "rt"] - rt_margin
+            )
+            update_rt_max = (targets.rt_max.isna()) & (~targets.rt.isna())
+            targets.loc[update_rt_max, "rt_max"] = (
+                targets.loc[update_rt_max, "rt"] + rt_margin
+            )
+
+    def _determine_nthreads(self, nthreads):
+        if nthreads is None:
+            nthreads = min(cpu_count(), self.n_files)
+        return nthreads
+
+    def _run_sequential(self, mode, fn, targets):
+        results = []
+        for i, filename in enumerate(self.ms_files):
+            args = {
+                "filename": filename,
+                "targets": targets,
+                "q": None,
+                "mode": mode,
+                "output_fn": None,
+            }
+            results.append(process_ms1_files_in_parallel(args))
+            self.progress = int(100 * (i / self.n_files))
+        self.results = pd.concat(results).reset_index(drop=True)
+
+    def _report_runtime(self, start):
         end = time.time()
         self.runtime = end - start
         self.runtime_per_file = self.runtime / self.n_files
@@ -192,11 +197,7 @@ class Mint(object):
             )
             print("Results:", self.results)
 
-        self._status = "done"
-        assert self.progress == 100
-        return self
-
-    def __run_parallel__(
+    def _run_parallel(
         self, nthreads=1, mode="standard", maxtasksperchild=None, fn=None
     ):
         print(f"maxtasksperchild: {maxtasksperchild}")
@@ -221,17 +222,7 @@ class Mint(object):
             )
 
         results = pool.map_async(process_ms1_files_in_parallel, args)
-
-        # monitor progress
-        while True:
-            if results.ready():
-                break
-            else:
-                size = q.qsize()
-                self.progress = 100 * size / self.n_files
-                time.sleep(1)
-
-        self.progress = 100
+        self._monitor_progress(results, q)
 
         pool.close()
         pool.join()
@@ -239,6 +230,13 @@ class Mint(object):
         if fn is None:
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
+
+    def _monitor_progress(self, results, q):
+        while not results.ready():
+            size = q.qsize()
+            self.progress = 100 * size / self.n_files
+            time.sleep(1)
+        self.progress = 100
 
     @property
     def status(self):
@@ -397,20 +395,6 @@ class Mint(object):
         if scaler:
             df = scale_dataframe(df, scaler=scaler)
         return df
-
-    @property
-    def progress_callback(self):
-        """
-        Assigns a callback function to update a progress bar.
-
-        :getter: Returns the current callback function.
-        :setter: Sets the callback function.
-        """
-        return self._progress_callback
-
-    @progress_callback.setter
-    def progress_callback(self, func: Callable = None):
-        self._progress_callback = func
 
     @property
     def progress(self):
