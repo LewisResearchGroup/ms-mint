@@ -53,9 +53,7 @@ except ImportError:
 
 # Backward compatibility
 # ------------------------------------------------
-try:
-    TimeoutError
-except NameError:
+if 'TimeoutError' not in globals():
     TimeoutError = OSError
 
 
