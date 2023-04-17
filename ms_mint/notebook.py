@@ -106,7 +106,7 @@ class Mint(_Mint_):
         self.tqdm = tqdm
 
     def _load_target_from_bytes_(self, value):
-        for fn, data in value["new"].items():
+        for data in value["new"].values():
             self.load(io.BytesIO(data["content"]))
         self._message_(f"{len(self.targets)} targets loaded.")
 
