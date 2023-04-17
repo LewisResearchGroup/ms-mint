@@ -6,11 +6,9 @@ import pandas as pd
 import numpy as np
 import io
 import logging
-import warnings
 
-import pymzml
 import pathlib
-from typing import Union, List, Optional
+from typing import Union, Optional
 
 from pathlib import Path as P
 from datetime import date
