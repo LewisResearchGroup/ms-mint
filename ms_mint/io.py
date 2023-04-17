@@ -79,10 +79,10 @@ def ms_file_to_df(fn, read_only: bool = False):
 
     set_dtypes(df)
 
-    assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype
-    assert df.intensity.dtype == np.int64, df.intensity.dtype
-    assert df.mz.dtype == np.float64, df.mz.dtype
-    assert df.scan_time.dtype == np.float64, df.scan_time.dtype
+    # assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype
+    # assert df.intensity.dtype == np.int64, df.intensity.dtype
+    # assert df.mz.dtype == np.float64, df.mz.dtype
+    # assert df.scan_time.dtype == np.float64, df.scan_time.dtype
 
     return df
 
@@ -118,31 +118,21 @@ def mzxml_to_df(
 
     # Convert retention time to seconds
     if time_unit_in_file == "min":
-        df["retentionTime"] = df["retentionTime"].astype(np.float64) * 60.0
+        df["scan_time"] = df["scan_time"].astype(np.float64) * 60.0
 
-    # Rename columns and reorder
-    df = df.rename(
-        columns={
-            "num": "scan_id",
-            "msLevel": "ms_level",
-            "retentionTime": "scan_time",
-            "m_z_array": "mz",
-            "intensity_array": "intensity",
-        }
-    )[MS_FILE_COLUMNS]
     df = df.explode(["mz", "intensity"])
     set_dtypes(df)
-    return df.reset_index(drop=True)
+    return df.reset_index(drop=True)[MS_FILE_COLUMNS]
 
 
 def _extract_mzxml(data):
     return {
-        "num": np.int64(data["num"]),
-        "msLevel": data["msLevel"],
+        "scan_id": data["num"],
+        "ms_level": data["msLevel"],
         "polarity": data["polarity"],
-        "retentionTime": np.float64(data["retentionTime"]),
-        "m_z_array": np.array(data["m/z array"], dtype=np.float64),
-        "intensity_array": np.array(data["intensity array"], dtype=np.int64),
+        "scan_time": data["retentionTime"],
+        "mz": np.array(data["m/z array"]),
+        "intensity": np.array(data["intensity array"]),
     }
 
 
@@ -206,10 +196,19 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
 
 
 def set_dtypes(df):
-    df["mz"] = df["mz"].astype(np.float64)
-    df["scan_time"] = df["scan_time"].astype(np.float64)
-    df["scan_time"] = df["scan_time"].astype(np.float64)
-    df["intensity"] = df["intensity"].astype(np.int64)
+    dtypes = dict(
+        mz=np.float32,
+        scan_id=np.int64,
+        ms_level=np.int8,
+        scan_time=np.float32,
+        intensity=np.int64,
+    )
+
+    for var, dtype in dtypes.items():
+        if not df[var].dtype == dtype:
+            df[var] = df[var].astype(dtype)
+
+    return df
 
 
 def _extract_mzml(data, time_unit):
