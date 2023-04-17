@@ -24,7 +24,7 @@ The project follows PEP8 standard and uses Black and Flake8 to ensure a consiste
 
 ---
 
-# Usage
+## Usage
 
 To use the main class of the ms-mint library, you can import it into your code with the following command:
 
@@ -145,7 +145,6 @@ Then we apply the changes and plot the new peak shapes:
 
 As you can see, the shapes of Xanthine, Succinate, Citrulline look much better.
 
-
 ## Plotting and data exploration
 
 The `Mint` class has a few convenient methods to visualize and explore the processed data. The results can be viewed directly in JupyterLab or stored to files using `matplotlib` and `seaborn` syntax. The figures are matplotlib objects and can be easily customised. 
@@ -157,7 +156,6 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
     mint.plot.peak_shapes(col_wrap = 3)
 
 The method uses seaborn [sns.relplot()](https://seaborn.pydata.org/generated/seaborn.relplot.html) function and keyword arguments are passed on. 
-
 
 ## Hierarchical clustering
 Mint ca be used to cluster the extracted data. An agglomerative hierarchical clustering is a bottom-up clustering technique where each data point starts as its own cluster and then are merged with other clusters in a hierarchical manner based on their proximity or similarity until a single cluster is formed or a specified stopping criteria is met. The proximity is usually determined by a distance metric, such as Euclidean distance, and the similarity is usually determined by a linkage function, such as ward linkage or complete linkage. The result is a tree-like representation called a dendrogram, which can be used to determine the number of clusters and the cluster assignments of the data points.
@@ -188,7 +186,6 @@ Before clustering the data can be transformed and scaled. By default `log2p1(x) 
         cmap=None  # Name of a matplotlib color map                
     )
 
-
 ![](notebooks/hierarchical_clustering.png)
 
 ## Principal Components Analysis
@@ -205,8 +202,8 @@ After running the PCA the results can be plotted with:
     
 ![](notebooks/pca-pairplot.png)
 
-# FAQ
-## What is a target list
+## FAQ
+### What is a target list
 A target list is a pandas dataframe with specific columns. 
 
 -   **peak_label**: string, Label of the peak (must be unique).
@@ -221,11 +218,11 @@ A target list is a pandas dataframe with specific columns.
 
 The target list can be stored as csv or Excel file. 
 
-## What input files can be used
+### What input files can be used
 `ms_mint` can be used with `mzXML`, `mzML`, `mzMLb` and experimental formats in `.feather` and `.parquet` format.
 
-## Which properties does ms-mint extract
-### Parameters from target list
+### Which properties does ms-mint extract
+#### Parameters from target list
 -   **ms_file**: Filename of MS-file
 -   **peak_label**: From target list
 -   **mz_mean**: From target list
@@ -239,7 +236,7 @@ The target list can be stored as csv or Excel file.
 
 ---
 
-### Results columns
+#### Results columns
 -   **peak_area**: The sum of all intensities in the extraction window
 -   **peak_area_top3**: The average of the 3 largest intensities in the extraction window
 -   **peak_n_datapoints**: Number of datapoints
@@ -260,9 +257,8 @@ The target list can be stored as csv or Excel file.
 -   **ms_file_size**: Size of the MS-file in MB
 ---
 
+## Release Notes
 
-# Release Notes
-
-## 0.2.0 Milestones
+### 0.2.0 Milestones
     - peak_area_top3 comparable to El-Maven PeakAreaTop values
 
