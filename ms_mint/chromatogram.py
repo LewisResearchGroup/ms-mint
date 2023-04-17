@@ -129,7 +129,7 @@ class Chromatogram:
 
     @property
     def selected_peaks(self):
-        self.peaks.loc[self.selected_peak_ndxs]
+        return self.peaks.loc[self.selected_peak_ndxs]
 
     @property
     def data(self):
