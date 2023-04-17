@@ -12,7 +12,7 @@ from .matplotlib_tools import plot_peaks
 
 class Chromatogram:
     def __init__(
-        self, scan_times=None, intensities=None, filter=None, expected_rt=None
+        self, scan_times=None, intensities=None, filters=None, expected_rt=None
     ):
         self.t = np.array([0])
         self.x = np.array([0])
