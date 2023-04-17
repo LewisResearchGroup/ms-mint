@@ -314,7 +314,7 @@ class MintPlotter:
             g = sns.relplot(data=data, **params)
 
             for peak_label, ax in zip(peak_labels, g.axes.flatten()):
-                mz_mean, mz_width, rt_min, rt_max = self.mint.get_target_params(
+                _, _, rt_min, rt_max = self.mint.get_target_params(
                     peak_label
                 )
                 if rt_min is not None and rt_max is not None:
