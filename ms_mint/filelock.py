@@ -50,13 +50,6 @@ try:
 except ImportError:
     fcntl = None
 
-
-# Backward compatibility
-# ------------------------------------------------
-if 'TimeoutError' not in globals():
-    TimeoutError = OSError
-
-
 # Data
 # ------------------------------------------------
 __all__ = [
