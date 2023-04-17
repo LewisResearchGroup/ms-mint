@@ -12,7 +12,7 @@ The `ms-mint` library includes a range of functions for processing LCMS data fro
 ## Documentation
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/readme.html).
 
-## News
+## ms-mint application with graphical user iterface (GUI)
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
 
 ## Contributions
