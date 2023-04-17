@@ -190,9 +190,9 @@ def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
     targets.columns = ["mz_mean", "rt_min"]
     targets["rt_max"] = targets.rt_min + (1 * dt)
     targets["peak_label"] = (
-        targets.mz_mean.apply(lambda x: "{:.3f}".format(x))
+        targets.mz_mean.apply("{:.3f}".format)
         + "__"
-        + targets.rt_min.apply(lambda x: "{:2.2f}".format(x))
+        + targets.rt_min.apply("{:2.2f}".format)
     )
     targets["mz_width"] = mz_ppm
     targets["intensity_threshold"] = intensity_threshold
