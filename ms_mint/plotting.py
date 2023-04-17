@@ -131,7 +131,7 @@ class MintPlotter:
         if transposed:
             tmp_data = tmp_data.T
 
-        clustered, fig, ndx_x, ndx_y = hierarchical_clustering(
+        _, fig, ndx_x, ndx_y = hierarchical_clustering(
             tmp_data,
             vmin=vmin,
             vmax=vmax,
