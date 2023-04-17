@@ -192,7 +192,7 @@ def plot_peak_shapes(
 
     dfs = []
     for peak_label in peak_labels:
-        for ndx, row in R[
+        for _, row in R[
             (R.peak_label == peak_label) & (R.peak_n_datapoints > 1)
         ].iterrows():
             peak_rt = [float(i) for i in row.peak_shape_rt.split(",")]
