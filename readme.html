@@ -49,10 +49,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#ms-mint-application-with-graphical-user-iterface-gui">ms-mint application with graphical user iterface (GUI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions">Contributions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-standards">Code standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook">ms-mint in JupyterLab, or the Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#usage">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook">ms-mint in JupyterLab, or the Jupyter Notebook</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-extraction">Data extraction</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#load-files">Load files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load-target-list">Load target list</a></li>
@@ -65,20 +65,20 @@
 <li class="toctree-l2"><a class="reference internal" href="#plot-peak-shapes">Plot peak shapes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#hierarchical-clustering">Hierarchical clustering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#principal-components-analysis">Principal Components Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-a-target-list">What is a target list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-input-files-can-be-used">What input files can be used</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#which-properties-does-ms-mint-extract">Which properties does ms-mint extract</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#parameters-from-target-list">Parameters from target list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#results-columns">Results columns</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#faq">FAQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-a-target-list">What is a target list</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-input-files-can-be-used">What input files can be used</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#which-properties-does-ms-mint-extract">Which properties does ms-mint extract</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#parameters-from-target-list">Parameters from target list</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#results-columns">Results columns</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#release-notes">Release Notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#milestones">0.2.0 Milestones</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#release-notes">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#milestones">0.2.0 Milestones</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">ms_mint</a></li>
@@ -135,10 +135,9 @@ Before you modify the code please reach out to us using the <a class="reference 
 <h2>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this heading"></a></h2>
 <p>The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.</p>
 </section>
-</section>
 <hr class="docutils" />
 <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
 <p>To use the main class of the ms-mint library, you can import it into your code with the following command:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>from ms_mint.Mint import Mint
 </pre></div>
@@ -149,13 +148,14 @@ Before you modify the code please reach out to us using the <a class="reference 
 </div>
 <p>This version of the class is designed specifically for use in Jupyter notebooks and includes additional functions. Once you have imported the appropriate version of the class, you can create an instance of the Mint class and use its methods to process your data.</p>
 <section id="ms-mint-in-jupyterlab-or-the-jupyter-notebook">
-<h2>ms-mint in JupyterLab, or the Jupyter Notebook<a class="headerlink" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook" title="Permalink to this heading"></a></h2>
+<h3>ms-mint in JupyterLab, or the Jupyter Notebook<a class="headerlink" href="#ms-mint-in-jupyterlab-or-the-jupyter-notebook" title="Permalink to this heading"></a></h3>
 <p>In the JupyterLab you would first instantiate the main class and then load a number of mass-spectrometry (MS) files and a target list.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>%pylab inline
 from ms_mint.notebook import Mint
 mint = Mint()
 </pre></div>
 </div>
+</section>
 </section>
 <section id="data-extraction">
 <h2>Data extraction<a class="headerlink" href="#data-extraction" title="Permalink to this heading"></a></h2>
@@ -310,11 +310,10 @@ mint.plot.peak_shapes(col_wrap=3)
 </div>
 <p><img alt="" src="notebooks/pca-pairplot.png" /></p>
 </section>
-</section>
 <section id="faq">
-<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this heading"></a></h1>
+<h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this heading"></a></h2>
 <section id="what-is-a-target-list">
-<h2>What is a target list<a class="headerlink" href="#what-is-a-target-list" title="Permalink to this heading"></a></h2>
+<h3>What is a target list<a class="headerlink" href="#what-is-a-target-list" title="Permalink to this heading"></a></h3>
 <p>A target list is a pandas dataframe with specific columns.</p>
 <ul class="simple">
 <li><p><strong>peak_label</strong>: string, Label of the peak (must be unique).</p></li>
@@ -330,13 +329,13 @@ mint.plot.peak_shapes(col_wrap=3)
 <p>The target list can be stored as csv or Excel file.</p>
 </section>
 <section id="what-input-files-can-be-used">
-<h2>What input files can be used<a class="headerlink" href="#what-input-files-can-be-used" title="Permalink to this heading"></a></h2>
+<h3>What input files can be used<a class="headerlink" href="#what-input-files-can-be-used" title="Permalink to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">ms_mint</span></code> can be used with <code class="docutils literal notranslate"><span class="pre">mzXML</span></code>, <code class="docutils literal notranslate"><span class="pre">mzML</span></code>, <code class="docutils literal notranslate"><span class="pre">mzMLb</span></code> and experimental formats in <code class="docutils literal notranslate"><span class="pre">.feather</span></code> and <code class="docutils literal notranslate"><span class="pre">.parquet</span></code> format.</p>
 </section>
 <section id="which-properties-does-ms-mint-extract">
-<h2>Which properties does ms-mint extract<a class="headerlink" href="#which-properties-does-ms-mint-extract" title="Permalink to this heading"></a></h2>
+<h3>Which properties does ms-mint extract<a class="headerlink" href="#which-properties-does-ms-mint-extract" title="Permalink to this heading"></a></h3>
 <section id="parameters-from-target-list">
-<h3>Parameters from target list<a class="headerlink" href="#parameters-from-target-list" title="Permalink to this heading"></a></h3>
+<h4>Parameters from target list<a class="headerlink" href="#parameters-from-target-list" title="Permalink to this heading"></a></h4>
 <ul class="simple">
 <li><p><strong>ms_file</strong>: Filename of MS-file</p></li>
 <li><p><strong>peak_label</strong>: From target list</p></li>
@@ -352,7 +351,7 @@ mint.plot.peak_shapes(col_wrap=3)
 </section>
 <hr class="docutils" />
 <section id="results-columns">
-<h3>Results columns<a class="headerlink" href="#results-columns" title="Permalink to this heading"></a></h3>
+<h4>Results columns<a class="headerlink" href="#results-columns" title="Permalink to this heading"></a></h4>
 <ul class="simple">
 <li><p><strong>peak_area</strong>: The sum of all intensities in the extraction window</p></li>
 <li><p><strong>peak_area_top3</strong>: The average of the 3 largest intensities in the extraction window</p></li>
@@ -378,12 +377,13 @@ mint.plot.peak_shapes(col_wrap=3)
 </section>
 <hr class="docutils" />
 <section id="release-notes">
-<h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<h2>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h2>
 <section id="milestones">
-<h2>0.2.0 Milestones<a class="headerlink" href="#milestones" title="Permalink to this heading"></a></h2>
+<h3>0.2.0 Milestones<a class="headerlink" href="#milestones" title="Permalink to this heading"></a></h3>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- peak_area_top3 comparable to El-Maven PeakAreaTop values
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
