@@ -194,7 +194,7 @@
 <p>Main module of the ms-mint library.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ms_mint.Mint.Mint">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.Mint.</span></span><span class="sig-name descname"><span class="pre">Mint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ms_mint.Mint.</span></span><span class="sig-name descname"><span class="pre">Mint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Main class of the ms_mint package, which processes metabolomics files.</p>
 <dl class="field-list simple">
@@ -377,20 +377,6 @@ The values in the cells are determined by <em>col_name</em>.</p>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="ms_mint.Mint.Mint.progress_callback">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">progress_callback</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.progress_callback" title="Permalink to this definition"></a></dt>
-<dd><p>Assigns a callback function to update a progress bar.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Getter<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Returns the current callback function.</p>
-</dd>
-<dt class="field-even">Setter<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sets the callback function.</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.Mint.Mint.reset">
 <span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/Mint.html#Mint.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.Mint.Mint.reset" title="Permalink to this definition"></a></dt>
@@ -437,9 +423,9 @@ The values in the cells are determined by <em>col_name</em>.</p>
 * None - Run with min</em><em>(</em><em>n_cpus</em><em>, </em><em>c_files</em><em>) </em><em>CPUs
 * 1: Run without multiprocessing on one CPU
 * &gt;1: Run with multiprocessing enabled using nthreads threads.</em>) – Number of cores to use, defaults to None</p></li>
-<li><p><strong>mode</strong> (<em>str</em>) – Compute mode (‘standard’ or ‘express’), defaults to ‘standard’
-* ‘standard’: calculates peak shaped projected to RT dimension
-* ‘express’: omits calculation of other features, only peak_areas</p></li>
+<li><p><strong>mode</strong> (<em>str
+* 'standard': calculates peak shaped projected to RT dimension
+* 'express': omits calculation</em><em> of </em><em>other features</em><em>, </em><em>only peak_areas</em>) – Compute mode (‘standard’ or ‘express’), defaults to ‘standard’</p></li>
 <li><p><strong>fn</strong> (<em>str</em>) – Output filename to not keep results in memory.</p></li>
 <li><p><strong>kwargs</strong> – Arguments passed to the procesing function.</p></li>
 </ul>
@@ -478,29 +464,6 @@ The values in the cells are determined by <em>col_name</em>.</p>
 <dd class="field-even"><p></p></dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>targets</strong> (<em>pandas.DataFrame</em>) – Sets the target list of the instance.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="ms_mint.Mint.Mint.verbose">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">verbose</span></span><a class="headerlink" href="#ms_mint.Mint.Mint.verbose" title="Permalink to this definition"></a></dt>
-<dd><p>Get/set verbosity.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Getter<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Get current verbosity.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True or False</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-<dt class="field-even">Setter<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sets verbosity.</p>
-</dd>
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<em>bool</em>) – True or False</p>
 </dd>
 </dl>
 </dd></dl>

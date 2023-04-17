@@ -153,10 +153,10 @@
 
     <span class="n">set_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">df</span><span class="o">.</span><span class="n">scan_id</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">scan_id</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="k">assert</span> <span class="n">df</span><span class="o">.</span><span class="n">intensity</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">intensity</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="k">assert</span> <span class="n">df</span><span class="o">.</span><span class="n">mz</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">mz</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="k">assert</span> <span class="n">df</span><span class="o">.</span><span class="n">scan_time</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">scan_time</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="c1"># assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype</span>
+    <span class="c1"># assert df.intensity.dtype == np.int64, df.intensity.dtype</span>
+    <span class="c1"># assert df.mz.dtype == np.float64, df.mz.dtype</span>
+    <span class="c1"># assert df.scan_time.dtype == np.float64, df.scan_time.dtype</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
 
@@ -192,31 +192,21 @@
 
     <span class="c1"># Convert retention time to seconds</span>
     <span class="k">if</span> <span class="n">time_unit_in_file</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mf">60.0</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mf">60.0</span>
 
-    <span class="c1"># Rename columns and reorder</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;num&quot;</span><span class="p">:</span> <span class="s2">&quot;scan_id&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;msLevel&quot;</span><span class="p">:</span> <span class="s2">&quot;ms_level&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;retentionTime&quot;</span><span class="p">:</span> <span class="s2">&quot;scan_time&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;m_z_array&quot;</span><span class="p">:</span> <span class="s2">&quot;mz&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;intensity_array&quot;</span><span class="p">:</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s2">&quot;mz&quot;</span><span class="p">,</span> <span class="s2">&quot;intensity&quot;</span><span class="p">])</span>
     <span class="n">set_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span></div>
 
 
 <span class="k">def</span> <span class="nf">_extract_mzxml</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;num&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;msLevel&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;msLevel&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;scan_id&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;ms_level&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;msLevel&quot;</span><span class="p">],</span>
         <span class="s2">&quot;polarity&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;retentionTime&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;m_z_array&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;m/z array&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="s2">&quot;intensity_array&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;intensity array&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s2">&quot;scan_time&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;mz&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;m/z array&quot;</span><span class="p">]),</span>
+        <span class="s2">&quot;intensity&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;intensity array&quot;</span><span class="p">]),</span>
     <span class="p">}</span>
 
 
@@ -280,10 +270,19 @@
 
 
 <div class="viewcode-block" id="set_dtypes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.io.set_dtypes">[docs]</a><span class="k">def</span> <span class="nf">set_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;mz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;mz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span></div>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">mz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="n">ms_level</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+        <span class="n">scan_time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+        <span class="n">intensity</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">dtype</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <span class="k">def</span> <span class="nf">_extract_mzml</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">):</span>
