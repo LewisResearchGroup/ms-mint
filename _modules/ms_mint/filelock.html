@@ -121,13 +121,6 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">fcntl</span> <span class="o">=</span> <span class="kc">None</span>
 
-
-<span class="c1"># Backward compatibility</span>
-<span class="c1"># ------------------------------------------------</span>
-<span class="k">if</span> <span class="s1">&#39;TimeoutError&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
-    <span class="ne">TimeoutError</span> <span class="o">=</span> <span class="ne">OSError</span>
-
-
 <span class="c1"># Data</span>
 <span class="c1"># ------------------------------------------------</span>
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
