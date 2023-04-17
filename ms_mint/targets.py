@@ -246,7 +246,7 @@ class TargetOptimizer:
         minimum_intensity=1e4,
         plot=False,
         sigma=20,
-        filter=None,
+        filters=None,
         post_opt=False,
         post_opt_kwargs=None,
         rel_height=0.9,
@@ -271,8 +271,8 @@ class TargetOptimizer:
         :type plot: bool, optional
         :param sigma: Sigma value for peak selection, defaults to 20
         :type sigma: float, optional
-        :param filter: Filter instances to apply in respective order, defaults to None
-        :type filter: ms_mint.filter.Filter, optional
+        :param filters: Filter instances to apply in respective order, defaults to None
+        :type filters: ms_mint.filters.Filter, optional
         :param post_opt: Optimize retention times after peak selection, defaults to False
         :type post_opt: bool, optional
         :param post_opt_kwargs: _description_, defaults to 20
@@ -312,7 +312,7 @@ class TargetOptimizer:
             _slice = extract_chromatogram_from_ms1(ms1, mz).groupby("scan_time").sum()
 
             chrom = Chromatogram(
-                _slice.index, _slice.values, expected_rt=rt, filter=filter
+                _slice.index, _slice.values, expected_rt=rt, filters=filters
             )
 
             if chrom.x.max() < minimum_intensity:
@@ -321,7 +321,7 @@ class TargetOptimizer:
                 )
                 continue
 
-            chrom.apply_filter()
+            chrom.apply_filters()
             chrom.find_peaks(rel_height=rel_height)
             chrom.select_peak_with_gaussian_weight(rt, sigma)
 
