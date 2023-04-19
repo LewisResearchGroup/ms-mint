@@ -49,7 +49,7 @@ class Smoother:
     averages.
     """
 
-    def __init__(self, windows=[30, 20]):
+    def __init__(self, windows=None):
         """
         Filter for time series that smoothes the
         x values by running one or more rolling
@@ -58,6 +58,8 @@ class Smoother:
         :param windows: Window sizes of rolling averages applied to time series, defaults to [30, 20]
         :type windows: : List[int], optional
         """
+        if windows is None:
+            windows = [30, 20]
         self.windows = windows
         self.name = "smoother"
 

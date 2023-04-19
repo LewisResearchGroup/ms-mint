@@ -167,5 +167,5 @@ class PCA_Plotter:
         fig = ff.create_scatterplotmatrix(df, index=color_col, **kwargs)
         # set the legendgroup equal to the marker color
         for t in fig.data:
-            t.legendgroup=t.marker.color
+            t.legendgroup = t.marker.color
         return fig

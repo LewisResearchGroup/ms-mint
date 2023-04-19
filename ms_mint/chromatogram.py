@@ -6,13 +6,13 @@ from matplotlib import pyplot as plt
 
 from .tools import find_peaks_in_timeseries, gaussian, mz_mean_width_to_min_max
 from .io import ms_file_to_df
-from .filter import Resampler, Smoother, GaussFilter
+from .filters import Resampler, Smoother, GaussFilter
 from .matplotlib_tools import plot_peaks
 
 
 class Chromatogram:
     def __init__(
-        self, scan_times=None, intensities=None, filter=None, expected_rt=None
+        self, scan_times=None, intensities=None, filters=None, expected_rt=None
     ):
         self.t = np.array([0])
         self.x = np.array([0])
@@ -21,10 +21,10 @@ class Chromatogram:
         if intensities is not None:
             self.x = np.append(self.x, intensities)
         self.noise_level = None
-        if filter is None:
-            self.filter = [Resampler(), GaussFilter(), Smoother()]
+        if filters is None:
+            self.filters = [Resampler(), GaussFilter(), Smoother()]
         else:
-            self.filter = filter
+            self.filters = filters
         self.peaks = None
         self.selected_peak_ndxs = None
         if expected_rt is None and scan_times is not None:
@@ -43,8 +43,8 @@ class Chromatogram:
         data = pd.Series(index=self.t, data=self.x)
         self.noise_level = data.rolling(window, center=True).std().median()
 
-    def apply_filter(self):
-        for filt in self.filter:
+    def apply_filters(self):
+        for filt in self.filters:
             self.t, self.x = filt.transform(self.t, self.x)
 
     def find_peaks(self, prominence=None, rel_height=0.9):
@@ -80,7 +80,6 @@ class Chromatogram:
             plt.show()
 
         for ndx, row in peaks.iterrows():
-
             new_rt_min = row.rt_min
             new_rt_max = row.rt_max
 
@@ -130,7 +129,7 @@ class Chromatogram:
 
     @property
     def selected_peaks(self):
-        self.peaks.loc[self.selected_peak_ndxs]
+        return self.peaks.loc[self.selected_peak_ndxs]
 
     @property
     def data(self):
