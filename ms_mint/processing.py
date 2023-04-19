@@ -36,7 +36,6 @@ def process_ms1_files_in_parallel(args):
     """
     Pickleable function for (parallel) peak integration.
     """
-
     filename = args["filename"]
     targets = args["targets"]
     output_fn = args["output_fn"]
@@ -50,6 +49,8 @@ def process_ms1_files_in_parallel(args):
     except Exception as e:
         logging.error(f"process_ms1_files_in_parallel(): {e}")
         results = pd.DataFrame()
+
+    print(len(results))
 
     if (output_fn is not None) and (len(results) > 0):
         append_results(results, output_fn)
@@ -89,6 +90,7 @@ def process_ms1_file(filename, targets):
     results["ms_path"] = os.path.dirname(filename)
     results["ms_file_size"] = os.path.getsize(filename) / 1024 / 1024
     results["peak_score"] = score_peaks(results)
+    print(results)
     return results[MINT_RESULTS_COLUMNS]
 
 
@@ -120,8 +122,6 @@ def _process_ms1_from_df_(df, targets):
         "peak_label",
     ]
     array_peaks = targets[peak_cols].values
-    # if "ms_level" in df.columns:
-    #    df = df[df.ms_level == 1]
     array_data = df[["scan_time", "mz", "intensity"]].values
     result = process_ms1_from_numpy(array_data, array_peaks)
     return result
@@ -139,7 +139,7 @@ def process_ms1_from_numpy(array, peaks):
     :rtype: list
     """
     results = []
-    for (mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label) in peaks:
+    for mz_mean, mz_width, rt_min, rt_max, intensity_threshold, peak_label in peaks:
         props = _process_ms1_from_numpy(
             array,
             mz_mean=mz_mean,
@@ -190,6 +190,15 @@ def extract_ms1_properties(array, mz_mean):
     int_list_to_comma_sep_str = lambda x: ",".join([str(int(i)) for i in x])
 
     projection = pd.DataFrame(array[:, [0, 2]], columns=["rt", "int"])
+
+    print("DEBUG extract_ms1_properties")
+    print(array)
+    print(array.dtype)
+    print(array.shape)
+    print(len(projection))
+    print(projection)
+    print(projection.dtypes)
+
     projection["rt"] = projection["rt"].round(2)
     projection["int"] = projection["int"].astype(int)
     projection = projection.groupby("rt").max().reset_index().values
@@ -252,7 +261,7 @@ def extract_ms1_properties(array, mz_mean):
     peak_shape_int = int_list_to_comma_sep_str(projection[:, 1])
 
     # Check that peak projection arrays (rt, int) have same number of elements
-    assert len(peak_shape_rt.split(',')) == len(peak_shape_int.split(','))
+    assert len(peak_shape_rt.split(",")) == len(peak_shape_int.split(","))
 
     return dict(
         peak_area=peak_area,

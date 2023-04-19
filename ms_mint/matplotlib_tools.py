@@ -192,7 +192,7 @@ def plot_peak_shapes(
 
     dfs = []
     for peak_label in peak_labels:
-        for ndx, row in R[
+        for _, row in R[
             (R.peak_label == peak_label) & (R.peak_n_datapoints > 1)
         ].iterrows():
             peak_rt = [float(i) for i in row.peak_shape_rt.split(",")]
@@ -200,7 +200,7 @@ def plot_peak_shapes(
             ms_file = row.ms_file
             mz = row.mz_mean
             rt = row.rt
-            
+
             df = pd.DataFrame(
                 {
                     "Scan time [s]": peak_rt,
@@ -265,7 +265,7 @@ def plot_peaks(
         )
         for i, (
             ndx,
-            (_, rt, rt_span, peak_base_height, peak_height, rt_min, rt_max),
+            (_, _, _, peak_base_height, _, rt_min, rt_max),
         ) in enumerate(peaks.iterrows()):
             if ndx in highlight:
                 plt.axvspan(rt_min, rt_max, color="green", alpha=0.25, label="Selected")
@@ -302,7 +302,6 @@ def plot_metabolomics_hist2d(
     mz_bins=100,
     **kwargs,
 ):
-
     if set_dim:
         plt.figure(figsize=figsize, dpi=dpi)
 
