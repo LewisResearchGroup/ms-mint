@@ -136,8 +136,8 @@
     <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="c1"># Compatibility with old schema</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">read_only</span><span class="p">:</span>
+        <span class="c1"># Compatibility with old schema</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;retentionTime&quot;</span><span class="p">:</span> <span class="s2">&quot;scan_time&quot;</span><span class="p">,</span>
@@ -145,8 +145,8 @@
                 <span class="s2">&quot;m/z array&quot;</span><span class="p">:</span> <span class="s2">&quot;mz&quot;</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="p">)</span>
-
-    <span class="n">set_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="c1"># Set datatypes</span>
+        <span class="n">set_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
     <span class="c1"># assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype</span>
     <span class="c1"># assert df.intensity.dtype == np.int64, df.intensity.dtype</span>
@@ -210,7 +210,7 @@
     <span class="k">return</span> <span class="n">mzml_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mzml_to_df"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.io.mzml_to_df">[docs]</a><span class="k">def</span> <span class="nf">mzml_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="mzml_to_df"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.io.mzml_to_df">[docs]</a><span class="k">def</span> <span class="nf">mzml_to_df</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads mzML file and returns a pandas.DataFrame</span>
 <span class="sd">    using the mzML library.</span>
@@ -225,16 +225,20 @@
 
     <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzml&quot;</span><span class="p">),</span> <span class="n">fn</span>
 
-    <span class="c1"># Read mzML file using pyteomics</span>
+  <span class="c1"># Read mzML file using pyteomics</span>
     <span class="k">with</span> <span class="n">mzml</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">))</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
         <span class="c1"># Initialize empty lists for the slices and the attributes</span>
         <span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="c1"># Loop through the spectra and extract the data</span>
         <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">time_unit</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="s1">&#39;scanList&#39;</span><span class="p">][</span><span class="s1">&#39;scan&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;scan start time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unit_info</span>
+            <span class="k">if</span> <span class="n">read_only</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="c1"># Extract the scan ID, retention time, m/z values, and intensity values</span>
             <span class="n">scan_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;scan=&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">rt</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">][</span><span class="s2">&quot;scan&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scan start time&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">time_unit</span> <span class="o">==</span> <span class="s1">&#39;minute&#39;</span><span class="p">:</span>
+                <span class="n">rt</span> <span class="o">=</span> <span class="n">rt</span> <span class="o">*</span> <span class="mf">60.</span>
             <span class="n">mz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;m/z array&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
             <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;intensity array&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;positive scan&quot;</span> <span class="ow">in</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -256,7 +260,8 @@
                     <span class="p">}</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-
+    <span class="k">if</span> <span class="n">read_only</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -281,13 +286,7 @@
 
 
 <span class="k">def</span> <span class="nf">_extract_mzml</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">):</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">RT</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">time_unit</span> <span class="o">==</span> <span class="s2">&quot;seconds&quot;</span><span class="p">:</span>
-            <span class="n">RT</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">scan_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">time_unit</span> <span class="o">==</span> <span class="s2">&quot;minutes&quot;</span><span class="p">:</span>
-            <span class="n">RT</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">scan_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">60.0</span>
+    <span class="n">RT</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span> <span class="o">*</span> <span class="mi">60</span>
     <span class="n">peaks</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">peaks</span><span class="p">(</span><span class="s2">&quot;centroided&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;scan_id&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
@@ -344,6 +343,7 @@
             <span class="p">}</span>
         <span class="p">)</span>
     <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">]</span><span class="o">*</span><span class="mi">60</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">intensity</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span>
@@ -369,10 +369,9 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">extract_mzmlb</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-
     <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;retentionTime&quot;</span><span class="p">])</span>
         <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">explode</span><span class="p">)</span>
         <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="o">.</span><span class="n">rename</span><span class="p">(</span>
@@ -386,6 +385,8 @@
         <span class="p">)</span>
     <span class="p">)</span>
 
+    <span class="c1"># mzMLb starts scan index with 0</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">df</span></div>
@@ -393,7 +394,7 @@
 
 <span class="k">def</span> <span class="nf">_extract_mzmlb</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;ms level&quot;</span><span class="p">,</span> <span class="s2">&quot;retentionTime&quot;</span><span class="p">,</span> <span class="s2">&quot;m/z array&quot;</span><span class="p">,</span> <span class="s2">&quot;intensity array&quot;</span><span class="p">]</span>
-    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">][</span><span class="s2">&quot;scan&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scan start time&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">60</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">][</span><span class="s2">&quot;scan&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scan start time&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">60</span>
     <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">}</span>
 
 
