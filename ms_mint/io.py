@@ -65,8 +65,8 @@ def ms_file_to_df(fn, read_only: bool = False):
     except IndexError as e:
         logging.warning(f"{e}: {fn}")
         return None
-    # Compatibility with old schema
     if not read_only:
+        # Compatibility with old schema
         df = df.rename(
             columns={
                 "retentionTime": "scan_time",
@@ -74,8 +74,8 @@ def ms_file_to_df(fn, read_only: bool = False):
                 "m/z array": "mz",
             }
         )
-
-    set_dtypes(df)
+        # Set datatypes
+        set_dtypes(df)
 
     # assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype
     # assert df.intensity.dtype == np.int64, df.intensity.dtype
@@ -139,7 +139,7 @@ def mzml_to_pandas_df_pyteomics(fn, **kwargs):
     return mzml_to_df(fn, **kwargs)
 
 
-def mzml_to_df(fn, time_unit="seconds", read_only=False):
+def mzml_to_df(fn, read_only=False):
     """
     Reads mzML file and returns a pandas.DataFrame
     using the mzML library.
@@ -154,16 +154,20 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
 
     assert str(fn).lower().endswith(".mzml"), fn
 
-    # Read mzML file using pyteomics
+  # Read mzML file using pyteomics
     with mzml.read(str(fn)) as reader:
         # Initialize empty lists for the slices and the attributes
         slices = []
-
         # Loop through the spectra and extract the data
         for spectrum in reader:
+            time_unit = spectrum['scanList']['scan'][0]['scan start time'].unit_info
+            if read_only:
+                continue
             # Extract the scan ID, retention time, m/z values, and intensity values
             scan_id = int(spectrum["id"].split("scan=")[-1])
             rt = spectrum["scanList"]["scan"][0]["scan start time"]
+            if time_unit == 'minute':
+                rt = rt * 60.
             mz = np.array(spectrum["m/z array"], dtype=np.float64)
             intensity = np.array(spectrum["intensity array"], dtype=np.float64)
             if "positive scan" in spectrum.keys():
@@ -185,7 +189,8 @@ def mzml_to_df(fn, time_unit="seconds", read_only=False):
                     }
                 )
             )
-
+    if read_only:
+        return None
     df = pd.concat(slices)
     df["intensity"] = df["intensity"].astype(int)
     df = df[MS_FILE_COLUMNS].reset_index(drop=True)
@@ -210,13 +215,7 @@ def set_dtypes(df):
 
 
 def _extract_mzml(data, time_unit):
-    try:
-        RT = data.scan_time_in_minutes()
-    except Exception:
-        if time_unit == "seconds":
-            RT = data.scan_time[0]
-        elif time_unit == "minutes":
-            RT = data.scan_time[0] * 60.0
+    RT = data.scan_time_in_minutes() * 60
     peaks = data.peaks("centroided")
     return {
         "scan_id": data["id"],
@@ -273,6 +272,7 @@ def format_thermo_raw_file_reader_parquet(df):
             }
         )
     )
+    df["scan_time"] = df["scan_time"]*60
     df["polarity"] = None
     df["intensity"] = df.intensity.astype(np.float64)
     df = df[MS_FILE_COLUMNS]
@@ -298,10 +298,9 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
         return None
 
     data = list(extract_mzmlb(data))
-
     df = (
         pd.DataFrame.from_dict(data)
-        .set_index("retentionTime")
+        .set_index(["index", "retentionTime"])
         .apply(pd.Series.explode)
         .reset_index()
         .rename(
@@ -315,6 +314,8 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
         )
     )
 
+    # mzMLb starts scan index with 0
+    df["scan_id"] = df["scan_id"] + 1
     df["polarity"] = None
     df = df[MS_FILE_COLUMNS]
     return df
@@ -322,7 +323,7 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
 
 def _extract_mzmlb(data):
     cols = ["index", "ms level", "retentionTime", "m/z array", "intensity array"]
-    data["retentionTime"] = data["scanList"]["scan"][0]["scan start time"] / 60
+    data["retentionTime"] = data["scanList"]["scan"][0]["scan start time"] * 60
     return {c: data[c] for c in cols}
 
 
