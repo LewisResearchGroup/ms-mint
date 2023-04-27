@@ -31,6 +31,8 @@ install_reqs = [
     "openpyxl",
     "pyarrow",
     "tables",
+    "h5py",
+    "hdf5plugin"
 ]
 
 
