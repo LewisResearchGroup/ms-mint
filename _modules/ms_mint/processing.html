@@ -121,8 +121,6 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;process_ms1_files_in_parallel(): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
-
     <span class="k">if</span> <span class="p">(</span><span class="n">output_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
         <span class="n">append_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">output_fn</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -161,7 +159,6 @@
     <span class="n">results</span><span class="p">[</span><span class="s2">&quot;ms_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">results</span><span class="p">[</span><span class="s2">&quot;ms_file_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span>
     <span class="n">results</span><span class="p">[</span><span class="s2">&quot;peak_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">score_peaks</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="n">MINT_RESULTS_COLUMNS</span><span class="p">]</span></div>
 
 
@@ -261,14 +258,6 @@
     <span class="n">int_list_to_comma_sep_str</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
 
     <span class="n">projection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">array</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rt&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">])</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG extract_ms1_properties&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">projection</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">projection</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
 
     <span class="n">projection</span><span class="p">[</span><span class="s2">&quot;rt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">projection</span><span class="p">[</span><span class="s2">&quot;rt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">projection</span><span class="p">[</span><span class="s2">&quot;int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">projection</span><span class="p">[</span><span class="s2">&quot;int&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
