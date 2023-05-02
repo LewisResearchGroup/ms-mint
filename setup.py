@@ -36,6 +36,10 @@ install_reqs = [
 ]
 
 
+scripts = [
+    "scripts/ms-mint-convert.py"
+]
+
 config = {
     "name": "ms-mint",
     "version": versioneer.get_version(),
@@ -55,6 +59,7 @@ config = {
     "python_requires": ">=3.8",
     "install_requires": install_reqs,
     "include_package_data": True,
+    "scripts": scripts
 }
 
 
