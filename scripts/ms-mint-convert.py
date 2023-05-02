@@ -30,7 +30,7 @@ def convert(fn, fmt='parquet', output_directory=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", action="append")
+    parser.add_argument("-i", "--input", nargs="+", required=True)
     parser.add_argument("-o", "--output-directory")
     parser.add_argument("-f", "--format", choices=['parquet', 'feather'], default='parquet')
 
