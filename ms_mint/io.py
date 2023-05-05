@@ -316,7 +316,9 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
 
     # mzMLb starts scan index with 0
     df["scan_id"] = df["scan_id"] + 1
+    
     df["polarity"] = None
+    
     df = df[MS_FILE_COLUMNS]
     return df
 
