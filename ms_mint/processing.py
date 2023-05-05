@@ -50,8 +50,6 @@ def process_ms1_files_in_parallel(args):
         logging.error(f"process_ms1_files_in_parallel(): {e}")
         results = pd.DataFrame()
 
-    print(len(results))
-
     if (output_fn is not None) and (len(results) > 0):
         append_results(results, output_fn)
         return None
@@ -90,7 +88,6 @@ def process_ms1_file(filename, targets):
     results["ms_path"] = os.path.dirname(filename)
     results["ms_file_size"] = os.path.getsize(filename) / 1024 / 1024
     results["peak_score"] = score_peaks(results)
-    print(results)
     return results[MINT_RESULTS_COLUMNS]
 
 
@@ -190,14 +187,6 @@ def extract_ms1_properties(array, mz_mean):
     int_list_to_comma_sep_str = lambda x: ",".join([str(int(i)) for i in x])
 
     projection = pd.DataFrame(array[:, [0, 2]], columns=["rt", "int"])
-
-    print("DEBUG extract_ms1_properties")
-    print(array)
-    print(array.dtype)
-    print(array.shape)
-    print(len(projection))
-    print(projection)
-    print(projection.dtypes)
 
     projection["rt"] = projection["rt"].round(2)
     projection["int"] = projection["int"].astype(int)

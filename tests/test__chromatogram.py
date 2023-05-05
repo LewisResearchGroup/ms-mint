@@ -172,12 +172,14 @@ def test__Chromatogram__plot_runs_without_error_return_figure():
 
 
 def test__Chromatogram_from_files_runs_through():
+    print(TEST_MZML)
     chrom = Chromatogram()
     chrom.from_file(TEST_MZML, mz_mean=101.024323, mz_width=10)
     chrom.apply_filters()
     chrom.find_peaks()
     chrom.select_peak_by_highest_intensity()
     peaks = chrom.selected_peak_ndxs
+
 
     print(chrom.data)
     print(peaks)
