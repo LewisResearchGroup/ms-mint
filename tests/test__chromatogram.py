@@ -180,7 +180,6 @@ def test__Chromatogram_from_files_runs_through():
     chrom.select_peak_by_highest_intensity()
     peaks = chrom.selected_peak_ndxs
 
-
     print(chrom.data)
     print(peaks)
 
