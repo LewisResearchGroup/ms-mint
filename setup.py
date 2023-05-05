@@ -31,8 +31,14 @@ install_reqs = [
     "openpyxl",
     "pyarrow",
     "tables",
+    "h5py",
+    "hdf5plugin"
 ]
 
+
+scripts = [
+    "scripts/ms-mint-convert.py"
+]
 
 config = {
     "name": "ms-mint",
@@ -53,6 +59,7 @@ config = {
     "python_requires": ">=3.8",
     "install_requires": install_reqs,
     "include_package_data": True,
+    "scripts": scripts
 }
 
 
