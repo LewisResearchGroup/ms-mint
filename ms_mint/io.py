@@ -299,7 +299,7 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
     data = list(extract_mzmlb(data))
     df = (
         pd.DataFrame.from_dict(data)
-        .set_index(["index", "retentionTime"])
+        .set_index(["index", "retentionTime", "polarity"])
         .apply(pd.Series.explode)
         .reset_index()
         .rename(
@@ -315,14 +315,20 @@ def mzmlb_to_df__pyteomics(fn, read_only=False):
 
     # mzMLb starts scan index with 0
     df["scan_id"] = df["scan_id"] + 1
-    df["polarity"] = None
+    
     df = df[MS_FILE_COLUMNS]
     return df
 
 
 def _extract_mzmlb(data):
-    cols = ["index", "ms level", "retentionTime", "m/z array", "intensity array"]
+    cols = ["index", "ms level", "polarity", "retentionTime", "m/z array", "intensity array"]
     data["retentionTime"] = data["scanList"]["scan"][0]["scan start time"] * 60
+    if 'positive scan' in data.keys():
+        data["polarity"] = '+'
+    elif 'negative scan' in data.keys():
+        data["polarity"] = '-'
+    else:
+        data["polarity"] = None
     return {c: data[c] for c in cols}
 
 
