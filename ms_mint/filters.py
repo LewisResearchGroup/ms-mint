@@ -1,5 +1,5 @@
 import pandas as pd
-from scipy.ndimage import gaussian_m1d
+from scipy.ndimage import gaussian_filter1d
 
 
 class Resampler:
