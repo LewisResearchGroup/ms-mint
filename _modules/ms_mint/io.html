@@ -87,10 +87,9 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">pyteomics</span> <span class="kn">import</span> <span class="n">mzmlb</span>
-
     <span class="n">MZMLB_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cound not import pyteomics.mzmlb&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cound not import pyteomics.mzmlb:</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">MZMLB_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
 
 
@@ -371,7 +370,7 @@
     <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">extract_mzmlb</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
     <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;retentionTime&quot;</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;retentionTime&quot;</span><span class="p">,</span> <span class="s2">&quot;polarity&quot;</span><span class="p">])</span>
         <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">explode</span><span class="p">)</span>
         <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="o">.</span><span class="n">rename</span><span class="p">(</span>
@@ -388,15 +387,19 @@
     <span class="c1"># mzMLb starts scan index with 0</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">MS_FILE_COLUMNS</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
 <span class="k">def</span> <span class="nf">_extract_mzmlb</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;ms level&quot;</span><span class="p">,</span> <span class="s2">&quot;retentionTime&quot;</span><span class="p">,</span> <span class="s2">&quot;m/z array&quot;</span><span class="p">,</span> <span class="s2">&quot;intensity array&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;ms level&quot;</span><span class="p">,</span> <span class="s2">&quot;polarity&quot;</span><span class="p">,</span> <span class="s2">&quot;retentionTime&quot;</span><span class="p">,</span> <span class="s2">&quot;m/z array&quot;</span><span class="p">,</span> <span class="s2">&quot;intensity array&quot;</span><span class="p">]</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;retentionTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scanList&quot;</span><span class="p">][</span><span class="s2">&quot;scan&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scan start time&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="k">if</span> <span class="s1">&#39;positive scan&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;negative scan&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">}</span>
 
 
