@@ -16,10 +16,9 @@ from pyteomics import mzxml, mzml
 
 try:
     from pyteomics import mzmlb
-
     MZMLB_AVAILABLE = True
-except ImportError:
-    logging.warning("Cound not import pyteomics.mzmlb")
+except ImportError as e:
+    logging.warning(f"Cound not import pyteomics.mzmlb:\n{e}")
     MZMLB_AVAILABLE = False
 
 
