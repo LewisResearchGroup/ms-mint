@@ -7,8 +7,8 @@ pexpect
 decorator
 pillow
 lxml
-pandas>=1.4,<1.5
-matplotlib>=3.5,<3.6
+pandas>=2
+matplotlib #>=3.5,<3.6
 seaborn
 pyteomics
 scikit-learn
@@ -18,13 +18,14 @@ plotly
 colorlover
 tqdm
 ipywidgets
-ipyfilechooser
 openpyxl
 pyarrow
 tables
 h5py
+ipyfilechooser
 hdf5plugin
-
+nbformat>=4.2.0 
 sphinx
 sphinx-rtd-theme
 myst-parser
+psims

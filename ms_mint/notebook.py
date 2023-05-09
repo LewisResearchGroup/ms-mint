@@ -37,7 +37,6 @@ class Mint(_Mint_):
     """
 
     def __init__(self, *args, **kwargs):
-
         self.progress_callback = self._set_progress_
 
         super().__init__(progress_callback=self.progress_callback, *args, **kwargs)
@@ -107,7 +106,7 @@ class Mint(_Mint_):
         self.tqdm = tqdm
 
     def _load_target_from_bytes_(self, value):
-        for fn, data in value["new"].items():
+        for data in value["new"].values():
             self.load(io.BytesIO(data["content"]))
         self._message_(f"{len(self.targets)} targets loaded.")
 
@@ -142,7 +141,7 @@ class Mint(_Mint_):
         return self.layout
 
     def _run_(self, b=None, **kwargs):
-        self.message(f"Start processing...")
+        self.message("Start processing...")
         self.progress = 0
         self.run(**kwargs)
         self.message("...finished processing.")

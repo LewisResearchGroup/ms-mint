@@ -5,6 +5,7 @@ import numpy as np
 from pathlib import Path as P
 from multiprocessing import Pool
 from ms_mint import processing
+from ms_mint.io import ms_file_to_df
 from ms_mint.standards import MINT_RESULTS_COLUMNS
 from paths import TEST_MZXML
 
@@ -99,7 +100,19 @@ def test__slice_ms1_array():
     assert np.array_equal(result, expect)
 
 
-def test__process_ms1_from_numpy():
+def test_process_ms1_from_numpy():
+    """
+    Test the processing of MS1 data from a numpy array.
+
+    The function processes an array of MS1 data and returns a list of
+    tuples containing the peak label, maximum intensity, apex RT, start
+    RT, end RT, intensity at start RT, intensity at end RT, mz, and
+    other fields.
+
+    :return: None
+    :rtype: None
+    """
+
     array = np.array([[1, 100, 2], [2, 200, 3], [3, 300, 7]])
 
     targets = [(100, 10, 0.5, 1.5, 0, "A"), (200, 10, 1.5, 2.5, 0, "B")]
@@ -127,30 +140,41 @@ def test__extract_chromatogram_from_ms1():
     assert result.equals(expected)
 
 
-def test__run_parallel(tmp_path):
+def test_run_parallel(tmp_path):
+    """
+    Test running parallel processing of multiple MS files and storing the results in a CSV file.
 
+    :param tmp_path: A temporary directory created by pytest.
+    :type tmp_path: py.path.local
+    """
+
+    # Define test targets
     targets = pd.DataFrame(
         {
             "peak_label": ["A"],
             "mz_mean": [128.034],
             "mz_width": [100],
             "intensity_threshold": [0],
-            "rt_min": [286 / 60],
-            "rt_max": [330 / 60],
-            "rt": [300 / 60],
+            "rt_min": [0],
+            "rt_max": [700],
+            "rt": [150],
+            "rt_unit": ["s"],
             "target_filename": ["unknown"],
         }
     )
 
+    # Initialize multiprocessing pool
     pool = Pool(processes=2, maxtasksperchild=None)
 
-    N = 4
-    fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(N)]
-
-    args_list = []
+    # Generate test MS files
+    n_files = 4
+    fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(n_files)]
     for fn in fns:
         os.symlink(TEST_MZXML, fn)
 
+    # Generate list of arguments for parallel processing
+    args_list = []
+    for fn in fns:
         args = {
             "filename": fn,
             "targets": targets,
@@ -158,20 +182,36 @@ def test__run_parallel(tmp_path):
             "mode": None,
             "output_fn": None,
         }
-
         args_list.append(args)
 
+    # Run parallel processing
     results = pool.map_async(processing.process_ms1_files_in_parallel, args_list)
-
     pool.close()
     pool.join()
 
+    # Concatenate results
     result = pd.concat(results.get())
+
+    # Print info for debugging
+    print(targets)
+    print(fns)
     print(result)
+    print(result.shape)
+    print(ms_file_to_df(fn))
+
+    # Assert that the results have the expected length
+    assert len(result) == n_files * len(targets)
 
 
 def test__run_parallel_with_output_filename(tmp_path):
+    """
+    Test for running parallel processing of multiple MS files and storing the results in a CSV file.
 
+    :param tmp_path: A temporary directory created by pytest.
+    :type tmp_path: py.path.local
+    """
+
+    # Create targets DataFrame
     targets = pd.DataFrame(
         {
             "peak_label": ["A"],
@@ -186,15 +226,15 @@ def test__run_parallel_with_output_filename(tmp_path):
         }
     )
 
+    # Set up multiprocessing pool
     pool = Pool(processes=2, maxtasksperchild=None)
 
     N = 4
     fns = [P(tmp_path) / f"File-{i}.mzXML" for i in range(N)]
     output_fn = P(tmp_path) / "results.csv"
 
+    # Create argument list and symlink test MS files
     args_list = []
-    # Create files in tmp_path and add
-    # parameters to argument list.
     for fn in fns:
         os.symlink(TEST_MZXML, fn)
 
@@ -206,6 +246,11 @@ def test__run_parallel_with_output_filename(tmp_path):
             "output_fn": output_fn,
         }
 
+        # Print some info for debugging
+        print(fn)
+        print(ms_file_to_df(fn).head())
+        print(ms_file_to_df(fn).tail())
+        print("*" * 80)
         args_list.append(args)
 
     # Prepare output file (only headers)
@@ -219,11 +264,16 @@ def test__run_parallel_with_output_filename(tmp_path):
 
     returned_results = results.get()
 
+    print(returned_results)
+
     # Expect all returned results to be None
-    assert all([i is None for i in returned_results]), returned_results
+    assert all(e is None for e in returned_results), returned_results
 
     # All results should be stored in the output file
     assert output_fn.is_file()
 
     stored_results = pd.read_csv(output_fn)
+    print("=" * 80)
+    print(output_fn)
+    print(stored_results)
     assert len(stored_results) == N * len(targets)

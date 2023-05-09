@@ -93,7 +93,6 @@ def test__scale_dataframe_robust():
 
 
 def test__df_diff():
-
     df1 = pd.DataFrame(
         {"A": [1, 1, 0, 0, 2], "B": [1, 0, 0, 1, 2]}, index=[1, 2, 3, 4, 5]
     )
@@ -119,7 +118,6 @@ def test__df_diff():
 
 
 def test__is_ms_file():
-
     pos = [
         "file.mzML",
         "path/file.mzML",
