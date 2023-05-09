@@ -228,7 +228,8 @@ def mz_mean_width_to_min_max(mz_mean, mz_width):
 
 def init_metadata():
     cols = [
-        'ms_file_label',  
+        'ms_file_label',
+        'ms_file',
         'label', 
         'group', 
         'type',

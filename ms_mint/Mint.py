@@ -501,10 +501,16 @@ class Mint(object):
             fns = self.ms_files
 
         if isinstance(fns, tuple):
-            fns = list(fns)
+            fns = list(fns)     
 
         if not isinstance(fns, list):
             fns = [fns]
+
+        labels = [fn_to_label(fn) for fn in fns]
+
+        # Need to get the actual file names with path
+        # in case only ms_file_labels are provided
+        fns = [fn for fn in self.ms_files if fn_to_label(fn) in labels]
 
         if peak_label is None:
             peak_label = self.peak_labels
