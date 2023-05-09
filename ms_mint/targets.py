@@ -190,9 +190,9 @@ def gen_target_grid(masses, dt, rt_max=10, mz_ppm=10, intensity_threshold=0):
     targets.columns = ["mz_mean", "rt_min"]
     targets["rt_max"] = targets.rt_min + (1 * dt)
     targets["peak_label"] = (
-        targets.mz_mean.apply(lambda x: "{:.3f}".format(x))
+        targets.mz_mean.apply("{:.3f}".format)
         + "__"
-        + targets.rt_min.apply(lambda x: "{:2.2f}".format(x))
+        + targets.rt_min.apply("{:2.2f}".format)
     )
     targets["mz_width"] = mz_ppm
     targets["intensity_threshold"] = intensity_threshold
@@ -246,14 +246,13 @@ class TargetOptimizer:
         minimum_intensity=1e4,
         plot=False,
         sigma=20,
-        filter=None,
+        filters=None,
         post_opt=False,
         post_opt_kwargs=None,
         rel_height=0.9,
         height=3,
         aspect=2,
         col_wrap=3,
-        verbose=False,
         **kwargs,
     ):
         """
@@ -272,8 +271,8 @@ class TargetOptimizer:
         :type plot: bool, optional
         :param sigma: Sigma value for peak selection, defaults to 20
         :type sigma: float, optional
-        :param filter: Filter instances to apply in respective order, defaults to None
-        :type filter: ms_mint.filter.Filter, optional
+        :param filters: Filter instances to apply in respective order, defaults to None
+        :type filters: ms_mint.filters.Filter, optional
         :param post_opt: Optimize retention times after peak selection, defaults to False
         :type post_opt: bool, optional
         :param post_opt_kwargs: _description_, defaults to 20
@@ -291,17 +290,8 @@ class TargetOptimizer:
         if peak_labels is None:
             peak_labels = targets.peak_label.values
 
-        if verbose:
-            print(targets)
-            print(fns)
-            print(peak_labels)
-
         _targets = targets.set_index("peak_label").copy()
 
-        if verbose:
-            print(_targets)
-
-        print("Reading files...")
         ms1 = pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)]).sort_values(
             ["scan_time", "mz"]
         )
@@ -311,10 +301,7 @@ class TargetOptimizer:
             fig = plt.figure(figsize=(col_wrap * height * aspect, n_rows * height))
 
         i = 0
-        for (peak_label, row) in tqdm(_targets.iterrows(), total=len(targets)):
-
-            if verbose:
-                print(peak_label)
+        for peak_label, row in tqdm(_targets.iterrows(), total=len(targets)):
             if peak_label not in peak_labels:
                 logging.warning(f"{peak_label} not in {peak_labels}")
                 continue
@@ -325,7 +312,7 @@ class TargetOptimizer:
             _slice = extract_chromatogram_from_ms1(ms1, mz).groupby("scan_time").sum()
 
             chrom = Chromatogram(
-                _slice.index, _slice.values, expected_rt=rt, filter=filter
+                _slice.index, _slice.values, expected_rt=rt, filters=filters
             )
 
             if chrom.x.max() < minimum_intensity:
@@ -334,7 +321,7 @@ class TargetOptimizer:
                 )
                 continue
 
-            chrom.apply_filter()
+            chrom.apply_filters()
             chrom.find_peaks(rel_height=rel_height)
             chrom.select_peak_with_gaussian_weight(rt, sigma)
 
@@ -350,9 +337,6 @@ class TargetOptimizer:
             ndx = chrom.selected_peak_ndxs[0]
             rt_min = chrom.peaks.at[ndx, "rt_min"]
             rt_max = chrom.peaks.at[ndx, "rt_max"]
-
-            if verbose:
-                print(ndx, peak_label, rt_min, rt_max)
 
             _targets.loc[peak_label, ["rt_min", "rt_max"]] = rt_min, rt_max
 

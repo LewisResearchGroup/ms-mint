@@ -131,7 +131,7 @@ class MintPlotter:
         if transposed:
             tmp_data = tmp_data.T
 
-        clustered, fig, ndx_x, ndx_y = hierarchical_clustering(
+        _, fig, ndx_x, ndx_y = hierarchical_clustering(
             tmp_data,
             vmin=vmin,
             vmax=vmax,
@@ -281,7 +281,7 @@ class MintPlotter:
 
         if isinstance(fns, str):
             fns = [fns]
-        
+
         if fns is not None:
             fns = tuple(fns)
 
@@ -293,7 +293,7 @@ class MintPlotter:
 
         if peak_labels is not None:
             peak_labels = tuple(peak_labels)
-        
+
         data = self.mint.get_chromatograms(fns=fns, peak_labels=peak_labels)
 
         if not interactive:
@@ -314,7 +314,7 @@ class MintPlotter:
             g = sns.relplot(data=data, **params)
 
             for peak_label, ax in zip(peak_labels, g.axes.flatten()):
-                mz_mean, mz_width, rt_min, rt_max = self.mint.get_target_params(
+                _, _, rt_min, rt_max = self.mint.get_target_params(
                     peak_label
                 )
                 if rt_min is not None and rt_max is not None:
