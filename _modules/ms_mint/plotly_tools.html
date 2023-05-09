@@ -82,6 +82,9 @@
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">plotly.subplots</span> <span class="kn">import</span> <span class="n">make_subplots</span>
 
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">fn_to_label</span>
+
+
 
 <div class="viewcode-block" id="set_template"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.set_template">[docs]</a><span class="k">def</span> <span class="nf">set_template</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -304,9 +307,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
+
     <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fns</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">]</span>
-        <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">fns</span><span class="p">)]</span>
+        <span class="n">fns</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">]</span>
+        <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file_label</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">fns</span><span class="p">)]</span>
 
     <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
 
@@ -314,10 +318,10 @@
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">mint_results</span><span class="p">[</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_max</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">fns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mint_results</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
+    <span class="n">fns</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">ms_file_label</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
 
-    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file_label&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">peak_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">peak_labels</span><span class="p">]</span>

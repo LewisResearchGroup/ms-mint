@@ -592,9 +592,10 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chrom_raw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">chrom</span> <span class="o">=</span> <span class="n">Chromatogram</span><span class="p">(</span><span class="n">chrom_raw</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">chrom_raw</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-                <span class="n">chrom</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">()</span>
+                <span class="n">chrom</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">()</span>
                 <span class="n">chrom_data</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">data</span>
                 <span class="n">chrom_data</span><span class="p">[</span><span class="s2">&quot;ms_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span>
+                <span class="n">chrom_data</span><span class="p">[</span><span class="s2">&quot;ms_file_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
                 <span class="n">chrom_data</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
                 <span class="n">chrom_data</span><span class="p">[</span><span class="s2">&quot;rt_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rt_min</span>
                 <span class="n">chrom_data</span><span class="p">[</span><span class="s2">&quot;rt_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rt_max</span>
