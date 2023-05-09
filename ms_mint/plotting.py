@@ -305,7 +305,7 @@ class MintPlotter:
                 col_order=peak_labels,
                 height=1.5,
                 aspect=5,
-                hue="ms_file",
+                hue="ms_file_label",
                 facet_kws=dict(sharey=False),
                 marker=".",
                 linewidth=0,
@@ -331,7 +331,7 @@ class MintPlotter:
                 x="scan_time",
                 y="intensity",
                 facet_col="peak_label",
-                color="ms_file",
+                color="ms_file_label",
                 height=700,
                 facet_col_wrap=1,
             )

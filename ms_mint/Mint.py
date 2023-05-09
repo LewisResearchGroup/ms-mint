@@ -521,9 +521,10 @@ class Mint(object):
                 if len(chrom_raw) == 0:
                     continue
                 chrom = Chromatogram(chrom_raw.index, chrom_raw.values)
-                chrom.apply_filter()
+                chrom.apply_filters()
                 chrom_data = chrom.data
                 chrom_data["ms_file"] = fn
+                chrom_data["ms_file_label"] = fn_to_label(fn)
                 chrom_data["peak_label"] = label
                 chrom_data["rt_min"] = rt_min
                 chrom_data["rt_max"] = rt_max
