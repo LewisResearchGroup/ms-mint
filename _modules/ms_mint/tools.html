@@ -216,8 +216,12 @@
 <span class="sd">    :return: List of filenames</span>
 <span class="sd">    :rtype: list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;ms_path&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
-    <span class="n">ms_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">ms_path</span><span class="p">)</span> <span class="o">/</span> <span class="n">ms_file</span> <span class="k">for</span> <span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span> <span class="ow">in</span> <span class="n">ms_files</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="c1"># Old schema</span>
+    <span class="k">if</span> <span class="s1">&#39;ms_path&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;ms_path&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+        <span class="n">ms_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">ms_path</span><span class="p">)</span> <span class="o">/</span> <span class="n">ms_file</span> <span class="k">for</span> <span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span> <span class="ow">in</span> <span class="n">ms_files</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ms_files</span></div>
 
 
@@ -292,6 +296,23 @@
     <span class="n">mz_min</span> <span class="o">=</span> <span class="n">mz_mean</span> <span class="o">-</span> <span class="n">delta_mass</span>
     <span class="n">mz_max</span> <span class="o">=</span> <span class="n">mz_mean</span> <span class="o">+</span> <span class="n">delta_mass</span>
     <span class="k">return</span> <span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_max</span></div>
+
+<div class="viewcode-block" id="init_metadata"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.init_metadata">[docs]</a><span class="k">def</span> <span class="nf">init_metadata</span><span class="p">():</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span>  
+        <span class="s1">&#39;label&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;group&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;type&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;run_order&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;plate&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;plate_row&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;plate_col&#39;</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fn_to_label"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.fn_to_label">[docs]</a><span class="k">def</span> <span class="nf">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span></div>
 </pre></div>
 
            </div>

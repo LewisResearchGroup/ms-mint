@@ -90,6 +90,8 @@
     <span class="n">get_ms_files_from_results</span><span class="p">,</span>
     <span class="n">get_targets_from_results</span><span class="p">,</span>
     <span class="n">scale_dataframe</span><span class="p">,</span>
+    <span class="n">init_metadata</span><span class="p">,</span>
+    <span class="n">fn_to_label</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.pca</span> <span class="kn">import</span> <span class="n">PrincipalComponentsAnalyser</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="kn">import</span> <span class="n">MintPlotter</span>
@@ -104,6 +106,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 
+<span class="n">METADATA_DEFAUT_FN</span> <span class="o">=</span> <span class="s1">&#39;metadata.parquet&#39;</span>
 
 <div class="viewcode-block" id="Mint"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint">[docs]</a><span class="k">class</span> <span class="nc">Mint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -115,6 +118,8 @@
 <span class="sd">    :param progress_callback: A callback for a progress bar.</span>
 <span class="sd">    :type progress_callback: Callable[]</span>
 
+<span class="sd">    :parm wdir: Working directory</span>
+<span class="sd">    :type wdir: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -122,18 +127,21 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">progress_callback</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span>
+        <span class="n">wdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="n">ms_mint</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mint version:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progress_callback</span> <span class="o">=</span> <span class="n">progress_callback</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mint Version:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">MintPlotter</span><span class="p">(</span><span class="n">mint</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opt</span> <span class="o">=</span> <span class="n">TargetOptimizer</span><span class="p">(</span><span class="n">mint</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pca</span> <span class="o">=</span> <span class="n">PrincipalComponentsAnalyser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tqdm</span> <span class="o">=</span> <span class="n">tqdm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Setup working directory as pathlib.Path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="k">if</span> <span class="n">wdir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">wdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -161,6 +169,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;waiting&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">init_metadata</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="Mint.clear_targets"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.clear_targets">[docs]</a>    <span class="k">def</span> <span class="nf">clear_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -271,7 +280,6 @@
     <span class="k">def</span> <span class="nf">_run_parallel</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="n">maxtasksperchild</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;maxtasksperchild: </span><span class="si">{</span><span class="n">maxtasksperchild</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> <span class="n">maxtasksperchild</span><span class="o">=</span><span class="n">maxtasksperchild</span><span class="p">)</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
@@ -345,6 +353,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="n">list_of_files</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set files to:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">reindex</span><span class="p">([</span><span class="n">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">list_of_files</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -444,7 +453,7 @@
     <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">df</span>
 
-<div class="viewcode-block" id="Mint.crosstab"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.crosstab">[docs]</a>    <span class="k">def</span> <span class="nf">crosstab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Mint.crosstab"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.crosstab">[docs]</a>    <span class="k">def</span> <span class="nf">crosstab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">aggfunc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">apply</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create condensed representation of the results.</span>
 <span class="sd">        More specifically, a cross-table with filenames as index and target labels.</span>
@@ -455,12 +464,23 @@
 
 <span class="sd">        cells of the returned table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df_meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="s1">&#39;ms_file_label&#39;</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="s1">&#39;peak_label&#39;</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="s1">&#39;peak_area_top3&#39;</span>
+
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">peak_label</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
-            <span class="n">aggfunc</span><span class="o">=</span><span class="nb">sum</span><span class="p">,</span>
+            <span class="n">df_meta</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+            <span class="n">df_meta</span><span class="p">[</span><span class="n">column</span><span class="p">],</span>
+            <span class="n">df_meta</span><span class="p">[</span><span class="n">values</span><span class="p">],</span>
+            <span class="n">aggfunc</span><span class="o">=</span><span class="n">aggfunc</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">apply</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">apply</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scaler</span><span class="p">:</span>
@@ -533,6 +553,11 @@
                 <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+        <span class="c1"># Add file labels if not present already    </span>
+        <span class="k">if</span> <span class="s1">&#39;ms_file_label&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">ms_file</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DEPRECATED_LABELS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">digest_results</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -578,7 +603,25 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ms_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ms_file&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span></div></div>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Mint.load_metadata"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">load_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="o">/</span><span class="n">METADATA_DEFAUT_FN</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.parquet&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Mint.save_metadata"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.save_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">save_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="o">/</span><span class="n">METADATA_DEFAUT_FN</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.parquet&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 
            </div>
