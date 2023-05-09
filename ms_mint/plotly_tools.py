@@ -11,6 +11,9 @@ from pathlib import Path as P
 from collections.abc import Iterable
 from plotly.subplots import make_subplots
 
+from .tools import fn_to_label
+
+
 
 def set_template():
     """
@@ -233,9 +236,10 @@ def plotly_peak_shapes(
     """
     mint_results = mint_results.copy()
 
+
     if fns is not None:
-        fns = [P(fn).name for fn in fns]
-        mint_results = mint_results[mint_results.ms_file.isin(fns)]
+        fns = [fn_to_label(fn) for fn in fns]
+        mint_results = mint_results[mint_results.ms_file_label.isin(fns)]
 
     mint_results.ms_file = [P(fn).name for fn in mint_results.ms_file]
 
@@ -243,10 +247,10 @@ def plotly_peak_shapes(
 
     res = mint_results[mint_results.peak_max > 0]
 
-    fns = list(res.ms_file.drop_duplicates())
-    labels = list(mint_results.peak_label.drop_duplicates())
+    fns = res.ms_file_label.unique()
+    labels = mint_results.peak_label.unique()
 
-    res = res.set_index(["peak_label", "ms_file"]).sort_index()
+    res = res.set_index(["peak_label", "ms_file_label"]).sort_index()
 
     if isinstance(peak_labels, str):
         peak_labels = [peak_labels]
