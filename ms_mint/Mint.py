@@ -19,6 +19,8 @@ from .tools import (
     get_ms_files_from_results,
     get_targets_from_results,
     scale_dataframe,
+    init_metadata,
+    fn_to_label
 )
 from .pca import PrincipalComponentsAnalyser
 from .plotting import MintPlotter
@@ -33,6 +35,7 @@ from tqdm import tqdm
 from typing import Callable
 from functools import lru_cache
 
+METADATA_DEFAUT_FN = 'metadata.parquet'
 
 class Mint(object):
     """
@@ -44,6 +47,8 @@ class Mint(object):
     :param progress_callback: A callback for a progress bar.
     :type progress_callback: Callable[]
 
+    :parm wdir: Working directory
+    :type wdir: str
     """
 
     def __init__(
@@ -51,18 +56,21 @@ class Mint(object):
         verbose: bool = False,
         progress_callback: Callable = None,
         time_unit: str = "s",
+        wdir: str = None
     ):
         self.verbose = verbose
         self._version = ms_mint.__version__
+        print("Mint version:", self.version, "\n")
         self.progress_callback = progress_callback
         self.reset()
-        if self.verbose:
-            print("Mint Version:", self.version, "\n")
         self.plot = MintPlotter(mint=self)
         self.opt = TargetOptimizer(mint=self)
         self.pca = PrincipalComponentsAnalyser(self)
         self.tqdm = tqdm
-        self.meta = None
+
+        # Setup working directory as pathlib.Path
+        self.wdir = os.getcwd() if wdir is None else wdir
+        self.wdir = P(self.wdir)
 
     @property
     def version(self):
@@ -90,6 +98,7 @@ class Mint(object):
         self.runtime = None
         self._status = "waiting"
         self._messages = []
+        self.meta = init_metadata()
         return self
 
     def clear_targets(self):
@@ -200,7 +209,6 @@ class Mint(object):
     def _run_parallel(
         self, nthreads=1, mode="standard", maxtasksperchild=None, fn=None
     ):
-        print(f"maxtasksperchild: {maxtasksperchild}")
         pool = Pool(processes=nthreads, maxtasksperchild=maxtasksperchild)
         m = Manager()
         q = m.Queue()
@@ -274,6 +282,7 @@ class Mint(object):
         self._files = list_of_files
         if self.verbose:
             print("Set files to:\n" + "\n".join(self.ms_files) + "\n")
+        self.meta = self.meta.reindex([fn_to_label(fn) for fn in list_of_files])
 
     @property
     def n_files(self):
@@ -373,7 +382,7 @@ class Mint(object):
     def results(self, df):
         self._results = df
 
-    def crosstab(self, col_name="peak_max", apply=None, scaler=None):
+    def crosstab(self, values: str = "peak_max", index: str = None, column: str = None, aggfunc: str = 'mean', apply: Callable = None, scaler: Callable = None):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
@@ -384,12 +393,23 @@ class Mint(object):
 
         cells of the returned table.
         """
+
+        df_meta = pd.merge(self.meta, self.results, left_index=True, right_on='ms_file_label')
+
+        if index is None:
+            index = 'ms_file_label'
+        if column is None:
+            column = 'peak_label'
+        if values is None:
+            values = 'peak_area_top3'
+
         df = pd.crosstab(
-            self.results.ms_file,
-            self.results.peak_label,
-            self.results[col_name],
-            aggfunc=sum,
+            df_meta[index],
+            df_meta[column],
+            df_meta[values],
+            aggfunc=aggfunc,
         ).astype(np.float64)
+
         if apply:
             df = df.apply(apply)
         if scaler:
@@ -462,6 +482,11 @@ class Mint(object):
                 results = pd.read_parquet(fn)
         else:
             results = pd.read_csv(fn)
+
+        # Add file labels if not present already    
+        if 'ms_file_label' not in results.columns:
+            results['ms_file_label'] = [fn_to_label(fn) for fn in results.ms_file]
+
         self.results = results.rename(columns=DEPRECATED_LABELS)
         self.digest_results()
         return self
@@ -508,3 +533,21 @@ class Mint(object):
 
         data["ms_file"] = data["ms_file"].apply(lambda x: P(x).with_suffix("").name)
         return data
+
+    def load_metadata(self, fn=None):
+        if fn is None:
+            fn = self.wdir/METADATA_DEFAUT_FN
+        if str(fn).endswith('.csv'):
+            self.meta = pd.read_csv(fn, index_col=0)
+        elif str(fn).endswith('.parquet'):
+            self.meta = pd.read_parquet(fn)
+        return self
+
+    def save_metadata(self, fn=None):
+        if fn is None:
+            fn = self.wdir/METADATA_DEFAUT_FN
+        if str(fn).endswith('.csv'):
+            self.meta.to_csv(fn, na_filter=False)
+        elif str(fn).endswith('.parquet'):
+            self.meta.to_parquet(fn)
+        return self
