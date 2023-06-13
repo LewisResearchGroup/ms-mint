@@ -104,9 +104,3 @@ html_baseurl = "https://lewisresearchgroup.github.io/ms-mint"
 
 requirements_path = "docs/requirements.txt"
 
-html_theme_options = {
-    # Other options...
-    'google_analytics_measurement_id': 'G-KZQBC4NMD2',
-}
-
-google_analytics_id = 'G-KZQBC4NMD2'
