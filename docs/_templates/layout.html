@@ -1,14 +1,13 @@
 {% extends "!layout.html" %}
 
 {% block footer %}
-{{ super() }}
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("G-KZQBC4NMD2");
-pageTracker._trackPageview();
-} catch(err) {}</script>
+  {{ super() }}
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KZQBC4NMD2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-KZQBC4NMD2');
+  </script>
 {% endblock %}
