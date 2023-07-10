@@ -64,7 +64,7 @@ class Chromatogram:
         for filt in self.filters:
             self.t, self.x = filt.transform(self.t, self.x)
 
-    def find_peaks(self, prominence=None, rel_height=0.9):
+    def find_peaks(self, prominence=None, rel_height=0.9, **kwargs):
         self.estimate_noise_level()
         if prominence is None:
             prominence = self.noise_level * 5
@@ -72,6 +72,7 @@ class Chromatogram:
             self.data.intensity,
             prominence=prominence,
             rel_height=rel_height,
+            **kwargs
         )
 
     def optimise_peak_times_with_diff(self, rolling_window=20, plot=False):

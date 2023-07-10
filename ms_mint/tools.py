@@ -167,7 +167,7 @@ def get_targets_from_results(results):
     ].drop_duplicates()
 
 
-def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9):
+def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9, **kwargs):
     """_summary_
 
     :param series: _description_
@@ -181,7 +181,7 @@ def find_peaks_in_timeseries(series, prominence=None, plot=False, rel_height=0.9
     """
     t = series.index
     x = series.values
-    peak_ndxs, _ = find_peaks(x, prominence=prominence)
+    peak_ndxs, _ = find_peaks(x, prominence=prominence, rel_height=rel_height, **kwargs)
     widths, heights, left_ips, right_ips = peak_widths(
         x, peak_ndxs, rel_height=rel_height
     )

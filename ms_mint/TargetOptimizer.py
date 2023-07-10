@@ -89,7 +89,7 @@ class TargetOptimizer:
 
         _targets = targets.set_index("peak_label").copy()
 
-        ms1 = pd.concat([ms_file_to_df(fn) for fn in tqdm(fns)]).sort_values(
+        ms1 = pd.concat([ms_file_to_df(fn) for fn in self.mint.tqdm(fns, desc='Reading files')]).sort_values(
             ["scan_time", "mz"]
         )
 
@@ -98,7 +98,7 @@ class TargetOptimizer:
             fig = plt.figure(figsize=(col_wrap * height * aspect, n_rows * height))
 
         i = 0
-        for peak_label, row in mint.tqdm(_targets.iterrows(), total=len(targets), desc='Optimizing targets''):
+        for peak_label, row in self.mint.tqdm(_targets.iterrows(), total=len(targets), desc='Optimizing targets'):
             if peak_label not in peak_labels:
                 logging.warning(f"{peak_label} not in {peak_labels}")
                 continue
@@ -119,7 +119,7 @@ class TargetOptimizer:
                 continue
 
             chrom.apply_filters()
-            chrom.find_peaks(rel_height=rel_height)
+            chrom.find_peaks(rel_height=rel_height, **kwargs)
             chrom.select_peak_with_gaussian_weight(rt, sigma)
 
             if post_opt:
