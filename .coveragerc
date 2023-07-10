@@ -1,6 +1,8 @@
 [run]
+source = 
+    ms_mint
 omit = 
-    */app/*
     */_version.py
     */__init__.py
     ms_mint/filelock.py
+    tests/*

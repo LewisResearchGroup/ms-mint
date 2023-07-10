@@ -145,8 +145,12 @@ def get_ms_files_from_results(results):
     :return: List of filenames
     :rtype: list
     """
-    ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
-    ms_files = [P(ms_path) / ms_file for ms_path, ms_file in ms_files.values]
+    # Old schema
+    if 'ms_path' in results.columns:
+        ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
+        ms_files = [P(ms_path) / ms_file for ms_path, ms_file in ms_files.values]
+    else:
+        ms_files = results.ms_file.unique()
     return ms_files
 
 
@@ -221,3 +225,21 @@ def mz_mean_width_to_min_max(mz_mean, mz_width):
     mz_min = mz_mean - delta_mass
     mz_max = mz_mean + delta_mass
     return mz_min, mz_max
+
+def init_metadata():
+    cols = [
+        'ms_file_label',
+        'ms_file',
+        'label', 
+        'group', 
+        'type',
+        'run_order', 
+        'plate', 
+        'plate_row', 
+        'plate_col'
+    ]
+    return pd.DataFrame(columns=cols).set_index('ms_file_label')
+
+
+def fn_to_label(fn):
+    return P(fn).with_suffix('').name

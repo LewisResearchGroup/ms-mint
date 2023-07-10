@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import logging
 
+from  pathlib import Path as P
+
 from .tools import lock, mz_mean_width_to_min_max
 
 from .io import ms_file_to_df
@@ -84,9 +86,9 @@ def process_ms1_file(filename, targets):
     df = ms_file_to_df(filename)
     results = process_ms1(df, targets)
     results["total_intensity"] = df["intensity"].sum()
-    results["ms_file"] = os.path.basename(filename)
-    results["ms_path"] = os.path.dirname(filename)
-    results["ms_file_size"] = os.path.getsize(filename) / 1024 / 1024
+    results["ms_file"] = filename
+    results["ms_file_label"] = P(filename).with_suffix('').name
+    results["ms_file_size_MB"] = os.path.getsize(filename) / 1024 / 1024
     results["peak_score"] = score_peaks(results)
     return results[MINT_RESULTS_COLUMNS]
 

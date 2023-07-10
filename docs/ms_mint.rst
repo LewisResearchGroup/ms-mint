@@ -28,10 +28,10 @@ ms\_mint.filelock module
    :undoc-members:
    :show-inheritance:
 
-ms\_mint.filter module
+ms\_mint.filters module
 ----------------------
 
-.. automodule:: ms_mint.filter
+.. automodule:: ms_mint.filters
    :members:
    :undoc-members:
    :show-inheritance:

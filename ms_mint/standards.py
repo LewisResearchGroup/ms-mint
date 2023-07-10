@@ -37,10 +37,10 @@ RESULTS_COLUMNS = [
 ]
 
 MINT_RESULTS_COLUMNS = (
-    ["ms_file"]
+    ["ms_file", "ms_file_label"]
     + TARGETS_COLUMNS
     + RESULTS_COLUMNS
-    + ["total_intensity", "ms_path", "ms_file_size"]
+    + ["total_intensity", "ms_file_size_MB"]
 )
 
 DEPRECATED_LABELS = {
@@ -55,6 +55,7 @@ DEPRECATED_LABELS = {
     "peaklist": "target_filename",
     "peaklist_name": "target_filename",
     "scan_time_min": "scan_time",
+    "ms_file_size": "ms_file_size_MB",
 }
 
 M_PROTON = 1.00782503223

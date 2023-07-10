@@ -9,20 +9,27 @@ The `ms-mint` library is a tool designed to assist with targeted metabolomics st
 
 The `ms-mint` library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling large amounts of data (10,000+ files). To use `ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications.
 
+## Installation
+
+    pip install ms-mint
+
+
 ## Documentation
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/readme.html).
 
 ## ms-mint application with graphical user iterface (GUI)
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
 
+## Publications that used ms-mint
+1. Brown K, Thomson CA, Wacker S, Drikic M, Groves R, Fan V, et al. [Microbiota alters the metabolome in an age- and sex- dependent manner in mice.](https://pubmed.ncbi.nlm.nih.gov/36906623/) Nat Commun. 2023;14: 1348.
+
+---
 ## Contributions
 All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
 Before you modify the code please reach out to us using the [issues](https://github.com/LewisResearchGroup/ms-mint/issues) page.
 
 ## Code standards
 The project follows PEP8 standard and uses Black and Flake8 to ensure a consistent code format throughout the project.
-
----
 
 ## Usage
 
@@ -115,7 +122,7 @@ If you only have retention time (Rt) values for your targets, or if the Rt value
 
 To use the `mint.opt.rt_min_max()` function, you will need to provide it with a list of retention times for your targets and the names of the mass spectrometry files containing your data. The function will then search through the data to find the optimal `rt_min` and `rt_max` values, which you can use to refine your analysis. You can then use these optimized values in conjunction with the other functions and methods of the `Mint` class to process and analyze your data.
 
-![](notebooks/peak-shapes-before-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-before-opt.png)
 
 Now, we can run the peak optimization with:
 
@@ -132,7 +139,7 @@ If you do not provide a list of peak_labels to the `mint.opt.rt_min_max()` funct
 
 After running the optimization, it is a good idea to perform a manual fine-tuning of the `rt_min` and `rt_max` values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the `mint.plot.peak_shapes()` function to visualize the peak shapes and identify any areas that may require further attention.
     
-![](notebooks/optimize-rt_min_max.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/optimize-rt_min_max.png)
 
 The black lines indicates the average intensity across all files used for the optimization. The orange dotted lines show the shape of the gaussian function used to weight the mean intensities for peak selection. The orange horizontal lines indicate the peak width and the blue `x`s show the identified peak maxima. The green shaded areas show the Rt ranges which were selected by the algorithm.
 
@@ -141,7 +148,7 @@ Then we apply the changes and plot the new peak shapes:
     mint.run()
     mint.plot.peak_shapes(col_wrap=3)
 
-![](notebooks/peak-shapes-after-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-after-opt.png)
 
 As you can see, the shapes of Xanthine, Succinate, Citrulline look much better.
 
@@ -151,7 +158,7 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 
 ## Plot peak shapes
 
-![](notebooks/peak-shapes-after-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-after-opt.png)
 
     mint.plot.peak_shapes(col_wrap = 3)
 
@@ -186,7 +193,7 @@ Before clustering the data can be transformed and scaled. By default `log2p1(x) 
         cmap=None  # Name of a matplotlib color map                
     )
 
-![](notebooks/hierarchical_clustering.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/hierarchical_clustering.png)
 
 ## Principal Components Analysis
 
@@ -200,7 +207,7 @@ After running the PCA the results can be plotted with:
     
     mint.pca.plot.pairplot(n_components=5, interactive=False)
     
-![](notebooks/pca-pairplot.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/pca-pairplot.png)
 
 ## FAQ
 ### What is a target list
