@@ -163,7 +163,7 @@ def mzml_to_df(fn, read_only=False):
             if read_only:
                 continue
             # Extract the scan ID, retention time, m/z values, and intensity values
-            scan_id = int(spectrum["id"].split("scan=")[-1])
+            scan_id = int(spectrum["id"].split("=")[-1])
             rt = spectrum["scanList"]["scan"][0]["scan start time"]
             if time_unit == 'minute':
                 rt = rt * 60.
