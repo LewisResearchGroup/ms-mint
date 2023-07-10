@@ -261,14 +261,14 @@ mint.results
 <p>The <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function in the ms-mint library allows you to optimize the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values for your analysis. These values define the range of retention times within which ms-mint will search for peaks corresponding to your targets. By optimizing these values, you can improve the accuracy and reliability of your results.</p>
 <p>If you do not provide a list of peak_labels to the <code class="docutils literal notranslate"><span class="pre">mint.opt.rt_min_max()</span></code> function, it will run the optimization for all metabolites. Similarly, if you do not provide a list of filenames for the fn parameter, the function will use all of the files currently loaded into mint.ms_files. It is generally recommended to use a maximum of 20-40 files for the optimization process. If you have run a set of standards along with your samples (which is highly recommended), you can use the standard files to perform the optimization.</p>
 <p>After running the optimization, it is a good idea to perform a manual fine-tuning of the <code class="docutils literal notranslate"><span class="pre">rt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">rt_max</span></code> values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the <code class="docutils literal notranslate"><span class="pre">mint.plot.peak_shapes()</span></code> function to visualize the peak shapes and identify any areas that may require further attention.</p>
-<p><img alt="" src="notebooks/optimize-rt_min_max.png" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/optimize-rt_min_max.png" /></p>
 <p>The black lines indicates the average intensity across all files used for the optimization. The orange dotted lines show the shape of the gaussian function used to weight the mean intensities for peak selection. The orange horizontal lines indicate the peak width and the blue <code class="docutils literal notranslate"><span class="pre">x</span></code>s show the identified peak maxima. The green shaded areas show the Rt ranges which were selected by the algorithm.</p>
 <p>Then we apply the changes and plot the new peak shapes:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.run()
 mint.plot.peak_shapes(col_wrap=3)
 </pre></div>
 </div>
-<p><img alt="" src="notebooks/peak-shapes-after-opt.png" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-after-opt.png" /></p>
 <p>As you can see, the shapes of Xanthine, Succinate, Citrulline look much better.</p>
 </section>
 <section id="plotting-and-data-exploration">
@@ -277,7 +277,7 @@ mint.plot.peak_shapes(col_wrap=3)
 </section>
 <section id="plot-peak-shapes">
 <h2>Plot peak shapes<a class="headerlink" href="#plot-peak-shapes" title="Permalink to this heading"></a></h2>
-<p><img alt="" src="notebooks/peak-shapes-after-opt.png" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-after-opt.png" /></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.plot.peak_shapes(col_wrap = 3)
 </pre></div>
 </div>
@@ -311,7 +311,7 @@ mint.plot.peak_shapes(col_wrap=3)
 )
 </pre></div>
 </div>
-<p><img alt="" src="notebooks/hierarchical_clustering.png" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/hierarchical_clustering.png" /></p>
 </section>
 <section id="principal-components-analysis">
 <h2>Principal Components Analysis<a class="headerlink" href="#principal-components-analysis" title="Permalink to this heading"></a></h2>
@@ -324,7 +324,7 @@ mint.plot.peak_shapes(col_wrap=3)
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mint.pca.plot.pairplot(n_components=5, interactive=False)
 </pre></div>
 </div>
-<p><img alt="" src="notebooks/pca-pairplot.png" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/pca-pairplot.png" /></p>
 </section>
 <section id="faq">
 <h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this heading"></a></h2>
