@@ -13,7 +13,8 @@ from glob import glob
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
-from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
+from .TargetOptimizer import TargetOptimizer
+from .targets import read_targets, check_targets, standardize_targets
 from .tools import (
     is_ms_file,
     get_ms_files_from_results,
