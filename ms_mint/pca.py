@@ -123,18 +123,21 @@ class PCA_Plotter:
         plt.xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
-    def _prepare_data(self, n_components=3, labels=None):
+    def _prepare_data(self, n_components=3, hue=None):
         df = self.pca.results["df_projected"].copy()
         cols = df.columns.to_list()[:n_components]
         df = df[cols]
-        if labels is not None:
-            group_name = "Label"
-            df[group_name] = labels
-            df[group_name] = df[group_name].astype(str)
+
+        df = pd.merge(df, self.pca.mint.meta.dropna(axis=1, how='all'), left_index=True, right_index=True)
+
+        if hue and (not isinstance(hue, str)):
+            df['Label'] = hue
+            df['Label'] = df['Label'].astype(str)
+
         return df
 
     def pairplot(
-        self, n_components=3, labels=None, fig_kws=None, interactive=False, **kwargs
+        self, n_components=3, hue=None, fig_kws=None, interactive=False, **kwargs
     ):
         """
         After running mint.pca() this function can be used to plot a scatter matrix of the
@@ -142,29 +145,32 @@ class PCA_Plotter:
 
         :param n_components: Number of principal components to plot, defaults to 3.
         :type n_components: int, optional
-        :param labels: Labels used for hue.
-        :type labels: List[str], optional
+        :param hue: Labels used for hue. If string, the data will be taken from the mint.meta dataframe.
+        :type hue: List[str] or str, optional
         :return: Returns a matplotlib figure.
         :rtype: seaborn.axisgrid.PairGrid
         """
 
-        df = self._prepare_data(n_components=n_components, labels=labels)
+        df = self._prepare_data(n_components=n_components, hue=hue)
+
+        if isinstance(hue, list):
+            hue = 'Label'
 
         if interactive:
-            return self.pairplot_plotly(df, **kwargs)
+            return self.pairplot_plotly(df, color_col=hue, **kwargs)
         else:
-            return self.pairplot_sns(df, fig_kws=fig_kws, **kwargs)
+            return self.pairplot_sns(df, fig_kws=fig_kws, hue=hue, **kwargs)
 
     def pairplot_sns(self, df, fig_kws=None, **kwargs):
         if fig_kws is None:
             fig_kws = {}
         plt.figure(**fig_kws)
-        g = sns.pairplot(df, hue="Label" if "Label" in df.columns else None, **kwargs)
+        g = sns.pairplot(df, **kwargs)
         return g
 
-    def pairplot_plotly(self, df, **kwargs):
-        color_col = "Label" if "Label" in df.columns else None
-        fig = ff.create_scatterplotmatrix(df, index=color_col, **kwargs)
+    def pairplot_plotly(self, df, color_col=None, **kwargs):
+        columns = df.filter(regex=f'PC|^{color_col}$').columns
+        fig = ff.create_scatterplotmatrix(df[columns], index=color_col, hovertext=df.index, **kwargs)
         # set the legendgroup equal to the marker color
         for t in fig.data:
             t.legendgroup = t.marker.color
