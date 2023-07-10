@@ -6,7 +6,7 @@ import matplotlib as mpl
 
 mpl.use("Agg")
 
-from ms_mint.chromatogram import Chromatogram
+from ms_mint._chromatogram import Chromatogram
 from ms_mint.tools import gaussian
 
 from paths import TEST_MZML

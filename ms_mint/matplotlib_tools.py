@@ -285,7 +285,7 @@ def plot_peaks(
     plt.ylabel("Intensity")
     plt.xlabel("Scan time [s]")
     ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-    plt.ylim((0.1, None))
+    #plt.ylim((0.001, None))
     if not legend:
         ax.get_legend().remove()
     return plt.gcf()

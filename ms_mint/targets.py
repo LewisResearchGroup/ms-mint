@@ -8,7 +8,8 @@ from pathlib import Path as P
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from .chromatogram import extract_chromatogram_from_ms1, Chromatogram
+from .Chromatogram import Chromatogram
+from .processing import get_chromatogram_from_ms_file, extract_chromatogram_from_ms1
 from .io import ms_file_to_df
 from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
 from .tools import formula_to_mass, df_diff

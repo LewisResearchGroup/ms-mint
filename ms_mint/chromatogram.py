@@ -6,31 +6,48 @@ from matplotlib import pyplot as plt
 
 from .tools import find_peaks_in_timeseries, gaussian, mz_mean_width_to_min_max
 from .io import ms_file_to_df
-from .filters import Resampler, Smoother, GaussFilter
+from .filters import Filter, Resampler, Smoother, GaussFilter
 from .matplotlib_tools import plot_peaks
+from .processing import get_chromatogram_from_ms_file
+
+from typing import Optional, Union, List, Any
 
 
 class Chromatogram:
     def __init__(
-        self, scan_times=None, intensities=None, filters=None, expected_rt=None
+        self,
+        scan_times: Optional[Union[List[float], np.ndarray]] = None,
+        intensities: Optional[Union[List[float], np.ndarray]] = None,
+        filters: Optional[List[Filter]] = None,
+        expected_rt: Optional[float] = None
     ):
-        self.t = np.array([0])
-        self.x = np.array([0])
+        """
+        Initialize a Chromatogram object.
+
+        :param scan_times: Array-like object containing the scan times.
+        :param intensities: Array-like object containing the intensities.
+        :param filters: List of filters to be applied.
+        :param expected_rt: Expected retention time.
+        """
+        # Initialize empty arrays for scan_times and intensities
+        # Initialize scan_times and intensities as empty lists or arrays
+        self.t = np.array([]) if scan_times is None or 0 in scan_times else np.array([0])
+        self.x = np.array([]) if intensities is None or 0 in scan_times else np.array([0])
+
+        # Update scan_times and intensities if provided
         if scan_times is not None:
             self.t = np.append(self.t, scan_times)
         if intensities is not None:
             self.x = np.append(self.x, intensities)
-        self.noise_level = None
-        if filters is None:
-            self.filters = [Resampler(), GaussFilter(), Smoother()]
-        else:
-            self.filters = filters
-        self.peaks = None
-        self.selected_peak_ndxs = None
-        if expected_rt is None and scan_times is not None:
-            expected_rt = max(scan_times) // 2
+
+        # Initialize other attributes
+        self.noise_level: Optional[float] = None
+        self.filters: List[Any] = filters or [Resampler(), GaussFilter(), Smoother()]
+        self.peaks: Optional[pd.DataFrame] = None
+        self.selected_peak_ndxs: Optional[List[int]] = None
         self.expected_rt = expected_rt
-        self.weights = None
+        self.weights: Optional[Union[List[float], np.ndarray]] = None
+
 
     def from_file(self, fn, mz_mean, mz_width=10, expected_rt=None):
         chrom = get_chromatogram_from_ms_file(fn, mz_mean=mz_mean, mz_width=mz_width)
@@ -50,7 +67,7 @@ class Chromatogram:
     def find_peaks(self, prominence=None, rel_height=0.9):
         self.estimate_noise_level()
         if prominence is None:
-            prominence = self.noise_level * 3
+            prominence = self.noise_level * 5
         self.peaks = find_peaks_in_timeseries(
             self.data.intensity,
             prominence=prominence,
@@ -153,15 +170,3 @@ class Chromatogram:
         )
         return fig
 
-
-def get_chromatogram_from_ms_file(ms_file, mz_mean, mz_width=10):
-    df = ms_file_to_df(ms_file)
-    chrom = extract_chromatogram_from_ms1(df, mz_mean, mz_width=mz_width)
-    return chrom
-
-
-def extract_chromatogram_from_ms1(ms1, mz_mean, mz_width=10):
-    mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
-    chrom = ms1[(ms1["mz"] >= mz_min) & (ms1["mz"] <= mz_max)].copy()
-    chrom = chrom.groupby("scan_time", as_index=False).sum(numeric_only=True)
-    return chrom.set_index("scan_time")["intensity"]

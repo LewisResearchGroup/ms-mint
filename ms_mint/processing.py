@@ -322,3 +322,32 @@ def score_peaks(mint_results):
         * (1 / (1 + abs(R.peak_rt_of_max - R[["rt_min", "rt_max"]].mean(axis=1))))
     )
     return scores
+
+
+def get_chromatogram_from_ms_file(ms_file: str, mz_mean: float, mz_width: float = 10) -> pd.DataFrame:
+    """
+    Get chromatogram data from an MS file.
+
+    :param ms_file: Path to the MS file.
+    :param mz_mean: Mean m/z value.
+    :param mz_width: Width around the mean m/z to extract.
+    :return: Chromatogram data as a DataFrame.
+    """
+    df = ms_file_to_df(ms_file)
+    chrom = extract_chromatogram_from_ms1(df, mz_mean, mz_width=mz_width)
+    return chrom
+
+
+def extract_chromatogram_from_ms1(ms1: pd.DataFrame, mz_mean: float, mz_width: float = 10) -> pd.DataFrame:
+    """
+    Extract chromatogram from MS1 data.
+
+    :param ms1: MS1 data as a DataFrame.
+    :param mz_mean: Mean m/z value.
+    :param mz_width: Width around the mean m/z to extract.
+    :return: Chromatogram data as a DataFrame.
+    """
+    mz_min, mz_max = mz_mean_width_to_min_max(mz_mean, mz_width)
+    chrom = ms1[(ms1["mz"] >= mz_min) & (ms1["mz"] <= mz_max)].copy()
+    chrom = chrom.groupby("scan_time", as_index=False).sum(numeric_only=True)
+    return chrom.set_index("scan_time")["intensity"]

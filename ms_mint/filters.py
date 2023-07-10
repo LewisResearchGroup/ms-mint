@@ -1,8 +1,15 @@
 import pandas as pd
 from scipy.ndimage import gaussian_filter1d
+from typing import List, Tuple
 
 
-class Resampler:
+
+class Filter:
+    def transform(self, t: List[float], x: List[float]) -> Tuple[List[float], List[float]]:
+        raise NotImplementedError
+    
+
+class Resampler(Filter):
     """
     Filter for time series that resamples the data in
     a certain frequency.
@@ -42,7 +49,7 @@ class Resampler:
         return new_t, new_x
 
 
-class Smoother:
+class Smoother(Filter):
     """
     Filter for time series that smoothes the
     x values by running one or more rolling
@@ -82,7 +89,7 @@ class Smoother:
         return new_t, new_x
 
 
-class GaussFilter:
+class GaussFilter(Filter):
     """
     Filter for time series that applies a Gaussian filter.
     """
