@@ -122,7 +122,7 @@ If you only have retention time (Rt) values for your targets, or if the Rt value
 
 To use the `mint.opt.rt_min_max()` function, you will need to provide it with a list of retention times for your targets and the names of the mass spectrometry files containing your data. The function will then search through the data to find the optimal `rt_min` and `rt_max` values, which you can use to refine your analysis. You can then use these optimized values in conjunction with the other functions and methods of the `Mint` class to process and analyze your data.
 
-![](notebooks/peak-shapes-before-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-before-opt.png)
 
 Now, we can run the peak optimization with:
 
