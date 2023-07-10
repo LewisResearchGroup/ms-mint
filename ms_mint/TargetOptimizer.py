@@ -109,7 +109,7 @@ class TargetOptimizer:
             _slice = extract_chromatogram_from_ms1(ms1, mz).groupby("scan_time").sum()
 
             chrom = Chromatogram(
-                _slice.index, _slice.values, expected_rt=rt, filters=filters
+                _slice.index, _slice.values, expected_rt=rt,   filters=filters
             )
 
             if chrom.x.max() < minimum_intensity:
