@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.figure_factory as ff
+from plotly import express as px
 
 from sklearn.decomposition import PCA
 from .tools import scale_dataframe
@@ -175,3 +176,22 @@ class PCA_Plotter:
         for t in fig.data:
             t.legendgroup = t.marker.color
         return fig
+
+    def loadings(self, interactive=False, **kwargs):
+        if interactive:
+            return self.loadings_plotly(**kwargs)
+        else:    
+            return self.loadings_sns(**kwargs)
+
+    def loadings_sns(self, **kwargs):
+        if 'row' not in kwargs:
+            kwargs['row'] = 'PC'
+        g = sns.catplot(data=self.pca.results['feature_contributions'], x='peak_label', y='Coefficient', kind='bar', **kwargs)
+        plt.tight_layout()
+        return g
+    
+    def loadings_plotly(self, **kwargs):
+        if 'facet_row' not in kwargs:
+            kwargs['facet_row'] = 'PC'
+        fig = px.bar(self.pca.results['feature_contributions'], x='peak_label', y='Coefficient', barmode='group', **kwargs)
+        return  fig
