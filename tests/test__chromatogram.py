@@ -6,7 +6,7 @@ import matplotlib as mpl
 
 mpl.use("Agg")
 
-from ms_mint.chromatogram import Chromatogram
+from ms_mint.Chromatogram import Chromatogram
 from ms_mint.tools import gaussian
 
 from paths import TEST_MZML
@@ -217,5 +217,4 @@ def test__Chromatogram__data():
 
     assert isinstance(data, pd.DataFrame), type(data)
     assert len(chrom.data) == len(x) + 1
-    # assert all(data.index == x), data.index
-    # assert all(data.intensity.values == [0]+y), data.values
+

@@ -2,7 +2,7 @@
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
 
-# Wecome to ms-mint 
+# Wecome to ms-mint
 
 ## A Python library for targeted metabolomics
 The `ms-mint` library is a tool designed to assist with targeted metabolomics studies, which involves the systematic analysis of small chemical compounds called metabolites that are present in biological samples. These metabolites can provide valuable information about the state of an organism, including indicators of disease or other physiological changes. In order to perform a targeted metabolomics study, researchers typically use liquid chromatography-mass spectrometry (LCMS) to identify and quantify specific metabolites of interest.

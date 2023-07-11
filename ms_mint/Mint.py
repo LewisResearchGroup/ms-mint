@@ -11,9 +11,10 @@ from multiprocessing import Pool, Manager, cpu_count
 from glob import glob
 
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
-from .processing import process_ms1_files_in_parallel
+from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
-from .targets import read_targets, check_targets, standardize_targets, TargetOptimizer
+from .TargetOptimizer import TargetOptimizer
+from .targets import read_targets, check_targets, standardize_targets
 from .tools import (
     is_ms_file,
     get_ms_files_from_results,
@@ -23,10 +24,8 @@ from .tools import (
     fn_to_label
 )
 from .pca import PrincipalComponentsAnalyser
-from .plotting import MintPlotter
-
-# from .filter import Resampler
-from .chromatogram import Chromatogram, extract_chromatogram_from_ms1
+from .MintPlotter import MintPlotter
+from .Chromatogram import Chromatogram
 
 import ms_mint
 
@@ -495,10 +494,17 @@ class Mint(object):
         self.ms_files = get_ms_files_from_results(self.results)
         self.targets = get_targets_from_results(self.results)
 
-    @lru_cache(1)
-    def get_chromatograms(self, fns=None, peak_label=None, **kwargs):
+
+    def get_chromatograms(self, fns=None, peak_labels=None, filters=None, **kwargs):
         if fns is None:
             fns = self.ms_files
+        if peak_labels is None:
+            peak_labels = self.peak_labels
+        return self._get_chromatograms(fns=tuple(fns), peak_labels=tuple(peak_labels), 
+                                       filters=tuple(filters) if filters is not None else None, **kwargs)
+
+    @lru_cache(1)
+    def _get_chromatograms(self, fns=None, peak_labels=None, filters=None, **kwargs):
 
         if isinstance(fns, tuple):
             fns = list(fns)     
@@ -508,26 +514,24 @@ class Mint(object):
 
         labels = [fn_to_label(fn) for fn in fns]
 
-        # Need to get the actual file names with path
+        # Need to get the actual file names with get_chromatogramsath
         # in case only ms_file_labels are provided
         fns = [fn for fn in self.ms_files if fn_to_label(fn) in labels]
 
-        if peak_label is None:
-            peak_label = self.peak_labels
-
         data = []
 
-        for fn in self.tqdm(fns):
+        for fn in self.tqdm(fns, desc="Loading chromatograms"):
             df = ms_file_to_df(fn)
-            for label in peak_label:
+            for label in peak_labels:
                 mz_mean, mz_width, rt_min, rt_max = self.get_target_params(label)
                 chrom_raw = extract_chromatogram_from_ms1(
                     df, mz_mean=mz_mean, mz_width=mz_width
                 ).to_frame()
                 if len(chrom_raw) == 0:
                     continue
-                chrom = Chromatogram(chrom_raw.index, chrom_raw.values)
-                chrom.apply_filters()
+                chrom = Chromatogram(chrom_raw.index, chrom_raw.values, filters=filters, **kwargs)
+                if filters is not None:
+                    chrom.apply_filters()
                 chrom_data = chrom.data
                 chrom_data["ms_file"] = fn
                 chrom_data["ms_file_label"] = fn_to_label(fn)
