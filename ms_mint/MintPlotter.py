@@ -100,7 +100,7 @@ class MintPlotter:
         if len(self.mint.results) == 0:
             return None
 
-        warning.simplefilter("ignore", ClusterWarning)
+        warnings.simplefilter("ignore", ClusterWarning)
         if data is None:
             data = self.mint.crosstab(var_name).copy()
 
