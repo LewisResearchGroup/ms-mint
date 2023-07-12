@@ -392,7 +392,7 @@ class Mint(object):
 
         cells of the returned table.
         """
-
+        
         df_meta = pd.merge(self.meta, self.results, left_index=True, right_on='ms_file_label')
 
         if index is None:
@@ -552,6 +552,8 @@ class Mint(object):
             self.meta = pd.read_csv(fn, index_col=0)
         elif str(fn).endswith('.parquet'):
             self.meta = pd.read_parquet(fn)
+        if 'ms_file_label' in self.meta.columns:
+            self.meta = self.meta.set_index('ms_file_label')
         return self
 
     def save_metadata(self, fn=None):
