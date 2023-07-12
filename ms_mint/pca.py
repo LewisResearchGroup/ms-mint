@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import warnings
+
 import plotly.figure_factory as ff
 from plotly import express as px
 
@@ -25,7 +27,7 @@ class PrincipalComponentsAnalyser:
         self.results = None
         self.plot = PCA_Plotter(self)
 
-    def run(self, n_components=3, on="peak_max", fillna="median", scaler="standard"):
+    def run(self, n_components=3, var_name="peak_max", fillna="median", scaler="standard"):
         """
         Run Principal Component Analysis on current results. Results are stored in
         self.decomposition_results.
@@ -39,7 +41,11 @@ class PrincipalComponentsAnalyser:
         :param scaler: Method to scale the columns, defaults to "standard"
         :type scaler: str, optional
         """
-
+        
+        if on is not None:
+            warnings.warn("on is depricated use var_name instead", DeprecationWarning)            
+            var_name = targets_var            
+        
         df = self.mint.crosstab(on).fillna(fillna)
 
         if fillna == "median":

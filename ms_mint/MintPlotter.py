@@ -1,7 +1,7 @@
 import numpy as np
 import seaborn as sns
+import warnings
 
-from warnings import simplefilter
 from scipy.cluster.hierarchy import ClusterWarning
 
 from pathlib import Path as P
@@ -44,7 +44,8 @@ class MintPlotter:
         ms_files=None,
         title=None,
         figsize=(8, 8),
-        targets_var="peak_max",
+        targets_var=None,
+        var_name="peak_max",
         vmin=-3,
         vmax=3,
         xmaxticks=None,
@@ -59,7 +60,7 @@ class MintPlotter:
     ):
         """
         Performs a cluster analysis and plots a heatmap. If no data is provided,
-        data is taken form self.mint.crosstab(targets_var).
+        data is taken form self.mint.crosstab(var_name).
         The clustered non-transformed non-scaled data is stored in `self.mint.clustered`.
 
         :param transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
@@ -91,12 +92,17 @@ class MintPlotter:
         :param transpose: bool, default False
             - True: transpose the figure
         """
+        
+        if targets_var is not None:
+            warnings.warn("targets_var is depricated use var_name instead", DeprecationWarning)
+            var_name = targets_var
+        
         if len(self.mint.results) == 0:
             return None
 
-        simplefilter("ignore", ClusterWarning)
+        warning.simplefilter("ignore", ClusterWarning)
         if data is None:
-            data = self.mint.crosstab(targets_var).copy()
+            data = self.mint.crosstab(var_name).copy()
 
         if peak_labels is not None:
             data = data[peak_labels]
