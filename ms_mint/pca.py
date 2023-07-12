@@ -100,7 +100,33 @@ class PCA_Plotter:
         """
         self.pca = pca
 
-    def cumulative_variance(self, height=4, aspect=2):
+        
+    def cumulative_variance(self, interactive=False, **kwargs):
+        if interactive:
+            return self.cumulative_variance_px(**kwargs)
+        else:
+            return self.cumulative_variance_sns(**kwargs) 
+        
+        
+    def cumulative_variance_px(self, **kwargs):
+        """
+        After running mint.pca() this function can be used to plot the cumulative variance of the
+        principal components.
+
+        :return: Returns a plotly express figure.
+        :rtype: plotly.graph_objs._figure.Figure
+        """
+        n_components = self.pca.results["n_components"]
+        cum_expl_var = self.pca.results["cum_expl_var"]
+        df = pd.DataFrame({'Principal Component': np.arange(n_components) + 1, 'Explained variance [%]': cum_expl_var})
+        fig = px.bar(df, x='Principal Component', y='Explained variance [%]', 
+                     title="Cumulative explained variance",
+                     labels={'Principal Component':'Principal Component', 'Explained variance [%]':'Explained variance [%]'},
+                     **kwargs)
+        fig.update_layout(autosize=True, showlegend=False)
+        return fig
+
+    def cumulative_variance_sns(self, **kwargs):
         """
         After running mint.pca() this function can be used to plot the cumulative variance of the
         principal components.
@@ -108,20 +134,30 @@ class PCA_Plotter:
         :return: Returns a matplotlib figure.
         :rtype: matplotlib.figure.Figure
         """
+        # Set default values for aspect and height
+        aspect = kwargs.get('aspect', 1)
+        height = kwargs.get('height', 5)
+
         n_components = self.pca.results["n_components"]
-        fig = plt.figure(figsize=(height * aspect, height))
         cum_expl_var = self.pca.results["cum_expl_var"]
-        plt.bar(
+
+        # Calculate width based on aspect ratio and number of components
+        width = height * aspect
+
+        fig, ax = plt.subplots(figsize=(width, height))
+        ax.bar(
             np.arange(n_components) + 1,
             cum_expl_var,
             facecolor="grey",
             edgecolor="none",
         )
-        plt.xlabel("Principal Component")
-        plt.ylabel("Explained variance [%]")
-        plt.title("Cumulative explained variance")
-        plt.grid()
-        plt.xticks(range(1, len(cum_expl_var) + 1))
+        ax.set_xlabel("Principal Component")
+        ax.set_ylabel("Explained variance [%]")
+        ax.set_title("Cumulative explained variance")
+        #ax.grid()
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)        
+        ax.set_xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
     def _prepare_data(self, n_components=3, hue=None):
@@ -155,7 +191,7 @@ class PCA_Plotter:
         df = self._prepare_data(n_components=n_components, hue=hue)
 
         if isinstance(hue, list):
-            hue = 'Label'
+            hue = 'label'
 
         if interactive:
             return self.pairplot_plotly(df, color_col=hue, **kwargs)

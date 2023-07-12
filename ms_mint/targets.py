@@ -59,6 +59,7 @@ def standardize_targets(targets, ms_mode="neutral"):
     targets = targets.rename(columns=DEPRECATED_LABELS)
     if targets.index.name == "peak_label":
         targets = targets.reset_index()
+
     assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
     cols = targets.columns
     if "formula" in targets.columns and not "mz_mean" in targets.columns:
@@ -85,8 +86,11 @@ def standardize_targets(targets, ms_mode="neutral"):
             targets[c] = None
             targets[c] = targets[c].astype(float)
     del c
+    
     if "peak_label" not in cols:
+        logging.warning(f'"peak_label" not in cols, assigning new labels:\n{targets}')
         targets["peak_label"] = [f"C_{i}" for i in range(len(targets))]
+        
     targets["intensity_threshold"] = targets["intensity_threshold"].fillna(0)
     targets["peak_label"] = targets["peak_label"].astype(str)
 

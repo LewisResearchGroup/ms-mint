@@ -75,12 +75,7 @@ def ms_file_to_df(fn, read_only: bool = False):
         )
         # Set datatypes
         set_dtypes(df)
-
-    # assert df.scan_id.dtype in [np.int32, np.int64], df.scan_id.dtype
-    # assert df.intensity.dtype == np.int64, df.intensity.dtype
-    # assert df.mz.dtype == np.float64, df.mz.dtype
-    # assert df.scan_time.dtype == np.float64, df.scan_time.dtype
-
+    print(df.columns)
     return df
 
 
