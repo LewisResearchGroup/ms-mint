@@ -10,6 +10,8 @@ from pathlib import Path as P
 from multiprocessing import Pool, Manager, cpu_count
 from glob import glob
 
+from sklearn.preprocessing import StandardScaler, RobustScaler
+
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
 from .io import export_to_excel, ms_file_to_df
@@ -381,40 +383,73 @@ class Mint(object):
     def results(self, df):
         self._results = df
 
-    def crosstab(self, values: str = "peak_max", index: str = None, column: str = None, aggfunc: str = 'mean', apply: Callable = None, scaler: Callable = None):
+    def crosstab(self, var_name: str = None, index: str = None, column: str = None, aggfunc: str = 'mean', apply: Callable = None, scaler: Callable = None, groupby: str = None):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
         The values in the cells are determined by *col_name*.
 
-        :param col_name: Name of the column from *mint.results* table that is used for the cell values.
-        :type col_name: str
+        :param var_name: Name of the column from *mint.results* table that is used for the cell values. If None, defaults to 'peak_area_top3'.
+        :type var_name: str, optional
 
-        cells of the returned table.
+        :param index: Name of the column to be used as index in the resulting cross-tabulation. If None, defaults to 'ms_file_label'.
+        :type index: str, optional
+
+        :param column: Name of the column to be used as columns in the resulting cross-tabulation. If None, defaults to 'peak_label'.
+        :type column: str, optional
+
+        :param aggfunc: Aggregation function to be used for aggregating values. Defaults to 'mean'.
+        :type aggfunc: str, optional
+
+        :param apply: Function to be applied to the resulting cross-tabulation. If None, no function is applied.
+        :type apply: Callable, optional
+
+        :param scaler: Function to scale the data in the resulting cross-tabulation. If None, no scaling is performed.
+        :type scaler: Callable, optional
+
+        :param groupby: Name of the column to group data before scaling. If None, scaling is applied to the whole data, not group-wise.
+        :type groupby: str, optional
+
+        :return: DataFrame representing the cross-tabulation.
+        :rtype: pandas.DataFrame
         """
-        
+
         df_meta = pd.merge(self.meta, self.results, left_index=True, right_on='ms_file_label')
 
         if index is None:
             index = 'ms_file_label'
         if column is None:
             column = 'peak_label'
-        if values is None:
-            values = 'peak_area_top3'
+        if var_name is None:
+            var_name = 'peak_area_top3'
+
+        if apply:
+            df_meta[var_name] = df_meta[var_name].apply(apply)
+
+        if isinstance(scaler, str):
+            scaler_dict = {'standard': StandardScaler(),
+                           'robust': RobustScaler()}
+
+            if scaler not in scaler_dict:
+                raise ValueError(f"Unsupported scaler: {scaler}")
+
+            scaler = scaler_dict[scaler]
+
+        if scaler:
+            if groupby:
+                df_meta[var_name] = df_meta.groupby([groupby, column])[var_name].transform(lambda x: self._scale_group(x, scaler))
+            else:
+                df_meta[var_name] = df_meta.groupby(column)[var_name].transform(lambda x: self._scale_group(x, scaler))
 
         df = pd.crosstab(
             df_meta[index],
             df_meta[column],
-            df_meta[values],
+            df_meta[var_name],
             aggfunc=aggfunc,
         ).astype(np.float64)
 
-        if apply:
-            df = df.apply(apply)
-        if scaler:
-            df = scale_dataframe(df, scaler=scaler)
         return df
-
+    
     @property
     def progress(self):
         """
@@ -564,3 +599,9 @@ class Mint(object):
         elif str(fn).endswith('.parquet'):
             self.meta.to_parquet(fn)
         return self
+
+    def _scale_group(self, group, scaler):
+        """
+        Helper function to scale groups individually.
+        """
+        return scaler.fit_transform(group.to_numpy().reshape(-1, 1)).flatten()
