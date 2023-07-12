@@ -173,7 +173,33 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pca</span> <span class="o">=</span> <span class="n">pca</span></div>
 
-<div class="viewcode-block" id="PCA_Plotter.cumulative_variance"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        
+<div class="viewcode-block" id="PCA_Plotter.cumulative_variance"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cumulative_variance_px</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cumulative_variance_sns</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> </div>
+        
+        
+<div class="viewcode-block" id="PCA_Plotter.cumulative_variance_px"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance_px">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance_px</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After running mint.pca() this function can be used to plot the cumulative variance of the</span>
+<span class="sd">        principal components.</span>
+
+<span class="sd">        :return: Returns a plotly express figure.</span>
+<span class="sd">        :rtype: plotly.graph_objs._figure.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;n_components&quot;</span><span class="p">]</span>
+        <span class="n">cum_expl_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cum_expl_var&quot;</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Principal Component&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Explained variance [%]&#39;</span><span class="p">:</span> <span class="n">cum_expl_var</span><span class="p">})</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Principal Component&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Explained variance [%]&#39;</span><span class="p">,</span> 
+                     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Cumulative explained variance&quot;</span><span class="p">,</span>
+                     <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Principal Component&#39;</span><span class="p">:</span><span class="s1">&#39;Principal Component&#39;</span><span class="p">,</span> <span class="s1">&#39;Explained variance [%]&#39;</span><span class="p">:</span><span class="s1">&#39;Explained variance [%]&#39;</span><span class="p">},</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">autosize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="PCA_Plotter.cumulative_variance_sns"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance_sns">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After running mint.pca() this function can be used to plot the cumulative variance of the</span>
 <span class="sd">        principal components.</span>
@@ -181,20 +207,30 @@
 <span class="sd">        :return: Returns a matplotlib figure.</span>
 <span class="sd">        :rtype: matplotlib.figure.Figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set default values for aspect and height</span>
+        <span class="n">aspect</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;aspect&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
         <span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;n_components&quot;</span><span class="p">]</span>
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">aspect</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
         <span class="n">cum_expl_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cum_expl_var&quot;</span><span class="p">]</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+
+        <span class="c1"># Calculate width based on aspect ratio and number of components</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">height</span> <span class="o">*</span> <span class="n">aspect</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
             <span class="n">cum_expl_var</span><span class="p">,</span>
             <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span>
             <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Principal Component&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Explained variance [%]&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Cumulative explained variance&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cum_expl_var</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Principal Component&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Explained variance [%]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Cumulative explained variance&quot;</span><span class="p">)</span>
+        <span class="c1">#ax.grid()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>        
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cum_expl_var</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
     <span class="k">def</span> <span class="nf">_prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -228,7 +264,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hue</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">hue</span> <span class="o">=</span> <span class="s1">&#39;Label&#39;</span>
+            <span class="n">hue</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
         <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pairplot_plotly</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">color_col</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

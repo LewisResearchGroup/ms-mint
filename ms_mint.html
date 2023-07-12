@@ -106,7 +106,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.plotly_tools.set_template"><code class="docutils literal notranslate"><span class="pre">set_template()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.plotting">ms_mint.plotting module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ms-mint-plotting-module">ms_mint.plotting module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ms_mint.processing">ms_mint.processing module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.append_results"><code class="docutils literal notranslate"><span class="pre">append_results()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ms_mint.processing.extract_chromatogram_from_ms1"><code class="docutils literal notranslate"><span class="pre">extract_chromatogram_from_ms1()</span></code></a></li>
@@ -1103,7 +1103,27 @@ using the pyteomics library.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.cumulative_variance">
-<span class="sig-name descname"><span class="pre">cumulative_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cumulative_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.cumulative_variance_px">
+<span class="sig-name descname"><span class="pre">cumulative_variance_px</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance_px"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance_px" title="Permalink to this definition"></a></dt>
+<dd><p>After running mint.pca() this function can be used to plot the cumulative variance of the
+principal components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns a plotly express figure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>plotly.graph_objs._figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ms_mint.pca.PCA_Plotter.cumulative_variance_sns">
+<span class="sig-name descname"><span class="pre">cumulative_variance_sns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ms_mint/pca.html#PCA_Plotter.cumulative_variance_sns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ms_mint.pca.PCA_Plotter.cumulative_variance_sns" title="Permalink to this definition"></a></dt>
 <dd><p>After running mint.pca() this function can be used to plot the cumulative variance of the
 principal components.</p>
 <dl class="field-list simple">
@@ -1246,8 +1266,8 @@ grouped by peak_label.</p>
 </dd></dl>
 
 </section>
-<section id="module-ms_mint.plotting">
-<span id="ms-mint-plotting-module"></span><h2>ms_mint.plotting module<a class="headerlink" href="#module-ms_mint.plotting" title="Permalink to this heading"></a></h2>
+<section id="ms-mint-plotting-module">
+<h2>ms_mint.plotting module<a class="headerlink" href="#ms-mint-plotting-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-ms_mint.processing">
 <span id="ms-mint-processing-module"></span><h2>ms_mint.processing module<a class="headerlink" href="#module-ms_mint.processing" title="Permalink to this heading"></a></h2>
