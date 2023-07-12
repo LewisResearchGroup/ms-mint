@@ -27,7 +27,7 @@ class PrincipalComponentsAnalyser:
         self.results = None
         self.plot = PCA_Plotter(self)
 
-    def run(self, n_components=3, var_name="peak_max", fillna="median", scaler="standard"):
+    def run(self, n_components=3, on=None, var_name="peak_max", fillna="median", apply=None, groupby=None, scaler="standard"):
         """
         Run Principal Component Analysis on current results. Results are stored in
         self.decomposition_results.
@@ -44,9 +44,9 @@ class PrincipalComponentsAnalyser:
         
         if on is not None:
             warnings.warn("on is depricated use var_name instead", DeprecationWarning)            
-            var_name = targets_var            
+            var_name = on            
         
-        df = self.mint.crosstab(on).fillna(fillna)
+        df = self.mint.crosstab(var_name=var_name, apply=apply, scaler=scaler, groupby=groupby)
 
         if fillna == "median":
             fillna = df.median()
@@ -56,8 +56,6 @@ class PrincipalComponentsAnalyser:
             fillna = 0
 
         df = df.fillna(fillna)
-        if scaler is not None:
-            df = scale_dataframe(df, scaler)
 
         min_dim = min(df.shape)
         n_components = min(n_components, min_dim)
