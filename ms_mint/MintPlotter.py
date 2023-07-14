@@ -5,7 +5,11 @@ import warnings
 from scipy.cluster.hierarchy import ClusterWarning
 
 from pathlib import Path as P
+
+import matplotlib
 from matplotlib import pyplot as plt
+
+from typing import Optional, List, Tuple
 
 from .plotly_tools import plotly_heatmap, plotly_peak_shapes
 from .matplotlib_tools import (
@@ -14,6 +18,7 @@ from .matplotlib_tools import (
     plot_metabolomics_hist2d,
 )
 
+import pandas as pd
 import plotly.express as px
 
 from .tools import scale_dataframe, mz_mean_width_to_min_max
@@ -36,109 +41,71 @@ class MintPlotter:
         :type mint: ms_mint.Mint.Mint
         """
         self.mint = mint
-
+        
+        
     def hierarchical_clustering(
         self,
-        data=None,
-        peak_labels=None,
-        ms_files=None,
-        title=None,
-        figsize=(8, 8),
-        targets_var=None,
-        var_name="peak_max",
-        vmin=-3,
-        vmax=3,
-        xmaxticks=None,
-        ymaxticks=None,
-        transform_func="log2p1",
-        scaler_ms_file=None,
-        scaler_peak_label="standard",
-        metric="cosine",
-        transform_filenames_func="basename",
-        transposed=False,
+        data: Optional[pd.DataFrame] = None,
+        peak_labels: Optional[List[str]] = None,
+        ms_files: Optional[List[str]] = None,
+        title: Optional[str] = None,
+        figsize: Tuple[int, int] = (8, 8),
+        targets_var: Optional[str] = None,
+        var_name: str = "peak_max",
+        vmin: int = -3,
+        vmax: int = 3,
+        xmaxticks: Optional[int] = None,
+        ymaxticks: Optional[int] = None,
+        apply: str = "log2p1",
+        metric: str = "cosine",
+        scaler: str = "standard",
+        groupby: Optional[str] = None,
+        transposed: bool = False,
         **kwargs,
-    ):
+    ) -> matplotlib.figure.Figure:
         """
         Performs a cluster analysis and plots a heatmap. If no data is provided,
-        data is taken form self.mint.crosstab(var_name).
+        data is taken from self.mint.crosstab(var_name).
         The clustered non-transformed non-scaled data is stored in `self.mint.clustered`.
 
-        :param transform_func: default 'log2p1', values: [None, 'log1p', 'log2p1', 'log10p1']
-            - None: no transformation
-            - log1p: tranform data with lambda x: np.log1p(x)
-            - log2p1: transform data with lambda x: log2(x+1)
-            - log10p1: transform data with lambda x: log10(x+1)
+        :param data: DataFrame with data to be used for clustering. If None, crosstab of mint instance is used.
+        :type data: pandas.DataFrame, optional
 
-        :param scaler_ms_file: default None, values: [None, 'standard', 'robust']
-            - scaler used to scale along ms_file axis
-            - if None no scaling is applied
-            - if 'standard' use scikit learn StandardScaler()
-            - if 'robust' use scikit learn RobustScaler()
+        :param var_name: Name of the column from data to be used for cell values in the heatmap. Defaults to "peak_max".
+        :type var_name: str
 
-        :param scaler_peak_label: default 'standard'
-            - like scaler_ms_file, but scaling along peak_label axis
+        :param apply: Transformation to be applied on the data. Can be "log1p", "log2p1", "log10p1" or None. Defaults to "log2p1".
+        :type apply: str, optional
 
-        :param metric: default 'cosine', can be string or a list of two values:
-            if two values are provided e.g. ('cosine', 'euclidean') the first
-            will be used to cluster the x-axis and the second for the y-axis.
+        :param scaler: Method to scale data along both axes. Can be "standard", "robust" or None. Defaults to "standard".
+        :type scaler: str, optional
 
-            'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine',
-            'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis',
-            'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean',
-            'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
-            More information:
-            https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
+        :param groupby: Name of the column to group data before scaling. If None, scaling is applied to the whole data, not group-wise.
+        :type groupby: str, optional
 
-        :param transpose: bool, default False
-            - True: transpose the figure
+        :param metric: The distance metric to use for the tree. Can be any metric supported by scipy.spatial.distance.pdist.
+        :type metric: str, optional
+
+        :param transposed: Whether to transpose the figure or not. Defaults to False.
+        :type transposed: bool, optional
+
+        :return: Matplotlib figure representing the clustered heatmap.
+        :rtype: matplotlib.figure.Figure
         """
-        
+
         if targets_var is not None:
             warnings.warn("targets_var is depricated use var_name instead", DeprecationWarning)
             var_name = targets_var
-        
-        if len(self.mint.results) == 0:
-            return None
 
         warnings.simplefilter("ignore", ClusterWarning)
         if data is None:
-            data = self.mint.crosstab(var_name).copy()
-
-        if peak_labels is not None:
-            data = data[peak_labels]
-
-        if ms_files is not None:
-            data = data.loc[ms_files]
-
-        tmp_data = data.copy()
-
-        if transform_func == "log1p":
-            transform_func = np.log1p
-        if transform_func == "log2p1":
-            transform_func = lambda x: np.log2(x + 1)
-        if transform_func == "log10p1":
-            transform_func = lambda x: np.log10(x + 1)
-        if transform_func is not None:
-            tmp_data = tmp_data.apply(transform_func)
-
-        if transform_filenames_func == "basename":
-            transform_filenames_func = lambda x: P(x).with_suffix("").name
-        if transform_filenames_func is not None:
-            tmp_data.index = [transform_filenames_func(i) for i in tmp_data.index]
-
-        # Scale along ms-files
-        if scaler_ms_file is not None:
-            tmp_data = scale_dataframe(tmp_data.T, scaler_ms_file).T
-
-        # Scale along peak_labels
-        if scaler_peak_label is not None:
-            tmp_data = scale_dataframe(tmp_data, scaler_peak_label)
+            data = self.mint.crosstab(var_name=var_name, apply=apply, scaler=scaler, groupby=groupby)
 
         if transposed:
-            tmp_data = tmp_data.T
+            data = data.T
 
         _, fig, ndx_x, ndx_y = hierarchical_clustering(
-            tmp_data,
+            data,
             vmin=vmin,
             vmax=vmax,
             figsize=figsize,
@@ -148,10 +115,8 @@ class MintPlotter:
             **kwargs,
         )
 
-        if not transposed:
-            self.mint.clustered = data.iloc[ndx_x, ndx_y]
-        else:
-            self.mint.clustered = data.iloc[ndx_y, ndx_x]
+        self.mint.clustered = data.iloc[ndx_x, ndx_y]
+        
         return fig
     
 

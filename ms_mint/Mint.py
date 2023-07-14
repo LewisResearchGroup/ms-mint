@@ -23,7 +23,8 @@ from .tools import (
     get_targets_from_results,
     scale_dataframe,
     init_metadata,
-    fn_to_label
+    fn_to_label,
+    log2p1
 )
 from .pca import PrincipalComponentsAnalyser
 from .MintPlotter import MintPlotter
@@ -61,7 +62,8 @@ class Mint(object):
     ):
         self.verbose = verbose
         self._version = ms_mint.__version__
-        print("Mint version:", self.version, "\n")
+        if verbose: 
+            print("Mint version:", self.version, "\n")
         self.progress_callback = progress_callback
         self.reset()
         self.plot = MintPlotter(mint=self)
@@ -383,7 +385,8 @@ class Mint(object):
     def results(self, df):
         self._results = df
 
-    def crosstab(self, var_name: str = None, index: str = None, column: str = None, aggfunc: str = 'mean', apply: Callable = None, scaler: Callable = None, groupby: str = None):
+    def crosstab(self, var_name: str = None, index: str = None, column: str = None, aggfunc: str = 'mean', 
+                 apply: Callable = None, scaler: Callable = None, groupby: str = None):
         """
         Create condensed representation of the results.
         More specifically, a cross-table with filenames as index and target labels.
@@ -413,19 +416,26 @@ class Mint(object):
         :return: DataFrame representing the cross-tabulation.
         :rtype: pandas.DataFrame
         """
-
         df_meta = pd.merge(self.meta, self.results, left_index=True, right_on='ms_file_label')
-
+        # Remove None if in index
+        if isinstance(index, list):
+            if None in index:
+                index.remove(None)
+        if isinstance(groupby, str):
+            groupby = [groupby]
+            
         if index is None:
             index = 'ms_file_label'
         if column is None:
             column = 'peak_label'
         if var_name is None:
             var_name = 'peak_area_top3'
-
         if apply:
+            if apply == 'log2p1':
+                apply = log2p1
+            if apply == 'logp1':
+                apply = np.log1p
             df_meta[var_name] = df_meta[var_name].apply(apply)
-
         if isinstance(scaler, str):
             scaler_dict = {'standard': StandardScaler(),
                            'robust': RobustScaler()}
@@ -434,20 +444,21 @@ class Mint(object):
                 raise ValueError(f"Unsupported scaler: {scaler}")
 
             scaler = scaler_dict[scaler]
-
+            
         if scaler:
-            if groupby:
-                df_meta[var_name] = df_meta.groupby([groupby, column])[var_name].transform(lambda x: self._scale_group(x, scaler))
+            if groupby:          
+                groupby_cols = groupby + [column]
+                df_meta[var_name] = df_meta.groupby(groupby_cols)[var_name].transform(lambda x: self._scale_group(x, scaler))
             else:
                 df_meta[var_name] = df_meta.groupby(column)[var_name].transform(lambda x: self._scale_group(x, scaler))
-
-        df = pd.crosstab(
-            df_meta[index],
-            df_meta[column],
-            df_meta[var_name],
+                
+        df = pd.pivot_table(
+            df_meta,
+            index=index,
+            columns=column,
+            values=var_name,
             aggfunc=aggfunc,
         ).astype(np.float64)
-
         return df
     
     @property

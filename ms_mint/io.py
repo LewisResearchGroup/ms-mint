@@ -64,7 +64,10 @@ def ms_file_to_df(fn, read_only: bool = False):
     except IndexError as e:
         logging.warning(f"{e}: {fn}")
         return None
-    if not read_only:
+    
+    if read_only:
+        return df
+    else:
         # Compatibility with old schema
         df = df.rename(
             columns={
@@ -73,9 +76,12 @@ def ms_file_to_df(fn, read_only: bool = False):
                 "m/z array": "mz",
             }
         )
+        if 'scan_id' not in df.columns:
+            df['scan_id'] = 0
+        if 'ms_level' not in df.columns:
+            df['ms_level'] = 1
         # Set datatypes
         set_dtypes(df)
-    print(df.columns)
     return df
 
 
