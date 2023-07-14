@@ -26,6 +26,7 @@ class TestClass:
         mint.ms_files = [TEST_MZXML]
         assert mint.n_files == 1, mint.n_files
         assert mint.ms_files == [TEST_MZXML]
+        mint.load_targets(TEST_TARGETS_FN_V2_CSV_SEC)
 
     def test__mint_run_standard(self):
         mint.run()
@@ -47,6 +48,8 @@ class TestClass:
         assert (expected == actual).all(), actual
 
     def test__crosstab_is_dataframe(self):
+        print(mint.results)
+        print(mint.meta)
         ct = mint.crosstab()
         assert isinstance(
             ct, pd.DataFrame
