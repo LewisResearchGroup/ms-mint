@@ -89,7 +89,7 @@ def process_ms1_file(filename, targets):
     results["ms_file"] = filename
     results["ms_file_label"] = P(filename).with_suffix('').name
     results["ms_file_size_MB"] = os.path.getsize(filename) / 1024 / 1024
-    results["peak_score"] = score_peaks(results)
+    results["peak_score"] = 0 #  score_peaks(results)
     return results[MINT_RESULTS_COLUMNS]
 
 

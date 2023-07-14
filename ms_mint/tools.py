@@ -13,6 +13,10 @@ from .filelock import FileLock
 from .matplotlib_tools import plot_peaks
 
 
+def log2p1(x):
+    return np.log2(x+1)
+
+
 def lock(fn):
     """
     File lock to ensure safe writing to file.
