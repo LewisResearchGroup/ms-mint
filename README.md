@@ -1,6 +1,8 @@
 [![Python package](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml)
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
+![PyPI](https://img.shields.io/pypi/v/ms-mint?label=pypi%20package)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
 
 # Wecome to ms-mint
 
