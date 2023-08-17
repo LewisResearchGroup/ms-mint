@@ -1,0 +1,7 @@
+peak_label,mz_mean,mz_width,rt,rt_min,rt_max,rt_unit,intensity_threshold,target_filename
+Arabitol,151.0605,10,295.50000000000006,277.0,315.0,s,0,targets.csv
+Mevalonate,147.0657,10,180.0,100.0,266.0,s,0,targets.csv
+Nicotinate,122.02455,10,183.204,163.0,228.0,s,0,targets.csv
+Succinate,117.01905,10,122.634,122.2,150.0,s,0,targets.csv
+Urocanate,137.0354,10,264.9,240.0,290.0,s,0,targets.csv
+Xanthine,151.02585,10,250,208,290.8,s,0,targets.csv
