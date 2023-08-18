@@ -130,18 +130,14 @@ class MintPlotter:
         if peak_labels is None:
             peak_labels = self.mint.peak_labels
 
-        df = pd.merge(self.mint.results, self.mint.meta, left_on='ms_file_label', right_index=True)
-
-        print(df)
-
-        if len(df) > 0:
+        if len(self.mint.results) > 0:
             if not interactive:
                 return plot_peak_shapes(
-                    df, fns=fns, peak_labels=peak_labels, **kwargs
+                    self.mint.results, mint_metadata=self.mint.meta, fns=fns, peak_labels=peak_labels, **kwargs
                 )
             else:
                 return plotly_peak_shapes(
-                    df, fns=fns, peak_labels=peak_labels, **kwargs
+                    self.mint.results, mint_metadata=self.mint.meta, fns=fns, peak_labels=peak_labels, **kwargs
                 )
 
     def heatmap(
