@@ -81,7 +81,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span><span class="p">,</span> <span class="n">peak_widths</span>
 
-<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">M_PROTON</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span>
+<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">M_PROTON</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">MINT_METADATA_COLUMNS</span>
 <span class="kn">from</span> <span class="nn">.filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
 <span class="kn">from</span> <span class="nn">.matplotlib_tools</span> <span class="kn">import</span> <span class="n">plot_peaks</span>
 
@@ -303,18 +303,9 @@
     <span class="n">mz_max</span> <span class="o">=</span> <span class="n">mz_mean</span> <span class="o">+</span> <span class="n">delta_mass</span>
     <span class="k">return</span> <span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_max</span></div>
 
+
 <div class="viewcode-block" id="init_metadata"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.init_metadata">[docs]</a><span class="k">def</span> <span class="nf">init_metadata</span><span class="p">():</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ms_file&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;label&#39;</span><span class="p">,</span> 
-        <span class="s1">&#39;group&#39;</span><span class="p">,</span> 
-        <span class="s1">&#39;type&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;run_order&#39;</span><span class="p">,</span> 
-        <span class="s1">&#39;plate&#39;</span><span class="p">,</span> 
-        <span class="s1">&#39;plate_row&#39;</span><span class="p">,</span> 
-        <span class="s1">&#39;plate_col&#39;</span>
-    <span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">MINT_METADATA_COLUMNS</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">)</span></div>
 
 
