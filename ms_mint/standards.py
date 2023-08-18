@@ -58,4 +58,18 @@ DEPRECATED_LABELS = {
     "ms_file_size": "ms_file_size_MB",
 }
 
+MINT_METADATA_COLUMNS = [
+    'ms_file_label',
+    'label', 
+    'group',
+    'batch',
+    'sample_type',
+    'run_order', 
+    'plate',
+    'plate_row', 
+    'plate_col',
+    'lc_column',
+    'polarity'
+]
+
 M_PROTON = 1.00782503223

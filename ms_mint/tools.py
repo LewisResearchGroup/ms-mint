@@ -8,7 +8,7 @@ from molmass import Formula, FormulaError
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from scipy.signal import find_peaks, peak_widths
 
-from .standards import M_PROTON, TARGETS_COLUMNS
+from .standards import M_PROTON, TARGETS_COLUMNS, MINT_METADATA_COLUMNS
 from .filelock import FileLock
 from .matplotlib_tools import plot_peaks
 
@@ -230,18 +230,9 @@ def mz_mean_width_to_min_max(mz_mean, mz_width):
     mz_max = mz_mean + delta_mass
     return mz_min, mz_max
 
+
 def init_metadata():
-    cols = [
-        'ms_file_label',
-        'ms_file',
-        'label', 
-        'group', 
-        'type',
-        'run_order', 
-        'plate', 
-        'plate_row', 
-        'plate_col'
-    ]
+    cols = MINT_METADATA_COLUMNS
     return pd.DataFrame(columns=cols).set_index('ms_file_label')
 
 
