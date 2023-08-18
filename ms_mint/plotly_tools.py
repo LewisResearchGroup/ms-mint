@@ -1,6 +1,7 @@
 import logging
 
 import numpy as np
+import pandas as pd
 import colorlover as cl
 
 import plotly.graph_objects as go
@@ -222,6 +223,8 @@ def plotly_heatmap(
 
 def plotly_peak_shapes(
     mint_results,
+    mint_metadata=None,
+    color='ms_file_label',  # Add the new argument for specifying color column
     fns=None,
     col_wrap=1,
     peak_labels=None,
@@ -229,52 +232,61 @@ def plotly_peak_shapes(
     verbose=False,
     legend_orientation="v",
     call_show=False,
+    palette='Plasma',
 ):
-    """
-    Returns a plotly multiplost of all peak_shapes in mint.results
-    grouped by peak_label.
-    """
     mint_results = mint_results.copy()
 
+    # Merge with metadata if provided
+    if mint_metadata is not None:
+        mint_results = pd.merge(mint_results, mint_metadata, left_on='ms_file_label', right_index=True)
 
+    # Filter by filenames
     if fns is not None:
         fns = [fn_to_label(fn) for fn in fns]
         mint_results = mint_results[mint_results.ms_file_label.isin(fns)]
+    else:
+        fns = mint_results.ms_file_label.unique()
+    
+    # Filter by peak_labels
+    if peak_labels is not None:
+        if isinstance(peak_labels, str):
+            peak_labels = [peak_labels]
+        mint_results = mint_results[mint_results.peak_label.isin(peak_labels)]
+    else:
+        peak_labels = mint_results.results.peak_label.unique()
+        
+    # Handle colors based on metadata or fall back to default behavior
+    colors = None
+    if color:
+        unique_hues = mint_results[color].unique()
 
-    mint_results.ms_file = [P(fn).name for fn in mint_results.ms_file]
+        colors = get_palette_colors(palette, len(unique_hues)) 
 
-    logging.warning("TEST")
+        color_mapping = dict(zip(unique_hues, colors))
+                        
+        if color == 'ms_file_label':
+            hue_column = [color_mapping[fn] for fn in fns]
+        else:
+            # Existing logic remains the same for the else part
+            hue_column = mint_results.drop_duplicates('ms_file_label').set_index('ms_file_label')[color].map(color_mapping).reindex(fns).tolist()
 
+    else:
+        hue_column = colors
+
+    # Rest of the plotting process
     res = mint_results[mint_results.peak_max > 0]
-
-    fns = res.ms_file_label.unique()
     labels = mint_results.peak_label.unique()
-
     res = res.set_index(["peak_label", "ms_file_label"]).sort_index()
 
-    if isinstance(peak_labels, str):
-        peak_labels = [peak_labels]
-
-    # Calculate neccessary number of rows
+    # Calculate necessary number of rows
     n_rows = max(1, len(labels) // col_wrap)
     if n_rows * col_wrap < len(labels):
         n_rows += 1
 
-    if verbose:
-        print(n_rows, col_wrap)
-        print("ms_files:", fns)
-        print("peak_labels:", peak_labels)
-        print("Data:", res)
-
     fig = make_subplots(
         rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels
     )
-    if len(fns) < 13:
-        colors = cl.scales["12"]["qual"]["Paired"]
-    else:
-        colors = cl.interp(cl.scales["12"]["qual"]["Paired"], len(fns))
 
-    # Create sub-plots
     for label_i, label in enumerate(peak_labels):
         for file_i, fn in enumerate(fns):
             try:
@@ -282,9 +294,9 @@ def plotly_peak_shapes(
             except KeyError as e:
                 logging.warning(e)
                 continue
+
             if not isinstance(x, Iterable):
                 continue
-
             if isinstance(x, str):
                 x = x.split(",")
                 y = y.split(",")
@@ -297,6 +309,8 @@ def plotly_peak_shapes(
             else:
                 mode = "lines"
 
+            trace_color = trace_color = hue_column[file_i]
+
             fig.add_trace(
                 go.Scatter(
                     x=x,
@@ -305,7 +319,7 @@ def plotly_peak_shapes(
                     mode=mode,
                     legendgroup=file_i,
                     showlegend=(label_i == 0),
-                    marker_color=colors[file_i],
+                    marker_color=trace_color,
                     text=fn,
                 ),
                 row=ndx_r,
@@ -315,10 +329,10 @@ def plotly_peak_shapes(
             fig.update_xaxes(title_text="Scan time [s]", row=ndx_r, col=ndx_c)
             fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
 
-    # Layout
+    # Layout updates
     if legend:
         fig.update_layout(legend_orientation=legend_orientation)
-
+        
     fig.update_layout(showlegend=legend)
     fig.update_layout(height=400 * n_rows, title_text="Peak Shapes")
 
@@ -326,3 +340,17 @@ def plotly_peak_shapes(
         fig.show(config={"displaylogo": False})
     else:
         return fig
+
+
+def get_palette_colors(palette_name, num_colors):
+    # Categories in the colorlover package
+    categories = ["qual", "seq", "div"]
+
+    num_colors = max(num_colors, 3)
+    # Check in which category our palette resides
+    for category in categories:
+        if palette_name in cl.scales[f"{num_colors}"][category]:
+            return cl.scales[f"{num_colors}"][category][palette_name]
+
+    # If palette not found in any category, return a default one or raise an error
+    return cl.scales[f"{num_colors}"]["qual"]["Paired"]
