@@ -234,6 +234,35 @@ def plotly_peak_shapes(
     call_show=False,
     palette='Plasma',
 ):
+    """ 
+    Plot peak shapes of mint results.
+
+    :param mint_results: DataFrame in Mint results format.
+    :type mint_results: pandas.DataFrame
+    :param mint_metadata: DataFrame in Mint metadata format, defaults to None.
+    :type mint_metadata: pandas.DataFrame, optional
+    :param color: Column name determining color-coding of plots, defaults to 'ms_file_label'.
+    :type color: str, optional
+    :param fns: Filenames to include, defaults to None.
+    :type fns: list, optional
+    :param col_wrap: Maximum number of subplot columns, defaults to 1.
+    :type col_wrap: int, optional
+    :param peak_labels: Peak-labels to include, defaults to None.
+    :type peak_labels: list, optional
+    :param legend: Whether to display legend, defaults to True.
+    :type legend: bool, optional
+    :param verbose: If True, prints additional details, defaults to False.
+    :type verbose: bool, optional
+    :param legend_orientation: Legend orientation, defaults to 'v'.
+    :type legend_orientation: str, optional
+    :param call_show: If True, displays the plot immediately, defaults to False.
+    :type call_show: bool, optional
+    :param palette: Color palette to use, defaults to 'Plasma'.
+    :type palette: str, optional
+
+    :return: Plotly Figure object or None if call_show is True.
+    :rtype: plotly.graph_objs._figure.Figure or None
+    """
     mint_results = mint_results.copy()
 
     # Merge with metadata if provided
