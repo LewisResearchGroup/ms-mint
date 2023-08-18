@@ -218,11 +218,11 @@ def plot_peak_shapes(
             )
             dfs.append(df)
 
-    df = pd.concat(dfs).reset_index(drop=True)
+    df = pd.concat(dfs, ignore_index=True).reset_index(drop=True)
 
     # Add metadata
     if mint_metadata is not None:
-        df = pd.merge(df, mint_metadata, left_on='ms_file_label', right_index=True)
+        df = pd.merge(df, mint_metadata, left_on='ms_file_label', right_index=True, how='left')
 
     g = sns.relplot(
         data=df,
