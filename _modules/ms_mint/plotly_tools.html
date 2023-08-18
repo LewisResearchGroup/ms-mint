@@ -307,6 +307,35 @@
     <span class="n">call_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;Plasma&#39;</span><span class="p">,</span>
 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Plot peak shapes of mint results.</span>
+
+<span class="sd">    :param mint_results: DataFrame in Mint results format.</span>
+<span class="sd">    :type mint_results: pandas.DataFrame</span>
+<span class="sd">    :param mint_metadata: DataFrame in Mint metadata format, defaults to None.</span>
+<span class="sd">    :type mint_metadata: pandas.DataFrame, optional</span>
+<span class="sd">    :param color: Column name determining color-coding of plots, defaults to &#39;ms_file_label&#39;.</span>
+<span class="sd">    :type color: str, optional</span>
+<span class="sd">    :param fns: Filenames to include, defaults to None.</span>
+<span class="sd">    :type fns: list, optional</span>
+<span class="sd">    :param col_wrap: Maximum number of subplot columns, defaults to 1.</span>
+<span class="sd">    :type col_wrap: int, optional</span>
+<span class="sd">    :param peak_labels: Peak-labels to include, defaults to None.</span>
+<span class="sd">    :type peak_labels: list, optional</span>
+<span class="sd">    :param legend: Whether to display legend, defaults to True.</span>
+<span class="sd">    :type legend: bool, optional</span>
+<span class="sd">    :param verbose: If True, prints additional details, defaults to False.</span>
+<span class="sd">    :type verbose: bool, optional</span>
+<span class="sd">    :param legend_orientation: Legend orientation, defaults to &#39;v&#39;.</span>
+<span class="sd">    :type legend_orientation: str, optional</span>
+<span class="sd">    :param call_show: If True, displays the plot immediately, defaults to False.</span>
+<span class="sd">    :type call_show: bool, optional</span>
+<span class="sd">    :param palette: Color palette to use, defaults to &#39;Plasma&#39;.</span>
+<span class="sd">    :type palette: str, optional</span>
+
+<span class="sd">    :return: Plotly Figure object or None if call_show is True.</span>
+<span class="sd">    :rtype: plotly.graph_objs._figure.Figure or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mint_results</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># Merge with metadata if provided</span>
