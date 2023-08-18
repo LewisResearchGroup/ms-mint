@@ -212,7 +212,7 @@ def plot_peak_shapes(
                     "Scan time [s]": peak_rt,
                     "Intensity": peak_int,
                     "ms_file_label": ms_file_label,
-                    "peak_label": peak_label + f"\nm/z={mz:.3f}",
+                    "peak_label": peak_label,
                     "Expected Scan time [s]": rt,
                 }
             )
@@ -230,6 +230,7 @@ def plot_peak_shapes(
         y="Intensity",
         hue=hue,
         col="peak_label",
+        col_order=peak_labels,
         kind=kind,
         col_wrap=col_wrap,
         height=height,
