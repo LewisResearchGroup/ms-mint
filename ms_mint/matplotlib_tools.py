@@ -130,17 +130,19 @@ def hierarchical_clustering(
 
 def plot_peak_shapes(
     mint_results,
+    mint_metadata=None,
     fns=None,
     peak_labels=None,
     height=3,
     aspect=1.5,
     legend=False,
     col_wrap=4,
-    hue="ms_file",
+    hue="ms_file_label",
     title=None,
     dpi=None,
     sharex=False,
     sharey=False,
+    kind='line',
     **kwargs,
 ):
     """
@@ -148,6 +150,8 @@ def plot_peak_shapes(
 
     :param mint_results: DataFrame in Mint results format.
     :type mint_results: pandas.DataFrame
+    :param mint_metadata: DataFrame in Mint metadata format.
+    :type mint_metadata: pandas.DataFrame
     :param fns: Filenames to include, defaults to None
     :type fns: list, optional
     :param peak_labels: Peak-labels to include, defaults to None
@@ -170,6 +174,8 @@ def plot_peak_shapes(
     :type sharex: bool, optional
     :param sharey: Whether or not to share y-axis range between subplots, defaults to False
     :type sharey: bool, optional
+    :param kind: Kind of seaborn relplot
+    :type kind: str, optional
     :return: Generated figure object.
     :rtype: matplotlib.pyplot.Figure
     """
@@ -197,7 +203,7 @@ def plot_peak_shapes(
         ].iterrows():
             peak_rt = [float(i) for i in row.peak_shape_rt.split(",")]
             peak_int = [float(i) for i in row.peak_shape_int.split(",")]
-            ms_file = row.ms_file
+            ms_file_label = row.ms_file_label
             mz = row.mz_mean
             rt = row.rt
 
@@ -205,7 +211,7 @@ def plot_peak_shapes(
                 {
                     "Scan time [s]": peak_rt,
                     "Intensity": peak_int,
-                    "ms_file": ms_file,
+                    "ms_file_label": ms_file_label,
                     "peak_label": peak_label + f"\nm/z={mz:.3f}",
                     "Expected Scan time [s]": rt,
                 }
@@ -214,13 +220,17 @@ def plot_peak_shapes(
 
     df = pd.concat(dfs).reset_index(drop=True)
 
+    # Add metadata
+    if mint_metadata is not None:
+        df = pd.merge(df, mint_metadata, left_on='ms_file_label', right_index=True)
+
     g = sns.relplot(
         data=df,
         x="Scan time [s]",
         y="Intensity",
         hue=hue,
         col="peak_label",
-        kind="line",
+        kind=kind,
         col_wrap=col_wrap,
         height=height,
         aspect=aspect,
