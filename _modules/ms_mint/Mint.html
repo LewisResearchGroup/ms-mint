@@ -83,7 +83,7 @@
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Manager</span><span class="p">,</span> <span class="n">cpu_count</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span><span class="p">,</span> <span class="n">MinMaxScaler</span>
 
 <span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">MINT_RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
 <span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="n">process_ms1_files_in_parallel</span><span class="p">,</span> <span class="n">extract_chromatogram_from_ms1</span>
@@ -539,7 +539,8 @@
             <span class="n">df_meta</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_meta</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">apply</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scaler</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">scaler_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;standard&#39;</span><span class="p">:</span> <span class="n">StandardScaler</span><span class="p">(),</span>
-                           <span class="s1">&#39;robust&#39;</span><span class="p">:</span> <span class="n">RobustScaler</span><span class="p">()}</span>
+                           <span class="s1">&#39;robust&#39;</span><span class="p">:</span> <span class="n">RobustScaler</span><span class="p">(),</span>
+                           <span class="s1">&#39;minmax&#39;</span><span class="p">:</span> <span class="n">MinMaxScaler</span><span class="p">()}</span>
 
             <span class="k">if</span> <span class="n">scaler</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scaler_dict</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported scaler: </span><span class="si">{</span><span class="n">scaler</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
