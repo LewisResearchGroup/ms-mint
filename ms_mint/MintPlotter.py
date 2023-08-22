@@ -303,7 +303,8 @@ class MintPlotter:
                                  x="scan_time",
                                  y="intensity",
                                  hue='ms_file_label',
-                                 ax=ax)
+                                 ax=ax,
+                                 **kwargs)
             return g
 
         else:

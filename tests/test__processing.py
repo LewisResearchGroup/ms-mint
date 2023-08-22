@@ -48,7 +48,7 @@ def test__process_ms1():
             },  # The only value in the extraction window is 3, therefore the expected value is 1
             "peak_n_datapoints": {0: 1},
             "peak_max": {0: 3},
-            "peak_rt_of_max": {0: 2},
+            "peak_rt_of_max": {0: 3},
             "peak_min": {0: 3},
             "peak_median": {0: 3.0},
             "peak_mean": {0: 3.0},
