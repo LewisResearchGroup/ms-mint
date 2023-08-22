@@ -15,7 +15,6 @@ The `ms-mint` library includes a range of functions for processing LCMS data fro
 
     pip install ms-mint
 
-
 ## Documentation
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/readme.html).
 
