@@ -321,8 +321,8 @@
     <span class="n">peak_max</span> <span class="o">=</span> <span class="n">intensities</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="n">peak_min</span> <span class="o">=</span> <span class="n">intensities</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
     <span class="n">peak_median</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">intensities</span><span class="p">)</span>
-
-    <span class="n">peak_rt_of_max</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">masses</span><span class="o">.</span><span class="n">argmax</span><span class="p">()]</span>
+    
+    <span class="n">peak_rt_of_max</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">intensities</span><span class="o">.</span><span class="n">argmax</span><span class="p">()]</span>
 
     <span class="n">peak_delta_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">intensities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">intensities</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 

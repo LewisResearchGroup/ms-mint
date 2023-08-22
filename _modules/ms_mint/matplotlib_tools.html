@@ -290,29 +290,35 @@
                     <span class="s2">&quot;Scan time [s]&quot;</span><span class="p">:</span> <span class="n">peak_rt</span><span class="p">,</span>
                     <span class="s2">&quot;Intensity&quot;</span><span class="p">:</span> <span class="n">peak_int</span><span class="p">,</span>
                     <span class="s2">&quot;ms_file_label&quot;</span><span class="p">:</span> <span class="n">ms_file_label</span><span class="p">,</span>
-                    <span class="s2">&quot;peak_label&quot;</span><span class="p">:</span> <span class="n">peak_label</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">m/z=</span><span class="si">{</span><span class="n">mz</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;peak_label&quot;</span><span class="p">:</span> <span class="n">peak_label</span><span class="p">,</span>
                     <span class="s2">&quot;Expected Scan time [s]&quot;</span><span class="p">:</span> <span class="n">rt</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
             <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># Add metadata</span>
     <span class="k">if</span> <span class="n">mint_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mint_metadata</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mint_metadata</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
 
+    <span class="n">_facet_kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sharex</span><span class="o">=</span><span class="n">sharex</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="n">sharey</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;facet_kws&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">_facet_kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;facet_kws&#39;</span><span class="p">))</span>
+        
     <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
         <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">,</span>
         <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span>
         <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span>
         <span class="n">col</span><span class="o">=</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span>
+        <span class="n">col_order</span><span class="o">=</span><span class="n">peak_labels</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
         <span class="n">col_wrap</span><span class="o">=</span><span class="n">col_wrap</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span>
-        <span class="n">facet_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sharex</span><span class="o">=</span><span class="n">sharex</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="n">sharey</span><span class="p">),</span>
+        <span class="n">facet_kws</span><span class="o">=</span><span class="n">_facet_kws</span><span class="p">,</span>
         <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
