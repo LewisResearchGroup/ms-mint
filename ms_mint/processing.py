@@ -231,7 +231,7 @@ def extract_ms1_properties(array, mz_mean):
     peak_max = intensities.max()
     peak_min = intensities.min()
     peak_median = np.median(intensities)
-
+    
     peak_rt_of_max = times[intensities.argmax()]
 
     peak_delta_int = np.abs(intensities[0] - intensities[-1])
