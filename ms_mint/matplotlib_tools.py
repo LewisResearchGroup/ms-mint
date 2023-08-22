@@ -217,13 +217,18 @@ def plot_peak_shapes(
                 }
             )
             dfs.append(df)
-
+    
+    
     df = pd.concat(dfs, ignore_index=True).reset_index(drop=True)
 
     # Add metadata
     if mint_metadata is not None:
         df = pd.merge(df, mint_metadata, left_on='ms_file_label', right_index=True, how='left')
 
+    _facet_kws = dict(sharex=sharex, sharey=sharey)
+    if 'facet_kws' in kwargs.keys():
+        _facet_kws.update(kwargs.pop('facet_kws'))
+        
     g = sns.relplot(
         data=df,
         x="Scan time [s]",
@@ -235,7 +240,7 @@ def plot_peak_shapes(
         col_wrap=col_wrap,
         height=height,
         aspect=aspect,
-        facet_kws=dict(sharex=sharex, sharey=sharey),
+        facet_kws=_facet_kws,
         legend=legend,
         **kwargs,
     )

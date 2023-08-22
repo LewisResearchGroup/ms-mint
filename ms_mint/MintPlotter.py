@@ -235,7 +235,7 @@ class MintPlotter:
             plt.title(f'{P(fn).with_suffix("").name}\n{peak_label}')
         return fig
 
-    def chromatogram(self, fns=None, peak_labels=None, interactive=False, filters=None, **kwargs):
+    def chromatogram(self, fns=None, peak_labels=None, interactive=False, filters=None, ax=None, **kwargs):
         """Plot the chromatogram extracted from one or more files.
 
         :param fns: File names to extract chromatogram from.
@@ -283,18 +283,27 @@ class MintPlotter:
                 linewidth=0,
             )
             params.update(kwargs)
-            g = sns.relplot(data=data, **params)
-
-            for peak_label, ax in zip(peak_labels, g.axes.flatten()):
-                _, _, rt_min, rt_max = self.mint.get_target_params(
-                    peak_label
-                )
-                if rt_min is not None and rt_max is not None:
-                    ax.axvspan(rt_min, rt_max, color="lightgreen", alpha=0.5, zorder=-1)
-                ax.ticklabel_format(
-                    style="sci", axis="y", useOffset=False, scilimits=(0, 0)
-                )
-            g.set_titles(template="{col_name}")
+            
+            if ax is None:
+                g = sns.relplot(data=data, **params)
+                         
+                for peak_label, ax in zip(peak_labels, g.axes.flatten()):
+                    _, _, rt_min, rt_max = self.mint.get_target_params(
+                        peak_label
+                    )
+                    if rt_min is not None and rt_max is not None:
+                        ax.axvspan(rt_min, rt_max, color="lightgreen", alpha=0.5, zorder=-1)
+                    ax.ticklabel_format(
+                        style="sci", axis="y", useOffset=False, scilimits=(0, 0)
+                    )
+                g.set_titles(template="{col_name}")
+            
+            else:
+                g = sns.lineplot(data=data, 
+                                 x="scan_time",
+                                 y="intensity",
+                                 hue='ms_file_label',
+                                 ax=ax)
             return g
 
         else:
