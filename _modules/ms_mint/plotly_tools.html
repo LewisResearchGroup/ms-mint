@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -89,7 +89,9 @@
 
 
 
-<div class="viewcode-block" id="set_template"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.set_template">[docs]</a><span class="k">def</span> <span class="nf">set_template</span><span class="p">():</span>
+<div class="viewcode-block" id="set_template">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.set_template">[docs]</a>
+<span class="k">def</span> <span class="nf">set_template</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function that sets a template for plotly figures.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -100,10 +102,13 @@
     <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;draft&quot;</span></div>
 
 
+
 <span class="n">set_template</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="plotly_heatmap"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_heatmap">[docs]</a><span class="k">def</span> <span class="nf">plotly_heatmap</span><span class="p">(</span>
+<div class="viewcode-block" id="plotly_heatmap">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_heatmap">[docs]</a>
+<span class="k">def</span> <span class="nf">plotly_heatmap</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">normed_by_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">transposed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -294,7 +299,10 @@
         <span class="k">return</span> <span class="n">fig</span></div>
 
 
-<div class="viewcode-block" id="plotly_peak_shapes"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes">[docs]</a><span class="k">def</span> <span class="nf">plotly_peak_shapes</span><span class="p">(</span>
+
+<div class="viewcode-block" id="plotly_peak_shapes">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes">[docs]</a>
+<span class="k">def</span> <span class="nf">plotly_peak_shapes</span><span class="p">(</span>
     <span class="n">mint_results</span><span class="p">,</span>
     <span class="n">mint_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">color</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span>  <span class="c1"># Add the new argument for specifying color column</span>
@@ -444,7 +452,10 @@
         <span class="k">return</span> <span class="n">fig</span></div>
 
 
-<div class="viewcode-block" id="get_palette_colors"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.get_palette_colors">[docs]</a><span class="k">def</span> <span class="nf">get_palette_colors</span><span class="p">(</span><span class="n">palette_name</span><span class="p">,</span> <span class="n">num_colors</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_palette_colors">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.get_palette_colors">[docs]</a>
+<span class="k">def</span> <span class="nf">get_palette_colors</span><span class="p">(</span><span class="n">palette_name</span><span class="p">,</span> <span class="n">num_colors</span><span class="p">):</span>
     <span class="c1"># Categories in the colorlover package</span>
     <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qual&quot;</span><span class="p">,</span> <span class="s2">&quot;seq&quot;</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">]</span>
 
@@ -456,6 +467,7 @@
 
     <span class="c1"># If palette not found in any category, return a default one or raise an error</span>
     <span class="k">return</span> <span class="n">cl</span><span class="o">.</span><span class="n">scales</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_colors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="s2">&quot;qual&quot;</span><span class="p">][</span><span class="s2">&quot;Paired&quot;</span><span class="p">]</span></div>
+
 </pre></div>
 
            </div>

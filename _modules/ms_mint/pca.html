@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -84,12 +84,16 @@
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">scale_dataframe</span>
 
 
-<div class="viewcode-block" id="PrincipalComponentsAnalyser"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser">[docs]</a><span class="k">class</span> <span class="nc">PrincipalComponentsAnalyser</span><span class="p">:</span>
+<div class="viewcode-block" id="PrincipalComponentsAnalyser">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser">[docs]</a>
+<span class="k">class</span> <span class="nc">PrincipalComponentsAnalyser</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for applying PCA to Mint instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="PrincipalComponentsAnalyser.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="PrincipalComponentsAnalyser.__init__">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class for applying PCA to Mint instance.</span>
 
@@ -100,7 +104,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">PCA_Plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrincipalComponentsAnalyser.run"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrincipalComponentsAnalyser.run">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;peak_max&quot;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run Principal Component Analysis on current results. Results are stored in</span>
 <span class="sd">        self.decomposition_results.</span>
@@ -160,15 +167,21 @@
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;PCA&quot;</span><span class="p">,</span>
             <span class="s2">&quot;feature_contributions&quot;</span><span class="p">:</span> <span class="n">dfc</span><span class="p">,</span>
             <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">pca</span><span class="p">,</span>
-        <span class="p">}</span></div></div>
+        <span class="p">}</span></div>
+</div>
 
 
-<div class="viewcode-block" id="PCA_Plotter"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter">[docs]</a><span class="k">class</span> <span class="nc">PCA_Plotter</span><span class="p">:</span>
+
+<div class="viewcode-block" id="PCA_Plotter">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter">[docs]</a>
+<span class="k">class</span> <span class="nc">PCA_Plotter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for plotting Mint PCA results.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="PCA_Plotter.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pca</span><span class="p">):</span>
+<div class="viewcode-block" id="PCA_Plotter.__init__">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pca</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class for plotting Mint PCA results.</span>
 
@@ -177,15 +190,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pca</span> <span class="o">=</span> <span class="n">pca</span></div>
 
+
         
-<div class="viewcode-block" id="PCA_Plotter.cumulative_variance"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PCA_Plotter.cumulative_variance">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance">[docs]</a>
+    <span class="k">def</span> <span class="nf">cumulative_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cumulative_variance_px</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cumulative_variance_sns</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> </div>
+
         
         
-<div class="viewcode-block" id="PCA_Plotter.cumulative_variance_px"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance_px">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance_px</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PCA_Plotter.cumulative_variance_px">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance_px">[docs]</a>
+    <span class="k">def</span> <span class="nf">cumulative_variance_px</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After running mint.pca() this function can be used to plot the cumulative variance of the</span>
 <span class="sd">        principal components.</span>
@@ -203,7 +222,10 @@
         <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">autosize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
-<div class="viewcode-block" id="PCA_Plotter.cumulative_variance_sns"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance_sns">[docs]</a>    <span class="k">def</span> <span class="nf">cumulative_variance_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PCA_Plotter.cumulative_variance_sns">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.cumulative_variance_sns">[docs]</a>
+    <span class="k">def</span> <span class="nf">cumulative_variance_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After running mint.pca() this function can be used to plot the cumulative variance of the</span>
 <span class="sd">        principal components.</span>
@@ -237,6 +259,7 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cum_expl_var</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
+
     <span class="k">def</span> <span class="nf">_prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;df_projected&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()[:</span><span class="n">n_components</span><span class="p">]</span>
@@ -250,7 +273,9 @@
 
         <span class="k">return</span> <span class="n">df</span>
 
-<div class="viewcode-block" id="PCA_Plotter.pairplot"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot">[docs]</a>    <span class="k">def</span> <span class="nf">pairplot</span><span class="p">(</span>
+<div class="viewcode-block" id="PCA_Plotter.pairplot">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot">[docs]</a>
+    <span class="k">def</span> <span class="nf">pairplot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -275,14 +300,20 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pairplot_sns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fig_kws</span><span class="o">=</span><span class="n">fig_kws</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PCA_Plotter.pairplot_sns"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot_sns">[docs]</a>    <span class="k">def</span> <span class="nf">pairplot_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">fig_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PCA_Plotter.pairplot_sns">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot_sns">[docs]</a>
+    <span class="k">def</span> <span class="nf">pairplot_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">fig_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fig_kws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fig_kws</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">fig_kws</span><span class="p">)</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">g</span></div>
 
-<div class="viewcode-block" id="PCA_Plotter.pairplot_plotly"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot_plotly">[docs]</a>    <span class="k">def</span> <span class="nf">pairplot_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">color_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PCA_Plotter.pairplot_plotly">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.pairplot_plotly">[docs]</a>
+    <span class="k">def</span> <span class="nf">pairplot_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">color_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;PC|^</span><span class="si">{</span><span class="n">color_col</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">create_scatterplotmatrix</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">color_col</span><span class="p">,</span> <span class="n">hovertext</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># set the legendgroup equal to the marker color</span>
@@ -290,24 +321,35 @@
             <span class="n">t</span><span class="o">.</span><span class="n">legendgroup</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">color</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
-<div class="viewcode-block" id="PCA_Plotter.loadings"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.loadings">[docs]</a>    <span class="k">def</span> <span class="nf">loadings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PCA_Plotter.loadings">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.loadings">[docs]</a>
+    <span class="k">def</span> <span class="nf">loadings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadings_plotly</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>    
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadings_sns</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PCA_Plotter.loadings_sns"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.loadings_sns">[docs]</a>    <span class="k">def</span> <span class="nf">loadings_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PCA_Plotter.loadings_sns">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.loadings_sns">[docs]</a>
+    <span class="k">def</span> <span class="nf">loadings_sns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;row&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;row&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PC&#39;</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">catplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;feature_contributions&#39;</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;peak_label&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Coefficient&#39;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">g</span></div>
+
     
-<div class="viewcode-block" id="PCA_Plotter.loadings_plotly"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.loadings_plotly">[docs]</a>    <span class="k">def</span> <span class="nf">loadings_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PCA_Plotter.loadings_plotly">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.pca.PCA_Plotter.loadings_plotly">[docs]</a>
+    <span class="k">def</span> <span class="nf">loadings_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;facet_row&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;facet_row&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PC&#39;</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pca</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;feature_contributions&#39;</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;peak_label&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Coefficient&#39;</span><span class="p">,</span> <span class="n">barmode</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span>  <span class="n">fig</span></div></div>
+        <span class="k">return</span>  <span class="n">fig</span></div>
+</div>
+
 </pre></div>
 
            </div>

@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -77,18 +77,28 @@
 
 
 
-<div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">:</span>
-<div class="viewcode-block" id="Filter.transform"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Filter.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+<div class="viewcode-block" id="Filter">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Filter">[docs]</a>
+<span class="k">class</span> <span class="nc">Filter</span><span class="p">:</span>
+<div class="viewcode-block" id="Filter.transform">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Filter.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</div>
+
     
 
-<div class="viewcode-block" id="Resampler"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler">[docs]</a><span class="k">class</span> <span class="nc">Resampler</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<div class="viewcode-block" id="Resampler">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler">[docs]</a>
+<span class="k">class</span> <span class="nc">Resampler</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter for time series that resamples the data in</span>
 <span class="sd">    a certain frequency.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Resampler.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="s2">&quot;500ms&quot;</span><span class="p">,</span> <span class="n">input_unit</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="Resampler.__init__">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="s2">&quot;500ms&quot;</span><span class="p">,</span> <span class="n">input_unit</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter for time series that resamples the data in</span>
 <span class="sd">        a certain frequency. The default is 500ms.</span>
@@ -102,7 +112,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">input_unit</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;resampler&quot;</span></div>
 
-<div class="viewcode-block" id="Resampler.transform"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Resampler.transform">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transformation method.</span>
 
@@ -119,17 +132,23 @@
         <span class="n">resampled</span> <span class="o">=</span> <span class="n">chrom</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="n">new_t</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">seconds</span> <span class="o">+</span> <span class="p">(</span><span class="n">resampled</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">microseconds</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">)</span>
         <span class="n">new_x</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">values</span>
-        <span class="k">return</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">new_x</span></div></div>
+        <span class="k">return</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">new_x</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Smoother"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother">[docs]</a><span class="k">class</span> <span class="nc">Smoother</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Smoother">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother">[docs]</a>
+<span class="k">class</span> <span class="nc">Smoother</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter for time series that smoothes the</span>
 <span class="sd">    x values by running one or more rolling</span>
 <span class="sd">    averages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Smoother.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Smoother.__init__">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter for time series that smoothes the</span>
 <span class="sd">        x values by running one or more rolling</span>
@@ -143,7 +162,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="o">=</span> <span class="n">windows</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;smoother&quot;</span></div>
 
-<div class="viewcode-block" id="Smoother.transform"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Smoother.transform">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transformation method.</span>
 
@@ -159,15 +181,21 @@
             <span class="n">tranformed</span> <span class="o">=</span> <span class="n">transformed</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">new_t</span> <span class="o">=</span> <span class="n">tranformed</span><span class="o">.</span><span class="n">index</span>
         <span class="n">new_x</span> <span class="o">=</span> <span class="n">tranformed</span><span class="o">.</span><span class="n">values</span>
-        <span class="k">return</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">new_x</span></div></div>
+        <span class="k">return</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">new_x</span></div>
+</div>
 
 
-<div class="viewcode-block" id="GaussFilter"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter">[docs]</a><span class="k">class</span> <span class="nc">GaussFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GaussFilter">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">GaussFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter for time series that applies a Gaussian filter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GaussFilter.__init__"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<div class="viewcode-block" id="GaussFilter.__init__">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter for time series that applies a Gaussian filter.</span>
 
@@ -176,7 +204,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span></div>
 
-<div class="viewcode-block" id="GaussFilter.transform"><a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GaussFilter.transform">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transformation method.</span>
 
@@ -188,7 +219,9 @@
 <span class="sd">        :rtype: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new_x</span> <span class="o">=</span> <span class="n">gaussian_filter1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">new_x</span></div></div>
+        <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">new_x</span></div>
+</div>
+
 </pre></div>
 
            </div>
