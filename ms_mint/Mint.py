@@ -10,7 +10,7 @@ from pathlib import Path as P
 from multiprocessing import Pool, Manager, cpu_count
 from glob import glob
 
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
 
 from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
 from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
@@ -438,7 +438,8 @@ class Mint(object):
             df_meta[var_name] = df_meta[var_name].apply(apply)
         if isinstance(scaler, str):
             scaler_dict = {'standard': StandardScaler(),
-                           'robust': RobustScaler()}
+                           'robust': RobustScaler(),
+                           'minmax': MinMaxScaler()}
 
             if scaler not in scaler_dict:
                 raise ValueError(f"Unsupported scaler: {scaler}")
