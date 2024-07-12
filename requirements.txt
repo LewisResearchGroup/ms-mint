@@ -8,7 +8,7 @@ decorator
 pillow
 lxml
 pandas>=2
-matplotlib #>=3.5,<3.6
+matplotlib
 seaborn
 pyteomics
 scikit-learn
@@ -29,3 +29,4 @@ sphinx
 sphinx-rtd-theme
 myst-parser
 psims
+numpy<2.0.0
