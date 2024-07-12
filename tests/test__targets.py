@@ -137,7 +137,7 @@ def test__diff_targets():
     targets2 = targets1.copy()
 
     new_value = 10.23434
-    selected_ndx = 1
+    selected_ndx = 0
     targets2.loc[selected_ndx, "rt_max"] = new_value
 
     result = diff_targets(targets1, targets2)
