@@ -47,7 +47,7 @@ def standardize_targets(targets, ms_mode="neutral"):
 
     - updates the target lists to newest format
     - ensures peak labels are strings
-    - replaces np.NaN with None
+    - replaces np.nan with None
 
     :param targets: DataFrame in target-list format.
     :type targets: pandas.DataFrame
@@ -96,7 +96,7 @@ def standardize_targets(targets, ms_mode="neutral"):
 
     targets.index = range(len(targets))
     targets = targets[targets.mz_mean.notna()]
-    targets = targets.replace(np.NaN, None)
+    targets = targets.replace(np.nan, None)
     fill_missing_rt_values(targets)
     convert_to_seconds(targets)
 

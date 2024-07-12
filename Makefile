@@ -8,7 +8,7 @@ lint:
 	flake8
 
 test:
-	pytest --cov=ms_mint --cov-report html
+	PYTHONPATH=. pytest --cov=ms_mint --cov-report html
 	touch images/coverage.svg && rm images/coverage.svg
 	coverage-badge -o images/coverage.svg
 

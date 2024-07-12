@@ -1,16 +1,14 @@
-"""A Python library for targetd metabolomics."""
-
 import os
 import logging
-from ._version import get_versions
 from .Mint import Mint
 
-__version__ = get_versions()["version"]
-del get_versions
+try:
+    from .version import __version__
+except ImportError:
+    __version__ = "0.0.0"
 
 MINT_DATA_PATH = os.path.abspath(os.path.join(__path__[0], "..", "static"))
 
-logging.info(Mint.version)
+Mint.version = __version__
 
-from . import _version
-__version__ = _version.get_versions()['version']
+logging.info(Mint.version)
