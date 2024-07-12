@@ -31,4 +31,4 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest==6.2.4
-        pytest
+        PYTHONPATH=. pytest
