@@ -1,0 +1,4 @@
+setuptools_scm
+pytest
+pytest-cov
+coverage-badge
