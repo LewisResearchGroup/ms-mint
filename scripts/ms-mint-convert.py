@@ -22,13 +22,12 @@ def convert(fn, fmt='parquet', output_directory=None):
         logging.info(f"{fn} --> {fn_out}")
         
         if fmt == 'parquet':
-          io.ms_file_to_df(fn).to_parquet(fn_out)
+            io.ms_file_to_df(fn).to_parquet(fn_out)
         elif fmt == 'feather':
-          io.ms_file_to_df(fn).to_feather(fn_out)
+            io.ms_file_to_df(fn).to_feather(fn_out)
          
         
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", nargs="+", required=True)
     parser.add_argument("-o", "--output-directory")
@@ -41,3 +40,7 @@ if __name__ == "__main__":
     
     for fn in tqdm(fns):
         convert(fn, fmt, output_directory)
+
+
+if __name__ == "__main__":
+    main()
