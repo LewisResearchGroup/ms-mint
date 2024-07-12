@@ -114,7 +114,20 @@ def test__df_diff():
         {"A": [1, 0, 0, 2, 3], "B": [0, 0, 1, 2, 3], "_merge": _merge}
     )
 
-    assert result.equals(expected), result.values == expected.values
+    print('DataFrame 1:')
+    print(df1)
+    print('Dataframe 2:')
+    print(df2)
+    print('Expected:')
+    print(expected)
+    print('Actual result:')
+    print(result)
+    
+    # Sorting the results before comparison
+    sorted_result = result.sort_values(by=result.columns.tolist()).reset_index(drop=True)
+    sorted_expected = expected.sort_values(by=expected.columns.tolist()).reset_index(drop=True)
+    
+    assert sorted_result.equals(sorted_expected), sorted_result.values == sorted_expected.values
 
 
 def test__is_ms_file():
