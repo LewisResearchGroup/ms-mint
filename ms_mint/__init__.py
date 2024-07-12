@@ -11,3 +11,6 @@ del get_versions
 MINT_DATA_PATH = os.path.abspath(os.path.join(__path__[0], "..", "static"))
 
 logging.info(Mint.version)
+
+from . import _version
+__version__ = _version.get_versions()['version']
