@@ -1,4 +1,4 @@
-name: Upload Python Package
+name: Publish Python Package to PyPI
 
 on:
   release:
@@ -9,19 +9,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    - name: Build and publish
+        pip install build twine
+
+    - name: Build package
+      run: |
+        python -m build
+        ls -l dist  # List files in dist directory for debugging
+
+    - name: Publish package
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist bdist_wheel
         twine upload dist/*
-
