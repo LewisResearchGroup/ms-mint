@@ -3,6 +3,7 @@
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
 ![PyPI](https://img.shields.io/pypi/v/ms-mint?label=pypi%20package)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
+[![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/doi/10.5281/zenodo.12733875)
 
 # Wecome to ms-mint
 
