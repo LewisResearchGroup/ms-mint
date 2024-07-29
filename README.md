@@ -1,6 +1,9 @@
 [![Python package](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml)
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
+![PyPI](https://img.shields.io/pypi/v/ms-mint?label=pypi%20package)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
+[![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/doi/10.5281/zenodo.12733875)
 
 # Wecome to ms-mint
 
@@ -12,7 +15,6 @@ The `ms-mint` library includes a range of functions for processing LCMS data fro
 ## Installation
 
     pip install ms-mint
-
 
 ## Documentation
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/readme.html).
@@ -122,7 +124,7 @@ If you only have retention time (Rt) values for your targets, or if the Rt value
 
 To use the `mint.opt.rt_min_max()` function, you will need to provide it with a list of retention times for your targets and the names of the mass spectrometry files containing your data. The function will then search through the data to find the optimal `rt_min` and `rt_max` values, which you can use to refine your analysis. You can then use these optimized values in conjunction with the other functions and methods of the `Mint` class to process and analyze your data.
 
-![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-before-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/img/peak-shapes-before-opt.png)
 
 Now, we can run the peak optimization with:
 
@@ -139,7 +141,7 @@ If you do not provide a list of peak_labels to the `mint.opt.rt_min_max()` funct
 
 After running the optimization, it is a good idea to perform a manual fine-tuning of the `rt_min` and `rt_max` values, especially for complicated peaks (peaks with multiple components, noisy peaks, etc.). You can use the `mint.plot.peak_shapes()` function to visualize the peak shapes and identify any areas that may require further attention.
     
-![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/optimize-rt_min_max.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/img/optimize-rt_min_max.png)
 
 The black lines indicates the average intensity across all files used for the optimization. The orange dotted lines show the shape of the gaussian function used to weight the mean intensities for peak selection. The orange horizontal lines indicate the peak width and the blue `x`s show the identified peak maxima. The green shaded areas show the Rt ranges which were selected by the algorithm.
 
@@ -148,7 +150,7 @@ Then we apply the changes and plot the new peak shapes:
     mint.run()
     mint.plot.peak_shapes(col_wrap=3)
 
-![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-after-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/img/peak-shapes-after-opt.png)
 
 As you can see, the shapes of Xanthine, Succinate, Citrulline look much better.
 
@@ -158,7 +160,7 @@ The `Mint` class has a few convenient methods to visualize and explore the proce
 
 ## Plot peak shapes
 
-![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/peak-shapes-after-opt.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/img/peak-shapes-after-opt.png)
 
     mint.plot.peak_shapes(col_wrap = 3)
 
@@ -193,7 +195,7 @@ Before clustering the data can be transformed and scaled. By default `log2p1(x) 
         cmap=None  # Name of a matplotlib color map                
     )
 
-![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/hierarchical_clustering.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/img/hierarchical_clustering.png)
 
 ## Principal Components Analysis
 
@@ -207,7 +209,7 @@ After running the PCA the results can be plotted with:
     
     mint.pca.plot.pairplot(n_components=5, interactive=False)
     
-![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/pca-pairplot.png)
+![](https://raw.githubusercontent.com/LewisResearchGroup/ms-mint/develop/notebooks/img/pca-pairplot.png)
 
 ## FAQ
 ### What is a target list
@@ -263,8 +265,3 @@ The target list can be stored as csv or Excel file.
 -   **ms_path**: Path of the MS-file
 -   **ms_file_size**: Size of the MS-file in MB
 ---
-
-## Release Notes
-
-### 0.2.0 Milestones
-    - peak_area_top3 comparable to El-Maven PeakAreaTop values

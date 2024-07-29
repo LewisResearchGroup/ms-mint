@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ms-mint"
+description = "Metabolomics Integrator (Mint)"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  {name = "Soren Wacker", email = "swacker@ucalgary.ca"}
+]
+urls = { "Homepage" = "https://github.com/LewisResearchGroup/ms-mint" }
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+dependencies = [
+  "six",
+  "jsonschema",
+  "entrypoints",
+  "pygments",
+  "pexpect",
+  "decorator",
+  "pillow",
+  "lxml",
+  "pandas",
+  "matplotlib",
+  "seaborn",
+  "pyteomics",
+  "scikit-learn",
+  "molmass",
+  "pymzml",
+  "plotly",
+  "colorlover",
+  "tqdm",
+  "ipywidgets",
+  "ipyfilechooser",
+  "openpyxl",
+  "pyarrow",
+  "tables",
+  "h5py",
+  "hdf5plugin"
+]
+dynamic = ["version"]
+
+[project.scripts]
+ms-mint-convert = "ms_mint.scripts.ms_mint_convert:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ms_mint*"]
+
+[tool.setuptools_scm]
+write_to = "src/ms_mint/_version.py"
+version_scheme = "guess-next-dev"
+local_scheme = "dirty-tag"
+
+[tool.pytest]
+addopts = "--maxfail=1 --disable-warnings"
+testpaths = ["tests"]
+

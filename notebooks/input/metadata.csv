@@ -1,0 +1,13 @@
+ms_file_label,label,group,batch,sample_type,run_order,plate,plate_row,plate_col,lc_column,polarity
+CA_B1,CA,,1,,1,,,,,-
+CA_B2,CA,,2,,4,,,,,-
+CA_B3,CA,,3,,7,,,,,-
+CA_B4,CA,,4,,10,,,,,-
+EC_B1,EC,,1,,2,,,,,-
+EC_B2,EC,,2,,5,,,,,-
+EC_B3,EC,,3,,8,,,,,-
+EC_B4,EC,,4,,11,,,,,-
+SA_B1,SA,,1,,3,,,,,-
+SA_B2,SA,,2,,6,,,,,-
+SA_B3,SA,,3,,9,,,,,-
+SA_B4,SA,,4,,12,,,,,-
