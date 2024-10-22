@@ -1,24 +1,22 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wecome to ms-mint &mdash; ms-mint 0.1.6 documentation</title>
+  <title>ms-mint: A Python library for targeted metabolomics &mdash; ms-mint 0.1.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
     <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/readme.html" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=6e0256f3"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,8 +45,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Wecome to ms-mint</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#a-python-library-for-targeted-metabolomics">A Python library for targeted metabolomics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ms-mint: A Python library for targeted metabolomics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#news">News</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ms-mint-application-with-graphical-user-iterface-gui">ms-mint application with graphical user iterface (GUI)</a></li>
@@ -100,7 +98,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Wecome to ms-mint</li>
+      <li class="breadcrumb-item active">ms-mint: A Python library for targeted metabolomics</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -116,12 +114,13 @@
 <img alt="PyPI" src="https://img.shields.io/pypi/v/ms-mint?label=pypi%20package" />
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/ms-mint" />
 <a class="reference external" href="https://zenodo.org/doi/10.5281/zenodo.12733875"><img alt="DOI" src="https://zenodo.org/badge/221567356.svg" /></a></p>
-<section id="wecome-to-ms-mint">
-<h1>Wecome to ms-mint<a class="headerlink" href="#wecome-to-ms-mint" title="Link to this heading"></a></h1>
-<section id="a-python-library-for-targeted-metabolomics">
-<h2>A Python library for targeted metabolomics<a class="headerlink" href="#a-python-library-for-targeted-metabolomics" title="Link to this heading"></a></h2>
+<section id="ms-mint-a-python-library-for-targeted-metabolomics">
+<h1>ms-mint: A Python library for targeted metabolomics<a class="headerlink" href="#ms-mint-a-python-library-for-targeted-metabolomics" title="Link to this heading"></a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> library is a tool designed to assist with targeted metabolomics studies, which involves the systematic analysis of small chemical compounds called metabolites that are present in biological samples. These metabolites can provide valuable information about the state of an organism, including indicators of disease or other physiological changes. In order to perform a targeted metabolomics study, researchers typically use liquid chromatography-mass spectrometry (LCMS) to identify and quantify specific metabolites of interest.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code> library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling large amounts of data (10,000+ files). To use <code class="docutils literal notranslate"><span class="pre">ms-mint</span></code>, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications.</p>
+<section id="news">
+<h2>News<a class="headerlink" href="#news" title="Link to this heading"></a></h2>
+<p>Starting with version 1.0.0, we have updated the installation setup to use pyproject.toml. Additionally, each release of the repository will now be assigned a DOI to facilitate citation of the software.</p>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
@@ -141,6 +140,7 @@
 <h2>Publications that used ms-mint<a class="headerlink" href="#publications-that-used-ms-mint" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
 <li><p>Brown K, Thomson CA, Wacker S, Drikic M, Groves R, Fan V, et al. <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/36906623/">Microbiota alters the metabolome in an age- and sex- dependent manner in mice.</a> Nat Commun. 2023;14: 1348.</p></li>
+<li><p>Ponce LF, Bishop SL, Wacker S, Groves RA, Lewis IA. <a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.analchem.3c04988">SCALiR: A Web Application for Automating Absolute Quantification of Mass Spectrometry-Based Metabolomics Data. Anal Chem.</a> 2024;96: 6566–6574.</p></li>
 </ol>
 </section>
 <hr class="docutils" />
