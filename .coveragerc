@@ -1,6 +1,0 @@
-[run]
-omit = 
-    */app/*
-    */_version.py
-    */__init__.py
-

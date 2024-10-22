@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=6e0256f3"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -116,21 +116,110 @@
 <li class="toctree-l1"><a class="reference internal" href="modules.html">ms_mint</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ms_mint.html">ms_mint package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ms_mint.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-mint-module">ms_mint.Mint module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-chromatogram-module">ms_mint.chromatogram module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-filelock-module">ms_mint.filelock module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-filters-module">ms_mint.filters module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-io-module">ms_mint.io module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-matplotlib-tools-module">ms_mint.matplotlib_tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-notebook-module">ms_mint.notebook module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-pca-module">ms_mint.pca module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-plotly-tools-module">ms_mint.plotly_tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.Mint">ms_mint.Mint module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.Mint.Mint"><code class="docutils literal notranslate"><span class="pre">Mint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.Chromatogram">ms_mint.Chromatogram module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.Chromatogram.Chromatogram"><code class="docutils literal notranslate"><span class="pre">Chromatogram</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.filelock">ms_mint.filelock module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filelock.BaseFileLock"><code class="docutils literal notranslate"><span class="pre">BaseFileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filelock.FileLock"><code class="docutils literal notranslate"><span class="pre">FileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filelock.SoftFileLock"><code class="docutils literal notranslate"><span class="pre">SoftFileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filelock.Timeout"><code class="docutils literal notranslate"><span class="pre">Timeout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filelock.UnixFileLock"><code class="docutils literal notranslate"><span class="pre">UnixFileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filelock.WindowsFileLock"><code class="docutils literal notranslate"><span class="pre">WindowsFileLock</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.filters">ms_mint.filters module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filters.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filters.GaussFilter"><code class="docutils literal notranslate"><span class="pre">GaussFilter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filters.Resampler"><code class="docutils literal notranslate"><span class="pre">Resampler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.filters.Smoother"><code class="docutils literal notranslate"><span class="pre">Smoother</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.io">ms_mint.io module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.convert_ms_file_to_feather"><code class="docutils literal notranslate"><span class="pre">convert_ms_file_to_feather()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.convert_ms_file_to_parquet"><code class="docutils literal notranslate"><span class="pre">convert_ms_file_to_parquet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.df_to_numeric"><code class="docutils literal notranslate"><span class="pre">df_to_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.export_to_excel"><code class="docutils literal notranslate"><span class="pre">export_to_excel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.format_thermo_raw_file_reader_parquet"><code class="docutils literal notranslate"><span class="pre">format_thermo_raw_file_reader_parquet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.ms_file_to_df"><code class="docutils literal notranslate"><span class="pre">ms_file_to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.mzml_to_df"><code class="docutils literal notranslate"><span class="pre">mzml_to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.mzml_to_pandas_df_pyteomics"><code class="docutils literal notranslate"><span class="pre">mzml_to_pandas_df_pyteomics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.mzmlb_to_df__pyteomics"><code class="docutils literal notranslate"><span class="pre">mzmlb_to_df__pyteomics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.mzxml_to_df"><code class="docutils literal notranslate"><span class="pre">mzxml_to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.read_parquet"><code class="docutils literal notranslate"><span class="pre">read_parquet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.io.set_dtypes"><code class="docutils literal notranslate"><span class="pre">set_dtypes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.matplotlib_tools">ms_mint.matplotlib_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.matplotlib_tools.hierarchical_clustering"><code class="docutils literal notranslate"><span class="pre">hierarchical_clustering()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.matplotlib_tools.plot_metabolomics_hist2d"><code class="docutils literal notranslate"><span class="pre">plot_metabolomics_hist2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.matplotlib_tools.plot_peak_shapes"><code class="docutils literal notranslate"><span class="pre">plot_peak_shapes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.matplotlib_tools.plot_peaks"><code class="docutils literal notranslate"><span class="pre">plot_peaks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.notebook">ms_mint.notebook module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.notebook.Mint"><code class="docutils literal notranslate"><span class="pre">Mint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.pca">ms_mint.pca module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.pca.PCA_Plotter"><code class="docutils literal notranslate"><span class="pre">PCA_Plotter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.pca.PrincipalComponentsAnalyser"><code class="docutils literal notranslate"><span class="pre">PrincipalComponentsAnalyser</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.plotly_tools">ms_mint.plotly_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.plotly_tools.get_palette_colors"><code class="docutils literal notranslate"><span class="pre">get_palette_colors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.plotly_tools.plotly_heatmap"><code class="docutils literal notranslate"><span class="pre">plotly_heatmap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes"><code class="docutils literal notranslate"><span class="pre">plotly_peak_shapes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.plotly_tools.set_template"><code class="docutils literal notranslate"><span class="pre">set_template()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-plotting-module">ms_mint.plotting module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-processing-module">ms_mint.processing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-standards-module">ms_mint.standards module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-targets-module">ms_mint.targets module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#ms-mint-tools-module">ms_mint.tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-contents">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.processing">ms_mint.processing module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.append_results"><code class="docutils literal notranslate"><span class="pre">append_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.extract_chromatogram_from_ms1"><code class="docutils literal notranslate"><span class="pre">extract_chromatogram_from_ms1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.extract_ms1_properties"><code class="docutils literal notranslate"><span class="pre">extract_ms1_properties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.get_chromatogram_from_ms_file"><code class="docutils literal notranslate"><span class="pre">get_chromatogram_from_ms_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.process_ms1"><code class="docutils literal notranslate"><span class="pre">process_ms1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.process_ms1_file"><code class="docutils literal notranslate"><span class="pre">process_ms1_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.process_ms1_files_in_parallel"><code class="docutils literal notranslate"><span class="pre">process_ms1_files_in_parallel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.process_ms1_from_numpy"><code class="docutils literal notranslate"><span class="pre">process_ms1_from_numpy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.score_peaks"><code class="docutils literal notranslate"><span class="pre">score_peaks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.processing.slice_ms1_array"><code class="docutils literal notranslate"><span class="pre">slice_ms1_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.standards">ms_mint.standards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.targets">ms_mint.targets module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.check_targets"><code class="docutils literal notranslate"><span class="pre">check_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.convert_to_seconds"><code class="docutils literal notranslate"><span class="pre">convert_to_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.diff_targets"><code class="docutils literal notranslate"><span class="pre">diff_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.fill_missing_rt_values"><code class="docutils literal notranslate"><span class="pre">fill_missing_rt_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.gen_target_grid"><code class="docutils literal notranslate"><span class="pre">gen_target_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.read_targets"><code class="docutils literal notranslate"><span class="pre">read_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.targets.standardize_targets"><code class="docutils literal notranslate"><span class="pre">standardize_targets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint.tools">ms_mint.tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.df_diff"><code class="docutils literal notranslate"><span class="pre">df_diff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.find_peaks_in_timeseries"><code class="docutils literal notranslate"><span class="pre">find_peaks_in_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.fn_to_label"><code class="docutils literal notranslate"><span class="pre">fn_to_label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.formula_to_mass"><code class="docutils literal notranslate"><span class="pre">formula_to_mass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.get_ms_files_from_results"><code class="docutils literal notranslate"><span class="pre">get_ms_files_from_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.get_targets_from_results"><code class="docutils literal notranslate"><span class="pre">get_targets_from_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.init_metadata"><code class="docutils literal notranslate"><span class="pre">init_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.is_ms_file"><code class="docutils literal notranslate"><span class="pre">is_ms_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.lock"><code class="docutils literal notranslate"><span class="pre">lock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.log2p1"><code class="docutils literal notranslate"><span class="pre">log2p1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.mz_mean_width_to_min_max"><code class="docutils literal notranslate"><span class="pre">mz_mean_width_to_min_max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ms_mint.html#ms_mint.tools.scale_dataframe"><code class="docutils literal notranslate"><span class="pre">scale_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ms_mint.html#module-ms_mint">Module contents</a></li>
 </ul>
 </li>
 </ul>

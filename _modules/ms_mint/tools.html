@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ms_mint.tools &mdash; ms-mint 0.1.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/_modules/ms_mint/tools.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ms-mint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ms-mint: A Python library for targeted metabolomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ms_mint</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ms-mint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ms_mint.tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ms_mint.tools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span> <span class="nn">molmass</span> <span class="kn">import</span> <span class="n">Formula</span><span class="p">,</span> <span class="n">FormulaError</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span><span class="p">,</span> <span class="n">peak_widths</span>
+
+<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">M_PROTON</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">MINT_METADATA_COLUMNS</span>
+<span class="kn">from</span> <span class="nn">.filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
+<span class="kn">from</span> <span class="nn">.matplotlib_tools</span> <span class="kn">import</span> <span class="n">plot_peaks</span>
+
+
+<div class="viewcode-block" id="log2p1">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.log2p1">[docs]</a>
+<span class="k">def</span> <span class="nf">log2p1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="lock">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.lock">[docs]</a>
+<span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File lock to ensure safe writing to file.</span>
+
+<span class="sd">    :param fn: Filename to lock.</span>
+<span class="sd">    :type fn: str or PosixPath</span>
+<span class="sd">    :return: File lock object.</span>
+<span class="sd">    :rtype: FileLock</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">FileLock</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">.lock&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="formula_to_mass">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.formula_to_mass">[docs]</a>
+<span class="k">def</span> <span class="nf">formula_to_mass</span><span class="p">(</span><span class="n">formulas</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate mz-mean vallue from formulas for specific ionization mode.</span>
+
+<span class="sd">    :param formulas: List of molecular formulas e.g. [&#39;H2O&#39;]</span>
+<span class="sd">    :type formulas: list[str]</span>
+<span class="sd">    :param ms_mode: Ionization mode, defaults to None</span>
+<span class="sd">    :type ms_mode: str, optional</span>
+<span class="sd">    :return: List of calculated masses</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="n">ms_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;negative&quot;</span><span class="p">,</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;neutral&quot;</span><span class="p">],</span> <span class="n">ms_mode</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formulas</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">formulas</span> <span class="o">=</span> <span class="p">[</span><span class="n">formulas</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">formulas</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mass</span> <span class="o">=</span> <span class="n">Formula</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">isotope</span><span class="o">.</span><span class="n">mass</span>
+        <span class="k">except</span> <span class="n">FormulaError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">masses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">waringin</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ms_mode</span> <span class="o">==</span> <span class="s2">&quot;positive&quot;</span><span class="p">:</span>
+            <span class="n">mass</span> <span class="o">+=</span> <span class="n">M_PROTON</span>
+        <span class="k">elif</span> <span class="n">ms_mode</span> <span class="o">==</span> <span class="s2">&quot;negative&quot;</span><span class="p">:</span>
+            <span class="n">mass</span> <span class="o">-=</span> <span class="n">M_PROTON</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">masses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">masses</span></div>
+
+
+
+<div class="viewcode-block" id="gaussian">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.gaussian">[docs]</a>
+<span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple gaussian function generator.</span>
+
+<span class="sd">    :param x: x-values to generate function values</span>
+<span class="sd">    :type x: np.array</span>
+<span class="sd">    :param mu: Mean of gaussian</span>
+<span class="sd">    :type mu: float</span>
+<span class="sd">    :param sig: Sigma of gaussian</span>
+<span class="sd">    :type sig: float</span>
+<span class="sd">    :return: f(x)</span>
+<span class="sd">    :rtype: np.array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="scale_dataframe">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.scale_dataframe">[docs]</a>
+<span class="k">def</span> <span class="nf">scale_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale all columns in a dense dataframe.</span>
+
+<span class="sd">    :param df: Dataframe to scale</span>
+<span class="sd">    :type df: pandas.DataFrame</span>
+<span class="sd">    :param scaler: Scaler to use [&#39;robust&#39;, &#39;standard&#39;], defaults to &quot;standard&quot;</span>
+<span class="sd">    :type scaler: str, optional</span>
+<span class="sd">    :return: Scaled dataframe</span>
+<span class="sd">    :rtype: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">scaler</span> <span class="o">==</span> <span class="s2">&quot;standard&quot;</span><span class="p">:</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">scaler</span> <span class="o">==</span> <span class="s2">&quot;robust&quot;</span><span class="p">:</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">RobustScaler</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">scaler</span> <span class="o">==</span> <span class="s2">&quot;minmax&quot;</span><span class="p">:</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="df_diff">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.df_diff">[docs]</a>
+<span class="k">def</span> <span class="nf">df_diff</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Difference between two dataframes.</span>
+
+<span class="sd">    :param df1: Reference dataframe</span>
+<span class="sd">    :type df1: pandas.DataFrame</span>
+<span class="sd">    :param df2: Dataframe to compare</span>
+<span class="sd">    :type df2: pandas.DataFrame</span>
+<span class="sd">    :param which: Direction in which to compare, defaults to &quot;both&quot;</span>
+<span class="sd">    :type which: str, optional</span>
+<span class="sd">    :return: DataFrame that contains unique rows.</span>
+<span class="sd">    :rtype: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_df</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="n">indicator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
+    <span class="n">diff_df</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;_merge&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">which</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">diff_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_ms_file">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.is_ms_file">[docs]</a>
+<span class="k">def</span> <span class="nf">is_ms_file</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if file is a MS-file based on filename.</span>
+
+<span class="sd">    :param fn: Filename</span>
+<span class="sd">    :type fn: str or PosixPath</span>
+<span class="sd">    :return: Whether or not the file is recognized as MS-file</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzxml&quot;</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzml&quot;</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzmlb&quot;</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mzhdf&quot;</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.raw&quot;</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.parquet&quot;</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.feather&quot;</span><span class="p">))</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="get_ms_files_from_results">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.get_ms_files_from_results">[docs]</a>
+<span class="k">def</span> <span class="nf">get_ms_files_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract MS-filenames from Mint results.</span>
+
+<span class="sd">    :param results: DataFrame in Mint fesults format</span>
+<span class="sd">    :type results: pandas.DataFrame</span>
+<span class="sd">    :return: List of filenames</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Old schema</span>
+    <span class="k">if</span> <span class="s1">&#39;ms_path&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;ms_path&quot;</span><span class="p">,</span> <span class="s2">&quot;ms_file&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+        <span class="n">ms_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">P</span><span class="p">(</span><span class="n">ms_path</span><span class="p">)</span> <span class="o">/</span> <span class="n">ms_file</span> <span class="k">for</span> <span class="n">ms_path</span><span class="p">,</span> <span class="n">ms_file</span> <span class="ow">in</span> <span class="n">ms_files</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ms_files</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ms_files</span></div>
+
+
+
+<div class="viewcode-block" id="get_targets_from_results">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.get_targets_from_results">[docs]</a>
+<span class="k">def</span> <span class="nf">get_targets_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract targets dataframe from ms-mint results table.</span>
+
+<span class="sd">    :param results: Mint results table</span>
+<span class="sd">    :type results: pandas.DataFrame</span>
+<span class="sd">    :return: Mint targets table</span>
+<span class="sd">    :rtype: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">results</span><span class="p">[</span>
+        <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">TARGETS_COLUMNS</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="find_peaks_in_timeseries">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.find_peaks_in_timeseries">[docs]</a>
+<span class="k">def</span> <span class="nf">find_peaks_in_timeseries</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    :param series: _description_</span>
+<span class="sd">    :type series: _type_</span>
+<span class="sd">    :param prominence: _description_, defaults to None</span>
+<span class="sd">    :type prominence: _type_, optional</span>
+<span class="sd">    :param plot: _description_, defaults to False</span>
+<span class="sd">    :type plot: bool, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">peak_ndxs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="n">prominence</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="n">rel_height</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">widths</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">left_ips</span><span class="p">,</span> <span class="n">right_ips</span> <span class="o">=</span> <span class="n">peak_widths</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">peak_ndxs</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="n">rel_height</span>
+    <span class="p">)</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">peak_ndxs</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="n">t_start</span> <span class="o">=</span> <span class="n">_map_ndxs_to_time</span><span class="p">(</span><span class="n">left_ips</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="n">t_end</span> <span class="o">=</span> <span class="n">_map_ndxs_to_time</span><span class="p">(</span><span class="n">right_ips</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">ndxs</span><span class="o">=</span><span class="n">peak_ndxs</span><span class="p">,</span>
+        <span class="n">rt</span><span class="o">=</span><span class="n">times</span><span class="p">,</span>
+        <span class="n">rt_span</span><span class="o">=</span><span class="n">widths</span><span class="p">,</span>
+        <span class="n">peak_base_height</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span>
+        <span class="n">peak_height</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">peak_ndxs</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">rt_min</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span>
+        <span class="n">rt_max</span><span class="o">=</span><span class="n">t_end</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">peaks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plot_peaks</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">peaks</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">peaks</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_map_ndxs_to_time</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">t_max</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">t_min</span> <span class="o">&lt;</span> <span class="n">t_max</span>
+    <span class="k">assert</span> <span class="n">x_min</span> <span class="o">&lt;</span> <span class="n">x_max</span>
+    <span class="n">t_span</span> <span class="o">=</span> <span class="n">t_max</span> <span class="o">-</span> <span class="n">t_min</span>
+    <span class="n">x_span</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">t_span</span> <span class="o">/</span> <span class="n">x_span</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">t_min</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<div class="viewcode-block" id="mz_mean_width_to_min_max">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.mz_mean_width_to_min_max">[docs]</a>
+<span class="k">def</span> <span class="nf">mz_mean_width_to_min_max</span><span class="p">(</span><span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">):</span>
+    <span class="n">delta_mass</span> <span class="o">=</span> <span class="n">mz_width</span> <span class="o">*</span> <span class="n">mz_mean</span> <span class="o">*</span> <span class="mf">1e-6</span>
+    <span class="n">mz_min</span> <span class="o">=</span> <span class="n">mz_mean</span> <span class="o">-</span> <span class="n">delta_mass</span>
+    <span class="n">mz_max</span> <span class="o">=</span> <span class="n">mz_mean</span> <span class="o">+</span> <span class="n">delta_mass</span>
+    <span class="k">return</span> <span class="n">mz_min</span><span class="p">,</span> <span class="n">mz_max</span></div>
+
+
+
+<div class="viewcode-block" id="init_metadata">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.init_metadata">[docs]</a>
+<span class="k">def</span> <span class="nf">init_metadata</span><span class="p">():</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">MINT_METADATA_COLUMNS</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fn_to_label">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.tools.fn_to_label">[docs]</a>
+<span class="k">def</span> <span class="nf">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Soren Wacker.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9RJ7Z0BG5W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-9RJ7Z0BG5W');
+  </script>
+
+
+</body>
+</html>

@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ms_mint.Chromatogram &mdash; ms-mint 0.1.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/_modules/ms_mint/Chromatogram.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ms-mint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ms-mint: A Python library for targeted metabolomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ms_mint</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ms-mint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ms_mint.Chromatogram</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ms_mint.Chromatogram</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">find_peaks_in_timeseries</span><span class="p">,</span> <span class="n">gaussian</span><span class="p">,</span> <span class="n">mz_mean_width_to_min_max</span>
+<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
+<span class="kn">from</span> <span class="nn">.filters</span> <span class="kn">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">Resampler</span><span class="p">,</span> <span class="n">Smoother</span><span class="p">,</span> <span class="n">GaussFilter</span>
+<span class="kn">from</span> <span class="nn">.matplotlib_tools</span> <span class="kn">import</span> <span class="n">plot_peaks</span>
+<span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="n">get_chromatogram_from_ms_file</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+
+<div class="viewcode-block" id="Chromatogram">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram">[docs]</a>
+<span class="k">class</span> <span class="nc">Chromatogram</span><span class="p">:</span>
+<div class="viewcode-block" id="Chromatogram.__init__">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scan_times</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">intensities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Filter</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">expected_rt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a Chromatogram object.</span>
+
+<span class="sd">        :param scan_times: Array-like object containing the scan times.</span>
+<span class="sd">        :param intensities: Array-like object containing the intensities.</span>
+<span class="sd">        :param filters: List of filters to be applied.</span>
+<span class="sd">        :param expected_rt: Expected retention time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize empty arrays for scan_times and intensities</span>
+        <span class="c1"># Initialize scan_times and intensities as empty lists or arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span> <span class="k">if</span> <span class="n">scan_times</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">scan_times</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span> <span class="k">if</span> <span class="n">intensities</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">scan_times</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Update scan_times and intensities if provided</span>
+        <span class="k">if</span> <span class="n">scan_times</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">scan_times</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">intensities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">intensities</span><span class="p">)</span>
+
+        <span class="c1"># Initialize other attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span> <span class="ow">or</span> <span class="p">[</span><span class="n">Resampler</span><span class="p">(),</span> <span class="n">GaussFilter</span><span class="p">(),</span> <span class="n">Smoother</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span> <span class="o">=</span> <span class="n">expected_rt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="Chromatogram.from_file">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.from_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">chrom</span> <span class="o">=</span> <span class="n">get_chromatogram_from_ms_file</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">mz_mean</span><span class="o">=</span><span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="n">mz_width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">chrom</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">chrom</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">expected_rt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span> <span class="o">=</span> <span class="n">expected_rt</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.estimate_noise_level">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.estimate_noise_level">[docs]</a>
+    <span class="k">def</span> <span class="nf">estimate_noise_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_level</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">median</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.apply_filters">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.apply_filters">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.find_peaks">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.find_peaks">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimate_noise_level</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">prominence</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prominence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_level</span> <span class="o">*</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span> <span class="o">=</span> <span class="n">find_peaks_in_timeseries</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">intensity</span><span class="p">,</span>
+            <span class="n">prominence</span><span class="o">=</span><span class="n">prominence</span><span class="p">,</span>
+            <span class="n">rel_height</span><span class="o">=</span><span class="n">rel_height</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.optimise_peak_times_with_diff">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.optimise_peak_times_with_diff">[docs]</a>
+    <span class="k">def</span> <span class="nf">optimise_peak_times_with_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rolling_window</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">peaks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">prominence</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">peak_startings</span> <span class="o">=</span> <span class="n">find_peaks_in_timeseries</span><span class="p">(</span>
+            <span class="n">diff</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">intensity</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="n">prominence</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">plot</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="n">peak_endings</span> <span class="o">=</span> <span class="n">find_peaks_in_timeseries</span><span class="p">(</span>
+            <span class="o">-</span><span class="n">diff</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">intensity</span><span class="p">,</span> <span class="n">prominence</span><span class="o">=</span><span class="n">prominence</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">plot</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">peaks</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">new_rt_min</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt_min</span>
+            <span class="n">new_rt_max</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt_max</span>
+
+            <span class="n">candidates_rt_min</span> <span class="o">=</span> <span class="n">peak_startings</span><span class="p">[</span><span class="n">peak_startings</span><span class="o">.</span><span class="n">rt</span> <span class="o">&lt;=</span> <span class="n">new_rt_min</span><span class="p">]</span>
+            <span class="n">candidates_rt_max</span> <span class="o">=</span> <span class="n">peak_endings</span><span class="p">[</span><span class="n">peak_endings</span><span class="o">.</span><span class="n">rt</span> <span class="o">&gt;=</span> <span class="n">new_rt_max</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates_rt_min</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">new_rt_min</span> <span class="o">=</span> <span class="n">candidates_rt_min</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates_rt_max</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">new_rt_max</span> <span class="o">=</span> <span class="n">candidates_rt_max</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">peaks</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ndx</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">new_rt_min</span><span class="p">,</span> <span class="n">new_rt_max</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.select_peak_by_rt">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.select_peak_by_rt">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_peak_by_rt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">peaks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span>
+        <span class="k">if</span> <span class="n">expected_rt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expected_rt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span> <span class="o">=</span> <span class="n">expected_rt</span>
+        <span class="n">selected_ndx</span> <span class="o">=</span> <span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">rt</span> <span class="o">-</span> <span class="n">expected_rt</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_peak_ndxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">selected_ndx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_peaks</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.select_peak_by_highest_intensity">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.select_peak_by_highest_intensity">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_peak_by_highest_intensity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">peaks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span>
+        <span class="n">selected_ndx</span> <span class="o">=</span> <span class="n">peaks</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;peak_height&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_peak_ndxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">selected_ndx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_peaks</span></div>
+
+
+<div class="viewcode-block" id="Chromatogram.select_peak_with_gaussian_weight">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.select_peak_with_gaussian_weight">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_peak_with_gaussian_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_rt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+        <span class="n">peaks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span>
+        <span class="k">if</span> <span class="n">expected_rt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expected_rt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span> <span class="o">=</span> <span class="n">expected_rt</span>
+        <span class="k">if</span> <span class="n">peaks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No peaks available to select.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">rt</span><span class="p">,</span> <span class="n">expected_rt</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="n">weighted_peaks</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">*</span> <span class="n">peaks</span><span class="o">.</span><span class="n">peak_height</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">peak_height</span><span class="p">)</span> <span class="o">*</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">expected_rt</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="n">selected_ndx</span> <span class="o">=</span> <span class="n">weighted_peaks</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_peak_ndxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">selected_ndx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_peaks</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">selected_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_peak_ndxs</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;intensity&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">})</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;scan_time&quot;</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+<div class="viewcode-block" id="Chromatogram.plot">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.Chromatogram.Chromatogram.plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">peaks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span>
+        <span class="n">selected_peak_ndxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_peak_ndxs</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_peaks</span><span class="p">(</span>
+            <span class="n">series</span><span class="p">,</span>
+            <span class="n">peaks</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">highlight</span><span class="o">=</span><span class="n">selected_peak_ndxs</span><span class="p">,</span>
+            <span class="n">expected_rt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expected_rt</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Soren Wacker.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9RJ7Z0BG5W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-9RJ7Z0BG5W');
+  </script>
+
+
+</body>
+</html>

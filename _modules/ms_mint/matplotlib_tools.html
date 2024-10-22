@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ms_mint.matplotlib_tools &mdash; ms-mint 0.1.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/_modules/ms_mint/matplotlib_tools.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ms-mint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ms-mint: A Python library for targeted metabolomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">ms_mint</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ms-mint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ms_mint.matplotlib_tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ms_mint.matplotlib_tools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+
+
+<div class="viewcode-block" id="hierarchical_clustering">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.hierarchical_clustering">[docs]</a>
+<span class="k">def</span> <span class="nf">hierarchical_clustering</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="n">top_height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">left_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">xmaxticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ymaxticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs and plot hierarchical clustering on dataframe in dense format.</span>
+
+<span class="sd">    :param df: Input data.</span>
+<span class="sd">    :type df: pandas.DataFrame</span>
+<span class="sd">    :param vmin: Minimum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.</span>
+<span class="sd">    :type vmin: int, optional</span>
+<span class="sd">    :param vmin: Maximum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.</span>
+<span class="sd">    :type vmax: int, optional</span>
+<span class="sd">    :param figsize: Size of the main figure in inches, defaults to (8, 8)</span>
+<span class="sd">    :type figsize: tuple, optional</span>
+<span class="sd">    :param top_height: Height of the top dendrogram, defaults to 2</span>
+<span class="sd">    :type top_height: int, optional</span>
+<span class="sd">    :param left_width: Width of the left dendrogram, defaults to 2</span>
+<span class="sd">    :type left_width: int, optional</span>
+<span class="sd">    :param xmaxticks: Maximum number of x-ticks to display, defaults to None</span>
+<span class="sd">    :type xmaxticks: int, optional</span>
+<span class="sd">    :param ymaxticks: Maxiumum number of y-ticks to display, defaults to None</span>
+<span class="sd">    :type ymaxticks: int, optional</span>
+<span class="sd">    :param metric: Metric to be used for distance calculation (both axes), defaults to &quot;cosine&quot;</span>
+<span class="sd">    :type metric: str, optional</span>
+<span class="sd">    :param cmap: Matplotlib color map name, defaults to None</span>
+<span class="sd">    :type cmap: str, optional</span>
+<span class="sd">    :return: Matplotlib figure</span>
+<span class="sd">    :rtype: matplotlib.pyplot.Figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">metric_x</span><span class="p">,</span> <span class="n">metric_y</span> <span class="o">=</span> <span class="n">metric</span><span class="p">,</span> <span class="n">metric</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">metric_x</span><span class="p">,</span> <span class="n">metric_y</span> <span class="o">=</span> <span class="n">metric</span>
+    <span class="k">elif</span> <span class="n">metric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">metric_x</span><span class="p">,</span> <span class="n">metric_y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Subplot sizes</span>
+    <span class="n">total_width</span><span class="p">,</span> <span class="n">total_height</span> <span class="o">=</span> <span class="n">figsize</span>
+
+    <span class="n">main_h</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">top_height</span> <span class="o">/</span> <span class="n">total_height</span><span class="p">)</span>
+    <span class="n">main_w</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">left_width</span> <span class="o">/</span> <span class="n">total_width</span><span class="p">)</span>
+
+    <span class="n">gap_x</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">/</span> <span class="n">total_width</span>
+    <span class="n">gap_y</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">/</span> <span class="n">total_height</span>
+
+    <span class="n">left_h</span> <span class="o">=</span> <span class="n">main_h</span>
+    <span class="n">left_w</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">main_w</span>
+
+    <span class="n">top_h</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">main_h</span>
+    <span class="n">top_w</span> <span class="o">=</span> <span class="n">main_w</span>
+
+    <span class="k">if</span> <span class="n">xmaxticks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xmaxticks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">main_w</span> <span class="o">*</span> <span class="n">total_width</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ymaxticks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ymaxticks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">main_h</span> <span class="o">*</span> <span class="n">total_height</span><span class="p">)</span>
+
+    <span class="n">dm</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">D1</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pdist</span><span class="p">(</span><span class="n">dm</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric_y</span><span class="p">))</span>
+    <span class="n">D2</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pdist</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric_x</span><span class="p">))</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_tight_layout</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># add left dendrogram</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">left_w</span> <span class="o">-</span> <span class="n">gap_x</span><span class="p">,</span> <span class="n">left_h</span><span class="p">],</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+    <span class="n">Z1</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">color_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">above_threshold_color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="c1"># add top dendrogram</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">left_w</span><span class="p">,</span> <span class="n">main_h</span> <span class="o">+</span> <span class="n">gap_y</span><span class="p">,</span> <span class="n">top_w</span><span class="p">,</span> <span class="n">top_h</span> <span class="o">-</span> <span class="n">gap_y</span><span class="p">],</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">D2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+    <span class="n">Z2</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">color_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">above_threshold_color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="c1"># add matrix plot</span>
+    <span class="n">axmatrix</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">left_w</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">main_w</span><span class="p">,</span> <span class="n">main_h</span><span class="p">])</span>
+    <span class="n">idx1</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="s2">&quot;leaves&quot;</span><span class="p">]</span>
+    <span class="n">idx2</span> <span class="o">=</span> <span class="n">Z2</span><span class="p">[</span><span class="s2">&quot;leaves&quot;</span><span class="p">]</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">dm</span><span class="p">[</span><span class="n">idx1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">D</span><span class="p">[:,</span> <span class="n">idx2</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;coolwarm&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">axmatrix</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">D</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+
+    <span class="n">axmatrix</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">axmatrix</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">tick_right</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">tick_bottom</span><span class="p">()</span>
+
+    <span class="n">clustered</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">Z1</span><span class="p">[</span><span class="s2">&quot;leaves&quot;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Z2</span><span class="p">[</span><span class="s2">&quot;leaves&quot;</span><span class="p">]]</span>
+
+    <span class="n">ndx_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">clustered</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ymaxticks</span><span class="p">)</span>
+    <span class="n">ndx_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">clustered</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xmaxticks</span><span class="p">)</span>
+    <span class="n">ndx_y</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ndx_y</span><span class="p">]</span>
+    <span class="n">ndx_x</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ndx_x</span><span class="p">]</span>
+
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">ndx_y</span><span class="p">,</span> <span class="n">clustered</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ndx_y</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">ndx_x</span><span class="p">,</span> <span class="n">clustered</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">ndx_x</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+    <span class="n">ndx_leaves</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="s2">&quot;leaves&quot;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">col_leaves</span> <span class="o">=</span> <span class="n">Z2</span><span class="p">[</span><span class="s2">&quot;leaves&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">clustered</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ndx_leaves</span><span class="p">,</span> <span class="n">col_leaves</span></div>
+
+
+
+<div class="viewcode-block" id="plot_peak_shapes">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_peak_shapes">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_peak_shapes</span><span class="p">(</span>
+    <span class="n">mint_results</span><span class="p">,</span>
+    <span class="n">mint_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">aspect</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">col_wrap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;ms_file_label&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot peak shapes of mint results.</span>
+
+<span class="sd">    :param mint_results: DataFrame in Mint results format.</span>
+<span class="sd">    :type mint_results: pandas.DataFrame</span>
+<span class="sd">    :param mint_metadata: DataFrame in Mint metadata format.</span>
+<span class="sd">    :type mint_metadata: pandas.DataFrame</span>
+<span class="sd">    :param fns: Filenames to include, defaults to None</span>
+<span class="sd">    :type fns: list, optional</span>
+<span class="sd">    :param peak_labels: Peak-labels to include, defaults to None</span>
+<span class="sd">    :type peak_labels: list, optional</span>
+<span class="sd">    :param height: Height of the figure facets, defaults to 4</span>
+<span class="sd">    :type height: int, optional</span>
+<span class="sd">    :param aspect: Aspect ratio of the figure facets, defaults to 1</span>
+<span class="sd">    :type aspect: int, optional</span>
+<span class="sd">    :param legend: Whether or not to add a legend, defaults to False</span>
+<span class="sd">    :type legend: bool, optional</span>
+<span class="sd">    :param col_wrap: Number of columns for sub-plots, defaults to 4</span>
+<span class="sd">    :type col_wrap: int, optional</span>
+<span class="sd">    :param hue: Column name for color groups, defaults to &quot;ms_file&quot;</span>
+<span class="sd">    :type hue: str, optional</span>
+<span class="sd">    :param title: Title to add, defaults to None</span>
+<span class="sd">    :type title: str, optional</span>
+<span class="sd">    :param dpi: Resolution of generated image, defaults to None</span>
+<span class="sd">    :type dpi: int, optional</span>
+<span class="sd">    :param sharex: Whether or not to share x-axis range between subplots, defaults to False</span>
+<span class="sd">    :type sharex: bool, optional</span>
+<span class="sd">    :param sharey: Whether or not to share y-axis range between subplots, defaults to False</span>
+<span class="sd">    :type sharey: bool, optional</span>
+<span class="sd">    :param kind: Kind of seaborn relplot</span>
+<span class="sd">    :type kind: str, optional</span>
+<span class="sd">    :return: Generated figure object.</span>
+<span class="sd">    :rtype: matplotlib.pyplot.Figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># fig = plt.figure(dpi=dpi)</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">mint_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">peak_area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">R</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">peak_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">peak_labels</span><span class="p">]</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">peak_labels</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">peak_labels</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">ms_file</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">fns</span><span class="p">)]</span>
+
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">peak_label</span> <span class="ow">in</span> <span class="n">peak_labels</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">R</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">peak_label</span> <span class="o">==</span> <span class="n">peak_label</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">peak_n_datapoints</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">peak_rt</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">peak_shape_rt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+            <span class="n">peak_int</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">peak_shape_int</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+            <span class="n">ms_file_label</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">ms_file_label</span>
+            <span class="n">mz</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mz_mean</span>
+            <span class="n">rt</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">rt</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;Scan time [s]&quot;</span><span class="p">:</span> <span class="n">peak_rt</span><span class="p">,</span>
+                    <span class="s2">&quot;Intensity&quot;</span><span class="p">:</span> <span class="n">peak_int</span><span class="p">,</span>
+                    <span class="s2">&quot;ms_file_label&quot;</span><span class="p">:</span> <span class="n">ms_file_label</span><span class="p">,</span>
+                    <span class="s2">&quot;peak_label&quot;</span><span class="p">:</span> <span class="n">peak_label</span><span class="p">,</span>
+                    <span class="s2">&quot;Expected Scan time [s]&quot;</span><span class="p">:</span> <span class="n">rt</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Add metadata</span>
+    <span class="k">if</span> <span class="n">mint_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mint_metadata</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+
+    <span class="n">_facet_kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sharex</span><span class="o">=</span><span class="n">sharex</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="n">sharey</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;facet_kws&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">_facet_kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;facet_kws&#39;</span><span class="p">))</span>
+        
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span>
+        <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="s2">&quot;peak_label&quot;</span><span class="p">,</span>
+        <span class="n">col_order</span><span class="o">=</span><span class="n">peak_labels</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+        <span class="n">col_wrap</span><span class="o">=</span><span class="n">col_wrap</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span>
+        <span class="n">facet_kws</span><span class="o">=</span><span class="n">_facet_kws</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">set_titles</span><span class="p">(</span><span class="n">row_template</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{row_name}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">col_template</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{col_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">():</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;sci&quot;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g</span></div>
+
+
+
+<div class="viewcode-block" id="plot_peaks">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_peaks">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_peaks</span><span class="p">(</span>
+    <span class="n">series</span><span class="p">,</span>
+    <span class="n">peaks</span><span class="p">,</span>
+    <span class="n">highlight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">expected_rt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">highlight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">highlight</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">label</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;Intensity&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">peaks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">peaks</span><span class="o">.</span><span class="n">ndxs</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Peaks&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;intensity&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span>
+            <span class="n">ndx</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">peak_base_height</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">),</span>
+        <span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="n">highlight</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Selected&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span>
+                <span class="n">peak_base_height</span><span class="p">,</span>
+                <span class="n">rt_min</span><span class="p">,</span>
+                <span class="n">rt_max</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Peak width&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">expected_rt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span>
+            <span class="n">expected_rt</span><span class="p">,</span> <span class="n">expected_rt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Expected Rt&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Gaussian weight&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;sci&quot;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="c1">#plt.ylim((0.001, None))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">legend</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="plot_metabolomics_hist2d">
+<a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_metabolomics_hist2d">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_metabolomics_hist2d</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">set_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">,</span>
+    <span class="n">rt_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">mz_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">mz_bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">set_dim</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mz_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mz_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">mz</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">mz</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">rt_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rt_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">scan_time</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">scan_time</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+    <span class="n">rt_bins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">rt_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rt_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1e3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">rt_range</span><span class="p">,</span> <span class="n">mz_range</span><span class="p">))</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;scan_time&quot;</span><span class="p">],</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;mz&quot;</span><span class="p">],</span>
+        <span class="n">weights</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">),</span>
+        <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="n">rt_bins</span><span class="p">,</span> <span class="n">mz_bins</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;m/z&quot;</span><span class="p">)</span>
+    <span class="c1"># plt.grid()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">useOffset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;plain&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Soren Wacker.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9RJ7Z0BG5W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-9RJ7Z0BG5W');
+  </script>
+
+
+</body>
+</html>
