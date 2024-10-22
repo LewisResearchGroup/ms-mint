@@ -15,7 +15,7 @@ ms\_mint.Mint module
 ms\_mint.chromatogram module
 ----------------------------
 
-.. automodule:: ms_mint.chromatogram
+.. automodule:: ms_mint.Chromatogram
    :members:
    :undoc-members:
    :show-inheritance:
