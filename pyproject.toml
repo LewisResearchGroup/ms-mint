@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ms-mint"
-description = "Metabolomics Integrator (Mint)"
+description = "Python library for large-scale targeted metabolomics."
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
