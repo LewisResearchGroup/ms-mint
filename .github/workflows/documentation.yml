@@ -2,27 +2,37 @@ name: Create Documentation
 on:
   push:
     branches:
-    - develop
+      - develop
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.12
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install .
-        pip install myst-parser sphinx-rtd-theme  # Install myst_parser and sphinx_rtd_theme
-    - name: Build Documentation
-      run: |
-        sphinx-build -b html docs/ build/ -W -v
-    - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Install the required dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install myst-parser sphinx-rtd-theme
+          pip install -r requirements.txt 
+
+      # Install your package to ensure autodoc works
+      - name: Install ms_mint package
+        run: pip install -e .
+
+      # Build the Sphinx documentation
+      - name: Build Documentation
+        run: |
+          sphinx-build -b html docs/ docs/_build/html -W -v
+
+      # Deploy the built documentation to the gh-pages branch
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html  # Ensure this path matches your build output
