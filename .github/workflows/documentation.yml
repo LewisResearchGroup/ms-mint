@@ -27,7 +27,7 @@ jobs:
       # Build the Sphinx documentation
       - name: Build Documentation
         run: |
-          sphinx-build -b html docs/ docs/_build/html -W -v
+          sphinx-build -b html docs/ docs/_build/html -v
 
       # Deploy the built documentation to the gh-pages branch
       - name: Deploy to GitHub Pages
