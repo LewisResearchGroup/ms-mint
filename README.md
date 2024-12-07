@@ -26,6 +26,8 @@ MINT has been split into the Python library and the app. This repository contain
 
 2. Ponce LF, Bishop SL, Wacker S, Groves RA, Lewis IA. [SCALiR: A Web Application for Automating Absolute Quantification of Mass Spectrometry-Based Metabolomics Data. Anal Chem.](https://pubs.acs.org/doi/10.1021/acs.analchem.3c04988) 2024;96: 6566–6574.
 
+3. Groves RA, Chan CCY, Wildman SD, Gregson DB, Rydzak T, Lewis IA. [Rapid LC-MS assay for targeted metabolite quantification by serial injection into isocratic gradients.](https://pmc.ncbi.nlm.nih.gov/articles/PMC9823034/) Anal Bioanal Chem. 2023 Jan;415(2):269-276. doi: 10.1007/s00216-022-04384-x. Epub 2022 Nov 28. PMID: 36443449; PMCID: PMC9823034.
+
 ---
 ## Contributions
 All contributions, bug reports, code reviews, bug fixes, documentation improvements, enhancements, and ideas are welcome.
