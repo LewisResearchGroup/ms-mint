@@ -30,3 +30,4 @@ sphinx-rtd-theme
 myst-parser
 psims
 numpy<2.0.0
+email-validator
