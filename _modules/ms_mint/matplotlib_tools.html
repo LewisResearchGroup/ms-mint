@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ms_mint.matplotlib_tools &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -71,18 +71,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for ms_mint.matplotlib_tools</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
 
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.cluster.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
 
 
 <div class="viewcode-block" id="hierarchical_clustering">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.hierarchical_clustering">[docs]</a>
-<span class="k">def</span> <span class="nf">hierarchical_clustering</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hierarchical_clustering</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -206,7 +206,7 @@
 
 <div class="viewcode-block" id="plot_peak_shapes">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_peak_shapes">[docs]</a>
-<span class="k">def</span> <span class="nf">plot_peak_shapes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_peak_shapes</span><span class="p">(</span>
     <span class="n">mint_results</span><span class="p">,</span>
     <span class="n">mint_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -337,7 +337,7 @@
 
 <div class="viewcode-block" id="plot_peaks">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_peaks">[docs]</a>
-<span class="k">def</span> <span class="nf">plot_peaks</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_peaks</span><span class="p">(</span>
     <span class="n">series</span><span class="p">,</span>
     <span class="n">peaks</span><span class="p">,</span>
     <span class="n">highlight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -391,7 +391,7 @@
 
 <div class="viewcode-block" id="plot_metabolomics_hist2d">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.matplotlib_tools.plot_metabolomics_hist2d">[docs]</a>
-<span class="k">def</span> <span class="nf">plot_metabolomics_hist2d</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_metabolomics_hist2d</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span>
     <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ms_mint.processing &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -73,21 +73,21 @@
   <h1>Source code for ms_mint.processing</h1><div class="highlight"><pre>
 <span></span><span class="c1"># ms_mint/processing.py</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span>  <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span><span class="w">  </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
 
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">lock</span><span class="p">,</span> <span class="n">mz_mean_width_to_min_max</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lock</span><span class="p">,</span> <span class="n">mz_mean_width_to_min_max</span>
 
-<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_file_to_df</span>
 
-<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">MINT_RESULTS_COLUMNS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.standards</span><span class="w"> </span><span class="kn">import</span> <span class="n">RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">MINT_RESULTS_COLUMNS</span>
 
 
-<span class="k">def</span> <span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract single chromatogram of specific m/z value from MS-data.</span>
 
@@ -109,7 +109,7 @@
 
 <div class="viewcode-block" id="process_ms1_files_in_parallel">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1_files_in_parallel">[docs]</a>
-<span class="k">def</span> <span class="nf">process_ms1_files_in_parallel</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_ms1_files_in_parallel</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Pickleable function for (parallel) peak integration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -137,7 +137,7 @@
 
 <div class="viewcode-block" id="append_results">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.append_results">[docs]</a>
-<span class="k">def</span> <span class="nf">append_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Appends results to file.</span>
 
@@ -153,7 +153,7 @@
 
 <div class="viewcode-block" id="process_ms1_file">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1_file">[docs]</a>
-<span class="k">def</span> <span class="nf">process_ms1_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_ms1_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Peak integration using a filename as input.</span>
 
@@ -177,7 +177,7 @@
 
 <div class="viewcode-block" id="process_ms1">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1">[docs]</a>
-<span class="k">def</span> <span class="nf">process_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_ms1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process MS-1 data with a target list.</span>
 
@@ -196,7 +196,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_process_ms1_from_df_</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_ms1_from_df_</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
     <span class="n">peak_cols</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;mz_mean&quot;</span><span class="p">,</span>
         <span class="s2">&quot;mz_width&quot;</span><span class="p">,</span>
@@ -213,7 +213,7 @@
 
 <div class="viewcode-block" id="process_ms1_from_numpy">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.process_ms1_from_numpy">[docs]</a>
-<span class="k">def</span> <span class="nf">process_ms1_from_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">peaks</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_ms1_from_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">peaks</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process MS1 data in numpy array format.</span>
 
@@ -242,7 +242,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_process_ms1_from_numpy</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_ms1_from_numpy</span><span class="p">(</span>
     <span class="n">array</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">intensity_threshold</span><span class="p">,</span> <span class="n">peak_label</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
     <span class="n">_slice</span> <span class="o">=</span> <span class="n">slice_ms1_array</span><span class="p">(</span>
@@ -263,7 +263,7 @@
 
 <div class="viewcode-block" id="extract_ms1_properties">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_ms1_properties">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_ms1_properties</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_ms1_properties</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process MS-1 data in array format.</span>
 
@@ -366,7 +366,7 @@
 
 <div class="viewcode-block" id="slice_ms1_array">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.slice_ms1_array">[docs]</a>
-<span class="k">def</span> <span class="nf">slice_ms1_array</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slice_ms1_array</span><span class="p">(</span>
     <span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">intensity_threshold</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -398,7 +398,7 @@
 
 <div class="viewcode-block" id="score_peaks">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.score_peaks">[docs]</a>
-<span class="k">def</span> <span class="nf">score_peaks</span><span class="p">(</span><span class="n">mint_results</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_peaks</span><span class="p">(</span><span class="n">mint_results</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Score the peak quality (experimental).</span>
 
@@ -423,7 +423,7 @@
 
 <div class="viewcode-block" id="get_chromatogram_from_ms_file">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.get_chromatogram_from_ms_file">[docs]</a>
-<span class="k">def</span> <span class="nf">get_chromatogram_from_ms_file</span><span class="p">(</span><span class="n">ms_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_chromatogram_from_ms_file</span><span class="p">(</span><span class="n">ms_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get chromatogram data from an MS file.</span>
 
@@ -440,7 +440,7 @@
 
 <div class="viewcode-block" id="extract_chromatogram_from_ms1">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.processing.extract_chromatogram_from_ms1">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">ms1</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_chromatogram_from_ms1</span><span class="p">(</span><span class="n">ms1</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">mz_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract chromatogram from MS1 data.</span>
 

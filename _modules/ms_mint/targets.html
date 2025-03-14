@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ms_mint.targets &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -73,24 +73,24 @@
   <h1>Source code for ms_mint.targets</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Everything related to target lists.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.Chromatogram</span> <span class="kn">import</span> <span class="n">Chromatogram</span>
-<span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="n">get_chromatogram_from_ms_file</span><span class="p">,</span> <span class="n">extract_chromatogram_from_ms1</span>
-<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">ms_file_to_df</span>
-<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">formula_to_mass</span><span class="p">,</span> <span class="n">df_diff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.Chromatogram</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chromatogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_chromatogram_from_ms_file</span><span class="p">,</span> <span class="n">extract_chromatogram_from_ms1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_file_to_df</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.standards</span><span class="w"> </span><span class="kn">import</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">formula_to_mass</span><span class="p">,</span> <span class="n">df_diff</span>
 
 
 <div class="viewcode-block" id="read_targets">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.read_targets">[docs]</a>
-<span class="k">def</span> <span class="nf">read_targets</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;negative&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_targets</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;negative&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts peak data from csv files that contain peak definitions.</span>
 
@@ -119,7 +119,7 @@
 
 <div class="viewcode-block" id="standardize_targets">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.standardize_targets">[docs]</a>
-<span class="k">def</span> <span class="nf">standardize_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;neutral&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">standardize_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">ms_mode</span><span class="o">=</span><span class="s2">&quot;neutral&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Standardize target list.</span>
 
@@ -184,7 +184,7 @@
 
 <div class="viewcode-block" id="convert_to_seconds">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.convert_to_seconds">[docs]</a>
-<span class="k">def</span> <span class="nf">convert_to_seconds</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_seconds</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert time units to seconds.</span>
 
@@ -205,7 +205,7 @@
 
 <div class="viewcode-block" id="fill_missing_rt_values">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.fill_missing_rt_values">[docs]</a>
-<span class="k">def</span> <span class="nf">fill_missing_rt_values</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fill_missing_rt_values</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    If rt values are missing fill with mean of rt_min, rt_max.</span>
 
@@ -224,7 +224,7 @@
 
 <div class="viewcode-block" id="check_targets">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.check_targets">[docs]</a>
-<span class="k">def</span> <span class="nf">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if targets are formated well.</span>
 
@@ -246,14 +246,14 @@
 
 
 
-<span class="k">def</span> <span class="nf">_check_labels_are_strings_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_labels_are_strings_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">targets</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="s2">&quot;peak_label&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Target labels are not strings.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">_check_duplicated_labels_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_duplicated_labels_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
     <span class="n">max_target_label_count</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">peak_label</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">max_target_label_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Target labels are not unique&quot;</span><span class="p">)</span>
@@ -261,7 +261,7 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">_check_target_list_columns_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_target_list_columns_</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span> <span class="o">!=</span> <span class="n">TARGETS_COLUMNS</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Target columns are wrong.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -270,7 +270,7 @@
 
 <div class="viewcode-block" id="gen_target_grid">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.gen_target_grid">[docs]</a>
-<span class="k">def</span> <span class="nf">gen_target_grid</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">rt_max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mz_ppm</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">intensity_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gen_target_grid</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">rt_max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mz_ppm</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">intensity_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a targets from a list of masses.</span>
 
@@ -298,7 +298,7 @@
 
 <div class="viewcode-block" id="diff_targets">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.targets.diff_targets">[docs]</a>
-<span class="k">def</span> <span class="nf">diff_targets</span><span class="p">(</span><span class="n">old_pklist</span><span class="p">,</span> <span class="n">new_pklist</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">diff_targets</span><span class="p">(</span><span class="n">old_pklist</span><span class="p">,</span> <span class="n">new_pklist</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the difference between two target lists.</span>
 

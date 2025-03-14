@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ms_mint.Mint &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -73,24 +73,24 @@
   <h1>Source code for ms_mint.Mint</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Main module of the ms-mint library.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Manager</span><span class="p">,</span> <span class="n">cpu_count</span>
-<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Manager</span><span class="p">,</span> <span class="n">cpu_count</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="kn">import</span> <span class="n">glob</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span><span class="p">,</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span><span class="p">,</span> <span class="n">MinMaxScaler</span>
 
-<span class="kn">from</span> <span class="nn">.standards</span> <span class="kn">import</span> <span class="n">MINT_RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
-<span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="n">process_ms1_files_in_parallel</span><span class="p">,</span> <span class="n">extract_chromatogram_from_ms1</span>
-<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">export_to_excel</span><span class="p">,</span> <span class="n">ms_file_to_df</span>
-<span class="kn">from</span> <span class="nn">.TargetOptimizer</span> <span class="kn">import</span> <span class="n">TargetOptimizer</span>
-<span class="kn">from</span> <span class="nn">.targets</span> <span class="kn">import</span> <span class="n">read_targets</span><span class="p">,</span> <span class="n">check_targets</span><span class="p">,</span> <span class="n">standardize_targets</span>
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.standards</span><span class="w"> </span><span class="kn">import</span> <span class="n">MINT_RESULTS_COLUMNS</span><span class="p">,</span> <span class="n">TARGETS_COLUMNS</span><span class="p">,</span> <span class="n">DEPRECATED_LABELS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_ms1_files_in_parallel</span><span class="p">,</span> <span class="n">extract_chromatogram_from_ms1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_excel</span><span class="p">,</span> <span class="n">ms_file_to_df</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.TargetOptimizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TargetOptimizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.targets</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_targets</span><span class="p">,</span> <span class="n">check_targets</span><span class="p">,</span> <span class="n">standardize_targets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tools</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_ms_file</span><span class="p">,</span>
     <span class="n">get_ms_files_from_results</span><span class="p">,</span>
     <span class="n">get_targets_from_results</span><span class="p">,</span>
@@ -99,22 +99,22 @@
     <span class="n">fn_to_label</span><span class="p">,</span>
     <span class="n">log2p1</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.pca</span> <span class="kn">import</span> <span class="n">PrincipalComponentsAnalyser</span>
-<span class="kn">from</span> <span class="nn">.MintPlotter</span> <span class="kn">import</span> <span class="n">MintPlotter</span>
-<span class="kn">from</span> <span class="nn">.Chromatogram</span> <span class="kn">import</span> <span class="n">Chromatogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.pca</span><span class="w"> </span><span class="kn">import</span> <span class="n">PrincipalComponentsAnalyser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.MintPlotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">MintPlotter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.Chromatogram</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chromatogram</span>
 
-<span class="kn">import</span> <span class="nn">ms_mint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ms_mint</span>
 
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 
 <span class="n">METADATA_DEFAUT_FN</span> <span class="o">=</span> <span class="s1">&#39;metadata.parquet&#39;</span>
 
 <div class="viewcode-block" id="Mint">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint">[docs]</a>
-<span class="k">class</span> <span class="nc">Mint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Mint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main class of the ms_mint package, which processes metabolomics files.</span>
 
@@ -128,7 +128,7 @@
 <span class="sd">    :type wdir: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">progress_callback</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -151,7 +151,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ms-mint version number.</span>
 
@@ -162,7 +162,7 @@
 
 <div class="viewcode-block" id="Mint.reset">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.reset">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset Mint instance. Removes targets, MS-files and results.</span>
 
@@ -184,7 +184,7 @@
 
 <div class="viewcode-block" id="Mint.clear_targets">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.clear_targets">[docs]</a>
-    <span class="k">def</span> <span class="nf">clear_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset target list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -193,7 +193,7 @@
 
 <div class="viewcode-block" id="Mint.clear_results">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.clear_results">[docs]</a>
-    <span class="k">def</span> <span class="nf">clear_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -202,7 +202,7 @@
 
 <div class="viewcode-block" id="Mint.clear_ms_files">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.clear_ms_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">clear_ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset ms files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -211,7 +211,7 @@
 
 <div class="viewcode-block" id="Mint.run">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.run">[docs]</a>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rt_margin</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rt_margin</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main routine to run MINT and process MS-files with current target list.</span>
 
@@ -255,7 +255,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_rt_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">rt_margin</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_rt_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">rt_margin</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;rt&quot;</span> <span class="ow">in</span> <span class="n">targets</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="n">update_rt_min</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">rt_min</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">targets</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span>
             <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">update_rt_min</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -266,12 +266,12 @@
                 <span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">update_rt_max</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">rt_margin</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_determine_nthreads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nthreads</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_nthreads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nthreads</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">nthreads</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">nthreads</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cpu_count</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_files</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nthreads</span>
 
-    <span class="k">def</span> <span class="nf">_run_sequential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_sequential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span><span class="p">):</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
@@ -285,7 +285,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_files</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_report_runtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_report_runtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">runtime_per_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_files</span>
@@ -299,7 +299,7 @@
             <span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Results:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_run_parallel</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_parallel</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="n">maxtasksperchild</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> <span class="n">maxtasksperchild</span><span class="o">=</span><span class="n">maxtasksperchild</span><span class="p">)</span>
@@ -332,7 +332,7 @@
             <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_monitor_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_monitor_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">results</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
             <span class="n">size</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">size</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_files</span>
@@ -340,7 +340,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="mi">100</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns current status of Mint instance.</span>
 
@@ -350,7 +350,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get/set ms-files to process.</span>
 
@@ -365,7 +365,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
 
     <span class="nd">@ms_files</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_files</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ms_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_files</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_of_files</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">list_of_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_of_files</span><span class="p">]</span>
         <span class="n">list_of_files</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">list_of_files</span> <span class="k">if</span> <span class="n">is_ms_file</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span>
@@ -378,7 +378,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">reindex</span><span class="p">([</span><span class="n">fn_to_label</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">list_of_files</span><span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Number of currently stored ms filenames.</span>
 
@@ -389,7 +389,7 @@
 
 <div class="viewcode-block" id="Mint.load_files">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load ms_files as a function that returns the Mint instance for chaining.</span>
 
@@ -407,7 +407,7 @@
 
 <div class="viewcode-block" id="Mint.load_targets">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load_targets">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_files</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_files</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load targets from a file (csv, xslx)</span>
 
@@ -430,7 +430,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set/get target list.</span>
 
@@ -445,7 +445,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span>
 
     <span class="nd">@targets</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="n">standardize_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span> <span class="n">check_targets</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;peak_label&quot;</span><span class="p">)</span>
@@ -454,7 +454,7 @@
 
 <div class="viewcode-block" id="Mint.get_target_params">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.get_target_params">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_target_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peak_label</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peak_label</span><span class="p">):</span>
         <span class="n">target_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">peak_label</span><span class="p">]</span>
         <span class="n">mz_mean</span><span class="p">,</span> <span class="n">mz_width</span><span class="p">,</span> <span class="n">rt_min</span><span class="p">,</span> <span class="n">rt_max</span> <span class="o">=</span> <span class="n">target_data</span><span class="p">[</span>
             <span class="p">[</span><span class="s2">&quot;mz_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;mz_width&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_min&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_max&quot;</span><span class="p">]</span>
@@ -463,11 +463,11 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">peak_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peak_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get/Set the Mint results.</span>
 
@@ -481,12 +481,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
 
     <span class="nd">@results</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">df</span>
 
 <div class="viewcode-block" id="Mint.crosstab">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.crosstab">[docs]</a>
-    <span class="k">def</span> <span class="nf">crosstab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">aggfunc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">crosstab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">aggfunc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> 
                  <span class="n">apply</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">groupby</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create condensed representation of the results.</span>
@@ -565,7 +565,7 @@
 
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shows the current progress.</span>
 
@@ -575,7 +575,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span>
 
     <span class="nd">@progress</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">value</span>
         <span class="k">assert</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">value</span>
@@ -584,7 +584,7 @@
 
 <div class="viewcode-block" id="Mint.export">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.export">[docs]</a>
-    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export current results to file.</span>
 
@@ -608,7 +608,7 @@
 
 <div class="viewcode-block" id="Mint.load">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load">[docs]</a>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load results into Mint instance.</span>
 
@@ -647,7 +647,7 @@
 
 <div class="viewcode-block" id="Mint.digest_results">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.digest_results">[docs]</a>
-    <span class="k">def</span> <span class="nf">digest_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">digest_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span> <span class="o">=</span> <span class="n">get_ms_files_from_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">get_targets_from_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span></div>
 
@@ -655,7 +655,7 @@
 
 <div class="viewcode-block" id="Mint.get_chromatograms">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.get_chromatograms">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_chromatograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_chromatograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ms_files</span>
         <span class="k">if</span> <span class="n">peak_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -665,7 +665,7 @@
 
 
     <span class="nd">@lru_cache</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_get_chromatograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_chromatograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fns</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
             <span class="n">fns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fns</span><span class="p">)</span>     
@@ -708,7 +708,7 @@
 
 <div class="viewcode-block" id="Mint.load_metadata">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.load_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="o">/</span><span class="n">METADATA_DEFAUT_FN</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
@@ -722,7 +722,7 @@
 
 <div class="viewcode-block" id="Mint.save_metadata">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint.save_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="o">/</span><span class="n">METADATA_DEFAUT_FN</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
@@ -734,7 +734,7 @@
 
 <div class="viewcode-block" id="Mint._scale_group">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.Mint.Mint._scale_group">[docs]</a>
-    <span class="k">def</span> <span class="nf">_scale_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">scaler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_scale_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">scaler</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to scale groups individually.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

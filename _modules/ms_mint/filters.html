@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ms_mint.filters &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -71,18 +71,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for ms_mint.filters</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter1d</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_filter1d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 
 
 <div class="viewcode-block" id="Filter">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Filter">[docs]</a>
-<span class="k">class</span> <span class="nc">Filter</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Filter</span><span class="p">:</span>
 <div class="viewcode-block" id="Filter.transform">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Filter.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 </div>
 
@@ -90,7 +90,7 @@
 
 <div class="viewcode-block" id="Resampler">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler">[docs]</a>
-<span class="k">class</span> <span class="nc">Resampler</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Resampler</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter for time series that resamples the data in</span>
 <span class="sd">    a certain frequency.</span>
@@ -98,7 +98,7 @@
 
 <div class="viewcode-block" id="Resampler.__init__">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="s2">&quot;500ms&quot;</span><span class="p">,</span> <span class="n">input_unit</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="s2">&quot;500ms&quot;</span><span class="p">,</span> <span class="n">input_unit</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter for time series that resamples the data in</span>
 <span class="sd">        a certain frequency. The default is 500ms.</span>
@@ -115,7 +115,7 @@
 
 <div class="viewcode-block" id="Resampler.transform">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Resampler.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transformation method.</span>
 
@@ -139,7 +139,7 @@
 
 <div class="viewcode-block" id="Smoother">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother">[docs]</a>
-<span class="k">class</span> <span class="nc">Smoother</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Smoother</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter for time series that smoothes the</span>
 <span class="sd">    x values by running one or more rolling</span>
@@ -148,7 +148,7 @@
 
 <div class="viewcode-block" id="Smoother.__init__">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter for time series that smoothes the</span>
 <span class="sd">        x values by running one or more rolling</span>
@@ -165,7 +165,7 @@
 
 <div class="viewcode-block" id="Smoother.transform">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.Smoother.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transformation method.</span>
 
@@ -188,14 +188,14 @@
 
 <div class="viewcode-block" id="GaussFilter">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter">[docs]</a>
-<span class="k">class</span> <span class="nc">GaussFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GaussFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter for time series that applies a Gaussian filter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GaussFilter.__init__">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter for time series that applies a Gaussian filter.</span>
 
@@ -207,7 +207,7 @@
 
 <div class="viewcode-block" id="GaussFilter.transform">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.filters.GaussFilter.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transformation method.</span>
 

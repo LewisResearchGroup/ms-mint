@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ms_mint.plotly_tools &mdash; ms-mint 0.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
@@ -71,27 +71,27 @@
            <div itemprop="articleBody">
              
   <h1>Source code for ms_mint.plotly_tools</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">colorlover</span> <span class="k">as</span> <span class="nn">cl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">colorlover</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cl</span>
 
-<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
-<span class="kn">import</span> <span class="nn">plotly.figure_factory</span> <span class="k">as</span> <span class="nn">ff</span>
-<span class="kn">import</span> <span class="nn">plotly.io</span> <span class="k">as</span> <span class="nn">pio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.figure_factory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ff</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">plotly.subplots</span> <span class="kn">import</span> <span class="n">make_subplots</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">fn_to_label</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">fn_to_label</span>
 
 
 
 <div class="viewcode-block" id="set_template">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.set_template">[docs]</a>
-<span class="k">def</span> <span class="nf">set_template</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_template</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function that sets a template for plotly figures.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -108,7 +108,7 @@
 
 <div class="viewcode-block" id="plotly_heatmap">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_heatmap">[docs]</a>
-<span class="k">def</span> <span class="nf">plotly_heatmap</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plotly_heatmap</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">normed_by_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">transposed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -302,7 +302,7 @@
 
 <div class="viewcode-block" id="plotly_peak_shapes">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.plotly_peak_shapes">[docs]</a>
-<span class="k">def</span> <span class="nf">plotly_peak_shapes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plotly_peak_shapes</span><span class="p">(</span>
     <span class="n">mint_results</span><span class="p">,</span>
     <span class="n">mint_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">color</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span><span class="p">,</span>  <span class="c1"># Add the new argument for specifying color column</span>
@@ -455,7 +455,7 @@
 
 <div class="viewcode-block" id="get_palette_colors">
 <a class="viewcode-back" href="../../ms_mint.html#ms_mint.plotly_tools.get_palette_colors">[docs]</a>
-<span class="k">def</span> <span class="nf">get_palette_colors</span><span class="p">(</span><span class="n">palette_name</span><span class="p">,</span> <span class="n">num_colors</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_palette_colors</span><span class="p">(</span><span class="n">palette_name</span><span class="p">,</span> <span class="n">num_colors</span><span class="p">):</span>
     <span class="c1"># Categories in the colorlover package</span>
     <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qual&quot;</span><span class="p">,</span> <span class="s2">&quot;seq&quot;</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">]</span>
 
