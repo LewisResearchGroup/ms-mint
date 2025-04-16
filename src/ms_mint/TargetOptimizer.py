@@ -156,3 +156,105 @@ class TargetOptimizer:
             return self.mint, fig
         else:
             return self.mint
+
+
+    def detect_largest_peak_rt(
+        self,
+        fns=None,
+        targets=None,
+        peak_labels=None,
+        minimum_intensity=1e4,
+        plot=False,
+        height=3,
+        aspect=2,
+        col_wrap=3,
+        **kwargs,
+    ):
+        """
+        Detect the largest peak and set the RT value (not RT_min and RT_max).
+        Uses a simple maximum intensity approach rather than complex peak detection.
+        
+        :param fns: List of filenames to use for peak detection
+        :type fns: List[str or PosixPath], optional
+        :param targets: Target list to update
+        :type targets: pandas.DataFrame in MINT target list format
+        :param peak_labels: Subset of peak_labels to update, defaults to None
+        :type peak_labels: List[str or PosixPath], optional
+        :param minimum_intensity: Minimum intensity required, otherwise skip target, defaults to 1e4
+        :type minimum_intensity: float, optional
+        :param plot: Whether to plot results, defaults to False
+        :type plot: bool, optional
+        :return: Updated mint instance
+        :rtype: ms_mint.Mint.Mint
+        """
+        if targets is None:
+            targets = self.mint.targets.reset_index()
+        
+        if fns is None:
+            fns = self.mint.ms_files
+        
+        if peak_labels is None:
+            peak_labels = targets.peak_label.values
+        
+        _targets = targets.set_index("peak_label").copy()
+        
+        ms1 = pd.concat([ms_file_to_df(fn) for fn in self.mint.tqdm(fns, desc='Reading files')]).sort_values(
+            ["scan_time", "mz"]
+        )
+        
+        if plot:
+            n_rows = int(np.ceil(min(len(peak_labels), 100) / col_wrap))
+            fig = plt.figure(figsize=(col_wrap * height * aspect, n_rows * height))
+        
+        i = 0
+        for peak_label, row in self.mint.tqdm(_targets.iterrows(), total=len(targets), desc='Detecting largest peaks'):
+            if peak_label not in peak_labels:
+                logging.warning(f"{peak_label} not in {peak_labels}")
+                continue
+            
+            mz = row.mz_mean
+            mz_width = row.mz_width if 'mz_width' in row else 0.01  # Default width if not present
+            
+            # Extract chromatogram
+            try:
+                _slice = extract_chromatogram_from_ms1(ms1, mz, mz_width if 'mz_width' in locals() else None)
+                if len(_slice) == 0:
+                    logging.warning(f"No data points found for {peak_label}")
+                    continue
+                    
+                chrom_data = _slice.groupby("scan_time").sum()
+                
+                # Simple approach: find the scan time with maximum intensity
+                if chrom_data.values.max() < minimum_intensity:
+                    logging.warning(f"Peak intensity for {peak_label} below threshold ({minimum_intensity})")
+                    continue
+                    
+                # Get the retention time with the maximum intensity
+                max_intensity_idx = chrom_data.values.argmax()
+                new_rt = chrom_data.index[max_intensity_idx]
+                
+                # Update only the RT value
+                _targets.loc[peak_label, "rt"] = new_rt
+                
+                if plot and i < 100:  # Only plot first 100
+                    i += 1
+                    plt.subplot(n_rows, col_wrap, i)
+                    plt.plot(chrom_data.index, chrom_data.values)
+                    plt.axvline(new_rt, color='red', linestyle='--')
+                    plt.title(f"{peak_label}\nm/z={mz:.3f}\nRT={new_rt:.1f}")
+                    
+            except Exception as e:
+                logging.error(f"Error processing {peak_label}: {str(e)}")
+                continue
+        
+        self.results = _targets.reset_index()
+        
+        if self.mint is not None:
+            self.mint.targets = self.results
+        
+        if plot:
+            plt.tight_layout()
+            return self.mint, fig
+        else:
+            return self.mint
+        
