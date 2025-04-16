@@ -5,10 +5,8 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
 [![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/doi/10.5281/zenodo.12733875)
 
-# ms-mint: A Python library for targeted metabolomics
-The `ms-mint` library is a tool designed to assist with targeted metabolomics studies, which involves the systematic analysis of small chemical compounds called metabolites that are present in biological samples. These metabolites can provide valuable information about the state of an organism, including indicators of disease or other physiological changes. In order to perform a targeted metabolomics study, researchers typically use liquid chromatography-mass spectrometry (LCMS) to identify and quantify specific metabolites of interest.
-
-The `ms-mint` library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling large amounts of data (10,000+ files). To use `ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications.
+# ms-mint: The Python library for data scientists doing large-scale metabolomics
+The `ms-mint` library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling **large amounts of data (10,000+ files)**. To use `ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications. `ms-mint` can be used in Python scripts, interactively in Jupyter Notebooks, or with the web-app (info below).
 
 ## News
 Starting with version 1.0.0, we have updated the installation setup to use pyproject.toml. Additionally, each release of the repository will now be assigned a DOI to facilitate citation of the software.
@@ -27,6 +25,8 @@ MINT has been split into the Python library and the app. This repository contain
 1. Brown K, Thomson CA, Wacker S, Drikic M, Groves R, Fan V, et al. [Microbiota alters the metabolome in an age- and sex- dependent manner in mice.](https://pubmed.ncbi.nlm.nih.gov/36906623/) Nat Commun. 2023;14: 1348.
 
 2. Ponce LF, Bishop SL, Wacker S, Groves RA, Lewis IA. [SCALiR: A Web Application for Automating Absolute Quantification of Mass Spectrometry-Based Metabolomics Data. Anal Chem.](https://pubs.acs.org/doi/10.1021/acs.analchem.3c04988) 2024;96: 6566–6574.
+
+3. Groves RA, Chan CCY, Wildman SD, Gregson DB, Rydzak T, Lewis IA. [Rapid LC-MS assay for targeted metabolite quantification by serial injection into isocratic gradients.](https://pmc.ncbi.nlm.nih.gov/articles/PMC9823034/) Anal Bioanal Chem. 2023 Jan;415(2):269-276. doi: 10.1007/s00216-022-04384-x. Epub 2022 Nov 28. PMID: 36443449; PMCID: PMC9823034.
 
 ---
 ## Contributions
