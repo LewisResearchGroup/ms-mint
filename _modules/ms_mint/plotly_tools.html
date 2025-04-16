@@ -414,23 +414,20 @@
             <span class="n">ndx_r</span> <span class="o">=</span> <span class="p">(</span><span class="n">label_i</span> <span class="o">//</span> <span class="n">col_wrap</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">ndx_c</span> <span class="o">=</span> <span class="n">label_i</span> <span class="o">%</span> <span class="n">col_wrap</span> <span class="o">+</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;markers&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;lines&quot;</span>
-
             <span class="n">trace_color</span> <span class="o">=</span> <span class="n">trace_color</span> <span class="o">=</span> <span class="n">hue_column</span><span class="p">[</span><span class="n">file_i</span><span class="p">]</span>
 
             <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-                <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                     <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
                     <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
                     <span class="n">name</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers&#39;</span><span class="p">,</span>
                     <span class="n">legendgroup</span><span class="o">=</span><span class="n">file_i</span><span class="p">,</span>
                     <span class="n">showlegend</span><span class="o">=</span><span class="p">(</span><span class="n">label_i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
                     <span class="n">marker_color</span><span class="o">=</span><span class="n">trace_color</span><span class="p">,</span>
                     <span class="n">text</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+                    <span class="n">fill</span><span class="o">=</span><span class="s1">&#39;tozeroy&#39;</span><span class="p">,</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
                 <span class="p">),</span>
                 <span class="n">row</span><span class="o">=</span><span class="n">ndx_r</span><span class="p">,</span>
                 <span class="n">col</span><span class="o">=</span><span class="n">ndx_c</span><span class="p">,</span>
@@ -438,6 +435,7 @@
 
             <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Scan time [s]&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">ndx_r</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">ndx_c</span><span class="p">)</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">ndx_r</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">ndx_c</span><span class="p">)</span>
+
 
     <span class="c1"># Layout updates</span>
     <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
