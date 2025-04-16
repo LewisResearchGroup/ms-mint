@@ -333,23 +333,20 @@ def plotly_peak_shapes(
             ndx_r = (label_i // col_wrap) + 1
             ndx_c = label_i % col_wrap + 1
 
-            if len(x) == 1:
-                mode = "markers"
-            else:
-                mode = "lines"
-
             trace_color = trace_color = hue_column[file_i]
 
             fig.add_trace(
-                go.Scatter(
+                go.Scattergl(
                     x=x,
                     y=y,
                     name=P(fn).name,
-                    mode=mode,
+                    mode='markers',
                     legendgroup=file_i,
                     showlegend=(label_i == 0),
                     marker_color=trace_color,
                     text=fn,
+                    fill='tozeroy',
+                    marker=dict(size=3),
                 ),
                 row=ndx_r,
                 col=ndx_c,
@@ -357,6 +354,7 @@ def plotly_peak_shapes(
 
             fig.update_xaxes(title_text="Scan time [s]", row=ndx_r, col=ndx_c)
             fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
+
 
     # Layout updates
     if legend:
