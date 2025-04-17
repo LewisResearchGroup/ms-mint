@@ -2,7 +2,7 @@ name: Create Documentation
 on:
   push:
     branches:
-      - develop, mkdocs
+      - develop, docs/mkdocs
 jobs:
   build:
     runs-on: ubuntu-latest
