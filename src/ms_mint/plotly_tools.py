@@ -1,24 +1,26 @@
-import logging
+#src/ms_mint/plotly_tools.py
 
+import logging
 import numpy as np
 import pandas as pd
 import colorlover as cl
-
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.io as pio
-
 from pathlib import Path as P
 from collections.abc import Iterable
 from plotly.subplots import make_subplots
+from typing import Optional, Union, List, Dict, Any, Tuple, Callable, Set
+from plotly.graph_objs._figure import Figure as PlotlyFigure
 
 from .tools import fn_to_label
 
 
+def set_template() -> None:
+    """Set a default template for plotly figures.
 
-def set_template():
-    """
-    A function that sets a template for plotly figures.
+    Creates a "draft" template with smaller font size and sets it as the default
+    template for all plotly figures.
     """
     pio.templates["draft"] = go.layout.Template(
         layout=dict(font={"size": 10}),
@@ -31,50 +33,38 @@ set_template()
 
 
 def plotly_heatmap(
-    df,
-    normed_by_cols=False,
-    transposed=False,
-    clustered=False,
-    add_dendrogram=False,
-    name="",
-    x_tick_colors=None,
-    height=None,
-    width=None,
-    correlation=False,
-    call_show=False,
-    verbose=False,
-):
-    """
-    Creates an interactive heatmap from a dense-formated dataframe.
+    df: pd.DataFrame,
+    normed_by_cols: bool = False,
+    transposed: bool = False,
+    clustered: bool = False,
+    add_dendrogram: bool = False,
+    name: str = "",
+    x_tick_colors: Optional[str] = None,
+    height: Optional[int] = None,
+    width: Optional[int] = None,
+    correlation: bool = False,
+    call_show: bool = False,
+    verbose: bool = False,
+) -> Optional[PlotlyFigure]:
+    """Create an interactive heatmap from a dense-formatted dataframe.
 
-    :param df: Input data
-    :type df: pandas.DataFrame
-    :param normed_by_cols: Whether or not to normalize column vectors, defaults to False
-    :type normed_by_cols: bool, optional
-    :param transposed: Whether or not to transpose the generated image, defaults to False
-    :type transposed: bool, optional
-    :param clustered: Whether or not to apply hierarchical clustering or rows, defaults to False
-    :type clustered: bool, optional
-    :param add_dendrogram: Whether or not to show a dendrogram (only with `clustered=True`), defaults to False
-    :type add_dendrogram: bool, optional
-    :param title: Title for figure, defaults to ""
-    :type title: str, optional
-    :param x_tick_colors: Color of x-ticks, defaults to None
-    :type x_tick_colors: str, optional
-    :param height: Image height in pixels, defaults to None
-    :type height: int, optional
-    :param width: Image width in pixels, defaults to None
-    :type width: int, optional
-    :param correlation: Whether or not to convert the table to a correlation matrix, defaults to False
-    :type correlation: bool, optional
-    :param call_show: Whether or not to call fig.show() to show image in new browser tab, defaults to False
-    :type call_show: bool, optional
-    :param verbose: Whether or not to be loud, defaults to False
-    :type verbose: bool, optional
-    :return: Returns a plotly image object.
-    :rtype: plotly.Figure
-    """
+    Args:
+        df: Input data in DataFrame format.
+        normed_by_cols: Whether to normalize column vectors.
+        transposed: Whether to transpose the generated image.
+        clustered: Whether to apply hierarchical clustering on rows.
+        add_dendrogram: Whether to show a dendrogram (only when clustered=True).
+        name: Name to use in figure title.
+        x_tick_colors: Color of x-ticks.
+        height: Image height in pixels.
+        width: Image width in pixels.
+        correlation: Whether to convert the table to a correlation matrix.
+        call_show: Whether to display the figure immediately.
+        verbose: Whether to print additional information.
 
+    Returns:
+        A Plotly Figure object, or None if call_show is True.
+    """
     max_is_not_zero = df.max(axis=1) != 0
     non_zero_labels = max_is_not_zero[max_is_not_zero].index
     df = df.loc[non_zero_labels]
@@ -132,7 +122,7 @@ def plotly_heatmap(
     if name == "":
         title = ""
     else:
-        title = f'{plot_type} of {",".join(plot_attributes)} {name}'
+        title = f"{plot_type} of {','.join(plot_attributes)} {name}"
 
     # Figure without side-dendrogram
     if (not add_dendrogram) or (not clustered):
@@ -202,12 +192,9 @@ def plotly_heatmap(
         )
 
         fig["layout"]["yaxis"]["ticktext"] = np.asarray(y_labels)
-        fig["layout"]["yaxis"]["tickvals"] = np.asarray(
-            dendro_side["layout"]["yaxis"]["tickvals"]
-        )
+        fig["layout"]["yaxis"]["tickvals"] = np.asarray(dendro_side["layout"]["yaxis"]["tickvals"])
 
     fig.update_layout(
-        # margin=dict( l=50, r=10, b=200, t=50, pad=0 ),
         autosize=True,
         hovermode="closest",
     )
@@ -217,57 +204,49 @@ def plotly_heatmap(
 
     if call_show:
         fig.show(config={"displaylogo": False})
+        return None
     else:
         return fig
 
 
 def plotly_peak_shapes(
-    mint_results,
-    mint_metadata=None,
-    color='ms_file_label',  # Add the new argument for specifying color column
-    fns=None,
-    col_wrap=1,
-    peak_labels=None,
-    legend=True,
-    verbose=False,
-    legend_orientation="v",
-    call_show=False,
-    palette='Plasma',
-):
-    """ 
-    Plot peak shapes of mint results.
+    mint_results: pd.DataFrame,
+    mint_metadata: Optional[pd.DataFrame] = None,
+    color: str = "ms_file_label",
+    fns: Optional[List[str]] = None,
+    col_wrap: int = 1,
+    peak_labels: Optional[Union[str, List[str]]] = None,
+    legend: bool = True,
+    verbose: bool = False,
+    legend_orientation: str = "v",
+    call_show: bool = False,
+    palette: str = "Plasma",
+) -> Optional[PlotlyFigure]:
+    """Plot peak shapes from mint results as interactive Plotly figure.
 
-    :param mint_results: DataFrame in Mint results format.
-    :type mint_results: pandas.DataFrame
-    :param mint_metadata: DataFrame in Mint metadata format, defaults to None.
-    :type mint_metadata: pandas.DataFrame, optional
-    :param color: Column name determining color-coding of plots, defaults to 'ms_file_label'.
-    :type color: str, optional
-    :param fns: Filenames to include, defaults to None.
-    :type fns: list, optional
-    :param col_wrap: Maximum number of subplot columns, defaults to 1.
-    :type col_wrap: int, optional
-    :param peak_labels: Peak-labels to include, defaults to None.
-    :type peak_labels: list, optional
-    :param legend: Whether to display legend, defaults to True.
-    :type legend: bool, optional
-    :param verbose: If True, prints additional details, defaults to False.
-    :type verbose: bool, optional
-    :param legend_orientation: Legend orientation, defaults to 'v'.
-    :type legend_orientation: str, optional
-    :param call_show: If True, displays the plot immediately, defaults to False.
-    :type call_show: bool, optional
-    :param palette: Color palette to use, defaults to 'Plasma'.
-    :type palette: str, optional
+    Args:
+        mint_results: DataFrame in Mint results format.
+        mint_metadata: DataFrame in Mint metadata format.
+        color: Column name determining color-coding of plots.
+        fns: Filenames to include. If None, all files are used.
+        col_wrap: Maximum number of subplot columns.
+        peak_labels: Peak-labels to include. If None, all peaks are used.
+        legend: Whether to display legend.
+        verbose: If True, prints additional details.
+        legend_orientation: Legend orientation ('v' for vertical, 'h' for horizontal).
+        call_show: If True, displays the plot immediately.
+        palette: Color palette to use.
 
-    :return: Plotly Figure object or None if call_show is True.
-    :rtype: plotly.graph_objs._figure.Figure or None
+    Returns:
+        A Plotly Figure object, or None if call_show is True.
     """
     mint_results = mint_results.copy()
 
     # Merge with metadata if provided
     if mint_metadata is not None:
-        mint_results = pd.merge(mint_results, mint_metadata, left_on='ms_file_label', right_index=True)
+        mint_results = pd.merge(
+            mint_results, mint_metadata, left_on="ms_file_label", right_index=True
+        )
 
     # Filter by filenames
     if fns is not None:
@@ -275,29 +254,35 @@ def plotly_peak_shapes(
         mint_results = mint_results[mint_results.ms_file_label.isin(fns)]
     else:
         fns = mint_results.ms_file_label.unique()
-    
+
     # Filter by peak_labels
     if peak_labels is not None:
         if isinstance(peak_labels, str):
             peak_labels = [peak_labels]
         mint_results = mint_results[mint_results.peak_label.isin(peak_labels)]
     else:
-        peak_labels = mint_results.results.peak_label.unique()
-        
+        peak_labels = mint_results.peak_label.unique()
+
     # Handle colors based on metadata or fall back to default behavior
     colors = None
     if color:
         unique_hues = mint_results[color].unique()
 
-        colors = get_palette_colors(palette, len(unique_hues)) 
+        colors = get_palette_colors(palette, len(unique_hues))
 
         color_mapping = dict(zip(unique_hues, colors))
-                        
-        if color == 'ms_file_label':
+
+        if color == "ms_file_label":
             hue_column = [color_mapping[fn] for fn in fns]
         else:
             # Existing logic remains the same for the else part
-            hue_column = mint_results.drop_duplicates('ms_file_label').set_index('ms_file_label')[color].map(color_mapping).reindex(fns).tolist()
+            hue_column = (
+                mint_results.drop_duplicates("ms_file_label")
+                .set_index("ms_file_label")[color]
+                .map(color_mapping)
+                .reindex(fns)
+                .tolist()
+            )
 
     else:
         hue_column = colors
@@ -312,9 +297,7 @@ def plotly_peak_shapes(
     if n_rows * col_wrap < len(labels):
         n_rows += 1
 
-    fig = make_subplots(
-        rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels
-    )
+    fig = make_subplots(rows=max(1, n_rows), cols=max(1, col_wrap), subplot_titles=peak_labels)
 
     for label_i, label in enumerate(peak_labels):
         for file_i, fn in enumerate(fns):
@@ -333,19 +316,19 @@ def plotly_peak_shapes(
             ndx_r = (label_i // col_wrap) + 1
             ndx_c = label_i % col_wrap + 1
 
-            trace_color = trace_color = hue_column[file_i]
+            trace_color = hue_column[file_i]
 
             fig.add_trace(
                 go.Scattergl(
                     x=x,
                     y=y,
                     name=P(fn).name,
-                    mode='markers',
+                    mode="markers",
                     legendgroup=file_i,
                     showlegend=(label_i == 0),
                     marker_color=trace_color,
                     text=fn,
-                    fill='tozeroy',
+                    fill="tozeroy",
                     marker=dict(size=3),
                 ),
                 row=ndx_r,
@@ -355,21 +338,30 @@ def plotly_peak_shapes(
             fig.update_xaxes(title_text="Scan time [s]", row=ndx_r, col=ndx_c)
             fig.update_yaxes(title_text="Intensity", row=ndx_r, col=ndx_c)
 
-
     # Layout updates
     if legend:
         fig.update_layout(legend_orientation=legend_orientation)
-        
+
     fig.update_layout(showlegend=legend)
     fig.update_layout(height=400 * n_rows, title_text="Peak Shapes")
 
     if call_show:
         fig.show(config={"displaylogo": False})
+        return None
     else:
         return fig
 
 
-def get_palette_colors(palette_name, num_colors):
+def get_palette_colors(palette_name: str, num_colors: int) -> List[str]:
+    """Get a list of colors from a specific colorlover palette.
+
+    Args:
+        palette_name: Name of the color palette.
+        num_colors: Number of colors to extract.
+
+    Returns:
+        List of color strings in the requested palette.
+    """
     # Categories in the colorlover package
     categories = ["qual", "seq", "div"]
 
@@ -379,5 +371,5 @@ def get_palette_colors(palette_name, num_colors):
         if palette_name in cl.scales[f"{num_colors}"][category]:
             return cl.scales[f"{num_colors}"][category][palette_name]
 
-    # If palette not found in any category, return a default one or raise an error
+    # If palette not found in any category, return a default one
     return cl.scales[f"{num_colors}"]["qual"]["Paired"]

@@ -1,57 +1,63 @@
+#src/ms_mint/matplotlib_tools.py
+
 import pandas as pd
 import numpy as np
 import seaborn as sns
-
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
+from typing import Union, List, Tuple, Optional, Dict, Any, Literal, Set
+from matplotlib.figure import Figure
+import seaborn.objects as so
 
 
 def hierarchical_clustering(
-    df,
-    vmin=None,
-    vmax=None,
-    figsize=(8, 8),
-    top_height=2,
-    left_width=2,
-    xmaxticks=None,
-    ymaxticks=None,
-    metric="cosine",
-    cmap=None,
-):
-    """
-    Performs and plot hierarchical clustering on dataframe in dense format.
+    df: pd.DataFrame,
+    vmin: Optional[float] = None,
+    vmax: Optional[float] = None,
+    figsize: Tuple[int, int] = (8, 8),
+    top_height: int = 2,
+    left_width: int = 2,
+    xmaxticks: Optional[int] = None,
+    ymaxticks: Optional[int] = None,
+    metric: Union[str, Tuple[str, str]] = "cosine",
+    cmap: Optional[str] = None,
+) -> Tuple[pd.DataFrame, Figure, List[int], List[int]]:
+    """Perform and plot hierarchical clustering on a dataframe.
 
-    :param df: Input data.
-    :type df: pandas.DataFrame
-    :param vmin: Minimum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.
-    :type vmin: int, optional
-    :param vmin: Maximum value to anchor the colormap, otherwise they are inferred from the data and other keyword arguments.
-    :type vmax: int, optional
-    :param figsize: Size of the main figure in inches, defaults to (8, 8)
-    :type figsize: tuple, optional
-    :param top_height: Height of the top dendrogram, defaults to 2
-    :type top_height: int, optional
-    :param left_width: Width of the left dendrogram, defaults to 2
-    :type left_width: int, optional
-    :param xmaxticks: Maximum number of x-ticks to display, defaults to None
-    :type xmaxticks: int, optional
-    :param ymaxticks: Maxiumum number of y-ticks to display, defaults to None
-    :type ymaxticks: int, optional
-    :param metric: Metric to be used for distance calculation (both axes), defaults to "cosine"
-    :type metric: str, optional
-    :param cmap: Matplotlib color map name, defaults to None
-    :type cmap: str, optional
-    :return: Matplotlib figure
-    :rtype: matplotlib.pyplot.Figure
-    """
+    Args:
+        df: Input data in DataFrame format.
+        vmin: Minimum value to anchor the colormap. If None, inferred from data.
+        vmax: Maximum value to anchor the colormap. If None, inferred from data.
+        figsize: Size of the main figure in inches.
+        top_height: Height of the top dendrogram.
+        left_width: Width of the left dendrogram.
+        xmaxticks: Maximum number of x-ticks to display.
+        ymaxticks: Maximum number of y-ticks to display.
+        metric: Distance metric to use. Either a string to use the same metric for
+            both axes, or a tuple of two strings for different metrics for each axis.
+        cmap: Matplotlib colormap name. If None, uses "coolwarm".
 
+    Returns:
+        A tuple containing:
+            - The clustered DataFrame (reordered according to clustering)
+            - The matplotlib Figure object
+            - The indices of rows in their clustered order
+            - The indices of columns in their clustered order
+    """
     if isinstance(metric, str):
         metric_x, metric_y = metric, metric
-    elif len(metric) == 2 and isinstance(metric[0], str) and isinstance(metric[1], str):
+    elif (
+        isinstance(metric, tuple)
+        and len(metric) == 2
+        and isinstance(metric[0], str)
+        and isinstance(metric[1], str)
+    ):
         metric_x, metric_y = metric
     elif metric is None:
         metric_x, metric_y = None, None
+    else:
+        raise ValueError("Metric must be a string or a tuple of two strings")
 
     df = df.copy()
 
@@ -103,7 +109,7 @@ def hierarchical_clustering(
 
     if cmap is None:
         cmap = "coolwarm"
-    fig = axmatrix.matshow(D[::-1], aspect="auto", cmap=cmap, vmin=vmin, vmax=vmax)
+    im = axmatrix.matshow(D[::-1], aspect="auto", cmap=cmap, vmin=vmin, vmax=vmax)
 
     axmatrix.set_xticks([])
     axmatrix.set_yticks([])
@@ -129,59 +135,44 @@ def hierarchical_clustering(
 
 
 def plot_peak_shapes(
-    mint_results,
-    mint_metadata=None,
-    fns=None,
-    peak_labels=None,
-    height=3,
-    aspect=1.5,
-    legend=False,
-    col_wrap=4,
-    hue="ms_file_label",
-    title=None,
-    dpi=None,
-    sharex=False,
-    sharey=False,
-    kind='line',
+    mint_results: pd.DataFrame,
+    mint_metadata: Optional[pd.DataFrame] = None,
+    fns: Optional[List[str]] = None,
+    peak_labels: Optional[Union[str, List[str]]] = None,
+    height: int = 3,
+    aspect: float = 1.5,
+    legend: bool = False,
+    col_wrap: int = 4,
+    hue: str = "ms_file_label",
+    title: Optional[str] = None,
+    dpi: Optional[int] = None,
+    sharex: bool = False,
+    sharey: bool = False,
+    kind: str = "line",
     **kwargs,
-):
+) -> sns.FacetGrid:
+    """Plot peak shapes from MS-MINT results.
+
+    Args:
+        mint_results: DataFrame in Mint results format.
+        mint_metadata: DataFrame in Mint metadata format for additional sample information.
+        fns: Filenames to include. If None, includes all files.
+        peak_labels: Peak label(s) to include. If None, includes all peak labels.
+        height: Height of each figure facet in inches.
+        aspect: Aspect ratio (width/height) of each figure facet.
+        legend: Whether to display a legend.
+        col_wrap: Number of columns for subplots.
+        hue: Column name to use for color grouping.
+        title: Title to add to the figure.
+        dpi: Resolution of generated image.
+        sharex: Whether to share x-axis range between subplots.
+        sharey: Whether to share y-axis range between subplots.
+        kind: Type of seaborn relplot ('line', 'scatter', etc.).
+        **kwargs: Additional keyword arguments passed to seaborn's relplot.
+
+    Returns:
+        A seaborn FacetGrid object containing the plot.
     """
-    Plot peak shapes of mint results.
-
-    :param mint_results: DataFrame in Mint results format.
-    :type mint_results: pandas.DataFrame
-    :param mint_metadata: DataFrame in Mint metadata format.
-    :type mint_metadata: pandas.DataFrame
-    :param fns: Filenames to include, defaults to None
-    :type fns: list, optional
-    :param peak_labels: Peak-labels to include, defaults to None
-    :type peak_labels: list, optional
-    :param height: Height of the figure facets, defaults to 4
-    :type height: int, optional
-    :param aspect: Aspect ratio of the figure facets, defaults to 1
-    :type aspect: int, optional
-    :param legend: Whether or not to add a legend, defaults to False
-    :type legend: bool, optional
-    :param col_wrap: Number of columns for sub-plots, defaults to 4
-    :type col_wrap: int, optional
-    :param hue: Column name for color groups, defaults to "ms_file"
-    :type hue: str, optional
-    :param title: Title to add, defaults to None
-    :type title: str, optional
-    :param dpi: Resolution of generated image, defaults to None
-    :type dpi: int, optional
-    :param sharex: Whether or not to share x-axis range between subplots, defaults to False
-    :type sharex: bool, optional
-    :param sharey: Whether or not to share y-axis range between subplots, defaults to False
-    :type sharey: bool, optional
-    :param kind: Kind of seaborn relplot
-    :type kind: str, optional
-    :return: Generated figure object.
-    :rtype: matplotlib.pyplot.Figure
-    """
-
-    # fig = plt.figure(dpi=dpi)
-
     R = mint_results.copy()
     R = R[R.peak_area > 0]
     R["peak_label"] = R["peak_label"]
@@ -198,9 +189,7 @@ def plot_peak_shapes(
 
     dfs = []
     for peak_label in peak_labels:
-        for _, row in R[
-            (R.peak_label == peak_label) & (R.peak_n_datapoints > 1)
-        ].iterrows():
+        for _, row in R[(R.peak_label == peak_label) & (R.peak_n_datapoints > 1)].iterrows():
             peak_rt = [float(i) for i in row.peak_shape_rt.split(",")]
             peak_int = [float(i) for i in row.peak_shape_int.split(",")]
             ms_file_label = row.ms_file_label
@@ -217,18 +206,20 @@ def plot_peak_shapes(
                 }
             )
             dfs.append(df)
-    
-    
+
+    if not dfs:
+        return None
+
     df = pd.concat(dfs, ignore_index=True).reset_index(drop=True)
 
     # Add metadata
     if mint_metadata is not None:
-        df = pd.merge(df, mint_metadata, left_on='ms_file_label', right_index=True, how='left')
+        df = pd.merge(df, mint_metadata, left_on="ms_file_label", right_index=True, how="left")
 
     _facet_kws = dict(sharex=sharex, sharey=sharey)
-    if 'facet_kws' in kwargs.keys():
-        _facet_kws.update(kwargs.pop('facet_kws'))
-        
+    if "facet_kws" in kwargs.keys():
+        _facet_kws.update(kwargs.pop("facet_kws"))
+
     g = sns.relplot(
         data=df,
         x="Scan time [s]",
@@ -257,15 +248,30 @@ def plot_peak_shapes(
 
 
 def plot_peaks(
-    series,
-    peaks,
-    highlight=None,
-    expected_rt=None,
-    weights=None,
-    legend=True,
-    label=None,
+    series: pd.Series,
+    peaks: Optional[pd.DataFrame] = None,
+    highlight: Optional[List[int]] = None,
+    expected_rt: Optional[float] = None,
+    weights: Optional[np.ndarray] = None,
+    legend: bool = True,
+    label: Optional[str] = None,
     **kwargs,
-):
+) -> Figure:
+    """Plot time series data with peak annotations.
+
+    Args:
+        series: Time series data with time as index and intensity as values.
+        peaks: DataFrame containing peak information.
+        highlight: List of peak indices to highlight.
+        expected_rt: Expected retention time to mark on the plot.
+        weights: Array of weight values (e.g., for Gaussian weighting).
+        legend: Whether to display the legend.
+        label: Label for the time series data.
+        **kwargs: Additional keyword arguments passed to the plot function.
+
+    Returns:
+        Matplotlib Figure containing the plot.
+    """
     if highlight is None:
         highlight = []
     ax = plt.gca()
@@ -276,9 +282,7 @@ def plot_peaks(
         **kwargs,
     )
     if peaks is not None:
-        series.iloc[peaks.ndxs].plot(
-            label="Peaks", marker="x", y="intensity", lw=0, ax=ax
-        )
+        series.iloc[peaks.ndxs].plot(label="Peaks", marker="x", y="intensity", lw=0, ax=ax)
         for i, (
             ndx,
             (_, _, _, peak_base_height, _, rt_min, rt_max),
@@ -293,31 +297,48 @@ def plot_peaks(
                 label="Peak width" if i == 0 else None,
             )
     if expected_rt is not None:
-        plt.axvspan(
-            expected_rt, expected_rt + 1, color="blue", alpha=1, label="Expected Rt"
-        )
+        plt.axvspan(expected_rt, expected_rt + 1, color="blue", alpha=1, label="Expected Rt")
     if weights is not None:
         plt.plot(weights, linestyle="--", label="Gaussian weight")
     plt.ylabel("Intensity")
     plt.xlabel("Scan time [s]")
     ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-    #plt.ylim((0.001, None))
     if not legend:
         ax.get_legend().remove()
     return plt.gcf()
 
 
 def plot_metabolomics_hist2d(
-    df,
-    figsize=(4, 2.5),
-    dpi=300,
-    set_dim=True,
-    cmap="jet",
-    rt_range=None,
-    mz_range=None,
-    mz_bins=100,
+    df: pd.DataFrame,
+    figsize: Tuple[float, float] = (4, 2.5),
+    dpi: int = 300,
+    set_dim: bool = True,
+    cmap: str = "jet",
+    rt_range: Optional[Tuple[float, float]] = None,
+    mz_range: Optional[Tuple[float, float]] = None,
+    mz_bins: int = 100,
     **kwargs,
-):
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Any]:
+    """Create a 2D histogram of metabolomics data.
+
+    Args:
+        df: DataFrame containing metabolomics data with scan_time, mz, and intensity columns.
+        figsize: Size of the figure in inches (width, height).
+        dpi: Resolution of the figure in dots per inch.
+        set_dim: Whether to set figure dimensions.
+        cmap: Colormap name to use for the plot.
+        rt_range: Retention time range (min, max) to display. If None, uses data range.
+        mz_range: M/Z range (min, max) to display. If None, uses data range.
+        mz_bins: Number of bins to use for the m/z axis.
+        **kwargs: Additional keyword arguments passed to plt.hist2d.
+
+    Returns:
+        The result of plt.hist2d, which is a tuple containing:
+            - The histogram array
+            - The edges of the bins along the x-axis
+            - The edges of the bins along the y-axis
+            - The Axes object
+    """
     if set_dim:
         plt.figure(figsize=figsize, dpi=dpi)
 
@@ -342,6 +363,5 @@ def plot_metabolomics_hist2d(
 
     plt.xlabel("Scan time [s]")
     plt.ylabel("m/z")
-    # plt.grid()
     plt.gca().ticklabel_format(useOffset=False, style="plain")
     return fig

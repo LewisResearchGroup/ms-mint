@@ -5,7 +5,7 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
 [![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/doi/10.5281/zenodo.12733875)
 
-# ms-mint: The Python library for data scientists doing large-scale metabolomics
+# ms-mint: Mass Spectrometry-Metabolomics Integration Toolkit
 The `ms-mint` library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling **large amounts of data (10,000+ files)**. To use `ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications. `ms-mint` can be used in Python scripts, interactively in Jupyter Notebooks, or with the web-app (info below).
 
 ## News

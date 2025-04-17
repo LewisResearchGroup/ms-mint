@@ -27,7 +27,6 @@
 A platform independent file lock that supports the with-statement.
 """
 
-
 # Modules
 # ------------------------------------------------
 import logging
@@ -268,9 +267,7 @@ class BaseFileLock(object):
                     logger().info("Lock %s acquired on %s", lock_id, lock_filename)
                     break
                 elif timeout >= 0 and time.time() - start_time > timeout:
-                    logger().debug(
-                        "Timeout on acquiring lock %s on %s", lock_id, lock_filename
-                    )
+                    logger().debug("Timeout on acquiring lock %s on %s", lock_id, lock_filename)
                     raise Timeout(self._lock_file)
                 else:
                     logger().debug(
@@ -309,9 +306,7 @@ class BaseFileLock(object):
                     lock_id = id(self)
                     lock_filename = self._lock_file
 
-                    logger().debug(
-                        "Attempting to release lock %s on %s", lock_id, lock_filename
-                    )
+                    logger().debug("Attempting to release lock %s on %s", lock_id, lock_filename)
                     self._release()
                     self._lock_counter = 0
                     logger().info("Lock %s released on %s", lock_id, lock_filename)
