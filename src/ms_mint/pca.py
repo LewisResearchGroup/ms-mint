@@ -1,3 +1,7 @@
+#src/ms_mint/pca.py
+
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,7 +13,6 @@ from plotly.graph_objs._figure import Figure as PlotlyFigure
 
 import plotly.figure_factory as ff
 from plotly import express as px
-from __future__ import annotations
 
 from sklearn.decomposition import PCA
 from .tools import scale_dataframe
