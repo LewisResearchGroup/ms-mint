@@ -61,3 +61,40 @@ local_scheme = "dirty-tag"
 addopts = "--maxfail=1 --disable-warnings"
 testpaths = ["tests"]
 
+[tool.ruff]
+# Which Python versions to target
+target-version = "py312"
+
+# Maximum line length
+line-length = 100
+
+# Enable specific rules (linters)
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "UP", # pyupgrade
+    "N",  # pep8-naming
+    "D",  # pydocstyle
+    "ANN", # flake8-annotations (type hints)
+]
+
+# Ignore specific rules
+ignore = [
+    "D203",  # one-blank-line-before-class
+    "D213",  # multi-line-summary-second-line
+]
+
+# Configure formatting
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+# Configure docstring linting
+[tool.ruff.pydocstyle]
+convention = "google"  # Use Google style docstrings
+
+# Configure import sorting
+[tool.ruff.isort]
+known-first-party = ["ms_mint"]
