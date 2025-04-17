@@ -1,4 +1,5 @@
 # src/ms_mint/MintPlotter.py
+from __future__ import annotations
 
 import numpy as np
 import seaborn as sns
@@ -11,7 +12,6 @@ from typing import Optional, List, Tuple, Union, Dict, Any, Callable
 import pandas as pd
 import plotly.express as px
 from plotly.graph_objs._figure import Figure as PlotlyFigure
-from __future__ import annotations
 
 from .plotly_tools import plotly_heatmap, plotly_peak_shapes
 from .matplotlib_tools import (

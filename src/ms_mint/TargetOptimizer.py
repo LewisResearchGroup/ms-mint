@@ -1,3 +1,7 @@
+#src/ms_mint/TargetOptimizer.py
+
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -8,7 +12,6 @@ import sys
 from typing import Optional, Union, List, Dict, Any, Tuple
 from pathlib import Path as P
 from matplotlib.figure import Figure
-from __future__ import annotations
 
 from .io import ms_file_to_df
 from .Chromatogram import Chromatogram

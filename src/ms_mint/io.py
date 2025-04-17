@@ -1,5 +1,7 @@
 """Functions to read and write MS-MINT files."""
 
+from __future__ import annotations
+
 import pandas as pd
 import numpy as np
 import io
@@ -9,7 +11,6 @@ from typing import Union, Optional, List, Dict, Any, Callable, Tuple, Literal, c
 from pathlib import Path as P
 from datetime import date
 from pyteomics import mzxml, mzml
-from __future__ import annotations
 
 try:
     from pyteomics import mzmlb
