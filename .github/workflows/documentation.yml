@@ -17,7 +17,7 @@ jobs:
 
       # Install your package to ensure autodoc works
       - name: Install ms_mint package
-        run: pip install -e .
+        run: pip install -e ".[docs]"
 
       # Install the required dependencies
       - name: Install Dependencies

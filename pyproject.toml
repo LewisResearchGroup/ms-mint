@@ -45,6 +45,15 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings>=0.23.0",
+    "mkdocstrings-python>=1.7.0",
+    "mkdocs-autorefs>=0.5.0",
+]
+
 [project.scripts]
 ms-mint-convert = "ms_mint.scripts.ms_mint_convert:main"
 
