@@ -9,6 +9,7 @@ from plotly.graph_objs._figure import Figure as PlotlyFigure
 
 import plotly.figure_factory as ff
 from plotly import express as px
+from __future__ import annotations
 
 from sklearn.decomposition import PCA
 from .tools import scale_dataframe
