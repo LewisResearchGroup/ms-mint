@@ -107,3 +107,10 @@ convention = "google"  # Use Google style docstrings
 # Configure import sorting
 [tool.ruff.isort]
 known-first-party = ["ms_mint"]
+
+[flake8]
+per-file-ignores = 
+    */MintPlotter.py:F821
+    */TargetOptimizer.py:F821
+    */io.py:F821
+    */pca.py:F821
