@@ -420,10 +420,10 @@ def export_to_excel(
     else:
         writer = pd.ExcelWriter(fn)
     # Write into file
-    mint.targets.to_excel(writer, "Targets", index=False)
-    mint.results.to_excel(writer, "Results", index=False)
+    mint.targets.to_excel(writer, sheet_name="Targets", index=False)
+    mint.results.to_excel(writer, sheet_name="Results", index=False)
     meta = pd.DataFrame({"MINT_version": [mint.version], "Date": [date_string]}).T[0]
-    meta.to_excel(writer, "Metadata", index=True, header=False)
+    meta.to_excel(writer, sheet_name="Metadata", index=True, header=False)
     # Close writer and maybe return file buffer
     writer.close()
     if fn is None:
