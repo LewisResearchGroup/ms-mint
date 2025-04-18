@@ -47,12 +47,19 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs==1.6.1",
-    "mkdocs-material==9.6.12",
-    "mkdocstrings==0.26.1",
-    "mkdocstrings-python==1.11.1",
-    "mkdocs-autorefs==1.2.0",
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.6.12",
+  "mkdocstrings==0.26.1",
+  "mkdocstrings-python==1.11.1",
+  "mkdocs-autorefs==1.2.0",
 ]
+dev = [
+  "pytest",
+  "numpy",
+  "libgfortran",
+  "openblas",
+]
+
 
 [project.scripts]
 ms-mint-convert = "ms_mint.scripts.ms_mint_convert:main"

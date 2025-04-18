@@ -12,7 +12,7 @@ def test__hierarchical_clustering():
     mint = Mint()
     mint.load(RESULTS_FN)
     fig = mint.plot.hierarchical_clustering()
-    assert isinstance(fig, mpl.image.AxesImage), type(fig)
+    assert isinstance(fig, mpl.figure.Figure), type(fig)
 
 
 def test__plot_peak_shapes():
