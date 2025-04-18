@@ -67,7 +67,8 @@ def standardize_targets(targets: pd.DataFrame, ms_mode: str = "neutral") -> pd.D
     if targets.index.name == "peak_label":
         targets = targets.reset_index()
 
-    assert pd.value_counts(targets.columns).max() == 1, pd.value_counts(targets.columns)
+    assert pd.Series(targets.columns).value_counts().max() == 1, pd.Series(targets.columns).value_counts()
+
     cols = targets.columns
     if "formula" in targets.columns and not "mz_mean" in targets.columns:
         targets["mz_mean"] = formula_to_mass(targets["formula"], ms_mode)
