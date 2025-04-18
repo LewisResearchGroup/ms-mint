@@ -86,7 +86,7 @@ def hierarchical_clustering(
     D2 = squareform(pdist(dm.T, metric=metric_x))
 
     fig = plt.figure(figsize=figsize)
-    fig.set_tight_layout(False)
+    fig.set_layout_engine('tight')
 
     # add left dendrogram
     ax1 = fig.add_axes([0, 0, left_w - gap_x, left_h], frameon=False)

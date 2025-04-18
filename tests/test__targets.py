@@ -30,6 +30,7 @@ def test__read_targets():
 
 
 def test__standardize_targets():
+    # The old convention was RT in minutes, but now it is in seconds.
     targets = pd.DataFrame(
         {
             "peakLabel": ["A"],
@@ -47,7 +48,7 @@ def test__standardize_targets():
             "mz_width": {0: 10},
             "rt_min": {0: 1 * 60},
             "rt_max": {0: 2 * 60},
-            "rt": {0: None},
+            "rt": {0: 90.0},
             "rt_unit": {0: "s"},
             "intensity_threshold": {0: 0},
             "target_filename": {0: "TEST"},
@@ -57,10 +58,22 @@ def test__standardize_targets():
 
     result = standardize_targets(targets)
 
-    print(expected.T)
-
-    print(result.T)
-
+    print("Types comparison:")
+    for col in expected.columns:
+        if col in result.columns:
+            print(f"{col}: expected {expected[col].dtype}, result {result[col].dtype}")
+    
+    print("Value comparison:")
+    for col in expected.columns:
+        if col in result.columns:
+            print(f"{col}: equal = {expected[col].equals(result[col])}")
+     
+    print("DataFrame comparison:")  
+    print("Expected:")     
+    print(expected.dtypes)
+    print("Result:")
+    print(result.dtypes)
+         
     assert result.equals(expected), result
 
 
