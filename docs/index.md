@@ -1,10 +1,2 @@
-# MS-MINT
 
-MS-MINT (Mass Spectrometry-Metabolomics Integration Toolkit) is a Python library for large-scale targeted metabolomics.
-
-## Key Features
-
-- **Fast Processing**: Handle large batches of MS files efficiently
-- **Interactive Visualization**: Explore your data with interactive plots
-- **Target Optimization**: Automatically optimize retention time parameters
-- **Flexible Export**: Export results in various formats for downstream analysis
+MS-MINT (Mass Spectrometry-Metabolomics Integration Toolkit) is a Python library for large-scale targeted metabolomics. The library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling **large amounts of data (10,000+ files)**. To use`ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications. `ms-mint` can be used in Python scripts, interactively in Jupyter Notebooks, or with the web-app [ms-mint-app](https://lewisresearchgroup.github.io/ms-mint-app/).
