@@ -16,7 +16,7 @@ Starting with version 1.0.0, we have updated the installation setup to use pypro
     pip install ms-mint
 
 ## Documentation
-The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint/readme.html).
+The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint).
 
 ## ms-mint application with graphical user iterface (GUI)
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
