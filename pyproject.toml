@@ -10,12 +10,15 @@ requires-python = ">=3.9"
 authors = [
   {name = "Soren Wacker", email = "swacker@ucalgary.ca"}
 ]
+
 urls = { "Homepage" = "https://github.com/LewisResearchGroup/ms-mint" }
+
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent"
 ]
+
 dependencies = [
   "six",
   "jsonschema",
@@ -45,6 +48,20 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+docs = [
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.6.12",
+  "mkdocstrings==0.26.1",
+  "mkdocstrings-python==1.11.1",
+  "mkdocs-autorefs==1.2.0",
+]
+dev = [
+  "pytest",
+  "numpy",
+  "flake8"
+]
+
 [project.scripts]
 ms-mint-convert = "ms_mint.scripts.ms_mint_convert:main"
 
@@ -61,3 +78,33 @@ local_scheme = "dirty-tag"
 addopts = "--maxfail=1 --disable-warnings"
 testpaths = ["tests"]
 
+[tool.ruff]
+target-version = "py312"
+
+line-length = 100
+
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "UP", # pyupgrade
+    "N",  # pep8-naming
+    "D",  # pydocstyle
+    "ANN", # flake8-annotations (type hints)
+]
+
+ignore = [
+    "D203",  # one-blank-line-before-class
+    "D213",  # multi-line-summary-second-line
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.pydocstyle]
+convention = "google"  # Use Google style docstrings
+
+[tool.ruff.isort]
+known-first-party = ["ms_mint"]
