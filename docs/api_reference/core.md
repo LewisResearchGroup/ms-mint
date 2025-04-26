@@ -1,4 +1,4 @@
-# Core classes (Mint, Chromatogram)
+# Core classes
 ::: ms_mint.Mint
 options:
   show_root_heading: true
