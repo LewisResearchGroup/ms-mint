@@ -59,7 +59,7 @@ docs = [
 dev = [
   "pytest",
   "numpy",
-  "libgfortran",
+  #"libgfortran",
   "openblas",
   "flake8"
 ]
