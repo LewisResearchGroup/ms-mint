@@ -8,7 +8,7 @@ Here’s a minimal working example to get started with `ms-mint` in just a few s
 pip install ms-mint
 ```
 
----
+
 
 ### 2. Import the library
 
@@ -27,7 +27,7 @@ from ms_mint.notebook import Mint
 mint = Mint()
 ```
 
----
+
 
 ### 3. Load your mass spectrometry data files
 
@@ -46,7 +46,7 @@ Or use wildcards to load multiple files:
 mint.load_files('./input/*.mzML')
 ```
 
----
+
 
 ### 4. Load your target list
 
@@ -65,8 +65,6 @@ targets = pd.read_csv('targets.csv')
 mint.targets = targets
 ```
 
----
-
 ### 5. Run the analysis
 
 ```python
@@ -79,15 +77,11 @@ If you're working with **thousands of files**, save results directly to a file t
 mint.run(fn='results.csv')
 ```
 
----
-
 ### 6. View results
 
 ```python
 mint.results
 ```
-
----
 
 ### Optional: Optimize retention time ranges
 
@@ -99,8 +93,6 @@ mint.opt.rt_min_max(
     plot=True
 )
 ```
-
----
 
 You’re now ready to process large-scale targeted metabolomics datasets with `ms-mint`!
 

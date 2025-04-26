@@ -34,13 +34,12 @@ These columns are crucial for MS-MINT processing and analysis.
 
 ### Special Cases and Notes
 
-- **Time Unit Handling**:
+#### Time Unit Handling
   - mzXML and mzML files may report scan times in **minutes**, but MS-MINT normalizes this to **seconds**.
-  
-- **Thermo RAW Parquet Files**:
+
+#### Thermo RAW Parquet Files
   - If you load a `.parquet` file not already in MS-MINT format, MS-MINT attempts to reformat it using `format_thermo_raw_file_reader_parquet()`.
 
-- **mzMLb Support**:
+#### mzMLb Support
   - Only works if the optional dependency `pyteomics.mzmlb` is available.
-  - If not installed, MS-MINT will log a warning but still function for other formats.
 

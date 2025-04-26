@@ -1,4 +1,4 @@
-# Installation instructions
+# Installation
 
 You can install the latest release of **ms-mint** directly from PyPI using pip:
 
