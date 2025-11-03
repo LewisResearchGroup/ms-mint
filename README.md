@@ -8,6 +8,8 @@
 # ms-mint: Mass Spectrometry-Metabolomics Integration Toolkit
 The `ms-mint` library includes a range of functions for processing LCMS data from targeted metabolomics experiments, and it is particularly well-suited for handling **large amounts of data (10,000+ files)**. To use `ms-mint`, you provide it with a target list of the specific metabolites you want to analyze, as well as the names of the mass spectrometry files containing the data. ms-mint then extracts peak intensities and other relevant information from the data, allowing you to gain insights into the concentrations and profiles of the metabolites in your samples. This information can be used to identify biomarkers, which are indicators of disease or other physiological changes that can be used in the development of diagnostic tests or other medical applications. `ms-mint` can be used in Python scripts, interactively in Jupyter Notebooks, or with the web-app (info below).
 
+**For additional metabolomics tools and resources from the Lewis Research Group, visit [lewisresearchgroup.org/software](https://www.lewisresearchgroup.org/software).**
+
 ## News
 Starting with version 1.0.0, we have updated the installation setup to use pyproject.toml. Additionally, each release of the repository will now be assigned a DOI to facilitate citation of the software.
 
@@ -17,6 +19,9 @@ Starting with version 1.0.0, we have updated the installation setup to use pypro
 
 ## Documentation
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint).
+
+## Demo Data
+Test data for `ms-mint` is available on [Google Drive](https://drive.google.com/drive/folders/1U4xMy5lfETk93sSVXPI79cCWyIMcAjeZ?usp=drive_link). This dataset includes sample LC-MS files and target lists to help you get started.
 
 ## ms-mint application with graphical user iterface (GUI)
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
