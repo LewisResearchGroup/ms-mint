@@ -1,6 +1,7 @@
 [![Python package](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/pythonpackage.yml)
-![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 [![CodeQL](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lewisresearchgroup/ms-mint/actions/workflows/codeql-analysis.yml)
+[![Documentation](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/documentation.yml/badge.svg)](https://github.com/LewisResearchGroup/ms-mint/actions/workflows/documentation.yml)
+![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 ![PyPI](https://img.shields.io/pypi/v/ms-mint?label=pypi%20package)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
 [![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/doi/10.5281/zenodo.12733875)
