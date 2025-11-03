@@ -1,7 +1,9 @@
 site_name: MS-MINT Documentation
 site_description: Documentation for MS-MINT, a mass spectrometry data analysis toolkit
 site_author: Lewis Research Group
-site_url: https://ms-mint.readthedocs.io/
+site_url: https://lewisresearchgroup.github.io/ms-mint/
+repo_url: https://github.com/LewisResearchGroup/ms-mint
+repo_name: LewisResearchGroup/ms-mint
 
 theme:
   name: material
