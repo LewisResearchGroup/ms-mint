@@ -63,8 +63,7 @@ class Resampler(Filter):
         """
         ndx = pd.to_timedelta(t, unit=self.unit)
         chrom = pd.Series(index=ndx, data=x)
-        # resampled = chrom.resample(self.tau).nearest()
-        resampled = chrom.resample(self.tau).fillna("nearest", limit=10)
+        resampled = chrom.resample(self.tau).nearest()
         new_t = np.array(resampled.index.seconds + (resampled.index.microseconds / 1e6))
         new_x = resampled.values
         return new_t, new_x

@@ -111,22 +111,22 @@ def hierarchical_clustering(
         cmap = "coolwarm"
     im = axmatrix.matshow(D[::-1], aspect="auto", cmap=cmap, vmin=vmin, vmax=vmax)
 
-    axmatrix.set_xticks([])
-    axmatrix.set_yticks([])
-
-    ax = plt.gca()
-    ax.yaxis.tick_right()
-    ax.xaxis.tick_bottom()
-
     clustered = df.iloc[Z1["leaves"][::-1], Z2["leaves"]]
 
+    # Calculate tick positions
     ndx_y = np.linspace(0, len(clustered.index) - 1, ymaxticks)
     ndx_x = np.linspace(0, len(clustered.columns) - 1, xmaxticks)
     ndx_y = [int(i) for i in ndx_y]
     ndx_x = [int(i) for i in ndx_x]
 
-    _ = plt.yticks(ndx_y, clustered.iloc[ndx_y].index)
-    _ = plt.xticks(ndx_x, clustered.columns[ndx_x], rotation=90)
+    # Set tick positions and labels with proper formatting
+    axmatrix.yaxis.tick_right()
+    axmatrix.xaxis.tick_bottom()
+    axmatrix.set_yticks(ndx_y)
+    axmatrix.set_yticklabels([str(clustered.index[i]) for i in ndx_y], fontsize=8)
+    axmatrix.set_xticks(ndx_x)
+    axmatrix.set_xticklabels([str(clustered.columns[i]) for i in ndx_x], rotation=45, ha='right', fontsize=8)
+    axmatrix.tick_params(axis='both', which='both', length=3)
 
     ndx_leaves = Z1["leaves"][::-1]
     col_leaves = Z2["leaves"]

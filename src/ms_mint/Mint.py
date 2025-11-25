@@ -61,6 +61,11 @@ class Mint:
         progress: Current progress of processing (0-100).
     """
 
+    # Type annotations for IDE autocompletion
+    plot: MintPlotter
+    opt: TargetOptimizer
+    pca: PrincipalComponentsAnalyser
+
     def __init__(
         self,
         verbose: bool = False,
@@ -716,6 +721,9 @@ class Mint:
     def load_metadata(self, fn: Optional[Union[str, P]] = None) -> "Mint":
         """Load metadata from file.
 
+        The CSV/parquet should have a column named 'ms_file_label' that matches
+        the ms_file_label values from the loaded MS files.
+
         Args:
             fn: Filename to load metadata from. Defaults to metadata.parquet in working directory.
 
@@ -725,11 +733,31 @@ class Mint:
         if fn is None:
             fn = self.wdir / METADATA_DEFAUT_FN
         if str(fn).endswith(".csv"):
-            self.meta = pd.read_csv(fn, index_col=0)
+            # Read without index_col to properly detect ms_file_label column
+            meta_df = pd.read_csv(fn)
         elif str(fn).endswith(".parquet"):
-            self.meta = pd.read_parquet(fn)
-        if "ms_file_label" in self.meta.columns:
-            self.meta = self.meta.set_index("ms_file_label")
+            meta_df = pd.read_parquet(fn)
+        else:
+            raise ValueError(f"Unsupported file format: {fn}. Use .csv or .parquet")
+
+        # Set ms_file_label as index if present
+        if "ms_file_label" in meta_df.columns:
+            meta_df = meta_df.set_index("ms_file_label")
+        elif meta_df.index.name == "ms_file_label":
+            pass  # Already indexed correctly
+        else:
+            # Check if first column looks like file labels
+            first_col = meta_df.columns[0]
+            if first_col in ["ms_file", "file", "sample", "filename"]:
+                meta_df = meta_df.rename(columns={first_col: "ms_file_label"})
+                meta_df = meta_df.set_index("ms_file_label")
+            else:
+                logging.warning(
+                    f"No 'ms_file_label' column found in metadata. "
+                    f"Available columns: {list(meta_df.columns)}"
+                )
+
+        self.meta = meta_df
         return self
 
     def save_metadata(self, fn: Optional[Union[str, P]] = None) -> "Mint":

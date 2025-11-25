@@ -121,6 +121,9 @@ class MintPlotter:
 
         return fig
 
+    # Alias for hierarchical_clustering
+    hc = hierarchical_clustering
+
     def peak_shapes(
         self,
         fns: Optional[Union[str, List[str]]] = None,
@@ -344,3 +347,170 @@ class MintPlotter:
             g.update_xaxes(matches=None)
             g.update_yaxes(matches=None)
             return g
+
+    def distribution(
+        self,
+        var_name: str = "peak_max",
+        apply: Optional[str] = "log2p1",
+        style: str = "boxplot",
+        hue: Optional[str] = None,
+        interactive: bool = False,
+        **kwargs,
+    ) -> Union[matplotlib.figure.Figure, PlotlyFigure]:
+        """Create distribution plots (histogram, boxplot, violin) for peak values.
+
+        Args:
+            var_name: Column from results to plot.
+            apply: Transformation to apply ("log2p1", "log10p1", or None).
+            style: Plot style - "boxplot", "violin", or "histogram".
+            hue: Metadata column for grouping/coloring.
+            interactive: If True, returns Plotly figure; otherwise Matplotlib.
+            **kwargs: Additional arguments passed to plotting functions.
+
+        Returns:
+            Matplotlib figure or Plotly figure depending on interactive parameter.
+        """
+        import numpy as np
+
+        data = self.mint.crosstab(var_name=var_name)
+        if data is None or len(data) == 0:
+            return None
+
+        # Apply transform
+        if apply == "log2p1":
+            data = np.log2(data + 1)
+        elif apply == "log10p1":
+            data = np.log10(data + 1)
+
+        # Melt to long format
+        df_long = data.reset_index().melt(
+            id_vars=data.index.name or "index",
+            var_name="peak_label",
+            value_name="value"
+        )
+        df_long = df_long.rename(columns={data.index.name or "index": "ms_file"})
+
+        # Add metadata if hue specified (peak_label is already in df_long)
+        if hue and hue != "peak_label" and self.mint.meta is not None and hue in self.mint.meta.columns:
+            df_long = df_long.merge(
+                self.mint.meta[[hue]], left_on="ms_file", right_index=True, how="left"
+            )
+
+        if interactive:
+            return self._distribution_plotly(df_long, var_name, apply, style, hue, **kwargs)
+        else:
+            return self._distribution_matplotlib(df_long, var_name, apply, style, hue, **kwargs)
+
+    def _distribution_matplotlib(
+        self,
+        df_long: pd.DataFrame,
+        var_name: str,
+        apply: Optional[str],
+        style: str,
+        hue: Optional[str],
+        **kwargs,
+    ) -> matplotlib.figure.Figure:
+        """Create matplotlib distribution plot."""
+        figsize = kwargs.get("figsize", (12, 6))
+        y_label = f"{var_name} ({apply})" if apply else var_name
+
+        # Determine x-axis: if hue is peak_label, use ms_file as x
+        if hue == "peak_label":
+            x_col = "ms_file"
+            x_label = "Sample"
+        else:
+            x_col = "peak_label"
+            x_label = "Target"
+
+        if style == "histogram":
+            fig, ax = plt.subplots(figsize=(10, 6))
+            if hue and hue in df_long.columns:
+                for group in df_long[hue].dropna().unique():
+                    subset = df_long[df_long[hue] == group]["value"].dropna()
+                    ax.hist(subset, bins=50, alpha=0.5, label=str(group))
+                ax.legend(title=hue)
+            else:
+                ax.hist(df_long["value"].dropna(), bins=50, alpha=0.7, color="steelblue")
+            ax.set_xlabel(y_label)
+            ax.set_ylabel("Count")
+            ax.set_title(f"Distribution of {var_name}")
+
+        elif style == "boxplot":
+            fig, ax = plt.subplots(figsize=figsize)
+            sns.boxplot(data=df_long, x=x_col, y="value", hue=hue if hue != x_col else None, ax=ax)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
+            ax.set_xlabel(x_label)
+            ax.set_ylabel(y_label)
+            ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
+
+        elif style == "violin":
+            fig, ax = plt.subplots(figsize=figsize)
+            sns.violinplot(data=df_long, x=x_col, y="value", hue=hue if hue != x_col else None, ax=ax)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
+            ax.set_xlabel(x_label)
+            ax.set_ylabel(y_label)
+            ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
+
+        else:
+            raise ValueError(f"Unknown style: {style}")
+
+        plt.tight_layout()
+        return fig
+
+    def _distribution_plotly(
+        self,
+        df_long: pd.DataFrame,
+        var_name: str,
+        apply: Optional[str],
+        style: str,
+        hue: Optional[str],
+        **kwargs,
+    ) -> PlotlyFigure:
+        """Create plotly distribution plot."""
+        y_label = f"{var_name} ({apply})" if apply else var_name
+
+        # Determine x-axis: if hue is peak_label, use ms_file as x
+        if hue == "peak_label":
+            x_col = "ms_file"
+            x_label = "Sample"
+        else:
+            x_col = "peak_label"
+            x_label = "Target"
+
+        if style == "histogram":
+            fig = px.histogram(
+                df_long,
+                x="value",
+                color=hue,
+                title=f"Distribution of {var_name}",
+                labels={"value": y_label},
+                **kwargs,
+            )
+
+        elif style == "boxplot":
+            fig = px.box(
+                df_long,
+                x=x_col,
+                y="value",
+                color=hue if hue != x_col else None,
+                title=f"Distribution of {var_name} by {x_label.lower()}",
+                labels={x_col: x_label, "value": y_label},
+                **kwargs,
+            )
+
+        elif style == "violin":
+            fig = px.violin(
+                df_long,
+                x=x_col,
+                y="value",
+                color=hue if hue != x_col else None,
+                title=f"Distribution of {var_name} by {x_label.lower()}",
+                labels={x_col: x_label, "value": y_label},
+                **kwargs,
+            )
+
+        else:
+            raise ValueError(f"Unknown style: {style}")
+
+        fig.update_layout(autosize=True)
+        return fig

@@ -218,6 +218,147 @@ class PCA_Plotter:
         ax.set_xticks(range(1, len(cum_expl_var) + 1))
         return fig
 
+    def scatter(
+        self,
+        x_component: int = 1,
+        y_component: int = 2,
+        color_by: Optional[str] = None,
+        interactive: bool = False,
+        **kwargs,
+    ) -> Union[Figure, PlotlyFigure]:
+        """Create a scatter plot of two principal components.
+
+        Args:
+            x_component: Principal component number for x-axis (1-indexed).
+            y_component: Principal component number for y-axis (1-indexed).
+            color_by: Metadata column to use for coloring points.
+            interactive: If True, returns a Plotly interactive figure.
+            **kwargs: Additional keyword arguments passed to plotting functions.
+
+        Returns:
+            Either a Matplotlib figure or a Plotly figure depending on interactive.
+        """
+        if interactive:
+            return self.scatter_plotly(x_component, y_component, color_by, **kwargs)
+        else:
+            return self.scatter_sns(x_component, y_component, color_by, **kwargs)
+
+    def scatter_sns(
+        self,
+        x_component: int = 1,
+        y_component: int = 2,
+        color_by: Optional[str] = None,
+        **kwargs,
+    ) -> Figure:
+        """Create a static scatter plot of two principal components.
+
+        Args:
+            x_component: Principal component number for x-axis (1-indexed).
+            y_component: Principal component number for y-axis (1-indexed).
+            color_by: Metadata column to use for coloring points.
+            **kwargs: Additional keyword arguments for figure customization.
+
+        Returns:
+            Matplotlib figure showing the scatter plot.
+        """
+        df = self.pca.results["df_projected"].copy()
+        x_col = f"PC-{x_component}"
+        y_col = f"PC-{y_component}"
+
+        if x_col not in df.columns or y_col not in df.columns:
+            raise ValueError(f"Components {x_component} or {y_component} not available")
+
+        # Merge with metadata if color_by is specified
+        if color_by and color_by != "none":
+            meta = self.pca.mint.meta.dropna(axis=1, how="all")
+            if color_by in meta.columns:
+                df = pd.merge(df, meta[[color_by]], left_index=True, right_index=True, how="left")
+
+        height = kwargs.get("height", 6)
+        width = kwargs.get("width", 8)
+
+        fig, ax = plt.subplots(figsize=(width, height))
+
+        if color_by and color_by != "none" and color_by in df.columns:
+            # Get unique categories
+            categories = df[color_by].dropna().unique()
+            colors = plt.cm.tab10(np.linspace(0, 1, len(categories)))
+            for cat, color in zip(categories, colors):
+                mask = df[color_by] == cat
+                ax.scatter(df.loc[mask, x_col], df.loc[mask, y_col],
+                          c=[color], label=str(cat), alpha=0.7, s=50)
+            ax.legend(title=color_by, bbox_to_anchor=(1.02, 1), loc='upper left')
+        else:
+            ax.scatter(df[x_col], df[y_col], alpha=0.7, s=50, c='steelblue')
+
+        # Get explained variance for axis labels
+        cum_var = self.pca.results["cum_expl_var"]
+        var_x = cum_var[x_component - 1] if x_component == 1 else cum_var[x_component - 1] - cum_var[x_component - 2]
+        var_y = cum_var[y_component - 1] if y_component == 1 else cum_var[y_component - 1] - cum_var[y_component - 2]
+
+        ax.set_xlabel(f"{x_col} ({var_x:.1f}%)")
+        ax.set_ylabel(f"{y_col} ({var_y:.1f}%)")
+        ax.set_title(f"PCA: {x_col} vs {y_col}")
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+        plt.tight_layout()
+        return fig
+
+    def scatter_plotly(
+        self,
+        x_component: int = 1,
+        y_component: int = 2,
+        color_by: Optional[str] = None,
+        **kwargs,
+    ) -> PlotlyFigure:
+        """Create an interactive Plotly scatter plot of two principal components.
+
+        Args:
+            x_component: Principal component number for x-axis (1-indexed).
+            y_component: Principal component number for y-axis (1-indexed).
+            color_by: Metadata column to use for coloring points.
+            **kwargs: Additional keyword arguments passed to px.scatter.
+
+        Returns:
+            Plotly figure showing the scatter plot.
+        """
+        df = self.pca.results["df_projected"].copy()
+        x_col = f"PC-{x_component}"
+        y_col = f"PC-{y_component}"
+
+        if x_col not in df.columns or y_col not in df.columns:
+            raise ValueError(f"Components {x_component} or {y_component} not available")
+
+        # Merge with metadata if color_by is specified
+        if color_by and color_by != "none":
+            meta = self.pca.mint.meta.dropna(axis=1, how="all")
+            if color_by in meta.columns:
+                df = pd.merge(df, meta[[color_by]], left_index=True, right_index=True, how="left")
+
+        # Get explained variance for axis labels
+        cum_var = self.pca.results["cum_expl_var"]
+        var_x = cum_var[x_component - 1] if x_component == 1 else cum_var[x_component - 1] - cum_var[x_component - 2]
+        var_y = cum_var[y_component - 1] if y_component == 1 else cum_var[y_component - 1] - cum_var[y_component - 2]
+
+        color_col = color_by if (color_by and color_by != "none" and color_by in df.columns) else None
+
+        fig = px.scatter(
+            df.reset_index(),
+            x=x_col,
+            y=y_col,
+            color=color_col,
+            hover_name="index" if "index" in df.reset_index().columns else None,
+            labels={
+                x_col: f"{x_col} ({var_x:.1f}%)",
+                y_col: f"{y_col} ({var_y:.1f}%)",
+            },
+            title=f"PCA: {x_col} vs {y_col}",
+            **kwargs,
+        )
+        fig.update_layout(autosize=True)
+        return fig
+
     def _prepare_data(
         self, n_components: int = 3, hue: Optional[Union[str, List[str]]] = None
     ) -> pd.DataFrame:
@@ -292,6 +433,10 @@ class PCA_Plotter:
         """
         if fig_kws is None:
             fig_kws = {}
+        # Only plot PC columns, not merged metadata columns
+        pc_cols = [c for c in df.columns if c.startswith("PC-")]
+        if "vars" not in kwargs:
+            kwargs["vars"] = pc_cols
         plt.figure(**fig_kws)
         g = sns.pairplot(df, **kwargs)
         return g
