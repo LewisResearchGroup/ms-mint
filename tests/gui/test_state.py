@@ -201,6 +201,33 @@ class TestMintStateReset:
         assert state.messages.value == []
 
 
+class TestMintStateSaveTargets:
+    """Test target saving functionality."""
+
+    def test_save_targets(self, test_targets_csv: Path, tmp_path: Path):
+        """Saving targets should create a file."""
+        state = MintState()
+        state._mint.wdir = tmp_path
+        state.load_targets_from_file(str(test_targets_csv))
+
+        filepath = state.save_targets()
+
+        assert filepath != ""
+        assert Path(filepath).exists()
+
+    def test_save_targets_message(self, test_targets_csv: Path, tmp_path: Path):
+        """Saving targets should add a message."""
+        state = MintState()
+        state._mint.wdir = tmp_path
+        state.load_targets_from_file(str(test_targets_csv))
+        state.clear_messages()
+
+        state.save_targets()
+
+        assert len(state.messages.value) > 0
+        assert "saved" in state.messages.value[0].lower()
+
+
 class TestMintStateTargetReordering:
     """Test target reordering functionality."""
 

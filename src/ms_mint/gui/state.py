@@ -161,6 +161,35 @@ class MintState:
         self.targets.value = pd.DataFrame()
         self.add_message("Targets cleared.")
 
+    def save_targets(self, filename: str = None) -> str:
+        """Save current targets to file.
+
+        Args:
+            filename: Optional filename. If None, auto-generates based on date.
+
+        Returns:
+            Path to saved file.
+        """
+        from datetime import datetime
+
+        if self._mint.targets is None or len(self._mint.targets) == 0:
+            self.add_message("No targets to save.")
+            return ""
+
+        # Create output directory
+        out_dir = self._mint.wdir / "targets"
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate filename if not provided
+        if filename is None:
+            date_str = datetime.now().strftime("%y%m%d-%H%M%S")
+            filename = f"targets-{date_str}.csv"
+
+        filepath = out_dir / filename
+        self._mint.targets.to_csv(filepath)
+        self.add_message(f"Targets saved: {filepath.name}")
+        return str(filepath)
+
     def reorder_targets(self, new_order: list) -> None:
         """Reorder targets by the given peak label order.
 

@@ -75,6 +75,10 @@ def MintGui():
         """Update target activation status."""
         state.set_inactive_targets(inactive)
 
+    def on_save_targets() -> None:
+        """Save targets to file."""
+        state.save_targets()
+
     def on_metadata_updated() -> None:
         """Refresh after metadata update."""
         pass  # Metadata is stored in mint instance
@@ -164,6 +168,7 @@ def MintGui():
                     on_targets_loaded=on_targets_loaded,
                     on_targets_reordered=on_targets_reordered,
                     on_targets_activation_changed=on_targets_activation_changed,
+                    on_save_targets=on_save_targets,
                     on_clear=on_clear_targets,
                 )
                 OptimizationPanel(
