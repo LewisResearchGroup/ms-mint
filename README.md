@@ -23,7 +23,7 @@ Starting with version 1.0.0, we have updated the installation setup to use pypro
 The code documentation can be accessed [here](https://lewisresearchgroup.github.io/ms-mint).
 
 ## Demo Data
-Test data for `ms-mint` is available on [Google Drive](https://drive.google.com/drive/folders/1U4xMy5lfETk93sSVXPI79cCWyIMcAjeZ?usp=drive_link). This dataset includes sample LC-MS files and target lists to help you get started.
+Demo data for `ms-mint` is available on [Zenodo](https://zenodo.org/records/14727891). This dataset includes 12 LC-MS files (bacterial metabolomics samples) and target lists to help you get started.
 
 ## ms-mint application with graphical user iterface (GUI)
 MINT has been split into the Python library and the app. This repository contains the Python library. For the app follow [this link](https://github.com/LewisResearchGroup/ms-mint-app).
