@@ -38,6 +38,7 @@ def save_figure_to_file(
     plot_name: str,
     settings: dict,
     dpi: int = 150,
+    image_format: str = "png",
 ) -> str:
     """Save figure to analyses/figures/ with readme.
 
@@ -47,6 +48,7 @@ def save_figure_to_file(
         plot_name: Name for the figure file
         settings: Dict of settings to write to readme
         dpi: Resolution for saving
+        image_format: Image format (png, pdf, svg, jpeg, tiff)
 
     Returns:
         Path to saved figure or error message
@@ -65,13 +67,16 @@ def save_figure_to_file(
         out_dir = mint.wdir / "analyses" / "figures"
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        # Generate filename
+        # Generate filename with correct extension
+        ext = image_format.lower()
+        if ext == "jpeg":
+            ext = "jpg"
         fig_name = f"{date_str}-{plot_name}"
-        fig_path = out_dir / f"{fig_name}.png"
+        fig_path = out_dir / f"{fig_name}.{ext}"
         readme_path = out_dir / f"{fig_name}.md"
 
         # Save figure
-        actual_fig.savefig(fig_path, format='png', dpi=dpi, bbox_inches='tight')
+        actual_fig.savefig(fig_path, format=image_format, dpi=dpi, bbox_inches='tight')
 
         # Write readme
         settings_str = "\n".join(f"- **{k}:** {v}" for k, v in settings.items())
@@ -83,7 +88,7 @@ def save_figure_to_file(
 {settings_str}
 
 ## Output
-- `{fig_name}.png`
+- `{fig_name}.{ext}`
 """
         readme_path.write_text(readme_content)
         return f"Saved: {fig_path.name}"
@@ -94,7 +99,8 @@ def save_figure_to_file(
 @solara.component
 def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
             var_name: str, apply: str, scaler: str, fillna: str, color_by: str = "none",
-            x_component: int = 1, y_component: int = 2, active_targets: list[str] = None):
+            x_component: int = 1, y_component: int = 2, active_targets: list[str] = None,
+            image_format: str = "png"):
     """Render PCA plot."""
     save_message = solara.use_reactive("")
 
@@ -130,7 +136,7 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
                 if plot_type == "scatter":
                     settings["X component"] = x_component
                     settings["Y component"] = y_component
-                msg = save_figure_to_file(fig, mint, f"pca_{plot_type}-{var_name}", settings)
+                msg = save_figure_to_file(fig, mint, f"pca_{plot_type}-{var_name}", settings, image_format=image_format)
                 save_message.set(msg)
                 plt.close('all')
 
@@ -192,13 +198,15 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
 
 
 @solara.component
-def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds"):
+def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds",
+                   image_format: str = "png"):
     """Render peak shapes plot.
 
     Args:
         mint: Mint instance
         interactive: Whether to use plotly
         rt_unit: Display unit for RT ("seconds" or "minutes")
+        image_format: Image format for saving
     """
     save_message = solara.use_reactive("")
     rt_label = "min" if rt_unit == "minutes" else "s"
@@ -208,7 +216,7 @@ def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds"):
             fig = mint.plot.peak_shapes(interactive=False)
             if fig is not None:
                 settings = {"Interactive": False, "RT unit": rt_unit}
-                msg = save_figure_to_file(fig, mint, "peak_shapes", settings)
+                msg = save_figure_to_file(fig, mint, "peak_shapes", settings, image_format=image_format)
                 save_message.set(msg)
                 plt.close('all')
 
@@ -254,7 +262,8 @@ def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds"):
 
 @solara.component
 def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspect: float = 5,
-                     rt_unit: str = "seconds", peak_labels: list = None, nthreads: int = None):
+                     rt_unit: str = "seconds", peak_labels: list = None, nthreads: int = None,
+                     image_format: str = "png"):
     """Render chromatogram plot.
 
     Args:
@@ -339,7 +348,8 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                      plot_style: str = "boxplot", color_by: str = "none",
                      facet_col: str = "none", facet_row: str = "none",
                      col_wrap: int = 0, x_label: str = "", y_label: str = "",
-                     active_targets: list[str] = None, interactive: bool = False):
+                     active_targets: list[str] = None, interactive: bool = False,
+                     image_format: str = "png"):
     """Render distribution plots (histogram, boxplot, violin).
 
     Args:
@@ -393,7 +403,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                     "Col wrap": col_wrap,
                     "Active targets": len(active_targets) if active_targets else "all",
                 }
-                msg = save_figure_to_file(fig, mint, f"distribution_{plot_style}-{var_name}", settings)
+                msg = save_figure_to_file(fig, mint, f"distribution_{plot_style}-{var_name}", settings, image_format=image_format)
                 save_message.set(msg)
                 plt.close('all')
 
@@ -489,7 +499,7 @@ def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
 def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
                       apply: str = "log2p1", scaler: str = "standard",
                       transposed: bool = False, width: int = 12, height: int = 10,
-                      active_targets: list[str] = None):
+                      active_targets: list[str] = None, image_format: str = "png"):
     """Render simple heatmap (seaborn heatmap without clustering)."""
     save_message = solara.use_reactive("")
 
@@ -505,7 +515,7 @@ def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
                     "Figure size": f"{width} x {height}",
                     "Active targets": len(active_targets) if active_targets else "all",
                 }
-                msg = save_figure_to_file(fig, mint, f"heatmap-{var_name}", settings)
+                msg = save_figure_to_file(fig, mint, f"heatmap-{var_name}", settings, image_format=image_format)
                 save_message.set(msg)
                 plt.close('all')
 
@@ -557,7 +567,8 @@ def _create_clustering_figure(mint: "Mint", var_name: str, apply: str, scaler: s
 def HierarchicalClusteringPlot(mint: "Mint", var_name: str = "peak_max",
                                 apply: str = "log2p1", scaler: str = "standard",
                                 metric: str = "cosine", transposed: bool = False,
-                                width: int = 12, height: int = 10, dpi: int = 150):
+                                width: int = 12, height: int = 10, dpi: int = 150,
+                                image_format: str = "png"):
     """Render hierarchical clustering heatmap (seaborn clustermap)."""
     save_message = solara.use_reactive("")
 
@@ -574,7 +585,7 @@ def HierarchicalClusteringPlot(mint: "Mint", var_name: str = "peak_max",
                     "Figure size": f"{width} x {height}",
                     "DPI": dpi,
                 }
-                msg = save_figure_to_file(fig, mint, f"hierarchical_clustering-{var_name}", settings, dpi=dpi)
+                msg = save_figure_to_file(fig, mint, f"hierarchical_clustering-{var_name}", settings, dpi=dpi, image_format=image_format)
                 save_message.set(msg)
                 plt.close('all')
 
@@ -609,6 +620,7 @@ def VisualizationPanel(
     rt_unit: solara.Reactive[str] = None,
     nthreads: solara.Reactive[int] = None,
     inactive_targets: solara.Reactive[list[str]] = None,
+    image_format: solara.Reactive[str] = None,
 ):
     """Component for interactive visualizations.
 
@@ -621,9 +633,12 @@ def VisualizationPanel(
         rt_unit: Reactive string for RT display unit ("seconds" or "minutes").
         nthreads: Reactive int for number of threads for chromatogram extraction.
         inactive_targets: Reactive list of inactive target labels to filter out.
+        image_format: Reactive string for image format (png, pdf, svg, jpeg, tiff).
     """
     # Access targets.value to trigger re-render when targets change
     _ = targets.value if targets is not None else None
+    # Get image format value
+    img_fmt = image_format.value if image_format is not None else "png"
     # Fallback for rt_unit
     fallback_rt_unit = solara.use_reactive("seconds")
     active_rt_unit = rt_unit if rt_unit is not None else fallback_rt_unit
@@ -918,6 +933,7 @@ def VisualizationPanel(
                 width=heatmap_width.value,
                 height=heatmap_height.value,
                 active_targets=available_targets,
+                image_format=img_fmt,
             )
         elif plot_type.value == "hierarchical_clustering":
             HierarchicalClusteringPlot(
@@ -930,6 +946,7 @@ def VisualizationPanel(
                 width=clust_width.value,
                 height=clust_height.value,
                 dpi=clust_dpi.value,
+                image_format=img_fmt,
             )
         elif plot_type.value == "distribution":
             DistributionPlot(
@@ -945,9 +962,10 @@ def VisualizationPanel(
                 y_label=dist_y_label.value,
                 active_targets=available_targets,
                 interactive=dist_interactive.value,
+                image_format=img_fmt,
             )
         elif plot_type.value == "peak_shapes":
-            PeakShapesPlot(mint=mint, interactive=peak_shapes_interactive.value, rt_unit=active_rt_unit.value)
+            PeakShapesPlot(mint=mint, interactive=peak_shapes_interactive.value, rt_unit=active_rt_unit.value, image_format=img_fmt)
         elif plot_type.value == "chromatogram":
             # Use selected targets, or fall back to all available (active) targets
             chrom_peak_labels = chrom_targets.value if chrom_targets.value else available_targets
@@ -959,6 +977,7 @@ def VisualizationPanel(
                 rt_unit=active_rt_unit.value,
                 peak_labels=chrom_peak_labels if chrom_peak_labels else None,
                 nthreads=nthreads.value if nthreads is not None else None,
+                image_format=img_fmt,
             )
         elif plot_type.value == "pca":
             PCAPlot(
@@ -974,4 +993,5 @@ def VisualizationPanel(
                 x_component=pca_x_component.value,
                 y_component=pca_y_component.value,
                 active_targets=available_targets,
+                image_format=img_fmt,
             )

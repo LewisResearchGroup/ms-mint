@@ -65,6 +65,7 @@ class MintState:
 
         # Display settings
         self.rt_unit: solara.Reactive[str] = solara.reactive("seconds")  # "seconds" or "minutes"
+        self.image_format: solara.Reactive[str] = solara.reactive("png")  # "png", "pdf", "jpeg", "tiff", "svg"
 
         # Target filtering
         self.inactive_targets: solara.Reactive[list[str]] = solara.reactive([])
