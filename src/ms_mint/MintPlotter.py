@@ -373,6 +373,7 @@ class MintPlotter:
         col_wrap: Optional[int] = None,
         x_label: Optional[str] = None,
         y_label: Optional[str] = None,
+        peak_labels: Optional[List[str]] = None,
         interactive: bool = False,
         **kwargs,
     ) -> Union[matplotlib.figure.Figure, PlotlyFigure]:
@@ -388,6 +389,7 @@ class MintPlotter:
             col_wrap: Number of columns before wrapping (only used if col is set and row is None).
             x_label: Custom x-axis label (default: auto-generated).
             y_label: Custom y-axis label (default: auto-generated from var_name and apply).
+            peak_labels: List of peak labels to include. If None, all peaks are included.
             interactive: If True, returns Plotly figure; otherwise Matplotlib.
             **kwargs: Additional arguments passed to plotting functions.
 
@@ -399,6 +401,11 @@ class MintPlotter:
         data = self.mint.crosstab(var_name=var_name)
         if data is None or len(data) == 0:
             return None
+
+        # Filter to specified peak labels
+        if peak_labels is not None and len(peak_labels) > 0:
+            available_cols = [c for c in peak_labels if c in data.columns]
+            data = data[available_cols]
 
         # Apply transform
         if apply == "log2p1":
