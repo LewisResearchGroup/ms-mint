@@ -49,6 +49,7 @@ class PrincipalComponentsAnalyser:
         apply: Optional[str] = None,
         groupby: Optional[Union[str, List[str]]] = None,
         scaler: str = "standard",
+        peak_labels: Optional[List[str]] = None,
     ) -> None:
         """Run Principal Component Analysis on the current results.
 
@@ -63,6 +64,7 @@ class PrincipalComponentsAnalyser:
             apply: Transformation to apply to the data before PCA.
             groupby: Column(s) to group by before analysis.
             scaler: Method to scale the data. One of "standard", "robust", "minmax".
+            peak_labels: List of peak labels to include. If None, all peaks are used.
 
         Raises:
             DeprecationWarning: If the deprecated 'on' parameter is used.
@@ -71,7 +73,7 @@ class PrincipalComponentsAnalyser:
             warnings.warn("on is deprecated, use var_name instead", DeprecationWarning)
             var_name = on
 
-        df = self.mint.crosstab(var_name=var_name, apply=apply, scaler=scaler, groupby=groupby)
+        df = self.mint.crosstab(var_name=var_name, apply=apply, scaler=scaler, groupby=groupby, peak_labels=peak_labels)
 
         if fillna == "median":
             fillna = df.median()

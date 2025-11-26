@@ -94,7 +94,7 @@ def save_figure_to_file(
 @solara.component
 def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
             var_name: str, apply: str, scaler: str, fillna: str, color_by: str = "none",
-            x_component: int = 1, y_component: int = 2):
+            x_component: int = 1, y_component: int = 2, active_targets: list[str] = None):
     """Render PCA plot."""
     save_message = solara.use_reactive("")
 
@@ -103,7 +103,7 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
 
     def save_figure():
         with no_display():
-            mint.pca.run(n_components=n_components, var_name=var_name, apply=apply_val, scaler=scaler, fillna=fillna)
+            mint.pca.run(n_components=n_components, var_name=var_name, apply=apply_val, scaler=scaler, fillna=fillna, peak_labels=active_targets)
             if plot_type == "scatter":
                 fig = mint.pca.plot.scatter(x_component=x_component, y_component=y_component,
                                             color_by=color_by if color_by != "none" else None, interactive=False)
@@ -143,6 +143,7 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
                 apply=apply_val,
                 scaler=scaler,
                 fillna=fillna,
+                peak_labels=active_targets,
             )
 
             # Generate the requested plot
@@ -338,7 +339,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                      plot_style: str = "boxplot", color_by: str = "none",
                      facet_col: str = "none", facet_row: str = "none",
                      col_wrap: int = 0, x_label: str = "", y_label: str = "",
-                     interactive: bool = False):
+                     active_targets: list[str] = None, interactive: bool = False):
     """Render distribution plots (histogram, boxplot, violin).
 
     Args:
@@ -352,6 +353,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
         col_wrap: Number of columns before wrapping (0 = no wrap)
         x_label: Custom x-axis label (empty = auto)
         y_label: Custom y-axis label (empty = auto)
+        active_targets: List of active target labels to include
         interactive: Whether to use plotly
     """
     save_message = solara.use_reactive("")
@@ -377,6 +379,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                 col_wrap=col_wrap_val,
                 x_label=x_label_val,
                 y_label=y_label_val,
+                peak_labels=active_targets,
                 interactive=False,
             )
             if fig is not None:
@@ -388,6 +391,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                     "Facet col": facet_col,
                     "Facet row": facet_row,
                     "Col wrap": col_wrap,
+                    "Active targets": len(active_targets) if active_targets else "all",
                 }
                 msg = save_figure_to_file(fig, mint, f"distribution_{plot_style}-{var_name}", settings)
                 save_message.set(msg)
@@ -405,6 +409,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                 col_wrap=col_wrap_val,
                 x_label=x_label_val,
                 y_label=y_label_val,
+                peak_labels=active_targets,
                 interactive=interactive,
             )
             if fig is None:
@@ -938,18 +943,21 @@ def VisualizationPanel(
                 col_wrap=dist_col_wrap.value,
                 x_label=dist_x_label.value,
                 y_label=dist_y_label.value,
+                active_targets=available_targets,
                 interactive=dist_interactive.value,
             )
         elif plot_type.value == "peak_shapes":
             PeakShapesPlot(mint=mint, interactive=peak_shapes_interactive.value, rt_unit=active_rt_unit.value)
         elif plot_type.value == "chromatogram":
+            # Use selected targets, or fall back to all available (active) targets
+            chrom_peak_labels = chrom_targets.value if chrom_targets.value else available_targets
             ChromatogramPlot(
                 mint=mint,
                 interactive=chrom_interactive.value,
                 height=chrom_height.value,
                 aspect=chrom_aspect.value,
                 rt_unit=active_rt_unit.value,
-                peak_labels=chrom_targets.value if chrom_targets.value else None,
+                peak_labels=chrom_peak_labels if chrom_peak_labels else None,
                 nthreads=nthreads.value if nthreads is not None else None,
             )
         elif plot_type.value == "pca":
@@ -965,4 +973,5 @@ def VisualizationPanel(
                 color_by=pca_color_by.value,
                 x_component=pca_x_component.value,
                 y_component=pca_y_component.value,
+                active_targets=available_targets,
             )

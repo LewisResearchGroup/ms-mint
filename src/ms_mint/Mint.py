@@ -471,6 +471,7 @@ class Mint:
         apply: Optional[Callable] = None,
         scaler: Optional[Union[str, Any]] = None,
         groupby: Optional[Union[str, List[str]]] = None,
+        peak_labels: Optional[List[str]] = None,
     ) -> pd.DataFrame:
         """Create condensed representation of the results.
 
@@ -490,6 +491,7 @@ class Mint:
             scaler: Function or name of scaler to scale the data.
                 Options include 'standard', 'robust', 'minmax', or a scikit-learn scaler.
             groupby: Column(s) to group data before scaling.
+            peak_labels: List of peak labels to include. If None, all peaks are used.
 
         Returns:
             DataFrame representing the cross-tabulation.
@@ -550,11 +552,17 @@ class Mint:
             aggfunc=aggfunc,
         ).astype(np.float64)
 
-        # Preserve target order for columns if column is peak_label
-        if column == "peak_label" and self.targets is not None:
-            target_order = list(self.peak_labels)
-            # Reorder columns to match target order (only include columns that exist)
-            ordered_cols = [c for c in target_order if c in df.columns]
+        # Filter and order columns if column is peak_label
+        if column == "peak_label":
+            if peak_labels is not None and len(peak_labels) > 0:
+                # Use provided peak_labels filter
+                ordered_cols = [c for c in peak_labels if c in df.columns]
+            elif self.targets is not None:
+                # Use target order from targets DataFrame
+                target_order = list(self.peak_labels)
+                ordered_cols = [c for c in target_order if c in df.columns]
+            else:
+                ordered_cols = list(df.columns)
             df = df[ordered_cols]
 
         return df
