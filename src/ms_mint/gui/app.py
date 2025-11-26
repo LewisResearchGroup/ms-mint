@@ -119,6 +119,12 @@ def MintGui():
                 values=["seconds", "minutes"],
                 on_value=state.rt_unit.set,
             )
+            solara.Select(
+                label="Image Format",
+                value=state.image_format.value,
+                values=["png", "pdf", "svg", "jpeg", "tiff"],
+                on_value=state.image_format.set,
+            )
             solara.Markdown("---")
             solara.Markdown("### Performance")
             solara.SliderInt(
@@ -218,6 +224,7 @@ def MintGui():
                     rt_unit=state.rt_unit,
                     nthreads=state.nthreads,
                     inactive_targets=state.inactive_targets,
+                    image_format=state.image_format,
                 )
 
 
