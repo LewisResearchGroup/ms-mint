@@ -8,6 +8,7 @@ import time
 import logging
 from pathlib import Path as P
 from multiprocessing import Pool, Manager, cpu_count
+from concurrent.futures import ThreadPoolExecutor
 from glob import glob
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
 from io import BytesIO
@@ -323,7 +324,11 @@ class Mint:
         Returns:
             List of filenames.
         """
-        return self._files
+        # Handle case where _files might be a Reactive object
+        files = self._files
+        if hasattr(files, 'value'):
+            files = files.value
+        return list(files) if files else []
 
     @ms_files.setter
     def ms_files(self, list_of_files: Union[str, List[str]]) -> None:
@@ -509,8 +514,10 @@ class Mint:
         if apply:
             if apply == "log2p1":
                 apply = log2p1
-            if apply == "logp1":
+            elif apply == "logp1":
                 apply = np.log1p
+            elif apply == "log10p1":
+                apply = lambda x: np.log10(x + 1)
             df_meta[var_name] = df_meta[var_name].apply(apply)
         if isinstance(scaler, str):
             scaler_dict = {
@@ -542,6 +549,14 @@ class Mint:
             values=var_name,
             aggfunc=aggfunc,
         ).astype(np.float64)
+
+        # Preserve target order for columns if column is peak_label
+        if column == "peak_label" and self.targets is not None:
+            target_order = list(self.peak_labels)
+            # Reorder columns to match target order (only include columns that exist)
+            ordered_cols = [c for c in target_order if c in df.columns]
+            df = df[ordered_cols]
+
         return df
 
     @property
@@ -636,6 +651,7 @@ class Mint:
         fns: Optional[List[str]] = None,
         peak_labels: Optional[List[str]] = None,
         filters: Optional[List[Any]] = None,
+        nthreads: Optional[int] = None,
         **kwargs,
     ) -> pd.DataFrame:
         """Get chromatograms for specified files and peak labels.
@@ -644,6 +660,7 @@ class Mint:
             fns: List of filenames to extract chromatograms from. Defaults to all MS files.
             peak_labels: List of peak labels to extract. Defaults to all peak labels.
             filters: List of filters to apply to the chromatograms.
+            nthreads: Number of threads for parallel extraction. If None, uses sequential.
             **kwargs: Additional arguments to pass to the Chromatogram constructor.
 
         Returns:
@@ -653,32 +670,57 @@ class Mint:
             fns = self.ms_files
         if peak_labels is None:
             peak_labels = self.peak_labels
+
+        # Handle case where fns or peak_labels might be Reactive objects
+        if hasattr(fns, 'value'):
+            fns = fns.value
+        if hasattr(peak_labels, 'value'):
+            peak_labels = peak_labels.value
+        if hasattr(nthreads, 'value'):
+            nthreads = nthreads.value
+
+        # Ensure they're lists before converting to tuple
+        if not isinstance(fns, (list, tuple)):
+            fns = list(fns) if fns else []
+        if not isinstance(peak_labels, (list, tuple)):
+            peak_labels = list(peak_labels) if peak_labels else []
+
         return self._get_chromatograms(
             fns=tuple(fns),
             peak_labels=tuple(peak_labels),
             filters=tuple(filters) if filters is not None else None,
+            nthreads=nthreads,
             **kwargs,
         )
 
-    @lru_cache(1)
     def _get_chromatograms(
         self,
         fns: Optional[Tuple[str, ...]] = None,
         peak_labels: Optional[Tuple[str, ...]] = None,
         filters: Optional[Tuple[Any, ...]] = None,
+        nthreads: Optional[int] = None,
         **kwargs,
     ) -> pd.DataFrame:
-        """Cached implementation of get_chromatograms.
+        """Implementation of get_chromatograms with optional parallel extraction.
 
         Args:
             fns: Tuple of filenames to extract chromatograms from.
             peak_labels: Tuple of peak labels to extract.
             filters: Tuple of filters to apply to the chromatograms.
+            nthreads: Number of threads for parallel extraction.
             **kwargs: Additional arguments to pass to the Chromatogram constructor.
 
         Returns:
             DataFrame containing chromatogram data.
         """
+        # Handle Reactive objects FIRST, before any isinstance checks
+        if hasattr(fns, 'value'):
+            fns = fns.value
+        if hasattr(peak_labels, 'value'):
+            peak_labels = peak_labels.value
+        if hasattr(nthreads, 'value'):
+            nthreads = nthreads.value
+
         if isinstance(fns, tuple):
             fns = list(fns)
 
@@ -687,16 +729,29 @@ class Mint:
 
         labels = [fn_to_label(fn) for fn in fns]
 
-        # Need to get the actual file names with get_chromatogramsath
-        # in case only ms_file_labels are provided
-        fns = [fn for fn in self.ms_files if fn_to_label(fn) in labels]
+        # Need to get the actual file names
+        # Handle case where ms_files might be Reactive
+        ms_files_source = self.ms_files
+        if hasattr(ms_files_source, 'value'):
+            ms_files_source = ms_files_source.value
+        ms_files_list = list(ms_files_source) if ms_files_source else []
+        fns = [fn for fn in ms_files_list if fn_to_label(fn) in labels]
 
-        data = []
+        # Convert peak_labels to list if it's a tuple
+        if isinstance(peak_labels, tuple):
+            peak_labels = list(peak_labels)
 
-        for fn in self.tqdm(fns, desc="Loading chromatograms"):
+        # Get target params for all peak labels upfront
+        target_params = {
+            label: self.get_target_params(label) for label in peak_labels
+        }
+
+        def extract_from_file(fn: str) -> List[pd.DataFrame]:
+            """Extract chromatograms for all peak labels from a single file."""
+            file_data = []
             df = ms_file_to_df(fn)
             for label in peak_labels:
-                mz_mean, mz_width, rt_min, rt_max = self.get_target_params(label)
+                mz_mean, mz_width, rt_min, rt_max = target_params[label]
                 chrom_raw = extract_chromatogram_from_ms1(
                     df, mz_mean=mz_mean, mz_width=mz_width
                 ).to_frame()
@@ -711,7 +766,24 @@ class Mint:
                 chrom_data["peak_label"] = label
                 chrom_data["rt_min"] = rt_min
                 chrom_data["rt_max"] = rt_max
-                data.append(chrom_data)
+                file_data.append(chrom_data)
+            return file_data
+
+        data = []
+
+        if nthreads is not None and nthreads > 1 and len(fns) > 1:
+            # Parallel extraction - each file processed by one thread
+            with ThreadPoolExecutor(max_workers=min(nthreads, len(fns))) as executor:
+                results = list(executor.map(extract_from_file, fns))
+            for file_data in results:
+                data.extend(file_data)
+        else:
+            # Sequential extraction
+            for fn in fns:
+                data.extend(extract_from_file(fn))
+
+        if not data:
+            return pd.DataFrame()
 
         data = pd.concat(data).reset_index()
 

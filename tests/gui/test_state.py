@@ -25,7 +25,7 @@ class TestMintStateInitialization:
         """MintState should have default run parameters."""
         state = MintState()
 
-        assert state.nthreads.value is None
+        assert state.nthreads.value == 4
         assert state.rt_margin.value == 0.5
         assert state.mode.value == "standard"
 
@@ -199,3 +199,81 @@ class TestMintStateReset:
         assert state.progress.value == 0.0
         assert state.status.value == "waiting"
         assert state.messages.value == []
+
+
+class TestMintStateTargetReordering:
+    """Test target reordering functionality."""
+
+    def test_reorder_targets(self, test_targets_csv: Path):
+        """Reordering targets should change the order."""
+        state = MintState()
+        state.load_targets_from_file(str(test_targets_csv))
+
+        # Get original order
+        original_order = state.targets.value["peak_label"].tolist()
+
+        # Reverse the order
+        new_order = list(reversed(original_order))
+        state.reorder_targets(new_order)
+
+        # Check that the order changed
+        reordered = state.targets.value["peak_label"].tolist()
+        assert reordered == new_order
+
+    def test_reorder_targets_message(self, test_targets_csv: Path):
+        """Reordering should add a message."""
+        state = MintState()
+        state.load_targets_from_file(str(test_targets_csv))
+        state.clear_messages()
+
+        original_order = state.targets.value["peak_label"].tolist()
+        state.reorder_targets(original_order)
+
+        assert len(state.messages.value) > 0
+        assert "reordered" in state.messages.value[0].lower()
+
+
+class TestMintStateTargetActivation:
+    """Test target activation/deactivation functionality."""
+
+    def test_initial_inactive_targets(self):
+        """Initially all targets should be active (empty inactive list)."""
+        state = MintState()
+        assert state.inactive_targets.value == []
+
+    def test_set_inactive_targets(self, test_targets_csv: Path):
+        """Setting inactive targets should update the list."""
+        state = MintState()
+        state.load_targets_from_file(str(test_targets_csv))
+
+        # Get first target label
+        first_label = state.targets.value["peak_label"].iloc[0]
+        state.set_inactive_targets([first_label])
+
+        assert first_label in state.inactive_targets.value
+
+    def test_active_peak_labels(self, test_targets_csv: Path):
+        """active_peak_labels should exclude inactive targets."""
+        state = MintState()
+        state.load_targets_from_file(str(test_targets_csv))
+
+        all_labels = state.targets.value["peak_label"].tolist()
+        first_label = all_labels[0]
+
+        # Deactivate first target
+        state.set_inactive_targets([first_label])
+
+        active = state.active_peak_labels
+        assert first_label not in active
+        assert len(active) == len(all_labels) - 1
+
+    def test_set_inactive_targets_message(self, test_targets_csv: Path):
+        """Setting inactive targets should add a message."""
+        state = MintState()
+        state.load_targets_from_file(str(test_targets_csv))
+        state.clear_messages()
+
+        state.set_inactive_targets(["test"])
+
+        assert len(state.messages.value) > 0
+        assert "activation" in state.messages.value[0].lower()

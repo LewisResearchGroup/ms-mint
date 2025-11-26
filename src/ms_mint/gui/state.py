@@ -59,12 +59,15 @@ class MintState:
         self.messages: solara.Reactive[list[str]] = solara.reactive([])
 
         # Run parameters
-        self.nthreads: solara.Reactive[Optional[int]] = solara.reactive(None)
+        self.nthreads: solara.Reactive[int] = solara.reactive(4)
         self.rt_margin: solara.Reactive[float] = solara.reactive(0.5)
         self.mode: solara.Reactive[str] = solara.reactive("standard")
 
         # Display settings
         self.rt_unit: solara.Reactive[str] = solara.reactive("seconds")  # "seconds" or "minutes"
+
+        # Target filtering
+        self.inactive_targets: solara.Reactive[list[str]] = solara.reactive([])
 
         # Create or use provided Mint instance
         if mint is None:
@@ -147,7 +150,8 @@ class MintState:
     def _sync_targets(self) -> None:
         """Sync targets from Mint to reactive state."""
         if self._mint.targets is not None and len(self._mint.targets) > 0:
-            self.targets.value = self._mint.targets.reset_index()
+            # Use copy() to ensure a new DataFrame object is created for reactivity
+            self.targets.value = self._mint.targets.reset_index().copy()
         else:
             self.targets.value = pd.DataFrame()
 
@@ -156,6 +160,50 @@ class MintState:
         self._mint.clear_targets()
         self.targets.value = pd.DataFrame()
         self.add_message("Targets cleared.")
+
+    def reorder_targets(self, new_order: list) -> None:
+        """Reorder targets by the given peak label order.
+
+        Args:
+            new_order: List of peak labels in the desired order.
+        """
+        if self._mint.targets is None:
+            return
+
+        # Get current index and convert new_order to match its dtype
+        current_index = self._mint.targets.index
+
+        # Convert new_order items to match the index dtype
+        if current_index.dtype == "object":
+            # Index is strings, convert new_order to strings
+            new_order = [str(x) for x in new_order]
+        elif current_index.dtype == "int64":
+            # Index is integers, convert new_order to integers
+            new_order = [int(x) for x in new_order]
+
+        # Reorder the targets DataFrame by the new order
+        self._mint.targets = self._mint.targets.loc[new_order]
+        self._sync_targets()
+        self.add_message(f"Targets reordered ({len(new_order)} targets)")
+
+    def set_inactive_targets(self, inactive: list[str]) -> None:
+        """Set which targets are inactive (not used in plots/processing).
+
+        Args:
+            inactive: List of peak labels to mark as inactive.
+        """
+        self.inactive_targets.set(inactive)
+        n_active = len(self._mint.peak_labels) - len(inactive) if self._mint.targets is not None else 0
+        self.add_message(f"Target activation updated: {n_active} active, {len(inactive)} inactive")
+
+    @property
+    def active_peak_labels(self) -> list[str]:
+        """Get list of active (non-inactive) peak labels."""
+        if self._mint.targets is None:
+            return []
+        all_labels = list(self._mint.peak_labels)
+        inactive = set(self.inactive_targets.value)
+        return [label for label in all_labels if label not in inactive]
 
     def run(self) -> None:
         """Execute Mint processing with current parameters."""

@@ -44,7 +44,8 @@ dependencies = [
   "pyarrow",
   "tables",
   "h5py",
-  "hdf5plugin"
+  "hdf5plugin",
+  "ipyvuetify>=1.11.3",
 ]
 dynamic = ["version"]
 

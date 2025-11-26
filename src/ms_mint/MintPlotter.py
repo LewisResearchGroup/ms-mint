@@ -268,6 +268,7 @@ class MintPlotter:
         interactive: bool = False,
         filters: Optional[List[Any]] = None,
         ax: Optional[plt.Axes] = None,
+        nthreads: Optional[int] = None,
         **kwargs,
     ) -> Union[sns.axisgrid.FacetGrid, sns.axes._base.AxesBase, PlotlyFigure]:
         """Plot chromatograms extracted from one or more files.
@@ -279,12 +280,21 @@ class MintPlotter:
             interactive: If True, returns an interactive Plotly figure instead of a static Matplotlib figure.
             filters: List of filters to apply to the chromatograms before plotting.
             ax: Matplotlib axes to plot on. If None, a new figure is created.
+            nthreads: Number of threads for parallel chromatogram extraction.
             **kwargs: Additional keyword arguments passed to the underlying plotting functions.
 
         Returns:
             Either a seaborn FacetGrid, a single Axes, or a Plotly figure depending on
             the 'interactive' parameter and whether an 'ax' is provided.
         """
+        # Handle Reactive objects
+        if hasattr(fns, 'value'):
+            fns = fns.value
+        if hasattr(peak_labels, 'value'):
+            peak_labels = peak_labels.value
+        if hasattr(nthreads, 'value'):
+            nthreads = nthreads.value
+
         if isinstance(fns, str):
             fns = [fns]
 
@@ -297,10 +307,14 @@ class MintPlotter:
         if peak_labels is None:
             peak_labels = self.mint.peak_labels
 
+        # Ensure peak_labels is a list/tuple, not Reactive
+        if hasattr(peak_labels, 'value'):
+            peak_labels = peak_labels.value
+
         if peak_labels is not None:
             peak_labels = tuple(peak_labels)
 
-        data = self.mint.get_chromatograms(fns=fns, peak_labels=peak_labels, filters=filters)
+        data = self.mint.get_chromatograms(fns=fns, peak_labels=peak_labels, filters=filters, nthreads=nthreads)
 
         if not interactive:
             params = dict(
@@ -354,6 +368,11 @@ class MintPlotter:
         apply: Optional[str] = "log2p1",
         style: str = "boxplot",
         hue: Optional[str] = None,
+        col: Optional[str] = None,
+        row: Optional[str] = None,
+        col_wrap: Optional[int] = None,
+        x_label: Optional[str] = None,
+        y_label: Optional[str] = None,
         interactive: bool = False,
         **kwargs,
     ) -> Union[matplotlib.figure.Figure, PlotlyFigure]:
@@ -364,6 +383,11 @@ class MintPlotter:
             apply: Transformation to apply ("log2p1", "log10p1", or None).
             style: Plot style - "boxplot", "violin", or "histogram".
             hue: Metadata column for grouping/coloring.
+            col: Variable for facet columns (e.g., "peak_label", "ms_file", or metadata column).
+            row: Variable for facet rows (e.g., "peak_label", "ms_file", or metadata column).
+            col_wrap: Number of columns before wrapping (only used if col is set and row is None).
+            x_label: Custom x-axis label (default: auto-generated).
+            y_label: Custom y-axis label (default: auto-generated from var_name and apply).
             interactive: If True, returns Plotly figure; otherwise Matplotlib.
             **kwargs: Additional arguments passed to plotting functions.
 
@@ -390,16 +414,31 @@ class MintPlotter:
         )
         df_long = df_long.rename(columns={data.index.name or "index": "ms_file"})
 
-        # Add metadata if hue specified (peak_label is already in df_long)
-        if hue and hue != "peak_label" and self.mint.meta is not None and hue in self.mint.meta.columns:
+        # Use target order for peak_label (Categorical preserves order in plots)
+        peak_order = list(self.mint.peak_labels) if self.mint.targets is not None else None
+        if peak_order:
+            df_long["peak_label"] = pd.Categorical(
+                df_long["peak_label"], categories=peak_order, ordered=True
+            )
+
+        # Add metadata columns needed for hue, col, or row
+        meta_cols_needed = set()
+        for var in [hue, col, row]:
+            if var and var not in ["peak_label", "ms_file"] and self.mint.meta is not None:
+                if var in self.mint.meta.columns:
+                    meta_cols_needed.add(var)
+
+        if meta_cols_needed and self.mint.meta is not None:
             df_long = df_long.merge(
-                self.mint.meta[[hue]], left_on="ms_file", right_index=True, how="left"
+                self.mint.meta[list(meta_cols_needed)], left_on="ms_file", right_index=True, how="left"
             )
 
         if interactive:
             return self._distribution_plotly(df_long, var_name, apply, style, hue, **kwargs)
         else:
-            return self._distribution_matplotlib(df_long, var_name, apply, style, hue, **kwargs)
+            return self._distribution_matplotlib(
+                df_long, var_name, apply, style, hue, col, row, col_wrap, x_label, y_label, **kwargs
+            )
 
     def _distribution_matplotlib(
         self,
@@ -408,54 +447,100 @@ class MintPlotter:
         apply: Optional[str],
         style: str,
         hue: Optional[str],
+        col: Optional[str] = None,
+        row: Optional[str] = None,
+        col_wrap: Optional[int] = None,
+        x_label: Optional[str] = None,
+        y_label: Optional[str] = None,
         **kwargs,
     ) -> matplotlib.figure.Figure:
-        """Create matplotlib distribution plot."""
+        """Create matplotlib distribution plot with optional faceting."""
         figsize = kwargs.get("figsize", (12, 6))
-        y_label = f"{var_name} ({apply})" if apply else var_name
+        height = kwargs.get("height", 4)
+        aspect = kwargs.get("aspect", 1.5)
 
-        # Determine x-axis: if hue is peak_label, use ms_file as x
+        # Default y-label from var_name and transformation
+        if y_label is None:
+            y_label = f"{var_name} ({apply})" if apply else var_name
+
+        # Determine x-axis column: default to peak_label unless hue is peak_label
         if hue == "peak_label":
             x_col = "ms_file"
-            x_label = "Sample"
+            if x_label is None:
+                x_label = "Sample"
         else:
             x_col = "peak_label"
-            x_label = "Target"
+            if x_label is None:
+                x_label = "Target"
+
+        # Map style to seaborn kind
+        kind_map = {"boxplot": "box", "violin": "violin", "histogram": "count"}
+        kind = kind_map.get(style, "box")
+
+        # Use catplot for faceted plots, regular plot otherwise
+        use_facet = col is not None or row is not None
 
         if style == "histogram":
-            fig, ax = plt.subplots(figsize=(10, 6))
-            if hue and hue in df_long.columns:
-                for group in df_long[hue].dropna().unique():
-                    subset = df_long[df_long[hue] == group]["value"].dropna()
-                    ax.hist(subset, bins=50, alpha=0.5, label=str(group))
-                ax.legend(title=hue)
+            # Histogram doesn't fit catplot well, handle separately
+            if use_facet:
+                g = sns.FacetGrid(
+                    df_long, col=col, row=row, col_wrap=col_wrap if row is None else None,
+                    height=height, aspect=aspect, sharex=True, sharey=True
+                )
+                g.map(plt.hist, "value", bins=50, alpha=0.7, color="steelblue")
+                g.set_axis_labels(y_label, "Count")
+                return g.fig
             else:
-                ax.hist(df_long["value"].dropna(), bins=50, alpha=0.7, color="steelblue")
-            ax.set_xlabel(y_label)
-            ax.set_ylabel("Count")
-            ax.set_title(f"Distribution of {var_name}")
+                fig, ax = plt.subplots(figsize=(10, 6))
+                if hue and hue in df_long.columns:
+                    for group in df_long[hue].dropna().unique():
+                        subset = df_long[df_long[hue] == group]["value"].dropna()
+                        ax.hist(subset, bins=50, alpha=0.5, label=str(group))
+                    ax.legend(title=hue)
+                else:
+                    ax.hist(df_long["value"].dropna(), bins=50, alpha=0.7, color="steelblue")
+                ax.set_xlabel(y_label)
+                ax.set_ylabel("Count")
+                ax.set_title(f"Distribution of {var_name}")
+                plt.tight_layout()
+                return fig
 
-        elif style == "boxplot":
-            fig, ax = plt.subplots(figsize=figsize)
-            sns.boxplot(data=df_long, x=x_col, y="value", hue=hue if hue != x_col else None, ax=ax)
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
-            ax.set_xlabel(x_label)
-            ax.set_ylabel(y_label)
-            ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
-
-        elif style == "violin":
-            fig, ax = plt.subplots(figsize=figsize)
-            sns.violinplot(data=df_long, x=x_col, y="value", hue=hue if hue != x_col else None, ax=ax)
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
-            ax.set_xlabel(x_label)
-            ax.set_ylabel(y_label)
-            ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
-
+        # For boxplot and violin, use catplot
+        if use_facet:
+            g = sns.catplot(
+                data=df_long,
+                x=x_col,
+                y="value",
+                hue=hue if hue and hue != x_col else None,
+                col=col,
+                row=row,
+                col_wrap=col_wrap if row is None else None,
+                kind=kind,
+                height=height,
+                aspect=aspect,
+                sharex=False,
+                sharey=True,
+            )
+            g.set_axis_labels(x_label, y_label)
+            for ax in g.axes.flatten():
+                for label in ax.get_xticklabels():
+                    label.set_rotation(45)
+                    label.set_ha("right")
+                    label.set_fontsize(8)
+            g.tight_layout()
+            return g.fig
         else:
-            raise ValueError(f"Unknown style: {style}")
-
-        plt.tight_layout()
-        return fig
+            fig, ax = plt.subplots(figsize=figsize)
+            if style == "boxplot":
+                sns.boxplot(data=df_long, x=x_col, y="value", hue=hue if hue and hue != x_col else None, ax=ax)
+            elif style == "violin":
+                sns.violinplot(data=df_long, x=x_col, y="value", hue=hue if hue and hue != x_col else None, ax=ax)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
+            ax.set_xlabel(x_label)
+            ax.set_ylabel(y_label)
+            ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
+            plt.tight_layout()
+            return fig
 
     def _distribution_plotly(
         self,

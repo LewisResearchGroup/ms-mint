@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from glob import glob
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -34,8 +35,6 @@ def find_ms_files(path_str: str, wdir: Path = None) -> list[str]:
     Returns:
         List of absolute file paths.
     """
-    from glob import glob
-
     files = []
     path = Path(path_str)
 

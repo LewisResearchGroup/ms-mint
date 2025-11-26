@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import io
+import traceback
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import pandas as pd
+import seaborn as sns
 import solara
 
 if TYPE_CHECKING:
@@ -25,6 +29,27 @@ def no_display():
             plt.ion()
 
 
+def extract_all_chromatograms(
+    mint: "Mint",
+    nthreads: Optional[int] = None,
+) -> Optional[pd.DataFrame]:
+    """Extract chromatogram data for ALL peaks at once (memoizable).
+
+    This extracts data for all peaks so each file is only processed once.
+    """
+    ms_files_list = list(mint.ms_files)
+    if not ms_files_list:
+        return None
+    peak_labels_list = list(mint.peak_labels) if mint.targets is not None else []
+    if not peak_labels_list:
+        return None
+    return mint.get_chromatograms(
+        fns=ms_files_list,
+        peak_labels=peak_labels_list,
+        nthreads=nthreads,
+    )
+
+
 @solara.component
 def OptimizationPanel(
     mint: "Mint",
@@ -32,6 +57,7 @@ def OptimizationPanel(
     targets: solara.Reactive[pd.DataFrame],
     on_targets_updated: Callable[[], None],
     rt_unit: solara.Reactive[str] = None,
+    nthreads: solara.Reactive[int] = None,
 ):
     """Component for target optimization with peak preview.
 
@@ -41,6 +67,7 @@ def OptimizationPanel(
         targets: Reactive DataFrame of targets.
         on_targets_updated: Callback when targets are updated after optimization.
         rt_unit: Reactive string for RT display unit ("seconds" or "minutes").
+        nthreads: Reactive int for number of threads for chromatogram extraction.
     """
     # Fallback reactive for rt_unit (always created to satisfy hooks rules)
     fallback_rt_unit = solara.use_reactive("seconds")
@@ -68,12 +95,14 @@ def OptimizationPanel(
     selected_peak = solara.use_reactive("")
 
     # Manual RT adjustment values
-    manual_rt_min = solara.use_reactive(0.0)
-    manual_rt_max = solara.use_reactive(0.0)
+    manual_rt_range = solara.use_reactive([0.0, 0.0])  # [min, max] tuple for range slider
     manual_rt = solara.use_reactive(0.0)
 
-    # Counter to force refresh after optimization
-    refresh_counter = solara.use_reactive(0)
+    # Zoom level for peak preview (margin around RT window in seconds)
+    zoom_margin = solara.use_reactive(30.0)  # 30 seconds default margin
+
+    # Y-axis zoom (percentage of max intensity to show, 100 = full range)
+    y_zoom_percent = solara.use_reactive(100.0)
 
     # Batch optimization parameters
     minimum_intensity = solara.use_reactive(1e4)
@@ -85,13 +114,23 @@ def OptimizationPanel(
         if selected_peak.value and mint.targets is not None:
             try:
                 row = mint.targets.loc[selected_peak.value]
-                manual_rt_min.set(to_display(float(row.get("rt_min", 0))))
-                manual_rt_max.set(to_display(float(row.get("rt_max", 0))))
+                rt_min_display = to_display(float(row.get("rt_min", 0)))
+                rt_max_display = to_display(float(row.get("rt_max", 0)))
+                manual_rt_range.set([rt_min_display, rt_max_display])
                 manual_rt.set(to_display(float(row.get("rt", 0))))
             except KeyError:
                 pass
 
     solara.use_effect(on_rt_unit_change, [active_rt_unit.value])
+
+    # Memoize chromatogram data extraction for ALL peaks - must be before early returns (rules of hooks)
+    # Re-extract when files or targets change (use lengths as proxy for change detection)
+    n_files = len(ms_files.value)
+    n_targets = len(targets.value)
+    all_chrom_data = solara.use_memo(
+        lambda: extract_all_chromatograms(mint, nthreads=4) if n_files > 0 and n_targets > 0 else None,
+        dependencies=[n_files, n_targets],
+    )
 
     if len(ms_files.value) == 0:
         solara.Info("Load MS files first for optimization.")
@@ -111,8 +150,9 @@ def OptimizationPanel(
                 # Use .loc for direct index access
                 row = mint.targets.loc[peak_label]
                 # Convert to display units
-                manual_rt_min.set(to_display(float(row.get("rt_min", 0))))
-                manual_rt_max.set(to_display(float(row.get("rt_max", 0))))
+                rt_min_display = to_display(float(row.get("rt_min", 0)))
+                rt_max_display = to_display(float(row.get("rt_max", 0)))
+                manual_rt_range.set([rt_min_display, rt_max_display])
                 manual_rt.set(to_display(float(row.get("rt", 0))))
             except KeyError:
                 pass  # Peak not found
@@ -131,8 +171,10 @@ def OptimizationPanel(
             return
         try:
             # Convert from display units back to seconds and update the target in mint
-            mint.targets.loc[selected_peak.value, "rt_min"] = from_display(manual_rt_min.value)
-            mint.targets.loc[selected_peak.value, "rt_max"] = from_display(manual_rt_max.value)
+            rt_min_sec = from_display(manual_rt_range.value[0])
+            rt_max_sec = from_display(manual_rt_range.value[1])
+            mint.targets.loc[selected_peak.value, "rt_min"] = rt_min_sec
+            mint.targets.loc[selected_peak.value, "rt_max"] = rt_max_sec
             mint.targets.loc[selected_peak.value, "rt"] = from_display(manual_rt.value)
             on_targets_updated()
             success_message.set(f"Updated RT for {selected_peak.value}")
@@ -198,26 +240,43 @@ def OptimizationPanel(
                 )
 
                 if selected_peak.value:
+                    # Get slider range based on target RT (with margin)
+                    try:
+                        row = mint.targets.loc[selected_peak.value]
+                        rt_center = float(row.get("rt", 0))
+                        # Set range to +/- 2 minutes around RT center (in display units)
+                        margin = 120  # 2 minutes in seconds
+                        slider_min = to_display(max(0, rt_center - margin))
+                        slider_max = to_display(rt_center + margin)
+                        step = 0.1 if active_rt_unit.value == "minutes" else 1.0
+                    except:
+                        slider_min = 0.0
+                        slider_max = to_display(600)  # 10 min default
+                        step = 0.1 if active_rt_unit.value == "minutes" else 1.0
+
                     solara.Markdown(f"### RT Adjustment ({unit_label})")
-                    solara.InputFloat(
+
+                    # RT expected slider
+                    solara.SliderFloat(
                         label=f"RT expected ({unit_label})",
                         value=manual_rt,
-                        on_value=manual_rt.set,
+                        min=slider_min,
+                        max=slider_max,
+                        step=step,
                     )
-                    solara.InputFloat(
-                        label=f"RT Min ({unit_label})",
-                        value=manual_rt_min,
-                        on_value=manual_rt_min.set,
-                    )
-                    solara.InputFloat(
-                        label=f"RT Max ({unit_label})",
-                        value=manual_rt_max,
-                        on_value=manual_rt_max.set,
+
+                    # RT window range slider
+                    solara.SliderRangeFloat(
+                        label=f"RT Window ({unit_label})",
+                        value=manual_rt_range,
+                        min=slider_min,
+                        max=slider_max,
+                        step=step,
                     )
 
                     with solara.Row():
                         solara.Button(
-                            "Apply Manual",
+                            "Apply",
                             on_click=apply_manual_rt,
                             color="primary",
                         )
@@ -228,31 +287,91 @@ def OptimizationPanel(
                         )
 
             # Right: Peak preview
-            with solara.Column(style={"flex": "2"}):
+            with solara.Column(style={"flex": "2", "min-width": "600px"}):
                 if selected_peak.value:
-                    solara.Markdown(f"### Peak: {selected_peak.value}")
-                    try:
-                        with no_display():
-                            fig = mint.plot.peak_shapes(
-                                peak_labels=[selected_peak.value],
-                                interactive=False,
-                            )
-                            if fig is not None:
-                                if hasattr(fig, 'fig'):
-                                    actual_fig = fig.fig
-                                elif hasattr(fig, 'figure'):
-                                    actual_fig = fig.figure
-                                else:
-                                    actual_fig = fig
-                                solara.FigureMatplotlib(
-                                    actual_fig,
-                                    dependencies=[selected_peak.value, manual_rt_min.value, manual_rt_max.value, refresh_counter.value]
+                    with solara.Row():
+                        solara.Markdown(f"### Peak: {selected_peak.value}")
+                        # X-axis zoom slider
+                        zoom_label = "min" if active_rt_unit.value == "minutes" else "s"
+                        solara.SliderFloat(
+                            label=f"RT margin ({zoom_label})",
+                            value=zoom_margin,
+                            min=5.0,
+                            max=120.0,
+                            step=5.0,
+                        )
+                        # Y-axis zoom slider
+                        solara.SliderFloat(
+                            label="Y max (%)",
+                            value=y_zoom_percent,
+                            min=1.0,
+                            max=100.0,
+                            step=1.0,
+                        )
+                    # Filter memoized chromatogram data for selected peak
+                    peak_label_str = str(selected_peak.value)
+                    chrom_data = None
+                    if all_chrom_data is not None and len(all_chrom_data) > 0:
+                        chrom_data = all_chrom_data[all_chrom_data["peak_label"] == peak_label_str]
+
+                    if chrom_data is not None and len(chrom_data) > 0:
+                        try:
+                            with no_display():
+                                # Calculate xlim based on current RT window + zoom margin
+                                rt_min_sec = from_display(manual_rt_range.value[0])
+                                rt_max_sec = from_display(manual_rt_range.value[1])
+                                xlim = (
+                                    max(0, rt_min_sec - zoom_margin.value),
+                                    rt_max_sec + zoom_margin.value
                                 )
-                                plt.close(actual_fig)
-                            else:
-                                solara.Warning("No data for this peak")
-                    except Exception as e:
-                        solara.Error(f"Preview error: {e}")
+
+                                # Create plot from cached data
+                                fig = sns.relplot(
+                                    data=chrom_data,
+                                    x="scan_time",
+                                    y="intensity",
+                                    hue="ms_file_label",
+                                    height=5,
+                                    aspect=1.5,
+                                    marker=".",
+                                    linewidth=0,
+                                )
+
+                                # Apply zoom and add RT indicators
+                                for ax in fig.axes.flatten():
+                                    ax.set_xlim(xlim)
+
+                                    # Apply Y-axis zoom (percentage of current max, always start from 0)
+                                    y_min, y_max = ax.get_ylim()
+                                    new_y_max = y_max * (y_zoom_percent.value / 100.0)
+                                    ax.set_ylim(0, new_y_max)
+
+                                    # Add green background for RT range
+                                    ax.axvspan(rt_min_sec, rt_max_sec, alpha=0.2, color='green', zorder=0)
+
+                                    # Add vertical line for expected RT
+                                    rt_expected_sec = from_display(manual_rt.value)
+                                    ax.axvline(rt_expected_sec, color='green', linestyle='--', linewidth=2, label='RT expected')
+
+                                    # Update x-label for unit
+                                    if active_rt_unit.value == "minutes":
+                                        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, p: f"{x/60:.1f}"))
+                                        ax.set_xlabel(f"RT ({zoom_label})")
+
+                                plt.tight_layout()
+
+                                # Render to PNG for full-width display
+                                buf = io.BytesIO()
+                                fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+                                buf.seek(0)
+                                plt.close('all')
+
+                                solara.Image(buf.read(), width="100%")
+                        except Exception as e:
+                            tb = traceback.format_exc()
+                            solara.Error(f"Preview error: {e}\n\nTraceback:\n{tb}")
+                    else:
+                        solara.Warning("No data for this peak")
                 else:
                     solara.Info("Select a peak to preview and adjust its retention time window.")
 
