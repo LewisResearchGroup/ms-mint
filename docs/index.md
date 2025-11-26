@@ -17,7 +17,7 @@ MINT streamlines the LC-MS data processing workflow with powerful features for t
 
 - **[Python Library Documentation](https://lewisresearchgroup.github.io/ms-mint)** - Core ms-mint library for scripts and notebooks
 - **[Web Application Documentation](https://lewisresearchgroup.github.io/ms-mint-app)** - Browser-based MINT interface
-- **[Demo Data](https://drive.google.com/drive/folders/1U4xMy5lfETk93sSVXPI79cCWyIMcAjeZ?usp=drive_link)** - Download test data with sample LC-MS files and target lists
+- **[Demo Data](https://zenodo.org/records/14727891)** - Download test data with sample LC-MS files and target lists
 
 ## Resources
 
