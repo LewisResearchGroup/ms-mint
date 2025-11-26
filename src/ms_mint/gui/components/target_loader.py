@@ -15,6 +15,7 @@ def TargetLoader(
     on_targets_loaded: Callable[[bytes, str], None],
     on_targets_reordered: Optional[Callable[[list[str]], None]] = None,
     on_targets_activation_changed: Optional[Callable[[list[str]], None]] = None,
+    on_save_targets: Optional[Callable[[], None]] = None,
     on_clear: Callable[[], None] = None,
     wdir: Path = None,
 ):
@@ -25,6 +26,7 @@ def TargetLoader(
         on_targets_loaded: Callback when targets are loaded (content, filename).
         on_targets_reordered: Callback when targets are reordered (new order of peak_labels).
         on_targets_activation_changed: Callback when target activation changes (list of inactive peak_labels).
+        on_save_targets: Callback to save targets to file.
         on_clear: Callback to clear targets.
         wdir: Working directory for resolving relative paths.
     """
@@ -127,7 +129,10 @@ def TargetLoader(
                 sortable_columns.append(col)
 
     # Get all target labels for activation selection
-    all_target_labels = list(targets.value.index) if len(targets.value) > 0 else []
+    if len(targets.value) > 0 and "peak_label" in targets.value.columns:
+        all_target_labels = targets.value["peak_label"].tolist()
+    else:
+        all_target_labels = []
     n_active = len(all_target_labels) - len(inactive_targets.value)
 
     with solara.Card("Targets", margin=0):
@@ -146,6 +151,13 @@ def TargetLoader(
                     color="primary",
                     disabled=not file_path_input.value,
                 )
+                if on_save_targets:
+                    solara.Button(
+                        "Save",
+                        on_click=on_save_targets,
+                        color="success",
+                        disabled=len(targets.value) == 0,
+                    )
                 solara.Button(
                     "Clear",
                     on_click=handle_clear,
