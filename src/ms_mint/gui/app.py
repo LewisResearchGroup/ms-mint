@@ -16,6 +16,7 @@ from .components.results_panel import ResultsPanel
 from .components.visualization import VisualizationPanel
 from .components.optimization_panel import OptimizationPanel
 from .components.metadata_panel import MetadataPanel
+from .components.crosstab_panel import CrosstabPanel
 
 
 @solara.component
@@ -66,6 +67,14 @@ def MintGui():
         """Sync targets after optimization."""
         state._sync_targets()
 
+    def on_targets_reordered(new_order: list[str]) -> None:
+        """Reorder targets by the given peak label order."""
+        state.reorder_targets(new_order)
+
+    def on_targets_activation_changed(inactive: list[str]) -> None:
+        """Update target activation status."""
+        state.set_inactive_targets(inactive)
+
     def on_metadata_updated() -> None:
         """Refresh after metadata update."""
         pass  # Metadata is stored in mint instance
@@ -107,6 +116,14 @@ def MintGui():
                 on_value=state.rt_unit.set,
             )
             solara.Markdown("---")
+            solara.Markdown("### Performance")
+            solara.SliderInt(
+                label="Threads",
+                value=state.nthreads,
+                min=1,
+                max=16,
+            )
+            solara.Markdown("---")
             solara.Markdown("### Session")
             solara.Button(
                 "Load Session",
@@ -145,6 +162,8 @@ def MintGui():
                 TargetLoader(
                     targets=state.targets,
                     on_targets_loaded=on_targets_loaded,
+                    on_targets_reordered=on_targets_reordered,
+                    on_targets_activation_changed=on_targets_activation_changed,
                     on_clear=on_clear_targets,
                 )
                 OptimizationPanel(
@@ -153,6 +172,7 @@ def MintGui():
                     targets=state.targets,
                     on_targets_updated=on_targets_updated,
                     rt_unit=state.rt_unit,
+                    nthreads=state.nthreads,
                 )
 
             with solara.lab.Tab("Processing"):
@@ -179,12 +199,21 @@ def MintGui():
                 ResultsPanel(
                     results=state.results,
                 )
+                solara.Markdown("---")
+                CrosstabPanel(
+                    mint=state._mint,
+                    results=state.results,
+                    inactive_targets=state.inactive_targets,
+                )
 
             with solara.lab.Tab("Visualization"):
                 VisualizationPanel(
                     mint=state._mint,
                     results=state.results,
+                    targets=state.targets,
                     rt_unit=state.rt_unit,
+                    nthreads=state.nthreads,
+                    inactive_targets=state.inactive_targets,
                 )
 
 

@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 import io
+import warnings
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Optional
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+import numpy as np
 import pandas as pd
+import seaborn as sns
 import solara
 
 if TYPE_CHECKING:
@@ -106,7 +110,7 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
             elif plot_type == "cumulative_variance":
                 fig = mint.pca.plot.cumulative_variance(interactive=False)
             elif plot_type == "pairplot":
-                fig = mint.pca.plot.pairplot(interactive=False, hue=color_by if color_by != "none" else None)
+                fig = mint.pca.plot.pairplot(n_components=n_components, interactive=False, hue=color_by if color_by != "none" else None)
             elif plot_type == "loadings":
                 fig = mint.pca.plot.loadings(interactive=False)
             else:
@@ -153,7 +157,7 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
                 fig = mint.pca.plot.cumulative_variance(interactive=interactive)
             elif plot_type == "pairplot":
                 hue = color_by if color_by != "none" else None
-                fig = mint.pca.plot.pairplot(interactive=interactive, hue=hue)
+                fig = mint.pca.plot.pairplot(n_components=n_components, interactive=interactive, hue=hue)
             elif plot_type == "loadings":
                 fig = mint.pca.plot.loadings(interactive=interactive)
             else:
@@ -187,15 +191,22 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
 
 
 @solara.component
-def PeakShapesPlot(mint: "Mint", interactive: bool):
-    """Render peak shapes plot."""
+def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds"):
+    """Render peak shapes plot.
+
+    Args:
+        mint: Mint instance
+        interactive: Whether to use plotly
+        rt_unit: Display unit for RT ("seconds" or "minutes")
+    """
     save_message = solara.use_reactive("")
+    rt_label = "min" if rt_unit == "minutes" else "s"
 
     def save_figure():
         with no_display():
             fig = mint.plot.peak_shapes(interactive=False)
             if fig is not None:
-                settings = {"Interactive": False}
+                settings = {"Interactive": False, "RT unit": rt_unit}
                 msg = save_figure_to_file(fig, mint, "peak_shapes", settings)
                 save_message.set(msg)
                 plt.close('all')
@@ -205,6 +216,12 @@ def PeakShapesPlot(mint: "Mint", interactive: bool):
             fig = mint.plot.peak_shapes(interactive=interactive)
             if fig is not None:
                 if interactive:
+                    # For plotly, update x-axis if minutes
+                    if rt_unit == "minutes":
+                        fig.update_xaxes(title_text=f"RT ({rt_label})")
+                        for trace in fig.data:
+                            if hasattr(trace, 'x') and trace.x is not None:
+                                trace.x = tuple(x / 60 for x in trace.x)
                     solara.FigurePlotly(fig)
                 else:
                     # Handle seaborn grid objects (FacetGrid, etc.)
@@ -214,7 +231,14 @@ def PeakShapesPlot(mint: "Mint", interactive: bool):
                         actual_fig = fig.figure
                     else:
                         actual_fig = fig
-                    solara.FigureMatplotlib(actual_fig)
+
+                    # Convert x-axis to minutes if needed
+                    if rt_unit == "minutes":
+                        for ax in actual_fig.axes if hasattr(actual_fig, 'axes') else [actual_fig.gca()]:
+                            ax.xaxis.set_major_formatter(FuncFormatter(lambda x, p: f"{x/60:.1f}"))
+                            ax.set_xlabel(f"RT ({rt_label})")
+
+                    solara.FigureMatplotlib(actual_fig, dependencies=[rt_unit])
                     plt.close(actual_fig)
 
                 with solara.Row():
@@ -229,7 +253,7 @@ def PeakShapesPlot(mint: "Mint", interactive: bool):
 
 @solara.component
 def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspect: float = 5,
-                     rt_unit: str = "seconds", peak_labels: list = None):
+                     rt_unit: str = "seconds", peak_labels: list = None, nthreads: int = None):
     """Render chromatogram plot.
 
     Args:
@@ -237,6 +261,7 @@ def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspec
         interactive: Whether to use plotly
         height: Height of each subplot
         aspect: Width/height ratio
+        nthreads: Number of threads for parallel extraction
         rt_unit: Display unit for RT ("seconds" or "minutes")
         peak_labels: List of targets to plot (None or empty = all)
     """
@@ -247,9 +272,8 @@ def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspec
     targets = peak_labels if peak_labels else None
 
     def save_figure():
-        from matplotlib.ticker import FuncFormatter
         with no_display():
-            fig = mint.plot.chromatogram(interactive=False, height=height, aspect=aspect, peak_labels=targets)
+            fig = mint.plot.chromatogram(interactive=False, height=height, aspect=aspect, peak_labels=targets, nthreads=nthreads)
             if fig is not None:
                 # Convert x-axis labels to minutes if needed
                 if rt_unit == "minutes":
@@ -270,7 +294,7 @@ def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspec
 
     try:
         with no_display():
-            fig = mint.plot.chromatogram(interactive=interactive, height=height, aspect=aspect, peak_labels=targets)
+            fig = mint.plot.chromatogram(interactive=interactive, height=height, aspect=aspect, peak_labels=targets, nthreads=nthreads)
             if fig is not None:
                 if interactive:
                     # For plotly, update x-axis labels if minutes
@@ -292,7 +316,6 @@ def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspec
 
                     # Convert x-axis labels to minutes if needed (keep data in seconds)
                     if rt_unit == "minutes":
-                        from matplotlib.ticker import FuncFormatter
                         for ax in actual_fig.axes:
                             ax.xaxis.set_major_formatter(FuncFormatter(lambda x, p: f"{x/60:.1f}"))
                             ax.set_xlabel(f"RT ({rt_label})")
@@ -312,7 +335,10 @@ def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspec
 
 @solara.component
 def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log2p1",
-                     plot_style: str = "boxplot", color_by: str = "none", interactive: bool = False):
+                     plot_style: str = "boxplot", color_by: str = "none",
+                     facet_col: str = "none", facet_row: str = "none",
+                     col_wrap: int = 0, x_label: str = "", y_label: str = "",
+                     interactive: bool = False):
     """Render distribution plots (histogram, boxplot, violin).
 
     Args:
@@ -320,14 +346,24 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
         var_name: Variable to plot
         apply: Transform to apply
         plot_style: One of "histogram", "boxplot", "violin"
-        color_by: Metadata column for grouping
+        color_by: Metadata column for grouping (hue)
+        facet_col: Variable for facet columns
+        facet_row: Variable for facet rows
+        col_wrap: Number of columns before wrapping (0 = no wrap)
+        x_label: Custom x-axis label (empty = auto)
+        y_label: Custom y-axis label (empty = auto)
         interactive: Whether to use plotly
     """
     save_message = solara.use_reactive("")
 
-    # Convert "none" to None for hue
+    # Convert "none" to None
     hue = color_by if color_by != "none" else None
+    col = facet_col if facet_col != "none" else None
+    row = facet_row if facet_row != "none" else None
     apply_val = apply if apply != "none" else None
+    col_wrap_val = col_wrap if col_wrap > 0 else None
+    x_label_val = x_label if x_label else None
+    y_label_val = y_label if y_label else None
 
     def save_figure():
         with no_display():
@@ -336,6 +372,11 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                 apply=apply_val,
                 style=plot_style,
                 hue=hue,
+                col=col,
+                row=row,
+                col_wrap=col_wrap_val,
+                x_label=x_label_val,
+                y_label=y_label_val,
                 interactive=False,
             )
             if fig is not None:
@@ -344,6 +385,9 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                     "Transform": apply,
                     "Style": plot_style,
                     "Color by": color_by,
+                    "Facet col": facet_col,
+                    "Facet row": facet_row,
+                    "Col wrap": col_wrap,
                 }
                 msg = save_figure_to_file(fig, mint, f"distribution_{plot_style}-{var_name}", settings)
                 save_message.set(msg)
@@ -356,6 +400,11 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
                 apply=apply_val,
                 style=plot_style,
                 hue=hue,
+                col=col,
+                row=row,
+                col_wrap=col_wrap_val,
+                x_label=x_label_val,
+                y_label=y_label_val,
                 interactive=interactive,
             )
             if fig is None:
@@ -365,8 +414,17 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
             if interactive:
                 solara.FigurePlotly(fig)
             else:
-                solara.FigureMatplotlib(fig, dependencies=[var_name, apply, plot_style, color_by])
-                plt.close(fig)
+                # Handle FacetGrid objects
+                if hasattr(fig, 'fig'):
+                    actual_fig = fig.fig
+                elif hasattr(fig, 'figure'):
+                    actual_fig = fig.figure
+                else:
+                    actual_fig = fig
+                solara.FigureMatplotlib(actual_fig, dependencies=[
+                    var_name, apply, plot_style, color_by, facet_col, facet_row, col_wrap, x_label, y_label
+                ])
+                plt.close(actual_fig)
 
             with solara.Row():
                 solara.Button("Save Figure", on_click=save_figure, color="primary")
@@ -376,12 +434,16 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
         solara.Error(f"Distribution error: {e}")
 
 
-def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str, transposed: bool):
+def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
+                           transposed: bool, width: int = 12, height: int = 10,
+                           active_targets: list[str] = None):
     """Helper to create heatmap figure."""
-    import seaborn as sns
-    import numpy as np
-
     data = mint.crosstab(var_name=var_name)
+
+    # Filter to active targets only
+    if active_targets is not None and len(active_targets) > 0:
+        active_cols = [c for c in active_targets if c in data.columns]
+        data = data[active_cols]
     if data is None or len(data) == 0:
         return None
 
@@ -406,10 +468,7 @@ def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
         data = data.T
         row_labels, col_labels = col_labels, row_labels
 
-    n_rows, n_cols = data.shape
-    figsize = (max(12, n_cols * 0.6), max(8, n_rows * 0.4))
-
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.subplots(figsize=(width, height))
     sns.heatmap(data, ax=ax, cmap="RdBu_r", center=0,
                xticklabels=col_labels, yticklabels=row_labels)
     ax.set_title(f"{var_name} ({apply}, {scaler})")
@@ -424,19 +483,22 @@ def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
 @solara.component
 def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
                       apply: str = "log2p1", scaler: str = "standard",
-                      transposed: bool = False):
+                      transposed: bool = False, width: int = 12, height: int = 10,
+                      active_targets: list[str] = None):
     """Render simple heatmap (seaborn heatmap without clustering)."""
     save_message = solara.use_reactive("")
 
     def save_figure():
         with no_display():
-            fig = _create_heatmap_figure(mint, var_name, apply, scaler, transposed)
+            fig = _create_heatmap_figure(mint, var_name, apply, scaler, transposed, width, height, active_targets)
             if fig is not None:
                 settings = {
                     "Variable": var_name,
                     "Transform": apply,
                     "Scaler": scaler,
                     "Transposed": transposed,
+                    "Figure size": f"{width} x {height}",
+                    "Active targets": len(active_targets) if active_targets else "all",
                 }
                 msg = save_figure_to_file(fig, mint, f"heatmap-{var_name}", settings)
                 save_message.set(msg)
@@ -444,12 +506,12 @@ def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
 
     try:
         with no_display():
-            fig = _create_heatmap_figure(mint, var_name, apply, scaler, transposed)
+            fig = _create_heatmap_figure(mint, var_name, apply, scaler, transposed, width, height, active_targets)
             if fig is None:
                 solara.Warning("No data for heatmap")
                 return
 
-            solara.FigureMatplotlib(fig, dependencies=[var_name, apply, scaler, transposed])
+            solara.FigureMatplotlib(fig, dependencies=[var_name, apply, scaler, transposed, width, height, str(active_targets)])
             plt.close(fig)
 
             with solara.Row():
@@ -463,7 +525,6 @@ def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
 def _create_clustering_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
                                metric: str, transposed: bool, width: int, height: int):
     """Helper to create hierarchical clustering figure."""
-    import warnings
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message=".*tight_layout.*")
         data = mint.crosstab(var_name=var_name)
@@ -539,7 +600,10 @@ def HierarchicalClusteringPlot(mint: "Mint", var_name: str = "peak_max",
 def VisualizationPanel(
     mint: "Mint",
     results: solara.Reactive[pd.DataFrame],
+    targets: solara.Reactive[pd.DataFrame] = None,
     rt_unit: solara.Reactive[str] = None,
+    nthreads: solara.Reactive[int] = None,
+    inactive_targets: solara.Reactive[list[str]] = None,
 ):
     """Component for interactive visualizations.
 
@@ -548,8 +612,13 @@ def VisualizationPanel(
     Args:
         mint: The Mint instance with plotting methods.
         results: Reactive DataFrame of results.
+        targets: Reactive DataFrame of targets (used to trigger re-render on reorder).
         rt_unit: Reactive string for RT display unit ("seconds" or "minutes").
+        nthreads: Reactive int for number of threads for chromatogram extraction.
+        inactive_targets: Reactive list of inactive target labels to filter out.
     """
+    # Access targets.value to trigger re-render when targets change
+    _ = targets.value if targets is not None else None
     # Fallback for rt_unit
     fallback_rt_unit = solara.use_reactive("seconds")
     active_rt_unit = rt_unit if rt_unit is not None else fallback_rt_unit
@@ -560,6 +629,8 @@ def VisualizationPanel(
     heatmap_scaler = solara.use_reactive("standard")
     heatmap_apply = solara.use_reactive("log2p1")
     heatmap_transposed = solara.use_reactive(False)
+    heatmap_width = solara.use_reactive(12)
+    heatmap_height = solara.use_reactive(10)
 
     # Hierarchical clustering settings
     clust_var = solara.use_reactive("peak_max")
@@ -585,6 +656,11 @@ def VisualizationPanel(
     dist_apply = solara.use_reactive("log2p1")
     dist_style = solara.use_reactive("boxplot")
     dist_color_by = solara.use_reactive("none")
+    dist_facet_col = solara.use_reactive("none")
+    dist_facet_row = solara.use_reactive("none")
+    dist_col_wrap = solara.use_reactive(0)
+    dist_x_label = solara.use_reactive("")
+    dist_y_label = solara.use_reactive("")
     dist_interactive = solara.use_reactive(False)
 
     # PCA settings
@@ -606,8 +682,10 @@ def VisualizationPanel(
         valid_cols = mint.meta.dropna(axis=1, how="all").columns.tolist()
         metadata_columns = ["none"] + valid_cols
 
-    # Get available peak labels for target selection
-    available_targets = list(mint.peak_labels) if mint.targets is not None else []
+    # Get available peak labels for target selection (filter out inactive)
+    all_targets = list(mint.peak_labels) if mint.targets is not None else []
+    inactive_set = set(inactive_targets.value) if inactive_targets is not None else set()
+    available_targets = [t for t in all_targets if t not in inactive_set]
 
     if len(results.value) == 0:
         solara.Info("No results to visualize. Run processing first.")
@@ -661,6 +739,9 @@ def VisualizationPanel(
                     on_value=heatmap_scaler.set,
                 )
                 solara.Checkbox(label="Transposed", value=heatmap_transposed)
+            with solara.Row():
+                solara.SliderInt(label="Width", value=heatmap_width, min=6, max=24)
+                solara.SliderInt(label="Height", value=heatmap_height, min=6, max=24)
 
         elif plot_type.value == "hierarchical_clustering":
             with solara.Row():
@@ -696,8 +777,8 @@ def VisualizationPanel(
                 solara.SliderInt(label="DPI", value=clust_dpi, min=72, max=300, step=10)
 
         elif plot_type.value == "distribution":
-            # Color options: none, peak_label, or metadata columns
-            dist_color_options = ["none", "peak_label"] + metadata_columns[1:]  # Skip "none" from metadata_columns
+            # Facet options: none, peak_label, ms_file, or metadata columns
+            facet_options = ["none", "peak_label", "ms_file"] + metadata_columns[1:]
             with solara.Row():
                 solara.Select(
                     label="Variable",
@@ -720,25 +801,50 @@ def VisualizationPanel(
                 solara.Select(
                     label="Color by",
                     value=dist_color_by.value,
-                    values=dist_color_options,
+                    values=facet_options,
                     on_value=dist_color_by.set,
+                )
+            with solara.Row():
+                solara.Select(
+                    label="Facet col",
+                    value=dist_facet_col.value,
+                    values=facet_options,
+                    on_value=dist_facet_col.set,
+                )
+                solara.Select(
+                    label="Facet row",
+                    value=dist_facet_row.value,
+                    values=facet_options,
+                    on_value=dist_facet_row.set,
+                )
+                solara.SliderInt(
+                    label="Col wrap",
+                    value=dist_col_wrap,
+                    min=0,
+                    max=6,
+                )
+            with solara.Row():
+                solara.InputText(
+                    label="X-axis label (empty=auto)",
+                    value=dist_x_label,
+                    on_value=dist_x_label.set,
+                )
+                solara.InputText(
+                    label="Y-axis label (empty=auto)",
+                    value=dist_y_label,
+                    on_value=dist_y_label.set,
                 )
 
         elif plot_type.value == "chromatogram":
             with solara.Row():
                 solara.SliderFloat(label="Height", value=chrom_height, min=1.0, max=5.0, step=0.5)
                 solara.SliderFloat(label="Aspect", value=chrom_aspect, min=2.0, max=10.0, step=0.5)
-                solara.Select(
-                    label="RT Unit",
-                    value=active_rt_unit.value,
-                    values=["seconds", "minutes"],
-                    on_value=active_rt_unit.set,
-                )
             if available_targets:
                 solara.SelectMultiple(
                     label="Targets (empty = all)",
-                    values=chrom_targets,
+                    values=chrom_targets.value,
                     all_values=available_targets,
+                    on_value=chrom_targets.set,
                 )
 
         elif plot_type.value == "pca":
@@ -804,6 +910,9 @@ def VisualizationPanel(
                 apply=heatmap_apply.value,
                 scaler=heatmap_scaler.value,
                 transposed=heatmap_transposed.value,
+                width=heatmap_width.value,
+                height=heatmap_height.value,
+                active_targets=available_targets,
             )
         elif plot_type.value == "hierarchical_clustering":
             HierarchicalClusteringPlot(
@@ -824,10 +933,15 @@ def VisualizationPanel(
                 apply=dist_apply.value,
                 plot_style=dist_style.value,
                 color_by=dist_color_by.value,
+                facet_col=dist_facet_col.value,
+                facet_row=dist_facet_row.value,
+                col_wrap=dist_col_wrap.value,
+                x_label=dist_x_label.value,
+                y_label=dist_y_label.value,
                 interactive=dist_interactive.value,
             )
         elif plot_type.value == "peak_shapes":
-            PeakShapesPlot(mint=mint, interactive=peak_shapes_interactive.value)
+            PeakShapesPlot(mint=mint, interactive=peak_shapes_interactive.value, rt_unit=active_rt_unit.value)
         elif plot_type.value == "chromatogram":
             ChromatogramPlot(
                 mint=mint,
@@ -836,6 +950,7 @@ def VisualizationPanel(
                 aspect=chrom_aspect.value,
                 rt_unit=active_rt_unit.value,
                 peak_labels=chrom_targets.value if chrom_targets.value else None,
+                nthreads=nthreads.value if nthreads is not None else None,
             )
         elif plot_type.value == "pca":
             PCAPlot(

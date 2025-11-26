@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
 import pandas as pd
 import solara
@@ -13,7 +13,9 @@ import solara
 def TargetLoader(
     targets: solara.Reactive[pd.DataFrame],
     on_targets_loaded: Callable[[bytes, str], None],
-    on_clear: Callable[[], None],
+    on_targets_reordered: Optional[Callable[[list[str]], None]] = None,
+    on_targets_activation_changed: Optional[Callable[[list[str]], None]] = None,
+    on_clear: Callable[[], None] = None,
     wdir: Path = None,
 ):
     """Component for loading target files (CSV/XLSX) and previewing targets.
@@ -21,11 +23,16 @@ def TargetLoader(
     Args:
         targets: Reactive DataFrame of currently loaded targets.
         on_targets_loaded: Callback when targets are loaded (content, filename).
+        on_targets_reordered: Callback when targets are reordered (new order of peak_labels).
+        on_targets_activation_changed: Callback when target activation changes (list of inactive peak_labels).
         on_clear: Callback to clear targets.
         wdir: Working directory for resolving relative paths.
     """
     error_message = solara.use_reactive("")
     file_path_input = solara.use_reactive("")
+    sort_column = solara.use_reactive("peak_label")
+    sort_ascending = solara.use_reactive(True)
+    inactive_targets = solara.use_reactive([])
 
     def handle_file_upload(file_info: dict):
         """Handle uploaded file."""
@@ -64,7 +71,64 @@ def TargetLoader(
     def handle_clear():
         """Clear loaded targets."""
         error_message.value = ""
-        on_clear()
+        if on_clear:
+            on_clear()
+
+    def handle_sort():
+        """Sort targets by selected column."""
+        if len(targets.value) == 0:
+            return
+        try:
+            df = targets.value.copy()
+            # Get the column to sort by
+            col = sort_column.value
+
+            # Sort the dataframe
+            if col in df.columns:
+                df = df.sort_values(by=col, ascending=sort_ascending.value)
+            else:
+                error_message.set(f"Column {col} not found")
+                return
+
+            # Get the new order of peak labels from the peak_label column
+            if "peak_label" in df.columns:
+                new_order = df["peak_label"].tolist()
+            else:
+                error_message.set("peak_label column not found")
+                return
+
+            if on_targets_reordered:
+                on_targets_reordered(new_order)
+            error_message.set("")
+        except Exception as e:
+            error_message.set(f"Sort error: {e}")
+
+    def handle_activation_change(new_inactive: list[str]):
+        """Handle changes to target activation."""
+        inactive_targets.set(list(new_inactive) if new_inactive else [])
+        if on_targets_activation_changed:
+            on_targets_activation_changed(list(new_inactive) if new_inactive else [])
+
+    def activate_all():
+        """Activate all targets."""
+        handle_activation_change([])
+
+    def deactivate_all():
+        """Deactivate all targets."""
+        if len(targets.value) > 0:
+            all_labels = list(targets.value.index)
+            handle_activation_change(all_labels)
+
+    # Get sortable columns
+    sortable_columns = ["peak_label"]
+    if len(targets.value) > 0:
+        for col in ["mz_mean", "rt", "rt_min", "rt_max", "intensity_threshold"]:
+            if col in targets.value.columns:
+                sortable_columns.append(col)
+
+    # Get all target labels for activation selection
+    all_target_labels = list(targets.value.index) if len(targets.value) > 0 else []
+    n_active = len(all_target_labels) - len(inactive_targets.value)
 
     with solara.Card("Targets", margin=0):
         with solara.Column():
@@ -102,23 +166,47 @@ def TargetLoader(
 
             # Target summary
             if len(targets.value) > 0:
-                solara.Info(f"{len(targets.value)} target(s) loaded")
+                solara.Info(f"{n_active}/{len(targets.value)} target(s) active")
+
+                # Sorting controls
+                if on_targets_reordered:
+                    with solara.Row():
+                        solara.Select(
+                            label="Sort by",
+                            value=sort_column.value,
+                            values=sortable_columns,
+                            on_value=sort_column.set,
+                        )
+                        solara.Checkbox(
+                            label="Ascending",
+                            value=sort_ascending,
+                        )
+                        solara.Button(
+                            "Apply Sort",
+                            on_click=handle_sort,
+                            color="primary",
+                        )
+
+                # Activation controls
+                if on_targets_activation_changed and len(all_target_labels) > 0:
+                    with solara.Details("Target Activation", expand=False):
+                        with solara.Row():
+                            solara.Button("Activate All", on_click=activate_all, color="success")
+                            solara.Button("Deactivate All", on_click=deactivate_all, color="warning")
+                        solara.SelectMultiple(
+                            label="Inactive targets",
+                            values=inactive_targets.value,
+                            all_values=all_target_labels,
+                            on_value=handle_activation_change,
+                        )
 
                 # Preview table
                 with solara.Details("Target preview", expand=False):
-                    # Show key columns if available
-                    display_cols = []
-                    for col in ["peak_label", "mz_mean", "rt", "rt_min", "rt_max"]:
-                        if col in targets.value.columns:
-                            display_cols.append(col)
-
-                    if display_cols:
-                        preview_df = targets.value[display_cols].head(10)
-                        solara.DataFrame(preview_df)
-                        if len(targets.value) > 10:
-                            solara.Text(
-                                f"... and {len(targets.value) - 10} more rows",
-                                style={"fontStyle": "italic", "fontSize": "12px"},
-                            )
-                    else:
-                        solara.Text("No standard columns found")
+                    # Show all columns
+                    preview_df = targets.value.head(10).reset_index()
+                    solara.DataFrame(preview_df)
+                    if len(targets.value) > 10:
+                        solara.Text(
+                            f"... and {len(targets.value) - 10} more rows",
+                            style={"fontStyle": "italic", "fontSize": "12px"},
+                        )

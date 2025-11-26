@@ -8,6 +8,7 @@ from .visualization import VisualizationPanel
 from .message_log import MessageLog
 from .optimization_panel import OptimizationPanel
 from .metadata_panel import MetadataPanel
+from .crosstab_panel import CrosstabPanel
 
 __all__ = [
     "MSFileSelector",
@@ -18,4 +19,5 @@ __all__ = [
     "MessageLog",
     "OptimizationPanel",
     "MetadataPanel",
+    "CrosstabPanel",
 ]
