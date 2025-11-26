@@ -143,6 +143,12 @@ def MintGui():
                 outlined=True,
                 style={"width": "100%", "margin-top": "8px"},
             )
+            solara.Markdown("---")
+            solara.Markdown("### Messages")
+            MessageLog(
+                messages=state.messages,
+                on_clear=on_clear_messages,
+            )
 
     with solara.Column(style={"padding": "16px"}):
         solara.Title("ms-mint")
@@ -181,24 +187,17 @@ def MintGui():
                 )
 
             with solara.lab.Tab("Processing"):
-                with solara.Row():
-                    with solara.Column(style={"flex": "2"}):
-                        RunPanel(
-                            status=state.status,
-                            progress=state.progress,
-                            nthreads=state.nthreads,
-                            rt_margin=state.rt_margin,
-                            mode=state.mode,
-                            can_run=can_run,
-                            can_export=can_export,
-                            on_run=on_run,
-                            on_export=on_export,
-                        )
-                    with solara.Column(style={"flex": "1"}):
-                        MessageLog(
-                            messages=state.messages,
-                            on_clear=on_clear_messages,
-                        )
+                RunPanel(
+                    status=state.status,
+                    progress=state.progress,
+                    nthreads=state.nthreads,
+                    rt_margin=state.rt_margin,
+                    mode=state.mode,
+                    can_run=can_run,
+                    can_export=can_export,
+                    on_run=on_run,
+                    on_export=on_export,
+                )
 
             with solara.lab.Tab("Results"):
                 ResultsPanel(
