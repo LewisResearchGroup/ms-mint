@@ -8,16 +8,34 @@ pip install ms-mint
 
 This will install the core library for use in scripts, notebooks, or other Python-based workflows.
 
-> **Note:** As of version `1.0.0`, ms-mint uses [PEP 621](https://peps.python.org/pep-0621/) standards via `pyproject.toml` for packaging. If you plan to install from source or contribute, ensure you have an up-to-date version of `pip`, `setuptools`, and `build` installed:
+## Optional: GUI Support
+
+To include the Solara-based interactive GUI for Jupyter notebooks:
 
 ```bash
-pip install --upgrade pip setuptools build
+pip install ms-mint[gui]
 ```
+
+## Development Version
 
 To install the latest development version directly from GitHub:
 
 ```bash
 pip install git+https://github.com/LewisResearchGroup/ms-mint.git
+```
+
+Or with GUI support:
+
+```bash
+pip install "ms-mint[gui] @ git+https://github.com/LewisResearchGroup/ms-mint.git"
+```
+
+## Notes
+
+As of version `1.0.0`, ms-mint uses [PEP 621](https://peps.python.org/pep-0621/) standards via `pyproject.toml` for packaging. If you plan to install from source or contribute, ensure you have an up-to-date version of `pip`, `setuptools`, and `build` installed:
+
+```bash
+pip install --upgrade pip setuptools build
 ```
 
 For most users, the PyPI version is sufficient and recommended.
