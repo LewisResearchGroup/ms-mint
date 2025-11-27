@@ -4,6 +4,8 @@ import pytest
 import pandas as pd
 from pathlib import Path
 
+pytest.importorskip("solara", reason="GUI dependencies not installed")
+
 from ms_mint.gui.state import MintState
 
 
