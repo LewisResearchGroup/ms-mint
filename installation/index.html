@@ -309,6 +309,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -320,6 +333,52 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#optional-gui-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional: GUI Support
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development Version
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -730,13 +789,20 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ms-mint
 </code></pre></div>
 <p>This will install the core library for use in scripts, notebooks, or other Python-based workflows.</p>
-<blockquote>
-<p><strong>Note:</strong> As of version <code>1.0.0</code>, ms-mint uses <a href="https://peps.python.org/pep-0621/">PEP 621</a> standards via <code>pyproject.toml</code> for packaging. If you plan to install from source or contribute, ensure you have an up-to-date version of <code>pip</code>, <code>setuptools</code>, and <code>build</code> installed:</p>
-</blockquote>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip<span class="w"> </span>setuptools<span class="w"> </span>build
+<h2 id="optional-gui-support">Optional: GUI Support<a class="headerlink" href="#optional-gui-support" title="Permanent link">&para;</a></h2>
+<p>To include the Solara-based interactive GUI for Jupyter notebooks:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ms-mint<span class="o">[</span>gui<span class="o">]</span>
 </code></pre></div>
+<h2 id="development-version">Development Version<a class="headerlink" href="#development-version" title="Permanent link">&para;</a></h2>
 <p>To install the latest development version directly from GitHub:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/LewisResearchGroup/ms-mint.git
+</code></pre></div>
+<p>Or with GUI support:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ms-mint[gui] @ git+https://github.com/LewisResearchGroup/ms-mint.git&quot;</span>
+</code></pre></div>
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<p>As of version <code>1.0.0</code>, ms-mint uses <a href="https://peps.python.org/pep-0621/">PEP 621</a> standards via <code>pyproject.toml</code> for packaging. If you plan to install from source or contribute, ensure you have an up-to-date version of <code>pip</code>, <code>setuptools</code>, and <code>build</code> installed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip<span class="w"> </span>setuptools<span class="w"> </span>build
 </code></pre></div>
 <p>For most users, the PyPI version is sufficient and recommended.</p>
 
