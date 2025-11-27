@@ -197,8 +197,6 @@ def OptimizationPanel(
             )
             # Reload the values from updated mint.targets
             load_peak_values(selected_peak.value)
-            # Increment counter to force plot refresh
-            refresh_counter.set(refresh_counter.value + 1)
             on_targets_updated()
             success_message.set(f"Optimized RT for {selected_peak.value}")
             error_message.set("")
@@ -218,8 +216,6 @@ def OptimizationPanel(
             # Reload selected peak values if one is selected
             if selected_peak.value:
                 load_peak_values(selected_peak.value)
-            # Increment counter to force plot refresh
-            refresh_counter.set(refresh_counter.value + 1)
             success_message.set("Optimized all peaks")
             error_message.set("")
         except Exception as e:
