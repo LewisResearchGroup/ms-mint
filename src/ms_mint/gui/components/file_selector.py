@@ -77,9 +77,9 @@ def MSFileSelector(
         on_files_loaded: Callback when files are loaded.
         wdir: Working directory for resolving relative paths.
     """
-    # Local state
-    default_dir = wdir if wdir is not None else Path.cwd()
-    path_input = solara.use_reactive(str(default_dir))
+    # Local state - default to ./ms-files/*
+    default_path = "./ms-files/*"
+    path_input = solara.use_reactive(default_path)
     error_message = solara.use_reactive("")
 
     def handle_load_from_path():

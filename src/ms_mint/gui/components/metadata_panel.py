@@ -27,7 +27,7 @@ def MetadataPanel(
     """
     error_message = solara.use_reactive("")
     success_message = solara.use_reactive("")
-    file_path_input = solara.use_reactive("")
+    file_path_input = solara.use_reactive("./metadata.csv")
 
     if len(ms_files.value) == 0:
         solara.Info("Load MS files first to view metadata.")
