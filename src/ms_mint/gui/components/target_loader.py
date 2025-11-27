@@ -31,7 +31,7 @@ def TargetLoader(
         wdir: Working directory for resolving relative paths.
     """
     error_message = solara.use_reactive("")
-    file_path_input = solara.use_reactive("")
+    file_path_input = solara.use_reactive("./targets.csv")
     sort_column = solara.use_reactive("peak_label")
     sort_ascending = solara.use_reactive(True)
     inactive_targets = solara.use_reactive([])
