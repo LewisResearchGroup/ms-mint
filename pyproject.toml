@@ -83,16 +83,21 @@ testpaths = ["tests"]
 
 [tool.ruff]
 target-version = "py312"
-
 line-length = 100
 
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "F",  # pyflakes
-    "I",  # isort
-    "UP", # pyupgrade
-    "N",  # pep8-naming
-    "D",  # pydocstyle
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "D",   # pydocstyle
     "ANN", # flake8-annotations (type hints)
 ]
 
@@ -101,13 +106,8 @@ ignore = [
     "D213",  # multi-line-summary-second-line
 ]
 
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-line-ending = "auto"
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
-[tool.ruff.pydocstyle]
-convention = "google"  # Use Google style docstrings
-
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["ms_mint"]

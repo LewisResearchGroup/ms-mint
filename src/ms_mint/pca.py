@@ -1,21 +1,22 @@
-#src/ms_mint/pca.py
+"""Principal Component Analysis for metabolomics data."""
 
 from __future__ import annotations
 
+import warnings
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .Mint import Mint
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import warnings
-from typing import Optional, Union, List, Dict, Any, Tuple, Literal
-from matplotlib.figure import Figure
-from plotly.graph_objs._figure import Figure as PlotlyFigure
-
 import plotly.figure_factory as ff
+import seaborn as sns
+from matplotlib.figure import Figure
 from plotly import express as px
-
+from plotly.graph_objs._figure import Figure as PlotlyFigure
 from sklearn.decomposition import PCA
-from .tools import scale_dataframe
 
 
 class PrincipalComponentsAnalyser:
@@ -30,26 +31,26 @@ class PrincipalComponentsAnalyser:
         plot: PCA_Plotter instance for visualizing the PCA results.
     """
 
-    def __init__(self, mint: Optional["ms_mint.Mint.Mint"] = None) -> None:
+    def __init__(self, mint: Mint | None = None) -> None:
         """Initialize a PrincipalComponentsAnalyser instance.
 
         Args:
             mint: Mint instance containing the data to analyze.
         """
         self.mint = mint
-        self.results: Optional[Dict[str, Any]] = None
+        self.results: dict[str, Any] | None = None
         self.plot = PCA_Plotter(self)
 
     def run(
         self,
         n_components: int = 3,
-        on: Optional[str] = None,
+        on: str | None = None,
         var_name: str = "peak_max",
-        fillna: Union[str, float] = "median",
-        apply: Optional[str] = None,
-        groupby: Optional[Union[str, List[str]]] = None,
+        fillna: str | float = "median",
+        apply: str | None = None,
+        groupby: str | list[str] | None = None,
         scaler: str = "standard",
-        peak_labels: Optional[List[str]] = None,
+        peak_labels: list[str] | None = None,
     ) -> None:
         """Run Principal Component Analysis on the current results.
 
@@ -137,7 +138,7 @@ class PCA_Plotter:
 
     def cumulative_variance(
         self, interactive: bool = False, **kwargs
-    ) -> Union[Figure, PlotlyFigure]:
+    ) -> Figure | PlotlyFigure:
         """Plot the cumulative explained variance of principal components.
 
         Args:
@@ -224,10 +225,10 @@ class PCA_Plotter:
         self,
         x_component: int = 1,
         y_component: int = 2,
-        color_by: Optional[str] = None,
+        color_by: str | None = None,
         interactive: bool = False,
         **kwargs,
-    ) -> Union[Figure, PlotlyFigure]:
+    ) -> Figure | PlotlyFigure:
         """Create a scatter plot of two principal components.
 
         Args:
@@ -249,7 +250,7 @@ class PCA_Plotter:
         self,
         x_component: int = 1,
         y_component: int = 2,
-        color_by: Optional[str] = None,
+        color_by: str | None = None,
         **kwargs,
     ) -> Figure:
         """Create a static scatter plot of two principal components.
@@ -311,7 +312,7 @@ class PCA_Plotter:
         self,
         x_component: int = 1,
         y_component: int = 2,
-        color_by: Optional[str] = None,
+        color_by: str | None = None,
         **kwargs,
     ) -> PlotlyFigure:
         """Create an interactive Plotly scatter plot of two principal components.
@@ -362,7 +363,7 @@ class PCA_Plotter:
         return fig
 
     def _prepare_data(
-        self, n_components: int = 3, hue: Optional[Union[str, List[str]]] = None
+        self, n_components: int = 3, hue: str | list[str] | None = None
     ) -> pd.DataFrame:
         """Prepare data for pairplot visualization.
 
@@ -391,11 +392,11 @@ class PCA_Plotter:
     def pairplot(
         self,
         n_components: int = 3,
-        hue: Optional[Union[str, List[str]]] = None,
-        fig_kws: Optional[Dict[str, Any]] = None,
+        hue: str | list[str] | None = None,
+        fig_kws: dict[str, Any] | None = None,
         interactive: bool = False,
         **kwargs,
-    ) -> Union[sns.axisgrid.PairGrid, PlotlyFigure]:
+    ) -> sns.axisgrid.PairGrid | PlotlyFigure:
         """Create a pairplot of principal components.
 
         Args:
@@ -421,7 +422,7 @@ class PCA_Plotter:
             return self.pairplot_sns(df, fig_kws=fig_kws, hue=hue, **kwargs)
 
     def pairplot_sns(
-        self, df: pd.DataFrame, fig_kws: Optional[Dict[str, Any]] = None, **kwargs
+        self, df: pd.DataFrame, fig_kws: dict[str, Any] | None = None, **kwargs
     ) -> sns.axisgrid.PairGrid:
         """Create a static Seaborn pairplot of principal components.
 
@@ -444,7 +445,7 @@ class PCA_Plotter:
         return g
 
     def pairplot_plotly(
-        self, df: pd.DataFrame, color_col: Optional[str] = None, **kwargs
+        self, df: pd.DataFrame, color_col: str | None = None, **kwargs
     ) -> PlotlyFigure:
         """Create an interactive Plotly pairplot of principal components.
 
@@ -467,7 +468,7 @@ class PCA_Plotter:
 
     def loadings(
         self, interactive: bool = False, **kwargs
-    ) -> Union[sns.axisgrid.FacetGrid, PlotlyFigure]:
+    ) -> sns.axisgrid.FacetGrid | PlotlyFigure:
         """Plot PCA loadings (feature contributions to principal components).
 
         Args:

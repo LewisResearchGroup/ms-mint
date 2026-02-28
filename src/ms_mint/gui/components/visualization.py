@@ -6,15 +6,14 @@ import io
 import warnings
 from contextlib import contextmanager
 from datetime import datetime
-from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import solara
+from matplotlib.ticker import FuncFormatter
 
 if TYPE_CHECKING:
     from ms_mint.Mint import Mint
@@ -34,7 +33,7 @@ def no_display():
 
 def save_figure_to_file(
     fig,
-    mint: "Mint",
+    mint: Mint,
     plot_name: str,
     settings: dict,
     dpi: int = 150,
@@ -97,7 +96,7 @@ def save_figure_to_file(
 
 
 @solara.component
-def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
+def PCAPlot(mint: Mint, plot_type: str, interactive: bool, n_components: int,
             var_name: str, apply: str, scaler: str, fillna: str, color_by: str = "none",
             x_component: int = 1, y_component: int = 2, active_targets: list[str] = None,
             image_format: str = "png"):
@@ -198,7 +197,7 @@ def PCAPlot(mint: "Mint", plot_type: str, interactive: bool, n_components: int,
 
 
 @solara.component
-def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds",
+def PeakShapesPlot(mint: Mint, interactive: bool, rt_unit: str = "seconds",
                    image_format: str = "png"):
     """Render peak shapes plot.
 
@@ -261,7 +260,7 @@ def PeakShapesPlot(mint: "Mint", interactive: bool, rt_unit: str = "seconds",
 
 
 @solara.component
-def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspect: float = 5,
+def ChromatogramPlot(mint: Mint, interactive: bool, height: float = 1.5, aspect: float = 5,
                      rt_unit: str = "seconds", peak_labels: list = None, nthreads: int = None,
                      image_format: str = "png"):
     """Render chromatogram plot.
@@ -344,7 +343,7 @@ def ChromatogramPlot(mint: "Mint", interactive: bool, height: float = 1.5, aspec
 
 
 @solara.component
-def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log2p1",
+def DistributionPlot(mint: Mint, var_name: str = "peak_max", apply: str = "log2p1",
                      plot_style: str = "boxplot", color_by: str = "none",
                      facet_col: str = "none", facet_row: str = "none",
                      col_wrap: int = 0, x_label: str = "", y_label: str = "",
@@ -449,7 +448,7 @@ def DistributionPlot(mint: "Mint", var_name: str = "peak_max", apply: str = "log
         solara.Error(f"Distribution error: {e}")
 
 
-def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
+def _create_heatmap_figure(mint: Mint, var_name: str, apply: str, scaler: str,
                            transposed: bool, width: int = 12, height: int = 10,
                            active_targets: list[str] = None):
     """Helper to create heatmap figure."""
@@ -496,7 +495,7 @@ def _create_heatmap_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
 
 
 @solara.component
-def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
+def SimpleHeatmapPlot(mint: Mint, var_name: str = "peak_max",
                       apply: str = "log2p1", scaler: str = "standard",
                       transposed: bool = False, width: int = 12, height: int = 10,
                       active_targets: list[str] = None, image_format: str = "png"):
@@ -537,7 +536,7 @@ def SimpleHeatmapPlot(mint: "Mint", var_name: str = "peak_max",
         solara.Error(f"Heatmap error: {e}")
 
 
-def _create_clustering_figure(mint: "Mint", var_name: str, apply: str, scaler: str,
+def _create_clustering_figure(mint: Mint, var_name: str, apply: str, scaler: str,
                                metric: str, transposed: bool, width: int, height: int):
     """Helper to create hierarchical clustering figure."""
     with warnings.catch_warnings():
@@ -564,7 +563,7 @@ def _create_clustering_figure(mint: "Mint", var_name: str, apply: str, scaler: s
 
 
 @solara.component
-def HierarchicalClusteringPlot(mint: "Mint", var_name: str = "peak_max",
+def HierarchicalClusteringPlot(mint: Mint, var_name: str = "peak_max",
                                 apply: str = "log2p1", scaler: str = "standard",
                                 metric: str = "cosine", transposed: bool = False,
                                 width: int = 12, height: int = 10, dpi: int = 150,
@@ -614,7 +613,7 @@ def HierarchicalClusteringPlot(mint: "Mint", var_name: str = "peak_max",
 
 @solara.component
 def VisualizationPanel(
-    mint: "Mint",
+    mint: Mint,
     results: solara.Reactive[pd.DataFrame],
     targets: solara.Reactive[pd.DataFrame] = None,
     rt_unit: solara.Reactive[str] = None,

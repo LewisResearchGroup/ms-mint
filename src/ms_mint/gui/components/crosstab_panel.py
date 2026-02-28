@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import solara
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
 
 @solara.component
 def CrosstabPanel(
-    mint: "Mint",
+    mint: Mint,
     results: solara.Reactive[pd.DataFrame],
     inactive_targets: solara.Reactive[list[str]] = None,
 ):

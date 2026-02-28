@@ -1,7 +1,10 @@
-import pandas as pd
+"""Signal processing filters for chromatogram data."""
+
+from typing import Literal
+
 import numpy as np
+import pandas as pd
 from scipy.ndimage import gaussian_filter1d
-from typing import List, Tuple, Union, Optional, Sequence, Literal
 
 
 class Filter:
@@ -12,8 +15,8 @@ class Filter:
     """
 
     def transform(
-        self, t: Union[List[float], np.ndarray], x: Union[List[float], np.ndarray]
-    ) -> Tuple[Union[List[float], np.ndarray], Union[List[float], np.ndarray]]:
+        self, t: list[float] | np.ndarray, x: list[float] | np.ndarray
+    ) -> tuple[list[float] | np.ndarray, list[float] | np.ndarray]:
         """Transform the time series data.
 
         Args:
@@ -50,8 +53,8 @@ class Resampler(Filter):
         self.name = "resampler"
 
     def transform(
-        self, t: Union[List[float], np.ndarray], x: Union[List[float], np.ndarray]
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        self, t: list[float] | np.ndarray, x: list[float] | np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Resample the time series to the specified frequency.
 
         Args:
@@ -76,7 +79,7 @@ class Smoother(Filter):
     with specified window sizes.
     """
 
-    def __init__(self, windows: Optional[List[int]] = None) -> None:
+    def __init__(self, windows: list[int] | None = None) -> None:
         """Initialize the Smoother filter.
 
         Args:
@@ -89,8 +92,8 @@ class Smoother(Filter):
         self.name = "smoother"
 
     def transform(
-        self, t: Union[List[float], np.ndarray], x: Union[List[float], np.ndarray]
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        self, t: list[float] | np.ndarray, x: list[float] | np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Apply rolling average smoothing to the time series.
 
         Args:
@@ -124,8 +127,8 @@ class GaussFilter(Filter):
         self.name = "gauss_filter"
 
     def transform(
-        self, t: Union[List[float], np.ndarray], x: Union[List[float], np.ndarray]
-    ) -> Tuple[Union[List[float], np.ndarray], np.ndarray]:
+        self, t: list[float] | np.ndarray, x: list[float] | np.ndarray
+    ) -> tuple[list[float] | np.ndarray, np.ndarray]:
         """Apply Gaussian filtering to the time series.
 
         Args:

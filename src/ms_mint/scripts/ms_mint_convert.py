@@ -1,18 +1,21 @@
 #!/usr/bin/env python
+"""Command-line tool for converting MS files to optimized formats."""
+
+import argparse
+import logging
+import os
+from pathlib import Path
+
+from tqdm import tqdm
 
 from ms_mint import io
-from pathlib import Path as P
-from tqdm import tqdm
-import argparse
-import os
-import logging
 
 
 def convert(fn, fmt="parquet", output_directory=None):
     if output_directory is None:
-        output_directory = P(fn).parent
+        output_directory = Path(fn).parent
 
-    fn_out = output_directory / P(fn).with_suffix(f".{fmt}")
+    fn_out = output_directory / Path(fn).with_suffix(f".{fmt}")
 
     if fn_out.is_file():
         logging.error(f"File exists {fn_out}")

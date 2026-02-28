@@ -1,40 +1,41 @@
 #src/ms_mint/Mint.py
 """Main module of the ms-mint library."""
 
-import os
-import numpy as np
-import pandas as pd
-import time
 import logging
-from pathlib import Path as P
-from multiprocessing import Pool, Manager, cpu_count
+import os
+import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from glob import glob
-from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
 from io import BytesIO
-from tqdm import tqdm
-from typing import Callable, Optional, Union, List, Dict, Tuple, Any, Set, Iterable
-from functools import lru_cache
+from multiprocessing import Manager, Pool, cpu_count
+from pathlib import Path
+from typing import Any, Optional
 
-from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
-from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
-from .io import export_to_excel, ms_file_to_df
-from .TargetOptimizer import TargetOptimizer
-from .targets import read_targets, check_targets, standardize_targets
-from .tools import (
-    is_ms_file,
-    get_ms_files_from_results,
-    get_targets_from_results,
-    scale_dataframe,
-    init_metadata,
-    fn_to_label,
-    log2p1,
-)
-from .pca import PrincipalComponentsAnalyser
-from .MintPlotter import MintPlotter
-from .Chromatogram import Chromatogram
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
+from tqdm import tqdm
 
 import ms_mint
+
+from .Chromatogram import Chromatogram
+from .io import export_to_excel, ms_file_to_df
+from .MintPlotter import MintPlotter
+from .pca import PrincipalComponentsAnalyser
+from .processing import extract_chromatogram_from_ms1, process_ms1_files_in_parallel
+from .standards import DEPRECATED_LABELS, MINT_RESULTS_COLUMNS, TARGETS_COLUMNS
+from .TargetOptimizer import TargetOptimizer
+from .targets import check_targets, read_targets, standardize_targets
+from .tools import (
+    fn_to_label,
+    get_ms_files_from_results,
+    get_targets_from_results,
+    init_metadata,
+    is_ms_file,
+    log2p1,
+    unwrap_reactive,
+)
 
 METADATA_DEFAUT_FN = "metadata.parquet"
 
@@ -70,9 +71,9 @@ class Mint:
     def __init__(
         self,
         verbose: bool = False,
-        progress_callback: Optional[Callable[[float], None]] = None,
+        progress_callback: Callable[[float], None] | None = None,
         time_unit: str = "s",
-        wdir: Optional[Union[str, P]] = None,
+        wdir: str | Path | None = None,
     ) -> None:
         """Initialize a Mint instance.
 
@@ -94,7 +95,7 @@ class Mint:
         self.tqdm = tqdm
 
         # Setup working directory as pathlib.Path
-        self.wdir = P(os.getcwd() if wdir is None else wdir)
+        self.wdir = Path(os.getcwd() if wdir is None else wdir)
 
     @property
     def version(self) -> str:
@@ -111,15 +112,15 @@ class Mint:
         Returns:
             Self for method chaining.
         """
-        self._files: List[str] = []
-        self._targets_files: List[str] = []
+        self._files: list[str] = []
+        self._targets_files: list[str] = []
         self._targets: pd.DataFrame = pd.DataFrame(columns=TARGETS_COLUMNS)
         self._results: pd.DataFrame = pd.DataFrame({i: [] for i in MINT_RESULTS_COLUMNS})
-        self._all_df: Optional[pd.DataFrame] = None
+        self._all_df: pd.DataFrame | None = None
         self._progress: float = 0
-        self.runtime: Optional[float] = None
+        self.runtime: float | None = None
         self._status: str = "waiting"
-        self._messages: List[str] = []
+        self._messages: list[str] = []
         self.meta: pd.DataFrame = init_metadata()
         return self
 
@@ -137,10 +138,10 @@ class Mint:
 
     def run(
         self,
-        nthreads: Optional[int] = None,
+        nthreads: int | None = None,
         rt_margin: float = 0.5,
         mode: str = "standard",
-        fn: Optional[str] = None,
+        fn: str | None = None,
         **kwargs,
     ) -> Optional["Mint"]:
         """Run MINT and process MS-files with current target list.
@@ -199,7 +200,7 @@ class Mint:
             update_rt_max = (targets.rt_max.isna()) & (~targets.rt.isna())
             targets.loc[update_rt_max, "rt_max"] = targets.loc[update_rt_max, "rt"] + rt_margin
 
-    def _determine_nthreads(self, nthreads: Optional[int]) -> int:
+    def _determine_nthreads(self, nthreads: int | None) -> int:
         """Determine number of threads to use for parallel processing.
 
         Args:
@@ -212,7 +213,7 @@ class Mint:
             nthreads = min(cpu_count(), self.n_files)
         return nthreads
 
-    def _run_sequential(self, mode: str, fn: Optional[str], targets: pd.DataFrame) -> None:
+    def _run_sequential(self, mode: str, fn: str | None, targets: pd.DataFrame) -> None:
         """Run processing sequentially (single-threaded).
 
         Args:
@@ -254,8 +255,8 @@ class Mint:
         self,
         nthreads: int = 1,
         mode: str = "standard",
-        maxtasksperchild: Optional[int] = None,
-        fn: Optional[str] = None,
+        maxtasksperchild: int | None = None,
+        fn: str | None = None,
     ) -> None:
         """Run processing in parallel using multiple threads.
 
@@ -318,20 +319,18 @@ class Mint:
         return self._status
 
     @property
-    def ms_files(self) -> List[str]:
+    def ms_files(self) -> list[str]:
         """Get list of MS files to process.
 
         Returns:
             List of filenames.
         """
         # Handle case where _files might be a Reactive object
-        files = self._files
-        if hasattr(files, 'value'):
-            files = files.value
+        files = unwrap_reactive(self._files)
         return list(files) if files else []
 
     @ms_files.setter
-    def ms_files(self, list_of_files: Union[str, List[str]]) -> None:
+    def ms_files(self, list_of_files: str | list[str]) -> None:
         """Set MS files to process.
 
         Args:
@@ -339,7 +338,7 @@ class Mint:
         """
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
-        list_of_files = [str(P(i)) for i in list_of_files if is_ms_file(i)]
+        list_of_files = [str(Path(i)) for i in list_of_files if is_ms_file(i)]
         for f in list_of_files:
             if not os.path.isfile(f):
                 logging.warning(f"File not found ({f})")
@@ -357,7 +356,7 @@ class Mint:
         """
         return len(self.ms_files)
 
-    def load_files(self, obj: Union[str, List[str]]) -> "Mint":
+    def load_files(self, obj: str | list[str]) -> "Mint":
         """Load MS files and return self for chaining.
 
         Args:
@@ -372,7 +371,7 @@ class Mint:
             self.ms_files = obj
         return self
 
-    def load_targets(self, list_of_files: Union[str, P, List[Union[str, P]]]) -> "Mint":
+    def load_targets(self, list_of_files: str | Path | list[str | Path]) -> "Mint":
         """Load targets from file(s) (csv, xlsx).
 
         Args:
@@ -385,7 +384,7 @@ class Mint:
             ValueError: If input is not a list of files.
             AssertionError: If a file is not found.
         """
-        if isinstance(list_of_files, str) or isinstance(list_of_files, P):
+        if isinstance(list_of_files, str) or isinstance(list_of_files, Path):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
             raise ValueError("Input should be a list of files.")
@@ -422,7 +421,7 @@ class Mint:
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
 
-    def get_target_params(self, peak_label: str) -> Tuple[float, float, float, float]:
+    def get_target_params(self, peak_label: str) -> tuple[float, float, float, float]:
         """Get target parameters for a specific peak label.
 
         Args:
@@ -436,7 +435,7 @@ class Mint:
         return mz_mean, mz_width, rt_min, rt_max
 
     @property
-    def peak_labels(self) -> List[str]:
+    def peak_labels(self) -> list[str]:
         """Get list of peak labels from targets.
 
         Returns:
@@ -464,14 +463,14 @@ class Mint:
 
     def crosstab(
         self,
-        var_name: Optional[str] = None,
-        index: Optional[Union[str, List[str]]] = None,
-        column: Optional[str] = None,
+        var_name: str | None = None,
+        index: str | list[str] | None = None,
+        column: str | None = None,
         aggfunc: str = "mean",
-        apply: Optional[Callable] = None,
-        scaler: Optional[Union[str, Any]] = None,
-        groupby: Optional[Union[str, List[str]]] = None,
-        peak_labels: Optional[List[str]] = None,
+        apply: Callable | None = None,
+        scaler: str | Any | None = None,
+        groupby: str | list[str] | None = None,
+        peak_labels: list[str] | None = None,
     ) -> pd.DataFrame:
         """Create condensed representation of the results.
 
@@ -592,7 +591,7 @@ class Mint:
         if self.progress_callback is not None:
             self.progress_callback(value)
 
-    def export(self, fn: Optional[str] = None) -> Optional[BytesIO]:
+    def export(self, fn: str | None = None) -> BytesIO | None:
         """Export current results to file.
 
         Args:
@@ -613,7 +612,7 @@ class Mint:
             self.results.to_parquet(fn, index=False)
         return None
 
-    def load(self, fn: Union[str, BytesIO]) -> "Mint":
+    def load(self, fn: str | BytesIO) -> "Mint":
         """Load results into Mint instance.
 
         Args:
@@ -656,10 +655,10 @@ class Mint:
 
     def get_chromatograms(
         self,
-        fns: Optional[List[str]] = None,
-        peak_labels: Optional[List[str]] = None,
-        filters: Optional[List[Any]] = None,
-        nthreads: Optional[int] = None,
+        fns: list[str] | None = None,
+        peak_labels: list[str] | None = None,
+        filters: list[Any] | None = None,
+        nthreads: int | None = None,
         **kwargs,
     ) -> pd.DataFrame:
         """Get chromatograms for specified files and peak labels.
@@ -680,12 +679,9 @@ class Mint:
             peak_labels = self.peak_labels
 
         # Handle case where fns or peak_labels might be Reactive objects
-        if hasattr(fns, 'value'):
-            fns = fns.value
-        if hasattr(peak_labels, 'value'):
-            peak_labels = peak_labels.value
-        if hasattr(nthreads, 'value'):
-            nthreads = nthreads.value
+        fns = unwrap_reactive(fns)
+        peak_labels = unwrap_reactive(peak_labels)
+        nthreads = unwrap_reactive(nthreads)
 
         # Ensure they're lists before converting to tuple
         if not isinstance(fns, (list, tuple)):
@@ -703,10 +699,10 @@ class Mint:
 
     def _get_chromatograms(
         self,
-        fns: Optional[Tuple[str, ...]] = None,
-        peak_labels: Optional[Tuple[str, ...]] = None,
-        filters: Optional[Tuple[Any, ...]] = None,
-        nthreads: Optional[int] = None,
+        fns: tuple[str, ...] | None = None,
+        peak_labels: tuple[str, ...] | None = None,
+        filters: tuple[Any, ...] | None = None,
+        nthreads: int | None = None,
         **kwargs,
     ) -> pd.DataFrame:
         """Implementation of get_chromatograms with optional parallel extraction.
@@ -722,12 +718,9 @@ class Mint:
             DataFrame containing chromatogram data.
         """
         # Handle Reactive objects FIRST, before any isinstance checks
-        if hasattr(fns, 'value'):
-            fns = fns.value
-        if hasattr(peak_labels, 'value'):
-            peak_labels = peak_labels.value
-        if hasattr(nthreads, 'value'):
-            nthreads = nthreads.value
+        fns = unwrap_reactive(fns)
+        peak_labels = unwrap_reactive(peak_labels)
+        nthreads = unwrap_reactive(nthreads)
 
         if isinstance(fns, tuple):
             fns = list(fns)
@@ -739,9 +732,7 @@ class Mint:
 
         # Need to get the actual file names
         # Handle case where ms_files might be Reactive
-        ms_files_source = self.ms_files
-        if hasattr(ms_files_source, 'value'):
-            ms_files_source = ms_files_source.value
+        ms_files_source = unwrap_reactive(self.ms_files)
         ms_files_list = list(ms_files_source) if ms_files_source else []
         fns = [fn for fn in ms_files_list if fn_to_label(fn) in labels]
 
@@ -754,7 +745,7 @@ class Mint:
             label: self.get_target_params(label) for label in peak_labels
         }
 
-        def extract_from_file(fn: str) -> List[pd.DataFrame]:
+        def extract_from_file(fn: str) -> list[pd.DataFrame]:
             """Extract chromatograms for all peak labels from a single file."""
             file_data = []
             df = ms_file_to_df(fn)
@@ -795,10 +786,10 @@ class Mint:
 
         data = pd.concat(data).reset_index()
 
-        data["ms_file"] = data["ms_file"].apply(lambda x: P(x).with_suffix("").name)
+        data["ms_file"] = data["ms_file"].apply(lambda x: Path(x).with_suffix("").name)
         return data
 
-    def load_metadata(self, fn: Optional[Union[str, P]] = None) -> "Mint":
+    def load_metadata(self, fn: str | Path | None = None) -> "Mint":
         """Load metadata from file.
 
         The CSV/parquet should have a column named 'ms_file_label' that matches
@@ -840,7 +831,7 @@ class Mint:
         self.meta = meta_df
         return self
 
-    def save_metadata(self, fn: Optional[Union[str, P]] = None) -> "Mint":
+    def save_metadata(self, fn: str | Path | None = None) -> "Mint":
         """Save metadata to file.
 
         Args:

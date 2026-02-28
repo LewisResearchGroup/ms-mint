@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
-import pandas as pd
 import solara
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 @solara.component
 def MetadataPanel(
-    mint: "Mint",
+    mint: Mint,
     ms_files: solara.Reactive[list[str]],
     on_metadata_updated: Callable[[], None],
 ):

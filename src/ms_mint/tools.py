@@ -1,18 +1,36 @@
+"""Utility functions for MS-MINT operations."""
+
 import logging
+from pathlib import Path
+from typing import Any, Literal
+
 import numpy as np
 import pandas as pd
-from pathlib import Path as P
 from molmass import Formula, FormulaError
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from scipy.signal import find_peaks, peak_widths
-from typing import Union, List, Tuple, Optional, Dict, Any, Callable, Literal
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
-from .standards import M_PROTON, TARGETS_COLUMNS, MINT_METADATA_COLUMNS
 from .filelock import FileLock
 from .matplotlib_tools import plot_peaks
+from .standards import M_PROTON, MINT_METADATA_COLUMNS, TARGETS_COLUMNS
 
 
-def log2p1(x: Union[float, np.ndarray, pd.Series]) -> Union[float, np.ndarray, pd.Series]:
+def unwrap_reactive(x: Any) -> Any:
+    """Unwrap a Solara reactive value if present.
+
+    Handles the pattern where values may be either raw values or
+    Solara reactive objects with a `.value` attribute.
+
+    Args:
+        x: Value that may be a reactive wrapper or a raw value.
+
+    Returns:
+        The unwrapped value if reactive, otherwise the original value.
+    """
+    return x.value if hasattr(x, 'value') else x
+
+
+def log2p1(x: float | np.ndarray | pd.Series) -> float | np.ndarray | pd.Series:
     """Apply log2(x+1) transformation to numeric data.
 
     Args:
@@ -24,7 +42,7 @@ def log2p1(x: Union[float, np.ndarray, pd.Series]) -> Union[float, np.ndarray, p
     return np.log2(x + 1)
 
 
-def lock(fn: Union[str, P]) -> FileLock:
+def lock(fn: str | Path) -> FileLock:
     """Create a file lock to ensure safe writing to file.
 
     Args:
@@ -37,9 +55,9 @@ def lock(fn: Union[str, P]) -> FileLock:
 
 
 def formula_to_mass(
-    formulas: Union[str, List[str]],
-    ms_mode: Optional[Literal["negative", "positive", "neutral"]] = None,
-) -> List[Optional[float]]:
+    formulas: str | list[str],
+    ms_mode: Literal["negative", "positive", "neutral"] | None = None,
+) -> list[float | None]:
     """Calculate m/z values from molecular formulas for specific ionization mode.
 
     Args:
@@ -71,7 +89,7 @@ def formula_to_mass(
     return masses
 
 
-def gaussian(x: Union[List[float], np.ndarray], mu: float, sig: float) -> np.ndarray:
+def gaussian(x: list[float] | np.ndarray, mu: float, sig: float) -> np.ndarray:
     """Generate values for a Gaussian function.
 
     Args:
@@ -87,7 +105,7 @@ def gaussian(x: Union[List[float], np.ndarray], mu: float, sig: float) -> np.nda
 
 
 def scale_dataframe(
-    df: pd.DataFrame, scaler: Union[str, Any] = "standard", **kwargs
+    df: pd.DataFrame, scaler: str | Any = "standard", **kwargs
 ) -> pd.DataFrame:
     """Scale all columns in a dense dataframe.
 
@@ -128,7 +146,7 @@ def df_diff(df1: pd.DataFrame, df2: pd.DataFrame, which: str = "both") -> pd.Dat
     return diff_df.reset_index(drop=True)
 
 
-def is_ms_file(fn: Union[str, P]) -> bool:
+def is_ms_file(fn: str | Path) -> bool:
     """Check if a file is a recognized MS file format based on its extension.
 
     Args:
@@ -152,7 +170,7 @@ def is_ms_file(fn: Union[str, P]) -> bool:
         return False
 
 
-def get_ms_files_from_results(results: pd.DataFrame) -> List[Union[str, P]]:
+def get_ms_files_from_results(results: pd.DataFrame) -> list[str | Path]:
     """Extract MS filenames from Mint results.
 
     Args:
@@ -164,7 +182,7 @@ def get_ms_files_from_results(results: pd.DataFrame) -> List[Union[str, P]]:
     # Old schema
     if "ms_path" in results.columns:
         ms_files = results[["ms_path", "ms_file"]].drop_duplicates()
-        ms_files = [P(ms_path) / ms_file for ms_path, ms_file in ms_files.values]
+        ms_files = [Path(ms_path) / ms_file for ms_path, ms_file in ms_files.values]
     else:
         ms_files = results.ms_file.unique()
     return ms_files
@@ -184,7 +202,7 @@ def get_targets_from_results(results: pd.DataFrame) -> pd.DataFrame:
 
 def find_peaks_in_timeseries(
     series: pd.Series,
-    prominence: Optional[float] = None,
+    prominence: float | None = None,
     plot: bool = False,
     rel_height: float = 0.9,
     **kwargs,
@@ -229,7 +247,7 @@ def find_peaks_in_timeseries(
 
 
 def _map_ndxs_to_time(
-    x: Union[List[float], np.ndarray], t_min: float, t_max: float, x_min: float, x_max: float
+    x: list[float] | np.ndarray, t_min: float, t_max: float, x_min: float, x_max: float
 ) -> np.ndarray:
     """Map indices to time values using linear interpolation.
 
@@ -257,7 +275,7 @@ def _map_ndxs_to_time(
     return result
 
 
-def mz_mean_width_to_min_max(mz_mean: float, mz_width: float) -> Tuple[float, float]:
+def mz_mean_width_to_min_max(mz_mean: float, mz_width: float) -> tuple[float, float]:
     """Convert m/z mean and width (in ppm) to min and max m/z values.
 
     Args:
@@ -283,7 +301,7 @@ def init_metadata() -> pd.DataFrame:
     return pd.DataFrame(columns=cols).set_index("ms_file_label")
 
 
-def fn_to_label(fn: Union[str, P]) -> str:
+def fn_to_label(fn: str | Path) -> str:
     """Convert a filename to a label by removing the file extension.
 
     Args:
@@ -292,4 +310,4 @@ def fn_to_label(fn: Union[str, P]) -> str:
     Returns:
         Filename without extension.
     """
-    return P(fn).with_suffix("").name
+    return Path(fn).with_suffix("").name

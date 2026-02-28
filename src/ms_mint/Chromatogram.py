@@ -1,15 +1,16 @@
+"""Chromatogram data structure and processing."""
+
+import logging
+
 import numpy as np
 import pandas as pd
-import logging
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
-from typing import Optional, Union, List, Any, Tuple, Dict
 
-from .tools import find_peaks_in_timeseries, gaussian, mz_mean_width_to_min_max
-from .io import ms_file_to_df
-from .filters import Filter, Resampler, Smoother, GaussFilter
+from .filters import Filter, GaussFilter, Resampler, Smoother
 from .matplotlib_tools import plot_peaks
 from .processing import get_chromatogram_from_ms_file
+from .tools import find_peaks_in_timeseries, gaussian
 
 
 class Chromatogram:
@@ -31,10 +32,10 @@ class Chromatogram:
 
     def __init__(
         self,
-        scan_times: Optional[Union[List[float], np.ndarray]] = None,
-        intensities: Optional[Union[List[float], np.ndarray]] = None,
-        filters: Optional[List[Filter]] = None,
-        expected_rt: Optional[float] = None,
+        scan_times: list[float] | np.ndarray | None = None,
+        intensities: list[float] | np.ndarray | None = None,
+        filters: list[Filter] | None = None,
+        expected_rt: float | None = None,
     ) -> None:
         """Initialize a Chromatogram object.
 
@@ -59,15 +60,15 @@ class Chromatogram:
             self.x = np.append(self.x, intensities)
 
         # Initialize other attributes
-        self.noise_level: Optional[float] = None
-        self.filters: List[Filter] = filters or [Resampler(), GaussFilter(), Smoother()]
-        self.peaks: Optional[pd.DataFrame] = None
-        self.selected_peak_ndxs: Optional[List[int]] = None
-        self.expected_rt: Optional[float] = expected_rt
-        self.weights: Optional[np.ndarray] = None
+        self.noise_level: float | None = None
+        self.filters: list[Filter] = filters or [Resampler(), GaussFilter(), Smoother()]
+        self.peaks: pd.DataFrame | None = None
+        self.selected_peak_ndxs: list[int] | None = None
+        self.expected_rt: float | None = expected_rt
+        self.weights: np.ndarray | None = None
 
     def from_file(
-        self, fn: str, mz_mean: float, mz_width: float = 10, expected_rt: Optional[float] = None
+        self, fn: str, mz_mean: float, mz_width: float = 10, expected_rt: float | None = None
     ) -> None:
         """Load chromatogram data from a mass spectrometry file.
 
@@ -100,7 +101,7 @@ class Chromatogram:
             self.t, self.x = filt.transform(self.t, self.x)
 
     def find_peaks(
-        self, prominence: Optional[float] = None, rel_height: float = 0.9, **kwargs
+        self, prominence: float | None = None, rel_height: float = 0.9, **kwargs
     ) -> None:
         """Find peaks in the chromatogram.
 
@@ -159,7 +160,7 @@ class Chromatogram:
 
             peaks.loc[ndx, ["rt_min", "rt_max"]] = new_rt_min, new_rt_max
 
-    def select_peak_by_rt(self, expected_rt: Optional[float] = None) -> pd.DataFrame:
+    def select_peak_by_rt(self, expected_rt: float | None = None) -> pd.DataFrame:
         """Select the peak closest to the expected retention time.
 
         Args:
@@ -189,8 +190,8 @@ class Chromatogram:
         return self.selected_peaks
 
     def select_peak_with_gaussian_weight(
-        self, expected_rt: Optional[float] = None, sigma: float = 50
-    ) -> Optional[pd.DataFrame]:
+        self, expected_rt: float | None = None, sigma: float = 50
+    ) -> pd.DataFrame | None:
         """Select peak using Gaussian weighting around expected retention time.
 
         This method applies a Gaussian weighting centered at the expected retention time
@@ -239,7 +240,7 @@ class Chromatogram:
         df.index.name = "scan_time"
         return df
 
-    def plot(self, label: Optional[str] = None, **kwargs) -> Figure:
+    def plot(self, label: str | None = None, **kwargs) -> Figure:
         """Plot the chromatogram with detected peaks.
 
         Args:

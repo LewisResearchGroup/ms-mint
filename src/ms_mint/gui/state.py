@@ -9,7 +9,7 @@ from __future__ import annotations
 import io
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import solara
@@ -41,7 +41,7 @@ class MintState:
         mode: Reactive string for processing mode.
     """
 
-    def __init__(self, mint: Optional[MintType] = None) -> None:
+    def __init__(self, mint: MintType | None = None) -> None:
         """Initialize MintState with optional Mint instance.
 
         Args:
@@ -293,7 +293,7 @@ class MintState:
         self.status.value = "waiting"
         self.messages.value = []
 
-    def save_session(self, filepath: Optional[Path] = None) -> None:
+    def save_session(self, filepath: Path | None = None) -> None:
         """Save current session state to a JSON file.
 
         Args:
@@ -331,7 +331,7 @@ class MintState:
             json.dump(session_data, f, indent=2)
         self.add_message(f"Session saved to {filepath}")
 
-    def load_session(self, filepath: Optional[Path] = None) -> bool:
+    def load_session(self, filepath: Path | None = None) -> bool:
         """Load session state from a JSON file.
 
         Args:
@@ -399,7 +399,7 @@ class MintState:
 
 
 # Global state instance for use across components
-_state: Optional[MintState] = None
+_state: MintState | None = None
 
 
 def get_state(auto_load_session: bool = True) -> MintState:

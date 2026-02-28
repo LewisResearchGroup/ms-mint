@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import solara
 
@@ -11,7 +11,7 @@ import solara
 def RunPanel(
     status: solara.Reactive[str],
     progress: solara.Reactive[float],
-    nthreads: solara.Reactive[Optional[int]],
+    nthreads: solara.Reactive[int | None],
     rt_margin: solara.Reactive[float],
     mode: solara.Reactive[str],
     can_run: bool,

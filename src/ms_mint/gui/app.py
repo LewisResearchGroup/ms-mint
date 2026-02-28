@@ -7,16 +7,16 @@ from __future__ import annotations
 
 import solara
 
-from .state import MintState, get_state
-from .components.file_selector import MSFileSelector
-from .components.target_loader import TargetLoader
-from .components.run_panel import RunPanel
-from .components.message_log import MessageLog
-from .components.results_panel import ResultsPanel
-from .components.visualization import VisualizationPanel
-from .components.optimization_panel import OptimizationPanel
-from .components.metadata_panel import MetadataPanel
 from .components.crosstab_panel import CrosstabPanel
+from .components.file_selector import MSFileSelector
+from .components.message_log import MessageLog
+from .components.metadata_panel import MetadataPanel
+from .components.optimization_panel import OptimizationPanel
+from .components.results_panel import ResultsPanel
+from .components.run_panel import RunPanel
+from .components.target_loader import TargetLoader
+from .components.visualization import VisualizationPanel
+from .state import get_state
 
 
 @solara.component

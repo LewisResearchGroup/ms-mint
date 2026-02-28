@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
-import pandas as pd
-import numpy as np
 import io
 import logging
 import pathlib
-from typing import Union, Optional, List, Dict, Any, Callable, Tuple, Literal, cast
-from pathlib import Path as P
 from datetime import date
-from pyteomics import mzxml, mzml
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from .Mint import Mint
+
+import numpy as np
+import pandas as pd
+from pyteomics import mzml, mzxml
 
 try:
     from pyteomics import mzmlb
@@ -31,7 +35,7 @@ MS_FILE_COLUMNS = [
 ]
 
 
-def ms_file_to_df(fn: Union[str, P], read_only: bool = False) -> Optional[pd.DataFrame]:
+def ms_file_to_df(fn: str | Path, read_only: bool = False) -> pd.DataFrame | None:
     """Read MS file and convert it to a pandas DataFrame.
 
     Args:
@@ -85,10 +89,10 @@ def ms_file_to_df(fn: Union[str, P], read_only: bool = False) -> Optional[pd.Dat
 
 
 def mzxml_to_df(
-    fn: Union[str, pathlib.Path],
+    fn: str | pathlib.Path,
     read_only: bool = False,
     time_unit_in_file: Literal["min", "sec"] = "min",
-) -> Optional[pd.DataFrame]:
+) -> pd.DataFrame | None:
     """Read mzXML file and convert it to pandas DataFrame.
 
     Args:
@@ -124,7 +128,7 @@ def mzxml_to_df(
     return df.reset_index(drop=True)[MS_FILE_COLUMNS]
 
 
-def _extract_mzxml(data: Dict[str, Any]) -> Dict[str, Any]:
+def _extract_mzxml(data: dict[str, Any]) -> dict[str, Any]:
     """Extract relevant data from mzXML spectrum.
 
     Args:
@@ -143,7 +147,7 @@ def _extract_mzxml(data: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def mzml_to_pandas_df_pyteomics(fn: Union[str, P], **kwargs) -> Optional[pd.DataFrame]:
+def mzml_to_pandas_df_pyteomics(fn: str | Path, **kwargs) -> pd.DataFrame | None:
     """Deprecated function to read mzML files.
 
     Args:
@@ -157,7 +161,7 @@ def mzml_to_pandas_df_pyteomics(fn: Union[str, P], **kwargs) -> Optional[pd.Data
     return mzml_to_df(fn, **kwargs)
 
 
-def mzml_to_df(fn: Union[str, P], read_only: bool = False) -> Optional[pd.DataFrame]:
+def mzml_to_df(fn: str | Path, read_only: bool = False) -> pd.DataFrame | None:
     """Read mzML file and convert it to pandas DataFrame using the mzML library.
 
     Args:
@@ -241,7 +245,7 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _extract_mzml(data: Any, time_unit: str) -> Dict[str, Any]:
+def _extract_mzml(data: Any, time_unit: str) -> dict[str, Any]:
     """Extract relevant data from mzML spectrum.
 
     Args:
@@ -266,7 +270,7 @@ def _extract_mzml(data: Any, time_unit: str) -> Dict[str, Any]:
 extract_mzml = np.vectorize(_extract_mzml)
 
 
-def read_parquet(fn: Union[str, P], read_only: bool = False) -> pd.DataFrame:
+def read_parquet(fn: str | Path, read_only: bool = False) -> pd.DataFrame:
     """Read parquet file and return a pandas DataFrame.
 
     Args:
@@ -323,7 +327,7 @@ def format_thermo_raw_file_reader_parquet(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def mzmlb_to_df__pyteomics(fn: Union[str, P], read_only: bool = False) -> Optional[pd.DataFrame]:
+def mzmlb_to_df__pyteomics(fn: str | Path, read_only: bool = False) -> pd.DataFrame | None:
     """Read mzMLb file and convert it to pandas DataFrame using the pyteomics library.
 
     Args:
@@ -368,7 +372,7 @@ def mzmlb_to_df__pyteomics(fn: Union[str, P], read_only: bool = False) -> Option
     return df
 
 
-def _extract_mzmlb(data: Dict[str, Any]) -> Dict[str, Any]:
+def _extract_mzmlb(data: dict[str, Any]) -> dict[str, Any]:
     """Extract relevant data from mzMLb spectrum.
 
     Args:
@@ -402,8 +406,8 @@ def df_to_numeric(df: pd.DataFrame) -> None:
 
 
 def export_to_excel(
-    mint: "ms_mint.Mint.Mint", fn: Optional[Union[str, P]] = None
-) -> Optional[io.BytesIO]:
+    mint: Mint, fn: str | Path | None = None
+) -> io.BytesIO | None:
     """Export MINT state to Excel file.
 
     Args:
@@ -432,7 +436,7 @@ def export_to_excel(
     return None
 
 
-def convert_ms_file_to_feather(fn: Union[str, P], fn_out: Optional[Union[str, P]] = None) -> str:
+def convert_ms_file_to_feather(fn: str | Path, fn_out: str | Path | None = None) -> str:
     """Convert MS file to feather format.
 
     Args:
@@ -442,7 +446,7 @@ def convert_ms_file_to_feather(fn: Union[str, P], fn_out: Optional[Union[str, P]
     Returns:
         Path to the generated feather file.
     """
-    fn = P(fn)
+    fn = Path(fn)
     if fn_out is None:
         fn_out = fn.with_suffix(".feather")
     df = ms_file_to_df(fn)
@@ -452,7 +456,7 @@ def convert_ms_file_to_feather(fn: Union[str, P], fn_out: Optional[Union[str, P]
     return str(fn_out)
 
 
-def convert_ms_file_to_parquet(fn: Union[str, P], fn_out: Optional[Union[str, P]] = None) -> str:
+def convert_ms_file_to_parquet(fn: str | Path, fn_out: str | Path | None = None) -> str:
     """Convert MS file to parquet format.
 
     Args:
@@ -462,7 +466,7 @@ def convert_ms_file_to_parquet(fn: Union[str, P], fn_out: Optional[Union[str, P]
     Returns:
         Path to the generated parquet file.
     """
-    fn = P(fn)
+    fn = Path(fn)
     if fn_out is None:
         fn_out = fn.with_suffix(".parquet")
     df = ms_file_to_df(fn)

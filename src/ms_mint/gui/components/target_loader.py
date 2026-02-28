@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 import pandas as pd
 import solara
@@ -13,9 +13,9 @@ import solara
 def TargetLoader(
     targets: solara.Reactive[pd.DataFrame],
     on_targets_loaded: Callable[[bytes, str], None],
-    on_targets_reordered: Optional[Callable[[list[str]], None]] = None,
-    on_targets_activation_changed: Optional[Callable[[list[str]], None]] = None,
-    on_save_targets: Optional[Callable[[], None]] = None,
+    on_targets_reordered: Callable[[list[str]], None] | None = None,
+    on_targets_activation_changed: Callable[[list[str]], None] | None = None,
+    on_save_targets: Callable[[], None] | None = None,
     on_clear: Callable[[], None] = None,
     wdir: Path = None,
 ):
@@ -60,7 +60,7 @@ def TargetLoader(
             if not path.exists():
                 error_message.set(f"File not found: {path}")
                 return
-            if not (path.suffix.lower() in {".csv", ".xlsx"}):
+            if path.suffix.lower() not in {".csv", ".xlsx"}:
                 error_message.set("Please provide a CSV or XLSX file")
                 return
 

@@ -1,21 +1,16 @@
 """Everything related to target lists."""
 
-import pandas as pd
-import numpy as np
 import logging
-from pathlib import Path as P
-from matplotlib import pyplot as plt
-from tqdm import tqdm
-from typing import List, Union, Optional, Dict, Any, Tuple, Callable, Literal
+from pathlib import Path
 
-from .Chromatogram import Chromatogram
-from .processing import get_chromatogram_from_ms_file, extract_chromatogram_from_ms1
-from .io import ms_file_to_df
-from .standards import TARGETS_COLUMNS, DEPRECATED_LABELS
-from .tools import formula_to_mass, df_diff
+import numpy as np
+import pandas as pd
+
+from .standards import DEPRECATED_LABELS, TARGETS_COLUMNS
+from .tools import df_diff, formula_to_mass
 
 
-def read_targets(fns: Union[str, List[str]], ms_mode: str = "negative") -> pd.DataFrame:
+def read_targets(fns: str | list[str], ms_mode: str = "negative") -> pd.DataFrame:
     """Extract peak data from files containing peak definitions.
 
     Args:
@@ -36,7 +31,7 @@ def read_targets(fns: Union[str, List[str]], ms_mode: str = "negative") -> pd.Da
         elif fn.endswith(".xlsx"):
             df = pd.read_excel(fn)
         df = standardize_targets(df)
-        df["target_filename"] = P(fn).name
+        df["target_filename"] = Path(fn).name
         targets.append(df)
 
     targets = pd.concat(targets)
@@ -70,7 +65,7 @@ def standardize_targets(targets: pd.DataFrame, ms_mode: str = "neutral") -> pd.D
     assert pd.Series(targets.columns).value_counts().max() == 1, pd.Series(targets.columns).value_counts()
 
     cols = targets.columns
-    if "formula" in targets.columns and not "mz_mean" in targets.columns:
+    if "formula" in targets.columns and "mz_mean" not in targets.columns:
         targets["mz_mean"] = formula_to_mass(targets["formula"], ms_mode)
     if "intensity_threshold" not in cols:
         targets["intensity_threshold"] = 0
@@ -119,15 +114,13 @@ def convert_to_seconds(targets: pd.DataFrame) -> None:
     Args:
         targets: Mint target list to modify in-place.
     """
-    for ndx, row in targets.iterrows():
-        if row.rt_unit == "min":
-            targets.loc[ndx, "rt_unit"] = "s"
-            if targets.loc[ndx, "rt"]:
-                targets.loc[ndx, "rt"] *= 60.0
-            if targets.loc[ndx, "rt_min"]:
-                targets.loc[ndx, "rt_min"] *= 60.0
-            if targets.loc[ndx, "rt_max"]:
-                targets.loc[ndx, "rt_max"] *= 60.0
+    mask = targets["rt_unit"] == "min"
+    if mask.any():
+        targets.loc[mask, "rt_unit"] = "s"
+        for col in ["rt", "rt_min", "rt_max"]:
+            # Only multiply non-null values
+            col_mask = mask & targets[col].notna()
+            targets.loc[col_mask, col] = targets.loc[col_mask, col] * 60.0
 
 
 def fill_missing_rt_values(targets: pd.DataFrame) -> None:
@@ -136,9 +129,9 @@ def fill_missing_rt_values(targets: pd.DataFrame) -> None:
     Args:
         targets: Mint target list to modify in-place.
     """
-    for ndx, row in targets.iterrows():
-        if (not row.rt) and (row.rt_min and row.rt_max):
-            targets.loc[ndx, "rt"] = np.mean([row.rt_min, row.rt_max])
+    mask = targets["rt"].isna() & targets["rt_min"].notna() & targets["rt_max"].notna()
+    if mask.any():
+        targets.loc[mask, "rt"] = (targets.loc[mask, "rt_min"] + targets.loc[mask, "rt_max"]) / 2
 
 
 def check_targets(targets: pd.DataFrame) -> bool:
@@ -209,7 +202,7 @@ def _check_target_list_columns_(targets: pd.DataFrame) -> bool:
 
 
 def gen_target_grid(
-    masses: List[float],
+    masses: list[float],
     dt: float,
     rt_max: float = 10,
     mz_ppm: float = 10,

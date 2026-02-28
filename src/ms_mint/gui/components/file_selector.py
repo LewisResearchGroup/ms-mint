@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from glob import glob
 from pathlib import Path
-from typing import Callable, Optional
 
 import solara
 import solara.lab
@@ -64,7 +64,7 @@ def find_ms_files(path_str: str, wdir: Path = None) -> list[str]:
 def MSFileSelector(
     ms_files: solara.Reactive[list[str]],
     on_files_loaded: Callable[[list[str]], None],
-    wdir: Optional[Path] = None,
+    wdir: Path | None = None,
 ):
     """Component for selecting MS files via directory browser or file upload.
 

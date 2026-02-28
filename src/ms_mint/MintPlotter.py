@@ -1,27 +1,31 @@
-# src/ms_mint/MintPlotter.py
+"""Visualization tools for MS-MINT analysis results."""
 
 from __future__ import annotations
 
-import numpy as np
-import seaborn as sns
 import warnings
-from scipy.cluster.hierarchy import ClusterWarning
-from pathlib import Path as P
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .Mint import Mint
+
 import matplotlib
-from matplotlib import pyplot as plt
-from typing import Optional, List, Tuple, Union, Dict, Any, Callable
+import numpy as np
 import pandas as pd
 import plotly.express as px
+import seaborn as sns
+from matplotlib import pyplot as plt
 from plotly.graph_objs._figure import Figure as PlotlyFigure
+from scipy.cluster.hierarchy import ClusterWarning
 
-from .plotly_tools import plotly_heatmap, plotly_peak_shapes
+from .io import ms_file_to_df
 from .matplotlib_tools import (
-    plot_peak_shapes,
     hierarchical_clustering,
     plot_metabolomics_hist2d,
+    plot_peak_shapes,
 )
-from .tools import scale_dataframe, mz_mean_width_to_min_max
-from .io import ms_file_to_df
+from .plotly_tools import plotly_heatmap, plotly_peak_shapes
+from .tools import mz_mean_width_to_min_max, unwrap_reactive
 
 
 class MintPlotter:
@@ -34,7 +38,7 @@ class MintPlotter:
         mint: The Mint instance containing data to be visualized.
     """
 
-    def __init__(self, mint: "ms_mint.Mint.Mint") -> None:
+    def __init__(self, mint: Mint) -> None:
         """Initialize the MintPlotter with a Mint instance.
 
         Args:
@@ -44,21 +48,21 @@ class MintPlotter:
 
     def hierarchical_clustering(
         self,
-        data: Optional[pd.DataFrame] = None,
-        peak_labels: Optional[List[str]] = None,
-        ms_files: Optional[List[str]] = None,
-        title: Optional[str] = None,
-        figsize: Tuple[int, int] = (8, 8),
-        targets_var: Optional[str] = None,
+        data: pd.DataFrame | None = None,
+        peak_labels: list[str] | None = None,
+        ms_files: list[str] | None = None,
+        title: str | None = None,
+        figsize: tuple[int, int] = (8, 8),
+        targets_var: str | None = None,
         var_name: str = "peak_max",
         vmin: int = -3,
         vmax: int = 3,
-        xmaxticks: Optional[int] = None,
-        ymaxticks: Optional[int] = None,
+        xmaxticks: int | None = None,
+        ymaxticks: int | None = None,
         apply: str = "log2p1",
         metric: str = "cosine",
         scaler: str = "standard",
-        groupby: Optional[str] = None,
+        groupby: str | None = None,
         transposed: bool = False,
         **kwargs,
     ) -> matplotlib.figure.Figure:
@@ -126,11 +130,11 @@ class MintPlotter:
 
     def peak_shapes(
         self,
-        fns: Optional[Union[str, List[str]]] = None,
-        peak_labels: Optional[Union[str, List[str]]] = None,
+        fns: str | list[str] | None = None,
+        peak_labels: str | list[str] | None = None,
         interactive: bool = False,
         **kwargs,
-    ) -> Union[sns.axisgrid.FacetGrid, PlotlyFigure]:
+    ) -> sns.axisgrid.FacetGrid | PlotlyFigure:
         """Plot peak shapes extracted from MS-MINT results.
 
         Args:
@@ -174,7 +178,7 @@ class MintPlotter:
         name: str = "",
         correlation: bool = False,
         **kwargs,
-    ) -> Optional[PlotlyFigure]:
+    ) -> PlotlyFigure | None:
         """Create an interactive heatmap to explore the data.
 
         Calls mint.crosstab() and then visualizes the result using plotly_heatmap.
@@ -195,7 +199,7 @@ class MintPlotter:
         data = self.mint.crosstab(col_name)
 
         # Remove path and suffix from file name.
-        transform_filenames_func = lambda x: P(x).with_suffix("").name
+        transform_filenames_func = lambda x: Path(x).with_suffix("").name
         data.index = [transform_filenames_func(i) for i in data.index]
 
         if len(self.mint.results) > 0:
@@ -214,7 +218,7 @@ class MintPlotter:
     def histogram_2d(
         self,
         fn: str,
-        peak_label: Optional[str] = None,
+        peak_label: str | None = None,
         rt_margin: float = 0,
         mz_margin: float = 0,
         **kwargs,
@@ -256,21 +260,21 @@ class MintPlotter:
                 lw=0.5,
             )
         if peak_label is None:
-            plt.title(f"{P(fn).with_suffix('').name}")
+            plt.title(f"{Path(fn).with_suffix('').name}")
         else:
-            plt.title(f"{P(fn).with_suffix('').name}\n{peak_label}")
+            plt.title(f"{Path(fn).with_suffix('').name}\n{peak_label}")
         return fig
 
     def chromatogram(
         self,
-        fns: Optional[Union[str, List[str]]] = None,
-        peak_labels: Optional[Union[str, List[str]]] = None,
+        fns: str | list[str] | None = None,
+        peak_labels: str | list[str] | None = None,
         interactive: bool = False,
-        filters: Optional[List[Any]] = None,
-        ax: Optional[plt.Axes] = None,
-        nthreads: Optional[int] = None,
+        filters: list[Any] | None = None,
+        ax: plt.Axes | None = None,
+        nthreads: int | None = None,
         **kwargs,
-    ) -> Union[sns.axisgrid.FacetGrid, sns.axes._base.AxesBase, PlotlyFigure]:
+    ) -> sns.axisgrid.FacetGrid | sns.axes._base.AxesBase | PlotlyFigure:
         """Plot chromatograms extracted from one or more files.
 
         Args:
@@ -288,12 +292,9 @@ class MintPlotter:
             the 'interactive' parameter and whether an 'ax' is provided.
         """
         # Handle Reactive objects
-        if hasattr(fns, 'value'):
-            fns = fns.value
-        if hasattr(peak_labels, 'value'):
-            peak_labels = peak_labels.value
-        if hasattr(nthreads, 'value'):
-            nthreads = nthreads.value
+        fns = unwrap_reactive(fns)
+        peak_labels = unwrap_reactive(peak_labels)
+        nthreads = unwrap_reactive(nthreads)
 
         if isinstance(fns, str):
             fns = [fns]
@@ -308,8 +309,7 @@ class MintPlotter:
             peak_labels = self.mint.peak_labels
 
         # Ensure peak_labels is a list/tuple, not Reactive
-        if hasattr(peak_labels, 'value'):
-            peak_labels = peak_labels.value
+        peak_labels = unwrap_reactive(peak_labels)
 
         if peak_labels is not None:
             peak_labels = tuple(peak_labels)
@@ -365,18 +365,18 @@ class MintPlotter:
     def distribution(
         self,
         var_name: str = "peak_max",
-        apply: Optional[str] = "log2p1",
+        apply: str | None = "log2p1",
         style: str = "boxplot",
-        hue: Optional[str] = None,
-        col: Optional[str] = None,
-        row: Optional[str] = None,
-        col_wrap: Optional[int] = None,
-        x_label: Optional[str] = None,
-        y_label: Optional[str] = None,
-        peak_labels: Optional[List[str]] = None,
+        hue: str | None = None,
+        col: str | None = None,
+        row: str | None = None,
+        col_wrap: int | None = None,
+        x_label: str | None = None,
+        y_label: str | None = None,
+        peak_labels: list[str] | None = None,
         interactive: bool = False,
         **kwargs,
-    ) -> Union[matplotlib.figure.Figure, PlotlyFigure]:
+    ) -> matplotlib.figure.Figure | PlotlyFigure:
         """Create distribution plots (histogram, boxplot, violin) for peak values.
 
         Args:
@@ -396,8 +396,6 @@ class MintPlotter:
         Returns:
             Matplotlib figure or Plotly figure depending on interactive parameter.
         """
-        import numpy as np
-
         data = self.mint.crosstab(var_name=var_name)
         if data is None or len(data) == 0:
             return None
@@ -447,30 +445,29 @@ class MintPlotter:
                 df_long, var_name, apply, style, hue, col, row, col_wrap, x_label, y_label, **kwargs
             )
 
-    def _distribution_matplotlib(
+    def _get_distribution_labels(
         self,
-        df_long: pd.DataFrame,
+        hue: str | None,
+        x_label: str | None,
+        y_label: str | None,
         var_name: str,
-        apply: Optional[str],
-        style: str,
-        hue: Optional[str],
-        col: Optional[str] = None,
-        row: Optional[str] = None,
-        col_wrap: Optional[int] = None,
-        x_label: Optional[str] = None,
-        y_label: Optional[str] = None,
-        **kwargs,
-    ) -> matplotlib.figure.Figure:
-        """Create matplotlib distribution plot with optional faceting."""
-        figsize = kwargs.get("figsize", (12, 6))
-        height = kwargs.get("height", 4)
-        aspect = kwargs.get("aspect", 1.5)
+        apply: str | None,
+    ) -> tuple[str, str, str]:
+        """Determine x-column and labels for distribution plots.
 
-        # Default y-label from var_name and transformation
+        Args:
+            hue: Hue variable for grouping.
+            x_label: Custom x-axis label or None.
+            y_label: Custom y-axis label or None.
+            var_name: Variable being plotted.
+            apply: Transformation applied.
+
+        Returns:
+            Tuple of (x_col, x_label, y_label).
+        """
         if y_label is None:
             y_label = f"{var_name} ({apply})" if apply else var_name
 
-        # Determine x-axis column: default to peak_label unless hue is peak_label
         if hue == "peak_label":
             x_col = "ms_file"
             if x_label is None:
@@ -480,39 +477,67 @@ class MintPlotter:
             if x_label is None:
                 x_label = "Target"
 
-        # Map style to seaborn kind
-        kind_map = {"boxplot": "box", "violin": "violin", "histogram": "count"}
-        kind = kind_map.get(style, "box")
+        return x_col, x_label, y_label
 
-        # Use catplot for faceted plots, regular plot otherwise
+    def _histogram_matplotlib(
+        self,
+        df_long: pd.DataFrame,
+        var_name: str,
+        y_label: str,
+        hue: str | None,
+        col: str | None,
+        row: str | None,
+        col_wrap: int | None,
+        height: float,
+        aspect: float,
+    ) -> matplotlib.figure.Figure:
+        """Create matplotlib histogram plot."""
         use_facet = col is not None or row is not None
 
-        if style == "histogram":
-            # Histogram doesn't fit catplot well, handle separately
-            if use_facet:
-                g = sns.FacetGrid(
-                    df_long, col=col, row=row, col_wrap=col_wrap if row is None else None,
-                    height=height, aspect=aspect, sharex=True, sharey=True
-                )
-                g.map(plt.hist, "value", bins=50, alpha=0.7, color="steelblue")
-                g.set_axis_labels(y_label, "Count")
-                return g.fig
-            else:
-                fig, ax = plt.subplots(figsize=(10, 6))
-                if hue and hue in df_long.columns:
-                    for group in df_long[hue].dropna().unique():
-                        subset = df_long[df_long[hue] == group]["value"].dropna()
-                        ax.hist(subset, bins=50, alpha=0.5, label=str(group))
-                    ax.legend(title=hue)
-                else:
-                    ax.hist(df_long["value"].dropna(), bins=50, alpha=0.7, color="steelblue")
-                ax.set_xlabel(y_label)
-                ax.set_ylabel("Count")
-                ax.set_title(f"Distribution of {var_name}")
-                plt.tight_layout()
-                return fig
+        if use_facet:
+            g = sns.FacetGrid(
+                df_long, col=col, row=row, col_wrap=col_wrap if row is None else None,
+                height=height, aspect=aspect, sharex=True, sharey=True
+            )
+            g.map(plt.hist, "value", bins=50, alpha=0.7, color="steelblue")
+            g.set_axis_labels(y_label, "Count")
+            return g.fig
 
-        # For boxplot and violin, use catplot
+        fig, ax = plt.subplots(figsize=(10, 6))
+        if hue and hue in df_long.columns:
+            for group in df_long[hue].dropna().unique():
+                subset = df_long[df_long[hue] == group]["value"].dropna()
+                ax.hist(subset, bins=50, alpha=0.5, label=str(group))
+            ax.legend(title=hue)
+        else:
+            ax.hist(df_long["value"].dropna(), bins=50, alpha=0.7, color="steelblue")
+        ax.set_xlabel(y_label)
+        ax.set_ylabel("Count")
+        ax.set_title(f"Distribution of {var_name}")
+        plt.tight_layout()
+        return fig
+
+    def _catplot_matplotlib(
+        self,
+        df_long: pd.DataFrame,
+        style: str,
+        x_col: str,
+        x_label: str,
+        y_label: str,
+        hue: str | None,
+        col: str | None,
+        row: str | None,
+        col_wrap: int | None,
+        height: float,
+        aspect: float,
+        figsize: tuple[int, int],
+        var_name: str,
+    ) -> matplotlib.figure.Figure:
+        """Create matplotlib boxplot or violin plot."""
+        kind_map = {"boxplot": "box", "violin": "violin"}
+        kind = kind_map.get(style, "box")
+        use_facet = col is not None or row is not None
+
         if use_facet:
             g = sns.catplot(
                 data=df_long,
@@ -536,26 +561,60 @@ class MintPlotter:
                     label.set_fontsize(8)
             g.tight_layout()
             return g.fig
-        else:
-            fig, ax = plt.subplots(figsize=figsize)
-            if style == "boxplot":
-                sns.boxplot(data=df_long, x=x_col, y="value", hue=hue if hue and hue != x_col else None, ax=ax)
-            elif style == "violin":
-                sns.violinplot(data=df_long, x=x_col, y="value", hue=hue if hue and hue != x_col else None, ax=ax)
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
-            ax.set_xlabel(x_label)
-            ax.set_ylabel(y_label)
-            ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
-            plt.tight_layout()
-            return fig
+
+        fig, ax = plt.subplots(figsize=figsize)
+        hue_arg = hue if hue and hue != x_col else None
+        if style == "boxplot":
+            sns.boxplot(data=df_long, x=x_col, y="value", hue=hue_arg, ax=ax)
+        else:  # violin
+            sns.violinplot(data=df_long, x=x_col, y="value", hue=hue_arg, ax=ax)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+        ax.set_title(f"Distribution of {var_name} by {x_label.lower()}")
+        plt.tight_layout()
+        return fig
+
+    def _distribution_matplotlib(
+        self,
+        df_long: pd.DataFrame,
+        var_name: str,
+        apply: str | None,
+        style: str,
+        hue: str | None,
+        col: str | None = None,
+        row: str | None = None,
+        col_wrap: int | None = None,
+        x_label: str | None = None,
+        y_label: str | None = None,
+        **kwargs,
+    ) -> matplotlib.figure.Figure:
+        """Create matplotlib distribution plot with optional faceting."""
+        figsize = kwargs.get("figsize", (12, 6))
+        height = kwargs.get("height", 4)
+        aspect = kwargs.get("aspect", 1.5)
+
+        x_col, x_label, y_label = self._get_distribution_labels(
+            hue, x_label, y_label, var_name, apply
+        )
+
+        if style == "histogram":
+            return self._histogram_matplotlib(
+                df_long, var_name, y_label, hue, col, row, col_wrap, height, aspect
+            )
+
+        return self._catplot_matplotlib(
+            df_long, style, x_col, x_label, y_label, hue,
+            col, row, col_wrap, height, aspect, figsize, var_name
+        )
 
     def _distribution_plotly(
         self,
         df_long: pd.DataFrame,
         var_name: str,
-        apply: Optional[str],
+        apply: str | None,
         style: str,
-        hue: Optional[str],
+        hue: str | None,
         **kwargs,
     ) -> PlotlyFigure:
         """Create plotly distribution plot."""

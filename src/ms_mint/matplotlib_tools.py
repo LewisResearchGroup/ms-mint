@@ -1,28 +1,28 @@
-#src/ms_mint/matplotlib_tools.py
+"""Matplotlib-based plotting utilities for MS-MINT."""
 
-import pandas as pd
+from typing import Any
+
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
-from scipy.cluster.hierarchy import linkage, dendrogram
-from scipy.spatial.distance import pdist, squareform
-from typing import Union, List, Tuple, Optional, Dict, Any, Literal, Set
 from matplotlib.figure import Figure
-import seaborn.objects as so
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import pdist, squareform
 
 
 def hierarchical_clustering(
     df: pd.DataFrame,
-    vmin: Optional[float] = None,
-    vmax: Optional[float] = None,
-    figsize: Tuple[int, int] = (8, 8),
+    vmin: float | None = None,
+    vmax: float | None = None,
+    figsize: tuple[int, int] = (8, 8),
     top_height: int = 2,
     left_width: int = 2,
-    xmaxticks: Optional[int] = None,
-    ymaxticks: Optional[int] = None,
-    metric: Union[str, Tuple[str, str]] = "cosine",
-    cmap: Optional[str] = None,
-) -> Tuple[pd.DataFrame, Figure, List[int], List[int]]:
+    xmaxticks: int | None = None,
+    ymaxticks: int | None = None,
+    metric: str | tuple[str, str] = "cosine",
+    cmap: str | None = None,
+) -> tuple[pd.DataFrame, Figure, list[int], list[int]]:
     """Perform and plot hierarchical clustering on a dataframe.
 
     Args:
@@ -136,16 +136,16 @@ def hierarchical_clustering(
 
 def plot_peak_shapes(
     mint_results: pd.DataFrame,
-    mint_metadata: Optional[pd.DataFrame] = None,
-    fns: Optional[List[str]] = None,
-    peak_labels: Optional[Union[str, List[str]]] = None,
+    mint_metadata: pd.DataFrame | None = None,
+    fns: list[str] | None = None,
+    peak_labels: str | list[str] | None = None,
     height: int = 3,
     aspect: float = 1.5,
     legend: bool = False,
     col_wrap: int = 4,
     hue: str = "ms_file_label",
-    title: Optional[str] = None,
-    dpi: Optional[int] = None,
+    title: str | None = None,
+    dpi: int | None = None,
     sharex: bool = False,
     sharey: bool = False,
     kind: str = "line",
@@ -249,12 +249,12 @@ def plot_peak_shapes(
 
 def plot_peaks(
     series: pd.Series,
-    peaks: Optional[pd.DataFrame] = None,
-    highlight: Optional[List[int]] = None,
-    expected_rt: Optional[float] = None,
-    weights: Optional[np.ndarray] = None,
+    peaks: pd.DataFrame | None = None,
+    highlight: list[int] | None = None,
+    expected_rt: float | None = None,
+    weights: np.ndarray | None = None,
     legend: bool = True,
-    label: Optional[str] = None,
+    label: str | None = None,
     **kwargs,
 ) -> Figure:
     """Plot time series data with peak annotations.
@@ -310,15 +310,15 @@ def plot_peaks(
 
 def plot_metabolomics_hist2d(
     df: pd.DataFrame,
-    figsize: Tuple[float, float] = (4, 2.5),
+    figsize: tuple[float, float] = (4, 2.5),
     dpi: int = 300,
     set_dim: bool = True,
     cmap: str = "jet",
-    rt_range: Optional[Tuple[float, float]] = None,
-    mz_range: Optional[Tuple[float, float]] = None,
+    rt_range: tuple[float, float] | None = None,
+    mz_range: tuple[float, float] | None = None,
     mz_bins: int = 100,
     **kwargs,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Any]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, Any]:
     """Create a 2D histogram of metabolomics data.
 
     Args:

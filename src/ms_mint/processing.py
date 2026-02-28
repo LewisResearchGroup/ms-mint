@@ -1,15 +1,16 @@
-# ms_mint/processing.py
+"""Peak integration and MS data processing functions."""
 
-import os
-import pandas as pd
-import numpy as np
 import logging
-from pathlib import Path as P
-from typing import Dict, List, Optional, Union, Tuple, Any, Callable
+import os
+from pathlib import Path
+from typing import Any
 
-from .tools import lock, mz_mean_width_to_min_max
+import numpy as np
+import pandas as pd
+
 from .io import ms_file_to_df
-from .standards import RESULTS_COLUMNS, MINT_RESULTS_COLUMNS
+from .standards import MINT_RESULTS_COLUMNS, RESULTS_COLUMNS
+from .tools import lock, mz_mean_width_to_min_max
 
 
 def extract_chromatogram_from_ms1(
@@ -32,7 +33,7 @@ def extract_chromatogram_from_ms1(
     return chrom["intensity"]
 
 
-def process_ms1_files_in_parallel(args: Dict[str, Any]) -> Optional[pd.DataFrame]:
+def process_ms1_files_in_parallel(args: dict[str, Any]) -> pd.DataFrame | None:
     """Process MS files in parallel using the provided arguments.
 
     This is a pickleable function for parallel peak integration that can be used
@@ -80,7 +81,7 @@ def append_results(results: pd.DataFrame, fn: str) -> None:
         results.to_csv(fn, mode="a", header=False, index=False)
 
 
-def process_ms1_file(filename: Union[str, P], targets: pd.DataFrame) -> pd.DataFrame:
+def process_ms1_file(filename: str | Path, targets: pd.DataFrame) -> pd.DataFrame:
     """Perform peak integration using a filename as input.
 
     Args:
@@ -94,9 +95,9 @@ def process_ms1_file(filename: Union[str, P], targets: pd.DataFrame) -> pd.DataF
     results = process_ms1(df, targets)
     results["total_intensity"] = df["intensity"].sum()
     results["ms_file"] = str(filename)
-    results["ms_file_label"] = P(filename).with_suffix("").name
+    results["ms_file_label"] = Path(filename).with_suffix("").name
     results["ms_file_size_MB"] = os.path.getsize(filename) / 1024 / 1024
-    results["peak_score"] = 0  # score_peaks(results)
+    results["peak_score"] = 0
     return results[MINT_RESULTS_COLUMNS]
 
 
@@ -117,7 +118,7 @@ def process_ms1(df: pd.DataFrame, targets: pd.DataFrame) -> pd.DataFrame:
     return results
 
 
-def _process_ms1_from_df_(df: pd.DataFrame, targets: pd.DataFrame) -> List[List[Any]]:
+def _process_ms1_from_df_(df: pd.DataFrame, targets: pd.DataFrame) -> list[list[Any]]:
     """Internal function to process MS-1 data from DataFrame.
 
     Args:
@@ -141,7 +142,7 @@ def _process_ms1_from_df_(df: pd.DataFrame, targets: pd.DataFrame) -> List[List[
     return result
 
 
-def process_ms1_from_numpy(array: np.ndarray, peaks: np.ndarray) -> List[List[Any]]:
+def process_ms1_from_numpy(array: np.ndarray, peaks: np.ndarray) -> list[list[Any]]:
     """Process MS1 data in numpy array format.
 
     Args:
@@ -176,8 +177,8 @@ def _process_ms1_from_numpy(
     rt_min: float,
     rt_max: float,
     intensity_threshold: float,
-    peak_label: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
+    peak_label: str | None = None,
+) -> dict[str, Any] | None:
     """Internal function to process a single peak from numpy array.
 
     Args:
@@ -208,7 +209,7 @@ def _process_ms1_from_numpy(
     return props
 
 
-def extract_ms1_properties(array: np.ndarray, mz_mean: float) -> Dict[str, Any]:
+def extract_ms1_properties(array: np.ndarray, mz_mean: float) -> dict[str, Any]:
     """Extract peak properties from an MS-1 data slice.
 
     Args:
@@ -218,8 +219,11 @@ def extract_ms1_properties(array: np.ndarray, mz_mean: float) -> Dict[str, Any]:
     Returns:
         Dictionary of extracted peak properties.
     """
-    float_list_to_comma_sep_str = lambda x: ",".join([str(np.round(i, 4)) for i in x])
-    int_list_to_comma_sep_str = lambda x: ",".join([str(int(i)) for i in x])
+    def float_list_to_comma_sep_str(x: np.ndarray) -> str:
+        return ",".join(str(np.round(i, 4)) for i in x)
+
+    def int_list_to_comma_sep_str(x: np.ndarray) -> str:
+        return ",".join(str(int(i)) for i in x)
 
     projection = pd.DataFrame(array[:, [0, 2]], columns=["rt", "int"])
 
@@ -356,7 +360,7 @@ def score_peaks(mint_results: pd.DataFrame) -> pd.Series:
 
 
 def get_chromatogram_from_ms_file(
-    ms_file: Union[str, P], mz_mean: float, mz_width: float = 10
+    ms_file: str | Path, mz_mean: float, mz_width: float = 10
 ) -> pd.Series:
     """Get chromatogram data from an MS file.
 

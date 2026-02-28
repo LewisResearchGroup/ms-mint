@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import io
 import traceback
+from collections.abc import Callable
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 import pandas as pd
 import seaborn as sns
 import solara
+from matplotlib.ticker import FuncFormatter
 
 if TYPE_CHECKING:
     from ms_mint.Mint import Mint
@@ -30,9 +31,9 @@ def no_display():
 
 
 def extract_all_chromatograms(
-    mint: "Mint",
-    nthreads: Optional[int] = None,
-) -> Optional[pd.DataFrame]:
+    mint: Mint,
+    nthreads: int | None = None,
+) -> pd.DataFrame | None:
     """Extract chromatogram data for ALL peaks at once (memoizable).
 
     This extracts data for all peaks so each file is only processed once.
@@ -52,7 +53,7 @@ def extract_all_chromatograms(
 
 @solara.component
 def OptimizationPanel(
-    mint: "Mint",
+    mint: Mint,
     ms_files: solara.Reactive[list[str]],
     targets: solara.Reactive[pd.DataFrame],
     on_targets_updated: Callable[[], None],

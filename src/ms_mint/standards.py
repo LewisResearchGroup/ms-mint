@@ -1,5 +1,4 @@
-"""
-Contains standard column names and other values.
+"""Contains standard column names and other values.
 """
 
 import os

@@ -1,17 +1,17 @@
-#src/ms_mint/plotly_tools.py
+"""Plotly-based interactive visualization tools for MS-MINT."""
 
 import logging
+from collections.abc import Iterable
+from pathlib import Path
+
+import colorlover as cl
 import numpy as np
 import pandas as pd
-import colorlover as cl
-import plotly.graph_objects as go
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
 import plotly.io as pio
-from pathlib import Path as P
-from collections.abc import Iterable
-from plotly.subplots import make_subplots
-from typing import Optional, Union, List, Dict, Any, Tuple, Callable, Set
 from plotly.graph_objs._figure import Figure as PlotlyFigure
+from plotly.subplots import make_subplots
 
 from .tools import fn_to_label
 
@@ -39,13 +39,13 @@ def plotly_heatmap(
     clustered: bool = False,
     add_dendrogram: bool = False,
     name: str = "",
-    x_tick_colors: Optional[str] = None,
-    height: Optional[int] = None,
-    width: Optional[int] = None,
+    x_tick_colors: str | None = None,
+    height: int | None = None,
+    width: int | None = None,
     correlation: bool = False,
     call_show: bool = False,
     verbose: bool = False,
-) -> Optional[PlotlyFigure]:
+) -> PlotlyFigure | None:
     """Create an interactive heatmap from a dense-formatted dataframe.
 
     Args:
@@ -211,17 +211,17 @@ def plotly_heatmap(
 
 def plotly_peak_shapes(
     mint_results: pd.DataFrame,
-    mint_metadata: Optional[pd.DataFrame] = None,
+    mint_metadata: pd.DataFrame | None = None,
     color: str = "ms_file_label",
-    fns: Optional[List[str]] = None,
+    fns: list[str] | None = None,
     col_wrap: int = 1,
-    peak_labels: Optional[Union[str, List[str]]] = None,
+    peak_labels: str | list[str] | None = None,
     legend: bool = True,
     verbose: bool = False,
     legend_orientation: str = "v",
     call_show: bool = False,
     palette: str = "Plasma",
-) -> Optional[PlotlyFigure]:
+) -> PlotlyFigure | None:
     """Plot peak shapes from mint results as interactive Plotly figure.
 
     Args:
@@ -322,7 +322,7 @@ def plotly_peak_shapes(
                 go.Scattergl(
                     x=x,
                     y=y,
-                    name=P(fn).name,
+                    name=Path(fn).name,
                     mode="markers",
                     legendgroup=file_i,
                     showlegend=(label_i == 0),
@@ -352,7 +352,7 @@ def plotly_peak_shapes(
         return fig
 
 
-def get_palette_colors(palette_name: str, num_colors: int) -> List[str]:
+def get_palette_colors(palette_name: str, num_colors: int) -> list[str]:
     """Get a list of colors from a specific colorlover palette.
 
     Args:
