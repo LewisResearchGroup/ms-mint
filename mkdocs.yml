@@ -114,3 +114,24 @@ plugins:
             show_submodules: true
             members_order: source
           paths: [./src]
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: installation.md
+    - Quickstart: quickstart.md
+  - User Guide:
+    - user_guide/index.md
+    - File Formats: user_guide/file_formats.md
+    - Target Lists: user_guide/target_lists.md
+    - Visualization: user_guide/visualization.md
+    - GUI: user_guide/gui.md
+  - API Reference:
+    - api_reference/index.md
+    - Core Classes: api_reference/core.md
+    - I/O: api_reference/io.md
+    - Processing: api_reference/processing.md
+    - Targets: api_reference/targets.md
+    - Visualization: api_reference/visualization.md
+    - Tools: api_reference/tools.md
+  - Troubleshooting: troubleshooting.md

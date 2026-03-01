@@ -1,7 +1,7 @@
-# API overview
+# API Reference
 
 - [Core classes](core.md)
 - [I/O](io.md)
-- [Processing utilites](processing.md)
+- [Processing utilities](processing.md)
 - [Target list utilities](targets.md)
-- [Vizualization tools](visualization.md)
+- [Visualization tools](visualization.md)
