@@ -64,12 +64,20 @@ class Resampler(Filter):
         Returns:
             Tuple of (resampled time points, resampled data points)
         """
-        ndx = pd.to_timedelta(t, unit=self.unit)
+        # Convert to milliseconds for consistent precision with tau (e.g. "500ms")
+        if self.unit == "seconds":
+            t_ms = np.array(t) * 1000
+        elif self.unit == "minutes":
+            t_ms = np.array(t) * 60000
+        else:
+            t_ms = np.array(t)
+        ndx = pd.to_timedelta(t_ms, unit="ms")
         chrom = pd.Series(index=ndx, data=x)
         resampled = chrom.resample(self.tau).nearest()
-        new_t = np.array(resampled.index.seconds + (resampled.index.microseconds / 1e6))
+        # Convert back to seconds
+        new_t = resampled.index.total_seconds()
         new_x = resampled.values
-        return new_t, new_x
+        return np.array(new_t), new_x
 
 
 class Smoother(Filter):

@@ -164,7 +164,9 @@ def _check_labels_are_strings_(targets: pd.DataFrame) -> bool:
     Returns:
         True if all peak labels are strings, else False.
     """
-    if not targets.dtypes["peak_label"] == np.dtype("O"):
+    dtype = targets.dtypes["peak_label"]
+    # Handle both object dtype and pandas StringDtype
+    if not (dtype == np.dtype("O") or pd.api.types.is_string_dtype(dtype)):
         logging.warning("Target labels are not strings.")
         return False
     return True
