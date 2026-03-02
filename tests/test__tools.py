@@ -6,7 +6,27 @@ from ms_mint.tools import (
     scale_dataframe,
     df_diff,
     is_ms_file,
+    unwrap_reactive,
 )
+
+
+def test__unwrap_reactive_with_value():
+    """Test unwrapping an object with .value attribute."""
+    class MockReactive:
+        def __init__(self, val):
+            self.value = val
+
+    reactive = MockReactive([1, 2, 3])
+    result = unwrap_reactive(reactive)
+    assert result == [1, 2, 3]
+
+
+def test__unwrap_reactive_without_value():
+    """Test that raw values pass through unchanged."""
+    raw = [1, 2, 3]
+    result = unwrap_reactive(raw)
+    assert result == [1, 2, 3]
+    assert result is raw  # Same object
 
 
 def test__formula_to_mass():

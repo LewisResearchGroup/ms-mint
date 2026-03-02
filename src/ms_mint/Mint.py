@@ -1,69 +1,92 @@
+#src/ms_mint/Mint.py
 """Main module of the ms-mint library."""
 
+import logging
 import os
+import time
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from glob import glob
+from io import BytesIO
+from multiprocessing import Manager, Pool, cpu_count
+from pathlib import Path
+from typing import Any, Optional
+
 import numpy as np
 import pandas as pd
-import time
-import logging
-
-from pathlib import Path as P
-from multiprocessing import Pool, Manager, cpu_count
-from glob import glob
-
-from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
-
-from .standards import MINT_RESULTS_COLUMNS, TARGETS_COLUMNS, DEPRECATED_LABELS
-from .processing import process_ms1_files_in_parallel, extract_chromatogram_from_ms1
-from .io import export_to_excel, ms_file_to_df
-from .TargetOptimizer import TargetOptimizer
-from .targets import read_targets, check_targets, standardize_targets
-from .tools import (
-    is_ms_file,
-    get_ms_files_from_results,
-    get_targets_from_results,
-    scale_dataframe,
-    init_metadata,
-    fn_to_label,
-    log2p1
-)
-from .pca import PrincipalComponentsAnalyser
-from .MintPlotter import MintPlotter
-from .Chromatogram import Chromatogram
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
+from tqdm import tqdm
 
 import ms_mint
 
-from tqdm import tqdm
+from .Chromatogram import Chromatogram
+from .io import export_to_excel, ms_file_to_df
+from .MintPlotter import MintPlotter
+from .pca import PrincipalComponentsAnalyser
+from .processing import extract_chromatogram_from_ms1, process_ms1_files_in_parallel
+from .standards import DEPRECATED_LABELS, MINT_RESULTS_COLUMNS, TARGETS_COLUMNS
+from .TargetOptimizer import TargetOptimizer
+from .targets import check_targets, read_targets, standardize_targets
+from .tools import (
+    fn_to_label,
+    get_ms_files_from_results,
+    get_targets_from_results,
+    init_metadata,
+    is_ms_file,
+    log2p1,
+    unwrap_reactive,
+)
 
-from typing import Callable
-from functools import lru_cache
+METADATA_DEFAUT_FN = "metadata.parquet"
 
-METADATA_DEFAUT_FN = 'metadata.parquet'
 
-class Mint(object):
+class Mint:
+    """Main class of the ms_mint package for processing metabolomics files.
+
+    This class provides the primary interface for extracting, processing, and
+    analyzing mass spectrometry data for metabolomics analysis.
+
+    Attributes:
+        verbose: Controls the verbosity level of the instance.
+        version: The version of the ms_mint package being used.
+        progress_callback: Function to update progress information.
+        plot: Instance of MintPlotter for visualization.
+        opt: Instance of TargetOptimizer for target optimization.
+        pca: Instance of PrincipalComponentsAnalyser for PCA analysis.
+        tqdm: Progress bar utility.
+        wdir: Working directory for input/output operations.
+        status: Current status of processing ('waiting', 'running', 'done').
+        ms_files: List of MS files to be processed.
+        n_files: Number of MS files currently loaded.
+        targets: DataFrame with target compounds information.
+        results: DataFrame with analysis results.
+        progress: Current progress of processing (0-100).
     """
-    Main class of the ms_mint package, which processes metabolomics files.
 
-    :param verbose: Sets verbosity of the instance.
-    :type verbose: bool
-
-    :param progress_callback: A callback for a progress bar.
-    :type progress_callback: Callable[]
-
-    :parm wdir: Working directory
-    :type wdir: str
-    """
+    # Type annotations for IDE autocompletion
+    plot: MintPlotter
+    opt: TargetOptimizer
+    pca: PrincipalComponentsAnalyser
 
     def __init__(
         self,
         verbose: bool = False,
-        progress_callback: Callable = None,
+        progress_callback: Callable[[float], None] | None = None,
         time_unit: str = "s",
-        wdir: str = None
-    ):
+        wdir: str | Path | None = None,
+    ) -> None:
+        """Initialize a Mint instance.
+
+        Args:
+            verbose: Sets verbosity of the instance.
+            progress_callback: A callback function for reporting progress (0-100).
+            time_unit: Unit for time measurements.
+            wdir: Working directory. If None, uses current directory.
+        """
         self.verbose = verbose
         self._version = ms_mint.__version__
-        if verbose: 
-            print("Mint version:", self.version, "\n")
+        if verbose:
+            print(f"Mint version: {self.version}\n")
         self.progress_callback = progress_callback
         self.reset()
         self.plot = MintPlotter(mint=self)
@@ -72,72 +95,71 @@ class Mint(object):
         self.tqdm = tqdm
 
         # Setup working directory as pathlib.Path
-        self.wdir = os.getcwd() if wdir is None else wdir
-        self.wdir = P(self.wdir)
+        self.wdir = Path(os.getcwd() if wdir is None else wdir)
 
     @property
-    def version(self):
-        """
-        ms-mint version number.
+    def version(self) -> str:
+        """Get the ms-mint version number.
 
-        :return: Version string.
-        :rtype: str
+        Returns:
+            Version string.
         """
         return self._version
 
-    def reset(self):
-        """
-        Reset Mint instance. Removes targets, MS-files and results.
+    def reset(self) -> "Mint":
+        """Reset Mint instance by removing targets, MS-files and results.
 
-        :return: self
-        :rtype: ms_mint.Mint.Mint
+        Returns:
+            Self for method chaining.
         """
-        self._files = []
-        self._targets_files = []
-        self._targets = pd.DataFrame(columns=TARGETS_COLUMNS)
-        self._results = pd.DataFrame({i: [] for i in MINT_RESULTS_COLUMNS})
-        self._all_df = None
-        self._progress = 0
-        self.runtime = None
-        self._status = "waiting"
-        self._messages = []
-        self.meta = init_metadata()
+        self._files: list[str] = []
+        self._targets_files: list[str] = []
+        self._targets: pd.DataFrame = pd.DataFrame(columns=TARGETS_COLUMNS)
+        self._results: pd.DataFrame = pd.DataFrame({i: [] for i in MINT_RESULTS_COLUMNS})
+        self._all_df: pd.DataFrame | None = None
+        self._progress: float = 0
+        self.runtime: float | None = None
+        self._status: str = "waiting"
+        self._messages: list[str] = []
+        self.meta: pd.DataFrame = init_metadata()
         return self
 
-    def clear_targets(self):
-        """
-        Reset target list.
-        """
+    def clear_targets(self) -> None:
+        """Reset target list."""
         self.targets = pd.DataFrame(columns=TARGETS_COLUMNS)
 
-    def clear_results(self):
-        """
-        Reset results.
-        """
+    def clear_results(self) -> None:
+        """Reset results."""
         self.results = pd.DataFrame(columns=MINT_RESULTS_COLUMNS)
 
-    def clear_ms_files(self):
-        """
-        Reset ms files.
-        """
+    def clear_ms_files(self) -> None:
+        """Reset MS files."""
         self.ms_files = []
 
-    def run(self, nthreads=None, rt_margin=0.5, mode="standard", fn=None, **kwargs):
-        """
-        Main routine to run MINT and process MS-files with current target list.
+    def run(
+        self,
+        nthreads: int | None = None,
+        rt_margin: float = 0.5,
+        mode: str = "standard",
+        fn: str | None = None,
+        **kwargs,
+    ) -> Optional["Mint"]:
+        """Run MINT and process MS-files with current target list.
 
-        :param nthreads: Number of cores to use, defaults to None
-        :type nthreads: int
-                * None - Run with min(n_cpus, c_files) CPUs
+        Args:
+            nthreads: Number of cores to use. Options:
+                * None - Run with min(n_cpus, n_files) CPUs
                 * 1: Run without multiprocessing on one CPU
-                * >1: Run with multiprocessing enabled using nthreads threads.
-        :param mode: Compute mode ('standard' or 'express'), defaults to 'standard'
-        :type mode: str
-                * 'standard': calculates peak shaped projected to RT dimension
+                * >1: Run with multiprocessing using specified threads
+            rt_margin: Margin to add to rt values when rt_min/rt_max not specified.
+            mode: Compute mode, one of:
+                * 'standard': calculates peak shapes projected to RT dimension
                 * 'express': omits calculation of other features, only peak_areas
-        :param fn: Output filename to not keep results in memory.
-        :type fn: str
-        :param kwargs: Arguments passed to the procesing function.
+            fn: Output filename to save results directly to disk instead of memory.
+            **kwargs: Additional arguments passed to the processing function.
+
+        Returns:
+            Self for method chaining, or None if no files or targets loaded.
         """
         self._status = "running"
 
@@ -165,23 +187,40 @@ class Mint(object):
         assert self.progress == 100
         return self
 
-    def _set_rt_min_max(self, targets, rt_margin):
+    def _set_rt_min_max(self, targets: pd.DataFrame, rt_margin: float) -> None:
+        """Set retention time min/max values based on rt and margin.
+
+        Args:
+            targets: DataFrame containing target information.
+            rt_margin: Margin to add/subtract from rt for min/max.
+        """
         if "rt" in targets.columns:
             update_rt_min = (targets.rt_min.isna()) & (~targets.rt.isna())
-            targets.loc[update_rt_min, "rt_min"] = (
-                targets.loc[update_rt_min, "rt"] - rt_margin
-            )
+            targets.loc[update_rt_min, "rt_min"] = targets.loc[update_rt_min, "rt"] - rt_margin
             update_rt_max = (targets.rt_max.isna()) & (~targets.rt.isna())
-            targets.loc[update_rt_max, "rt_max"] = (
-                targets.loc[update_rt_max, "rt"] + rt_margin
-            )
+            targets.loc[update_rt_max, "rt_max"] = targets.loc[update_rt_max, "rt"] + rt_margin
 
-    def _determine_nthreads(self, nthreads):
+    def _determine_nthreads(self, nthreads: int | None) -> int:
+        """Determine number of threads to use for parallel processing.
+
+        Args:
+            nthreads: Requested number of threads, or None for automatic.
+
+        Returns:
+            Number of threads to use.
+        """
         if nthreads is None:
             nthreads = min(cpu_count(), self.n_files)
         return nthreads
 
-    def _run_sequential(self, mode, fn, targets):
+    def _run_sequential(self, mode: str, fn: str | None, targets: pd.DataFrame) -> None:
+        """Run processing sequentially (single-threaded).
+
+        Args:
+            mode: Processing mode ('standard' or 'express').
+            fn: Output filename or None.
+            targets: DataFrame of targets to process.
+        """
         results = []
         for i, filename in enumerate(self.ms_files):
             args = {
@@ -195,7 +234,12 @@ class Mint(object):
             self.progress = int(100 * (i / self.n_files))
         self.results = pd.concat(results).reset_index(drop=True)
 
-    def _report_runtime(self, start):
+    def _report_runtime(self, start: float) -> None:
+        """Report runtime statistics after processing.
+
+        Args:
+            start: Start time of processing in seconds.
+        """
         end = time.time()
         self.runtime = end - start
         self.runtime_per_file = self.runtime / self.n_files
@@ -204,14 +248,24 @@ class Mint(object):
         if self.verbose:
             print(f"Total runtime: {self.runtime:.2f}s")
             print(f"Runtime per file: {self.runtime_per_file:.2f}s")
-            print(
-                f"Runtime per peak ({len(self.targets)}): {self.runtime_per_peak:.2f}s\n"
-            )
+            print(f"Runtime per peak ({len(self.targets)}): {self.runtime_per_peak:.2f}s\n")
             print("Results:", self.results)
 
     def _run_parallel(
-        self, nthreads=1, mode="standard", maxtasksperchild=None, fn=None
-    ):
+        self,
+        nthreads: int = 1,
+        mode: str = "standard",
+        maxtasksperchild: int | None = None,
+        fn: str | None = None,
+    ) -> None:
+        """Run processing in parallel using multiple threads.
+
+        Args:
+            nthreads: Number of threads to use.
+            mode: Processing mode ('standard' or 'express').
+            maxtasksperchild: Maximum number of tasks per child process.
+            fn: Output filename or None.
+        """
         pool = Pool(processes=nthreads, maxtasksperchild=maxtasksperchild)
         m = Manager()
         q = m.Queue()
@@ -242,7 +296,13 @@ class Mint(object):
             results = results.get()
             self.results = pd.concat(results).reset_index(drop=True)
 
-    def _monitor_progress(self, results, q):
+    def _monitor_progress(self, results: Any, q: Any) -> None:
+        """Monitor progress of parallel processing.
+
+        Args:
+            results: AsyncResult object from parallel processing.
+            q: Queue for tracking progress.
+        """
         while not results.ready():
             size = q.qsize()
             self.progress = 100 * size / self.n_files
@@ -250,35 +310,35 @@ class Mint(object):
         self.progress = 100
 
     @property
-    def status(self):
-        """
-        Returns current status of Mint instance.
+    def status(self) -> str:
+        """Get current status of Mint instance.
 
-        :return: ['waiting', 'running', 'done']
-        :rtype: str
+        Returns:
+            Status string, one of: 'waiting', 'running', 'done'
         """
         return self._status
 
     @property
-    def ms_files(self):
-        """
-        Get/set ms-files to process.
+    def ms_files(self) -> list[str]:
+        """Get list of MS files to process.
 
-        :getter:
-        :return: List of filenames.
-        :rtype: list[str]
-
-        :setter:
-        :param list_of_files: Filename or list of file names of MS-files.
-        :type list_of_files: str or list[str]
+        Returns:
+            List of filenames.
         """
-        return self._files
+        # Handle case where _files might be a Reactive object
+        files = unwrap_reactive(self._files)
+        return list(files) if files else []
 
     @ms_files.setter
-    def ms_files(self, list_of_files):
+    def ms_files(self, list_of_files: str | list[str]) -> None:
+        """Set MS files to process.
+
+        Args:
+            list_of_files: Filename or list of file names of MS-files.
+        """
         if isinstance(list_of_files, str):
             list_of_files = [list_of_files]
-        list_of_files = [str(P(i)) for i in list_of_files if is_ms_file(i)]
+        list_of_files = [str(Path(i)) for i in list_of_files if is_ms_file(i)]
         for f in list_of_files:
             if not os.path.isfile(f):
                 logging.warning(f"File not found ({f})")
@@ -288,23 +348,22 @@ class Mint(object):
         self.meta = self.meta.reindex([fn_to_label(fn) for fn in list_of_files])
 
     @property
-    def n_files(self):
-        """
-        Number of currently stored ms filenames.
+    def n_files(self) -> int:
+        """Get number of currently stored MS filenames.
 
-        :return: Number of files stored in self.ms_files
-        :rtype: int
+        Returns:
+            Number of files stored in self.ms_files
         """
         return len(self.ms_files)
 
-    def load_files(self, obj):
-        """
-        Load ms_files as a function that returns the Mint instance for chaining.
+    def load_files(self, obj: str | list[str]) -> "Mint":
+        """Load MS files and return self for chaining.
 
-        :param list_of_files: Filename or list of file names.
-        :type list_of_files: str or list[str]
-        :return: self
-        :rtype: ms_mint.Mint.Mint
+        Args:
+            obj: Filename pattern (for glob) or list of file names.
+
+        Returns:
+            Self for method chaining.
         """
         if isinstance(obj, str):
             self.ms_files = glob(obj, recursive=True)
@@ -312,16 +371,20 @@ class Mint(object):
             self.ms_files = obj
         return self
 
-    def load_targets(self, list_of_files):
-        """
-        Load targets from a file (csv, xslx)
+    def load_targets(self, list_of_files: str | Path | list[str | Path]) -> "Mint":
+        """Load targets from file(s) (csv, xlsx).
 
-        :param list_of_files: Filename or list of file names.
-        :type list_of_files: str or list[str]
-        :return: self
-        :rtype: ms_mint.Mint.Mint
+        Args:
+            list_of_files: Filename or list of file names.
+
+        Returns:
+            Self for method chaining.
+
+        Raises:
+            ValueError: If input is not a list of files.
+            AssertionError: If a file is not found.
         """
-        if isinstance(list_of_files, str) or isinstance(list_of_files, P):
+        if isinstance(list_of_files, str) or isinstance(list_of_files, Path):
             list_of_files = [list_of_files]
         if not isinstance(list_of_files, list):
             raise ValueError("Input should be a list of files.")
@@ -329,130 +392,157 @@ class Mint(object):
             assert os.path.isfile(f), f"File not found ({f})"
         self._targets_files = list_of_files
         if self.verbose:
-            print("Set targets files to:\n".join(self._targets_files) + "\n")
+            print("Set targets files to:\n" + "\n".join(str(f) for f in self._targets_files) + "\n")
         self.targets = read_targets(list_of_files)
         return self
 
     @property
-    def targets(self):
-        """
-        Set/get target list.
+    def targets(self) -> pd.DataFrame:
+        """Get target list.
 
-        :getter:
-        :return: Target list
-        :rtype: pandas.DataFrame
-
-        :setter:
-        :param targets: Sets the target list of the instance.
-        :type targets: pandas.DataFrame
+        Returns:
+            Target list DataFrame.
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets):
+    def targets(self, targets: pd.DataFrame) -> None:
+        """Set target list.
+
+        Args:
+            targets: DataFrame containing target information.
+
+        Raises:
+            AssertionError: If targets validation fails.
+        """
         targets = standardize_targets(targets)
         assert check_targets(targets), check_targets(targets)
         self._targets = targets.set_index("peak_label")
         if self.verbose:
             print("Set targets to:\n", self.targets.to_string(), "\n")
 
-    def get_target_params(self, peak_label):
+    def get_target_params(self, peak_label: str) -> tuple[float, float, float, float]:
+        """Get target parameters for a specific peak label.
+
+        Args:
+            peak_label: Label of the target peak.
+
+        Returns:
+            Tuple of (mz_mean, mz_width, rt_min, rt_max).
+        """
         target_data = self.targets.loc[peak_label]
-        mz_mean, mz_width, rt_min, rt_max = target_data[
-            ["mz_mean", "mz_width", "rt_min", "rt_max"]
-        ]
+        mz_mean, mz_width, rt_min, rt_max = target_data[["mz_mean", "mz_width", "rt_min", "rt_max"]]
         return mz_mean, mz_width, rt_min, rt_max
 
     @property
-    def peak_labels(self):
+    def peak_labels(self) -> list[str]:
+        """Get list of peak labels from targets.
+
+        Returns:
+            List of peak label strings.
+        """
         return self.targets.index.to_list()
 
     @property
-    def results(self):
-        """
-        Get/Set the Mint results.
+    def results(self) -> pd.DataFrame:
+        """Get results DataFrame.
 
-        :getter:
-        :return: Results
-        :rtype: pandas.DataFrame
-        :setter:
-        :param df: DataFrame with MINT results.
-        :type df: pandas.DataFrame
+        Returns:
+            DataFrame containing analysis results.
         """
         return self._results
 
     @results.setter
-    def results(self, df):
+    def results(self, df: pd.DataFrame) -> None:
+        """Set results DataFrame.
+
+        Args:
+            df: DataFrame with MINT results.
+        """
         self._results = df
 
-    def crosstab(self, var_name: str = None, index: str = None, column: str = None, aggfunc: str = 'mean', 
-                 apply: Callable = None, scaler: Callable = None, groupby: str = None):
+    def crosstab(
+        self,
+        var_name: str | None = None,
+        index: str | list[str] | None = None,
+        column: str | None = None,
+        aggfunc: str = "mean",
+        apply: Callable | None = None,
+        scaler: str | Any | None = None,
+        groupby: str | list[str] | None = None,
+        peak_labels: list[str] | None = None,
+    ) -> pd.DataFrame:
+        """Create condensed representation of the results.
+
+        Creates a cross-table with filenames as index and target labels as columns.
+        The values in the cells are determined by var_name.
+
+        Args:
+            var_name: Name of the column from results table for cell values.
+                Defaults to 'peak_area_top3'.
+            index: Column(s) to use as index in the resulting cross-tabulation.
+                Defaults to 'ms_file_label'.
+            column: Column to use as columns in the resulting cross-tabulation.
+                Defaults to 'peak_label'.
+            aggfunc: Aggregation function for aggregating values. Defaults to 'mean'.
+            apply: Function to apply to the resulting cross-tabulation.
+                Options include 'log2p1', 'logp1', or a custom function.
+            scaler: Function or name of scaler to scale the data.
+                Options include 'standard', 'robust', 'minmax', or a scikit-learn scaler.
+            groupby: Column(s) to group data before scaling.
+            peak_labels: List of peak labels to include. If None, all peaks are used.
+
+        Returns:
+            DataFrame representing the cross-tabulation.
+
+        Raises:
+            ValueError: If an unsupported scaler is specified.
         """
-        Create condensed representation of the results.
-        More specifically, a cross-table with filenames as index and target labels.
-        The values in the cells are determined by *col_name*.
-
-        :param var_name: Name of the column from *mint.results* table that is used for the cell values. If None, defaults to 'peak_area_top3'.
-        :type var_name: str, optional
-
-        :param index: Name of the column to be used as index in the resulting cross-tabulation. If None, defaults to 'ms_file_label'.
-        :type index: str, optional
-
-        :param column: Name of the column to be used as columns in the resulting cross-tabulation. If None, defaults to 'peak_label'.
-        :type column: str, optional
-
-        :param aggfunc: Aggregation function to be used for aggregating values. Defaults to 'mean'.
-        :type aggfunc: str, optional
-
-        :param apply: Function to be applied to the resulting cross-tabulation. If None, no function is applied.
-        :type apply: Callable, optional
-
-        :param scaler: Function to scale the data in the resulting cross-tabulation. If None, no scaling is performed.
-        :type scaler: Callable, optional
-
-        :param groupby: Name of the column to group data before scaling. If None, scaling is applied to the whole data, not group-wise.
-        :type groupby: str, optional
-
-        :return: DataFrame representing the cross-tabulation.
-        :rtype: pandas.DataFrame
-        """
-        df_meta = pd.merge(self.meta, self.results, left_index=True, right_on='ms_file_label')
+        df_meta = pd.merge(self.meta, self.results, left_index=True, right_on="ms_file_label")
         # Remove None if in index
         if isinstance(index, list):
             if None in index:
                 index.remove(None)
         if isinstance(groupby, str):
             groupby = [groupby]
-            
+
         if index is None:
-            index = 'ms_file_label'
+            index = "ms_file_label"
         if column is None:
-            column = 'peak_label'
+            column = "peak_label"
         if var_name is None:
-            var_name = 'peak_area_top3'
+            var_name = "peak_area_top3"
         if apply:
-            if apply == 'log2p1':
+            if apply == "log2p1":
                 apply = log2p1
-            if apply == 'logp1':
+            elif apply == "logp1":
                 apply = np.log1p
+            elif apply == "log10p1":
+                apply = lambda x: np.log10(x + 1)
             df_meta[var_name] = df_meta[var_name].apply(apply)
         if isinstance(scaler, str):
-            scaler_dict = {'standard': StandardScaler(),
-                           'robust': RobustScaler(),
-                           'minmax': MinMaxScaler()}
+            scaler_dict = {
+                "standard": StandardScaler(),
+                "robust": RobustScaler(),
+                "minmax": MinMaxScaler(),
+            }
 
             if scaler not in scaler_dict:
                 raise ValueError(f"Unsupported scaler: {scaler}")
 
             scaler = scaler_dict[scaler]
-            
+
         if scaler:
-            if groupby:          
+            if groupby:
                 groupby_cols = groupby + [column]
-                df_meta[var_name] = df_meta.groupby(groupby_cols)[var_name].transform(lambda x: self._scale_group(x, scaler))
+                df_meta[var_name] = df_meta.groupby(groupby_cols)[var_name].transform(
+                    lambda x: self._scale_group(x, scaler)
+                )
             else:
-                df_meta[var_name] = df_meta.groupby(column)[var_name].transform(lambda x: self._scale_group(x, scaler))
-                
+                df_meta[var_name] = df_meta.groupby(column)[var_name].transform(
+                    lambda x: self._scale_group(x, scaler)
+                )
+
         df = pd.pivot_table(
             df_meta,
             index=index,
@@ -460,36 +550,56 @@ class Mint(object):
             values=var_name,
             aggfunc=aggfunc,
         ).astype(np.float64)
-        return df
-    
-    @property
-    def progress(self):
-        """
-        Shows the current progress.
 
-        :getter: Returns the current progress value.
-        :setter: Set the progress to a value between 0 and 100 and calls the progress callback function.
+        # Filter and order columns if column is peak_label
+        if column == "peak_label":
+            if peak_labels is not None and len(peak_labels) > 0:
+                # Use provided peak_labels filter
+                ordered_cols = [c for c in peak_labels if c in df.columns]
+            elif self.targets is not None:
+                # Use target order from targets DataFrame
+                target_order = list(self.peak_labels)
+                ordered_cols = [c for c in target_order if c in df.columns]
+            else:
+                ordered_cols = list(df.columns)
+            df = df[ordered_cols]
+
+        return df
+
+    @property
+    def progress(self) -> float:
+        """Get current progress value.
+
+        Returns:
+            Current progress value (0-100).
         """
         return self._progress
 
     @progress.setter
-    def progress(self, value):
+    def progress(self, value: float) -> None:
+        """Set progress and call progress callback function.
+
+        Args:
+            value: Progress value between 0 and 100.
+
+        Raises:
+            AssertionError: If value is outside the range 0-100.
+        """
         assert value >= 0, value
         assert value <= 100, value
         self._progress = value
         if self.progress_callback is not None:
             self.progress_callback(value)
 
-    def export(self, fn=None):
-        """
-        Export current results to file.
+    def export(self, fn: str | None = None) -> BytesIO | None:
+        """Export current results to file.
 
-        :param fn: Filename, defaults to None
-        :type fn: str, optional
-        :param filename: **deprecated**
-        :type filename: str, optional
-        :return: file buffer if *filename* is None otherwise returns None
-        :rtype: io.BytesIO
+        Args:
+            fn: Filename to export to. If None, returns file buffer.
+                Supported formats: .xlsx, .csv, .parquet
+
+        Returns:
+            BytesIO buffer if fn is None, otherwise None.
         """
         if fn is None:
             buffer = export_to_excel(self, fn=fn)
@@ -500,15 +610,16 @@ class Mint(object):
             self.results.to_csv(fn, index=False)
         elif fn.endswith(".parquet"):
             self.results.to_parquet(fn, index=False)
+        return None
 
-    def load(self, fn):
-        """
-        Load results into Mint instance.
+    def load(self, fn: str | BytesIO) -> "Mint":
+        """Load results into Mint instance.
 
-        :param fn: Filename (csv, xlsx)
-        :type fn: str
-        :return: self
-        :rtype: ms_mint.Mint.Mint
+        Args:
+            fn: Filename (csv, xlsx, parquet) or file-like object.
+
+        Returns:
+            Self for method chaining.
         """
         if self.verbose:
             print(f"Loading MINT results from {fn}")
@@ -529,48 +640,117 @@ class Mint(object):
         else:
             results = pd.read_csv(fn)
 
-        # Add file labels if not present already    
-        if 'ms_file_label' not in results.columns:
-            results['ms_file_label'] = [fn_to_label(fn) for fn in results.ms_file]
+        # Add file labels if not present already
+        if "ms_file_label" not in results.columns:
+            results["ms_file_label"] = [fn_to_label(fn) for fn in results.ms_file]
 
         self.results = results.rename(columns=DEPRECATED_LABELS)
         self.digest_results()
         return self
 
-    def digest_results(self):
+    def digest_results(self) -> None:
+        """Extract MS files and targets from results and set them in the instance."""
         self.ms_files = get_ms_files_from_results(self.results)
         self.targets = get_targets_from_results(self.results)
 
+    def get_chromatograms(
+        self,
+        fns: list[str] | None = None,
+        peak_labels: list[str] | None = None,
+        filters: list[Any] | None = None,
+        nthreads: int | None = None,
+        **kwargs,
+    ) -> pd.DataFrame:
+        """Get chromatograms for specified files and peak labels.
 
-    def get_chromatograms(self, fns=None, peak_labels=None, filters=None, **kwargs):
+        Args:
+            fns: List of filenames to extract chromatograms from. Defaults to all MS files.
+            peak_labels: List of peak labels to extract. Defaults to all peak labels.
+            filters: List of filters to apply to the chromatograms.
+            nthreads: Number of threads for parallel extraction. If None, uses sequential.
+            **kwargs: Additional arguments to pass to the Chromatogram constructor.
+
+        Returns:
+            DataFrame containing chromatogram data.
+        """
         if fns is None:
             fns = self.ms_files
         if peak_labels is None:
             peak_labels = self.peak_labels
-        return self._get_chromatograms(fns=tuple(fns), peak_labels=tuple(peak_labels), 
-                                       filters=tuple(filters) if filters is not None else None, **kwargs)
 
-    @lru_cache(1)
-    def _get_chromatograms(self, fns=None, peak_labels=None, filters=None, **kwargs):
+        # Handle case where fns or peak_labels might be Reactive objects
+        fns = unwrap_reactive(fns)
+        peak_labels = unwrap_reactive(peak_labels)
+        nthreads = unwrap_reactive(nthreads)
+
+        # Ensure they're lists before converting to tuple
+        if not isinstance(fns, (list, tuple)):
+            fns = list(fns) if fns else []
+        if not isinstance(peak_labels, (list, tuple)):
+            peak_labels = list(peak_labels) if peak_labels else []
+
+        return self._get_chromatograms(
+            fns=tuple(fns),
+            peak_labels=tuple(peak_labels),
+            filters=tuple(filters) if filters is not None else None,
+            nthreads=nthreads,
+            **kwargs,
+        )
+
+    def _get_chromatograms(
+        self,
+        fns: tuple[str, ...] | None = None,
+        peak_labels: tuple[str, ...] | None = None,
+        filters: tuple[Any, ...] | None = None,
+        nthreads: int | None = None,
+        **kwargs,
+    ) -> pd.DataFrame:
+        """Implementation of get_chromatograms with optional parallel extraction.
+
+        Args:
+            fns: Tuple of filenames to extract chromatograms from.
+            peak_labels: Tuple of peak labels to extract.
+            filters: Tuple of filters to apply to the chromatograms.
+            nthreads: Number of threads for parallel extraction.
+            **kwargs: Additional arguments to pass to the Chromatogram constructor.
+
+        Returns:
+            DataFrame containing chromatogram data.
+        """
+        # Handle Reactive objects FIRST, before any isinstance checks
+        fns = unwrap_reactive(fns)
+        peak_labels = unwrap_reactive(peak_labels)
+        nthreads = unwrap_reactive(nthreads)
 
         if isinstance(fns, tuple):
-            fns = list(fns)     
+            fns = list(fns)
 
         if not isinstance(fns, list):
             fns = [fns]
 
         labels = [fn_to_label(fn) for fn in fns]
 
-        # Need to get the actual file names with get_chromatogramsath
-        # in case only ms_file_labels are provided
-        fns = [fn for fn in self.ms_files if fn_to_label(fn) in labels]
+        # Need to get the actual file names
+        # Handle case where ms_files might be Reactive
+        ms_files_source = unwrap_reactive(self.ms_files)
+        ms_files_list = list(ms_files_source) if ms_files_source else []
+        fns = [fn for fn in ms_files_list if fn_to_label(fn) in labels]
 
-        data = []
+        # Convert peak_labels to list if it's a tuple
+        if isinstance(peak_labels, tuple):
+            peak_labels = list(peak_labels)
 
-        for fn in self.tqdm(fns, desc="Loading chromatograms"):
+        # Get target params for all peak labels upfront
+        target_params = {
+            label: self.get_target_params(label) for label in peak_labels
+        }
+
+        def extract_from_file(fn: str) -> list[pd.DataFrame]:
+            """Extract chromatograms for all peak labels from a single file."""
+            file_data = []
             df = ms_file_to_df(fn)
             for label in peak_labels:
-                mz_mean, mz_width, rt_min, rt_max = self.get_target_params(label)
+                mz_mean, mz_width, rt_min, rt_max = target_params[label]
                 chrom_raw = extract_chromatogram_from_ms1(
                     df, mz_mean=mz_mean, mz_width=mz_width
                 ).to_frame()
@@ -585,35 +765,97 @@ class Mint(object):
                 chrom_data["peak_label"] = label
                 chrom_data["rt_min"] = rt_min
                 chrom_data["rt_max"] = rt_max
-                data.append(chrom_data)
+                file_data.append(chrom_data)
+            return file_data
+
+        data = []
+
+        if nthreads is not None and nthreads > 1 and len(fns) > 1:
+            # Parallel extraction - each file processed by one thread
+            with ThreadPoolExecutor(max_workers=min(nthreads, len(fns))) as executor:
+                results = list(executor.map(extract_from_file, fns))
+            for file_data in results:
+                data.extend(file_data)
+        else:
+            # Sequential extraction
+            for fn in fns:
+                data.extend(extract_from_file(fn))
+
+        if not data:
+            return pd.DataFrame()
 
         data = pd.concat(data).reset_index()
 
-        data["ms_file"] = data["ms_file"].apply(lambda x: P(x).with_suffix("").name)
+        data["ms_file"] = data["ms_file"].apply(lambda x: Path(x).with_suffix("").name)
         return data
 
-    def load_metadata(self, fn=None):
+    def load_metadata(self, fn: str | Path | None = None) -> "Mint":
+        """Load metadata from file.
+
+        The CSV/parquet should have a column named 'ms_file_label' that matches
+        the ms_file_label values from the loaded MS files.
+
+        Args:
+            fn: Filename to load metadata from. Defaults to metadata.parquet in working directory.
+
+        Returns:
+            Self for method chaining.
+        """
         if fn is None:
-            fn = self.wdir/METADATA_DEFAUT_FN
-        if str(fn).endswith('.csv'):
-            self.meta = pd.read_csv(fn, index_col=0)
-        elif str(fn).endswith('.parquet'):
-            self.meta = pd.read_parquet(fn)
-        if 'ms_file_label' in self.meta.columns:
-            self.meta = self.meta.set_index('ms_file_label')
+            fn = self.wdir / METADATA_DEFAUT_FN
+        if str(fn).endswith(".csv"):
+            # Read without index_col to properly detect ms_file_label column
+            meta_df = pd.read_csv(fn)
+        elif str(fn).endswith(".parquet"):
+            meta_df = pd.read_parquet(fn)
+        else:
+            raise ValueError(f"Unsupported file format: {fn}. Use .csv or .parquet")
+
+        # Set ms_file_label as index if present
+        if "ms_file_label" in meta_df.columns:
+            meta_df = meta_df.set_index("ms_file_label")
+        elif meta_df.index.name == "ms_file_label":
+            pass  # Already indexed correctly
+        else:
+            # Check if first column looks like file labels
+            first_col = meta_df.columns[0]
+            if first_col in ["ms_file", "file", "sample", "filename"]:
+                meta_df = meta_df.rename(columns={first_col: "ms_file_label"})
+                meta_df = meta_df.set_index("ms_file_label")
+            else:
+                logging.warning(
+                    f"No 'ms_file_label' column found in metadata. "
+                    f"Available columns: {list(meta_df.columns)}"
+                )
+
+        self.meta = meta_df
         return self
 
-    def save_metadata(self, fn=None):
+    def save_metadata(self, fn: str | Path | None = None) -> "Mint":
+        """Save metadata to file.
+
+        Args:
+            fn: Filename to save metadata to. Defaults to metadata.parquet in working directory.
+
+        Returns:
+            Self for method chaining.
+        """
         if fn is None:
-            fn = self.wdir/METADATA_DEFAUT_FN
-        if str(fn).endswith('.csv'):
+            fn = self.wdir / METADATA_DEFAUT_FN
+        if str(fn).endswith(".csv"):
             self.meta.to_csv(fn, na_filter=False)
-        elif str(fn).endswith('.parquet'):
+        elif str(fn).endswith(".parquet"):
             self.meta.to_parquet(fn)
         return self
 
-    def _scale_group(self, group, scaler):
-        """
-        Helper function to scale groups individually.
+    def _scale_group(self, group: pd.Series, scaler: Any) -> np.ndarray:
+        """Scale a group of values using a scaler.
+
+        Args:
+            group: Series of values to scale.
+            scaler: Scikit-learn scaler with fit_transform method.
+
+        Returns:
+            Scaled values as a numpy array.
         """
         return scaler.fit_transform(group.to_numpy().reshape(-1, 1)).flatten()

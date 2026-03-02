@@ -10,12 +10,15 @@ requires-python = ">=3.9"
 authors = [
   {name = "Soren Wacker", email = "swacker@ucalgary.ca"}
 ]
+
 urls = { "Homepage" = "https://github.com/LewisResearchGroup/ms-mint" }
+
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent"
 ]
+
 dependencies = [
   "six",
   "jsonschema",
@@ -35,15 +38,32 @@ dependencies = [
   "plotly",
   "colorlover",
   "tqdm",
-  "ipywidgets",
-  "ipyfilechooser",
   "openpyxl",
   "pyarrow",
   "tables",
   "h5py",
-  "hdf5plugin"
+  "hdf5plugin",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+gui = [
+  "solara>=1.30.0",
+  "anywidget>=0.9.0",
+  "ipyvuetify>=1.11.3",
+]
+docs = [
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.6.12",
+  "mkdocstrings==0.26.1",
+  "mkdocstrings-python==1.11.1",
+  "mkdocs-autorefs==1.2.0",
+]
+dev = [
+  "pytest",
+  "numpy",
+  "flake8"
+]
 
 [project.scripts]
 ms-mint-convert = "ms_mint.scripts.ms_mint_convert:main"
@@ -57,7 +77,37 @@ write_to = "src/ms_mint/_version.py"
 version_scheme = "guess-next-dev"
 local_scheme = "dirty-tag"
 
-[tool.pytest]
-addopts = "--maxfail=1 --disable-warnings"
+[tool.pytest.ini_options]
+addopts = ["--maxfail=1", "--disable-warnings"]
 testpaths = ["tests"]
 
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "D",   # pydocstyle
+    "ANN", # flake8-annotations (type hints)
+]
+
+ignore = [
+    "D203",  # one-blank-line-before-class
+    "D213",  # multi-line-summary-second-line
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["ms_mint"]

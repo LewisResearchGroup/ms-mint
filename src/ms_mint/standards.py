@@ -1,5 +1,4 @@
-"""
-Contains standard column names and other values.
+"""Contains standard column names and other values.
 """
 
 import os
@@ -59,17 +58,17 @@ DEPRECATED_LABELS = {
 }
 
 MINT_METADATA_COLUMNS = [
-    'ms_file_label',
-    'label', 
-    'group',
-    'batch',
-    'sample_type',
-    'run_order', 
-    'plate',
-    'plate_row', 
-    'plate_col',
-    'lc_column',
-    'polarity'
+    "ms_file_label",
+    "label",
+    "group",
+    "batch",
+    "sample_type",
+    "run_order",
+    "plate",
+    "plate_row",
+    "plate_col",
+    "lc_column",
+    "polarity",
 ]
 
 M_PROTON = 1.00782503223

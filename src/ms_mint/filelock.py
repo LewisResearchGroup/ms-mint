@@ -23,10 +23,8 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+"""A platform independent file lock that supports the with-statement.
 """
-A platform independent file lock that supports the with-statement.
-"""
-
 
 # Modules
 # ------------------------------------------------
@@ -77,8 +75,7 @@ def logger():
 # Exceptions
 # ------------------------------------------------
 class Timeout(TimeoutError):
-    """
-    Raised when the lock could not be acquired in *timeout*
+    """Raised when the lock could not be acquired in *timeout*
     seconds.
     """
 
@@ -89,7 +86,7 @@ class Timeout(TimeoutError):
         return None
 
     def __str__(self):
-        temp = "The file lock '{}' could not be acquired.".format(self.lock_file)
+        temp = f"The file lock '{self.lock_file}' could not be acquired."
         return temp
 
 
@@ -105,7 +102,7 @@ class Timeout(TimeoutError):
 # automatically.
 #
 # :seealso: issue #37 (memory leak)
-class _Acquire_ReturnProxy(object):
+class _Acquire_ReturnProxy:
     def __init__(self, lock):
         self.lock = lock
         return None
@@ -118,9 +115,8 @@ class _Acquire_ReturnProxy(object):
         return None
 
 
-class BaseFileLock(object):
-    """
-    Implements the base class of a file lock.
+class BaseFileLock:
+    """Implements the base class of a file lock.
     """
 
     def __init__(self, lock_file, timeout=-1):
@@ -148,15 +144,13 @@ class BaseFileLock(object):
 
     @property
     def lock_file(self):
-        """
-        The path to the lock file.
+        """The path to the lock file.
         """
         return self._lock_file
 
     @property
     def timeout(self):
-        """
-        You can set a default timeout for the filelock. It will be used as
+        """You can set a default timeout for the filelock. It will be used as
         fallback value in the acquire method, if no timeout value (*None*) is
         given.
 
@@ -179,16 +173,14 @@ class BaseFileLock(object):
     # --------------------------------------------
 
     def _acquire(self):
-        """
-        Platform dependent. If the file lock could be
+        """Platform dependent. If the file lock could be
         acquired, self._lock_file_fd holds the file descriptor
         of the lock file.
         """
         raise NotImplementedError()
 
     def _release(self):
-        """
-        Releases the lock and sets self._lock_file_fd to None.
+        """Releases the lock and sets self._lock_file_fd to None.
         """
         raise NotImplementedError()
 
@@ -197,8 +189,7 @@ class BaseFileLock(object):
 
     @property
     def is_locked(self):
-        """
-        True, if the object holds the file lock.
+        """True, if the object holds the file lock.
 
         .. versionchanged:: 2.0.0
 
@@ -207,8 +198,7 @@ class BaseFileLock(object):
         return self._lock_file_fd is not None
 
     def acquire(self, timeout=None, poll_intervall=0.05):
-        """
-        Acquires the file lock or fails with a :exc:`Timeout` error.
+        """Acquires the file lock or fails with a :exc:`Timeout` error.
 
         .. code-block:: python
 
@@ -268,9 +258,7 @@ class BaseFileLock(object):
                     logger().info("Lock %s acquired on %s", lock_id, lock_filename)
                     break
                 elif timeout >= 0 and time.time() - start_time > timeout:
-                    logger().debug(
-                        "Timeout on acquiring lock %s on %s", lock_id, lock_filename
-                    )
+                    logger().debug("Timeout on acquiring lock %s on %s", lock_id, lock_filename)
                     raise Timeout(self._lock_file)
                 else:
                     logger().debug(
@@ -289,8 +277,7 @@ class BaseFileLock(object):
         return _Acquire_ReturnProxy(lock=self)
 
     def release(self, force=False):
-        """
-        Releases the file lock.
+        """Releases the file lock.
 
         Please note, that the lock is only completly released, if the lock
         counter is 0.
@@ -309,9 +296,7 @@ class BaseFileLock(object):
                     lock_id = id(self)
                     lock_filename = self._lock_file
 
-                    logger().debug(
-                        "Attempting to release lock %s on %s", lock_id, lock_filename
-                    )
+                    logger().debug("Attempting to release lock %s on %s", lock_id, lock_filename)
                     self._release()
                     self._lock_counter = 0
                     logger().info("Lock %s released on %s", lock_id, lock_filename)
@@ -336,8 +321,7 @@ class BaseFileLock(object):
 
 
 class WindowsFileLock(BaseFileLock):
-    """
-    Uses the :func:`msvcrt.locking` function to hard lock the lock file on
+    """Uses the :func:`msvcrt.locking` function to hard lock the lock file on
     windows systems.
     """
 
@@ -351,7 +335,7 @@ class WindowsFileLock(BaseFileLock):
         else:
             try:
                 msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
-            except (IOError, OSError):
+            except OSError:
                 os.close(fd)
             else:
                 self._lock_file_fd = fd
@@ -377,8 +361,7 @@ class WindowsFileLock(BaseFileLock):
 
 
 class UnixFileLock(BaseFileLock):
-    """
-    Uses the :func:`fcntl.flock` to hard lock the lock file on unix systems.
+    """Uses the :func:`fcntl.flock` to hard lock the lock file on unix systems.
     """
 
     def _acquire(self):
@@ -387,7 +370,7 @@ class UnixFileLock(BaseFileLock):
 
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except (IOError, OSError):
+        except OSError:
             os.close(fd)
         else:
             self._lock_file_fd = fd
@@ -410,15 +393,14 @@ class UnixFileLock(BaseFileLock):
 
 
 class SoftFileLock(BaseFileLock):
-    """
-    Simply watches the existence of the lock file.
+    """Simply watches the existence of the lock file.
     """
 
     def _acquire(self):
         open_mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_TRUNC
         try:
             fd = os.open(self._lock_file, open_mode)
-        except (IOError, OSError):
+        except OSError:
             pass
         else:
             self._lock_file_fd = fd

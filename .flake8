@@ -1,0 +1,6 @@
+[flake8]
+per-file-ignores = 
+    **/MintPlotter.py:F821
+    **/TargetOptimizer.py:F821 
+    **/io.py:F821
+    **/pca.py:F821
