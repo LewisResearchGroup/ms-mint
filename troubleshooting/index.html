@@ -12,13 +12,11 @@
         <meta name="author" content="Lewis Research Group">
       
       
-        <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/api_reference/">
+        <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/troubleshooting/">
       
       
-        <link rel="prev" href="../user_guide/gui/">
+        <link rel="prev" href="../api_reference/tools/">
       
-      
-        <link rel="next" href="core/">
       
       
       <link rel="icon" href="../assets/favicon.png">
@@ -26,7 +24,7 @@
     
     
       
-        <title>API Reference - MS-MINT Documentation</title>
+        <title>Troubleshooting - MS-MINT Documentation</title>
       
     
     
@@ -92,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-reference" class="md-skip">
+        <a href="#troubleshooting" class="md-skip">
           Skip to content
         </a>
       
@@ -128,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API Reference
+              Troubleshooting
             
           </span>
         </div>
@@ -568,8 +566,6 @@
       
   
   
-    
-  
   
   
     
@@ -600,15 +596,17 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+            <a href="../api_reference/" class="md-nav__link ">
               
   
   
@@ -621,13 +619,13 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_4" id="__nav_4_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             API Reference
@@ -643,7 +641,7 @@
   
   
     <li class="md-nav__item">
-      <a href="core/" class="md-nav__link">
+      <a href="../api_reference/core/" class="md-nav__link">
         
   
   
@@ -666,7 +664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="io/" class="md-nav__link">
+      <a href="../api_reference/io/" class="md-nav__link">
         
   
   
@@ -689,7 +687,7 @@
   
   
     <li class="md-nav__item">
-      <a href="processing/" class="md-nav__link">
+      <a href="../api_reference/processing/" class="md-nav__link">
         
   
   
@@ -712,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="targets/" class="md-nav__link">
+      <a href="../api_reference/targets/" class="md-nav__link">
         
   
   
@@ -735,7 +733,7 @@
   
   
     <li class="md-nav__item">
-      <a href="visualization/" class="md-nav__link">
+      <a href="../api_reference/visualization/" class="md-nav__link">
         
   
   
@@ -758,7 +756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tools/" class="md-nav__link">
+      <a href="../api_reference/tools/" class="md-nav__link">
         
   
   
@@ -785,10 +783,32 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../troubleshooting/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -799,6 +819,287 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#importerror-solara-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImportError: solara not found
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mzmlb-files-not-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      mzMLb files not supported
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-loading-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Loading Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Loading Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-not-found-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      "File not found" errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empty-dataframe-after-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Empty DataFrame after loading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-errors-with-large-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory errors with large files
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#target-list-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Target List Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Target List Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#duplicate-peak_label-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Duplicate peak_label" error
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-peaks-detected" class="md-nav__link">
+    <span class="md-ellipsis">
+      No peaks detected
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrong-rt-unit-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wrong RT unit conversion
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#processing-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processing Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Processing Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#processing-hangs-or-is-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processing hangs or is slow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zero-peak-areas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Zero peak areas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#results-differ-between-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results differ between runs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualization-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visualization Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Visualization Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plots-not-displaying-in-jupyter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plots not displaying in Jupyter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interactive-plots-not-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interactive plots not working
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#heatmap-clustering-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Heatmap clustering fails
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gui-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      GUI Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GUI Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gui-not-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      GUI not rendering
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-load-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session load fails
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      Getting Help
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -822,13 +1123,161 @@
   
 
 
-<h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
+<h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h1>
+<p>Common issues and solutions when using MS-MINT.</p>
+<h2 id="installation-issues">Installation Issues<a class="headerlink" href="#installation-issues" title="Permanent link">&para;</a></h2>
+<h3 id="importerror-solara-not-found">ImportError: solara not found<a class="headerlink" href="#importerror-solara-not-found" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> GUI dependencies not installed.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ms-mint<span class="o">[</span>gui<span class="o">]</span>
+</code></pre></div></p>
+<h3 id="mzmlb-files-not-supported">mzMLb files not supported<a class="headerlink" href="#mzmlb-files-not-supported" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Optional HDF5 dependencies missing.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>h5py<span class="w"> </span>hdf5plugin
+</code></pre></div></p>
+<h2 id="file-loading-issues">File Loading Issues<a class="headerlink" href="#file-loading-issues" title="Permanent link">&para;</a></h2>
+<h3 id="file-not-found-errors">"File not found" errors<a class="headerlink" href="#file-not-found-errors" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Incorrect file path or working directory.</p>
+<p><strong>Solution:</strong>
+1. Use absolute paths or verify relative paths
+2. Check the working directory: <code>mint.wdir</code>
+3. Verify files exist: <code>ls your_path/*.mzML</code></p>
+<h3 id="empty-dataframe-after-loading">Empty DataFrame after loading<a class="headerlink" href="#empty-dataframe-after-loading" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> File format not recognized or corrupted file.</p>
+<p><strong>Solution:</strong>
+1. Verify file extension is lowercase (<code>.mzml</code> not <code>.MZML</code>)
+2. Try converting with MSConvert
+3. Check file integrity by opening in another tool</p>
+<h3 id="memory-errors-with-large-files">Memory errors with large files<a class="headerlink" href="#memory-errors-with-large-files" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Loading too many files simultaneously.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Process files and save results incrementally</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">mint</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="s1">&#39;results.csv&#39;</span><span class="p">)</span>
+</code></pre></div></p>
+<h2 id="target-list-issues">Target List Issues<a class="headerlink" href="#target-list-issues" title="Permanent link">&para;</a></h2>
+<h3 id="duplicate-peak_label-error">"Duplicate peak_label" error<a class="headerlink" href="#duplicate-peak_label-error" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Non-unique labels in target list.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Check for duplicates</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">targets</span><span class="p">[</span><span class="n">targets</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="s1">&#39;peak_label&#39;</span><span class="p">)]</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Auto-generate unique labels</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">targets</span><span class="p">[</span><span class="s1">&#39;peak_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;peak_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">))]</span>
+</code></pre></div></p>
+<h3 id="no-peaks-detected">No peaks detected<a class="headerlink" href="#no-peaks-detected" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> RT windows or m/z values don't match actual data.</p>
+<p><strong>Solution:</strong>
+1. Check RT units (seconds vs minutes)
+2. Verify m/z values match ionization mode
+3. Use RT optimization:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">mint</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">rt_min_max</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="wrong-rt-unit-conversion">Wrong RT unit conversion<a class="headerlink" href="#wrong-rt-unit-conversion" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Inconsistent <code>rt_unit</code> column values.</p>
+<p><strong>Solution:</strong>
+Standardize units before loading:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">targets</span><span class="p">[</span><span class="s1">&#39;rt_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>  <span class="c1"># or &#39;min&#39;</span>
+</code></pre></div></p>
+<h2 id="processing-issues">Processing Issues<a class="headerlink" href="#processing-issues" title="Permanent link">&para;</a></h2>
+<h3 id="processing-hangs-or-is-slow">Processing hangs or is slow<a class="headerlink" href="#processing-hangs-or-is-slow" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Large number of files or targets.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Use parallel processing</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">mint</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nthreads</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Or process in batches</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">file_batches</span><span class="p">:</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">mint</span><span class="o">.</span><span class="n">ms_files</span> <span class="o">=</span> <span class="n">batch</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">mint</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="s1">&#39;results.csv&#39;</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="zero-peak-areas">Zero peak areas<a class="headerlink" href="#zero-peak-areas" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> No data points within the specified RT/m/z window.</p>
+<p><strong>Solution:</strong>
+1. Widen RT windows: increase <code>rt_min</code>/<code>rt_max</code> range
+2. Increase m/z width: set <code>mz_width</code> to 15-20 ppm
+3. Lower intensity threshold: set <code>intensity_threshold</code> to 0</p>
+<h3 id="results-differ-between-runs">Results differ between runs<a class="headerlink" href="#results-differ-between-runs" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Floating-point precision or file order differences.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Sort results for consistent comparison</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;ms_file&#39;</span><span class="p">,</span> <span class="s1">&#39;peak_label&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div></p>
+<h2 id="visualization-issues">Visualization Issues<a class="headerlink" href="#visualization-issues" title="Permanent link">&para;</a></h2>
+<h3 id="plots-not-displaying-in-jupyter">Plots not displaying in Jupyter<a class="headerlink" href="#plots-not-displaying-in-jupyter" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Matplotlib backend issue.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># or</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="o">%</span><span class="n">pylab</span> <span class="n">inline</span>
+</code></pre></div></p>
+<h3 id="interactive-plots-not-working">Interactive plots not working<a class="headerlink" href="#interactive-plots-not-working" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Plotly not installed or notebook extension missing.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>plotly
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>jupyter<span class="w"> </span>labextension<span class="w"> </span>install<span class="w"> </span>jupyterlab-plotly<span class="w">  </span><span class="c1"># for JupyterLab</span>
+</code></pre></div></p>
+<h3 id="heatmap-clustering-fails">Heatmap clustering fails<a class="headerlink" href="#heatmap-clustering-fails" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> NaN or infinite values in data.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Fill missing values</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">crosstab</span> <span class="o">=</span> <span class="n">mint</span><span class="o">.</span><span class="n">crosstab</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Or remove rows/columns with missing data</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">crosstab</span> <span class="o">=</span> <span class="n">crosstab</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+</code></pre></div></p>
+<h2 id="gui-issues">GUI Issues<a class="headerlink" href="#gui-issues" title="Permanent link">&para;</a></h2>
+<h3 id="gui-not-rendering">GUI not rendering<a class="headerlink" href="#gui-not-rendering" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Solara not properly installed or kernel mismatch.</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ms-mint<span class="o">[</span>gui<span class="o">]</span><span class="w"> </span>--force-reinstall
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1"># Restart Jupyter kernel</span>
+</code></pre></div></p>
+<h3 id="session-load-fails">Session load fails<a class="headerlink" href="#session-load-fails" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> Incompatible session file from different version.</p>
+<p><strong>Solution:</strong>
+Delete the session file and start fresh:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>rm<span class="w"> </span>mint_session.pkl
+</code></pre></div></p>
+<h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Slow file loading</td>
+<td>Convert to parquet format</td>
+</tr>
+<tr>
+<td>Memory issues</td>
+<td>Process files in batches</td>
+</tr>
+<tr>
+<td>Slow processing</td>
+<td>Increase thread count</td>
+</tr>
+<tr>
+<td>Large result files</td>
+<td>Use <code>fn</code> parameter to stream to disk</td>
+</tr>
+</tbody>
+</table>
+<h2 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h2>
+<p>Enable verbose output for debugging:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">mint</span> <span class="o">=</span> <span class="n">Mint</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="core/">Core classes</a></li>
-<li><a href="io/">I/O</a></li>
-<li><a href="processing/">Processing utilities</a></li>
-<li><a href="targets/">Target list utilities</a></li>
-<li><a href="visualization/">Visualization tools</a></li>
+<li><a href="https://github.com/LewisResearchGroup/ms-mint/issues">GitHub Issues</a></li>
+<li>Check existing issues before creating new ones</li>
+<li>Include: Python version, ms-mint version, error traceback</li>
 </ul>
 
 

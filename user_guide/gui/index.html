@@ -12,13 +12,13 @@
         <meta name="author" content="Lewis Research Group">
       
       
-        <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/user_guide/visualization/">
+        <link rel="canonical" href="https://lewisresearchgroup.github.io/ms-mint/user_guide/gui/">
       
       
-        <link rel="prev" href="../target_lists/">
+        <link rel="prev" href="../visualization/">
       
       
-        <link rel="next" href="../gui/">
+        <link rel="next" href="../../api_reference/">
       
       
       <link rel="icon" href="../../assets/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Visualization - MS-MINT Documentation</title>
+        <title>GUI - MS-MINT Documentation</title>
       
     
     
@@ -92,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#visualization" class="md-skip">
+        <a href="#interactive-gui" class="md-skip">
           Skip to content
         </a>
       
@@ -128,7 +128,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Visualization
+              GUI
             
           </span>
         </div>
@@ -515,6 +515,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Visualization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -532,7 +555,7 @@
   
   
   <span class="md-ellipsis">
-    Visualization
+    GUI
     
   </span>
   
@@ -545,7 +568,7 @@
   
   
   <span class="md-ellipsis">
-    Visualization
+    GUI
     
   </span>
   
@@ -568,112 +591,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Overview
+      Installation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#visualization-types" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
-      Visualization Types
+      Usage
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Visualization Types">
+    <nav class="md-nav" aria-label="Usage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-heatmaps" class="md-nav__link">
+  <a href="#in-jupyter-notebook" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Heatmaps
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="1. Heatmaps">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#static-heatmaps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Static Heatmaps
+      In Jupyter Notebook
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#interactive-heatmaps" class="md-nav__link">
+  <a href="#standalone-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Interactive Heatmaps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#heatmap-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Heatmap Options
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-peak-shapes" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Peak Shapes
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. Peak Shapes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#static-peak-shape-plots" class="md-nav__link">
-    <span class="md-ellipsis">
-      Static Peak Shape Plots
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#interactive-peak-shape-plots" class="md-nav__link">
-    <span class="md-ellipsis">
-      Interactive Peak Shape Plots
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-chromatograms" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Chromatograms
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-2d-histograms" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. 2D Histograms
+      Standalone Application
     </span>
   </a>
   
@@ -685,28 +633,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-visualization-techniques" class="md-nav__link">
+  <a href="#interface-overview" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced Visualization Techniques
+      Interface Overview
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Advanced Visualization Techniques">
+    <nav class="md-nav" aria-label="Interface Overview">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#customization-options" class="md-nav__link">
+  <a href="#ms-files-tab" class="md-nav__link">
     <span class="md-ellipsis">
-      Customization Options
+      MS Files Tab
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#color-customization" class="md-nav__link">
+  <a href="#targets-tab" class="md-nav__link">
     <span class="md-ellipsis">
-      Color Customization
+      Targets Tab
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processing-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processing Tab
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#results-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results Tab
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visualization-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visualization Tab
     </span>
   </a>
   
@@ -718,45 +693,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
+  <a href="#sidebar-settings" class="md-nav__link">
     <span class="md-ellipsis">
-      Best Practices
+      Sidebar Settings
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#workflow-example" class="md-nav__link">
     <span class="md-ellipsis">
-      Troubleshooting
+      Workflow Example
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-tips" class="md-nav__link">
+  <a href="#session-management" class="md-nav__link">
     <span class="md-ellipsis">
-      Performance Tips
+      Session Management
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-workflow" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
-      Example Workflow
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Notes
+      See Also
     </span>
   </a>
   
@@ -766,29 +732,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../gui/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    GUI
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1059,145 +1002,113 @@
   
 
 
-<h1 id="visualization">Visualization<a class="headerlink" href="#visualization" title="Permanent link">&para;</a></h1>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The MS-MINT visualization tools provide powerful and flexible ways to explore mass spectrometry data, offering both static (Matplotlib) and interactive (Plotly) visualization options.</p>
-<h2 id="visualization-types">Visualization Types<a class="headerlink" href="#visualization-types" title="Permanent link">&para;</a></h2>
-<h3 id="1-heatmaps">1. Heatmaps<a class="headerlink" href="#1-heatmaps" title="Permanent link">&para;</a></h3>
-<h4 id="static-heatmaps">Static Heatmaps<a class="headerlink" href="#static-heatmaps" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Hierarchical clustering heatmap</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">hierarchical_clustering</span><span class="p">(</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">data</span><span class="o">=</span><span class="n">your_dataframe</span><span class="p">,</span>      <span class="c1"># Data to visualize</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">vmin</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span>                  <span class="c1"># Minimum value for color scaling</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">vmax</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>                   <span class="c1"># Maximum value for color scaling</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;cosine&#39;</span><span class="p">,</span>          <span class="c1"># Distance metric for clustering</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>           <span class="c1"># Figure size</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">xmaxticks</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>             <span class="c1"># Maximum x-axis ticks</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">ymaxticks</span><span class="o">=</span><span class="mi">10</span>              <span class="c1"># Maximum y-axis ticks</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
+<h1 id="interactive-gui">Interactive GUI<a class="headerlink" href="#interactive-gui" title="Permanent link">&para;</a></h1>
+<p>MS-MINT includes a Solara-based graphical interface for interactive analysis in Jupyter notebooks.</p>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<p>Install with GUI support:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ms-mint<span class="o">[</span>gui<span class="o">]</span>
 </code></pre></div>
-<h4 id="interactive-heatmaps">Interactive Heatmaps<a class="headerlink" href="#interactive-heatmaps" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Create an interactive heatmap</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">col_name</span><span class="o">=</span><span class="s1">&#39;peak_max&#39;</span><span class="p">,</span>      <span class="c1"># Column to visualize</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">normed_by_cols</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>      <span class="c1"># Normalize by column</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">transposed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>         <span class="c1"># Transpose matrix</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">clustered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>           <span class="c1"># Apply hierarchical clustering</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">correlation</span><span class="o">=</span><span class="kc">False</span>         <span class="c1"># Convert to correlation matrix</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">)</span>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<h3 id="in-jupyter-notebook">In Jupyter Notebook<a class="headerlink" href="#in-jupyter-notebook" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ms_mint.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">MintGui</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">MintGui</span><span class="p">()</span>
 </code></pre></div>
-<h4 id="heatmap-options">Heatmap Options<a class="headerlink" href="#heatmap-options" title="Permanent link">&para;</a></h4>
+<h3 id="standalone-application">Standalone Application<a class="headerlink" href="#standalone-application" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>solara<span class="w"> </span>run<span class="w"> </span>ms_mint.gui.app:MintGui
+</code></pre></div>
+<h2 id="interface-overview">Interface Overview<a class="headerlink" href="#interface-overview" title="Permanent link">&para;</a></h2>
+<p>The GUI is organized into five tabs:</p>
+<h3 id="ms-files-tab">MS Files Tab<a class="headerlink" href="#ms-files-tab" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Normalization</strong>: Scale data by column maximum</li>
-<li><strong>Clustering</strong>: Hierarchical clustering of rows/columns</li>
-<li><strong>Correlation</strong>: Convert to correlation matrix</li>
-<li><strong>Color Scaling</strong>: Customize color range and palette</li>
+<li><strong>File Selection</strong>: Load MS files using glob patterns (e.g., <code>./data/*.mzML</code>)</li>
+<li><strong>Metadata Panel</strong>: View and edit sample metadata</li>
+<li>Supports mzML, mzXML, mzMLb, and parquet formats</li>
 </ul>
-<h3 id="2-peak-shapes">2. Peak Shapes<a class="headerlink" href="#2-peak-shapes" title="Permanent link">&para;</a></h3>
-<h4 id="static-peak-shape-plots">Static Peak Shape Plots<a class="headerlink" href="#static-peak-shape-plots" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Plot peak shapes from results</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">peak_shapes</span><span class="p">(</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">fns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file1.mzXML&#39;</span><span class="p">,</span> <span class="s1">&#39;file2.mzXML&#39;</span><span class="p">],</span>  <span class="c1"># Specific files</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">peak_labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Caffeine&#39;</span><span class="p">,</span> <span class="s1">&#39;Glucose&#39;</span><span class="p">],</span>  <span class="c1"># Specific peaks</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>                 <span class="c1"># Facet height</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">aspect</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>               <span class="c1"># Facet aspect ratio</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">col_wrap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>               <span class="c1"># Maximum columns</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span>               <span class="c1"># Show legend</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
-</code></pre></div>
-<h4 id="interactive-peak-shape-plots">Interactive Peak Shape Plots<a class="headerlink" href="#interactive-peak-shape-plots" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Interactive peak shape visualization</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">peak_shapes</span><span class="p">(</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">fns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file1.mzXML&#39;</span><span class="p">,</span> <span class="s1">&#39;file2.mzXML&#39;</span><span class="p">],</span>  <span class="c1"># Specific files</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">peak_labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Caffeine&#39;</span><span class="p">,</span> <span class="s1">&#39;Glucose&#39;</span><span class="p">],</span>  <span class="c1"># Specific peaks</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>         <span class="c1"># Use Plotly interactive mode</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span>     <span class="c1"># Color by file label</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
-</code></pre></div>
-<h3 id="3-chromatograms">3. Chromatograms<a class="headerlink" href="#3-chromatograms" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Plot chromatograms</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">chromatogram</span><span class="p">(</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">fns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file1.mzXML&#39;</span><span class="p">,</span> <span class="s1">&#39;file2.mzXML&#39;</span><span class="p">],</span>  <span class="c1"># Specific files</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">peak_labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Caffeine&#39;</span><span class="p">,</span> <span class="s1">&#39;Glucose&#39;</span><span class="p">],</span>  <span class="c1"># Specific peaks</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>        <span class="c1"># Static plot</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">filters</span><span class="o">=</span><span class="kc">None</span>              <span class="c1"># Optional data filters</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
-</code></pre></div>
-<h3 id="4-2d-histograms">4. 2D Histograms<a class="headerlink" href="#4-2d-histograms" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Create 2D histogram of MS file</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">histogram_2d</span><span class="p">(</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">fn</span><span class="o">=</span><span class="s1">&#39;your_ms_file.mzXML&#39;</span><span class="p">,</span>  <span class="c1"># MS file to visualize</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">peak_label</span><span class="o">=</span><span class="s1">&#39;Caffeine&#39;</span><span class="p">,</span>    <span class="c1"># Optional peak label to highlight</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">rt_margin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>              <span class="c1"># Retention time margin</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">mz_margin</span><span class="o">=</span><span class="mi">0</span>               <span class="c1"># M/Z margin</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
-</code></pre></div>
-<h2 id="advanced-visualization-techniques">Advanced Visualization Techniques<a class="headerlink" href="#advanced-visualization-techniques" title="Permanent link">&para;</a></h2>
-<h3 id="customization-options">Customization Options<a class="headerlink" href="#customization-options" title="Permanent link">&para;</a></h3>
+<h3 id="targets-tab">Targets Tab<a class="headerlink" href="#targets-tab" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Color Palettes</strong>: Choose from various color schemes</li>
-<li><strong>Interactive vs. Static</strong>: Switch between Plotly and Matplotlib</li>
-<li><strong>Filtering</strong>: Select specific files or peaks</li>
-<li><strong>Scaling</strong>: Normalize and transform data</li>
+<li><strong>Target Loading</strong>: Upload target lists (CSV/Excel)</li>
+<li><strong>Target Management</strong>: Reorder, activate/deactivate targets</li>
+<li><strong>RT Optimization</strong>: Automatically optimize retention time windows based on actual chromatographic data</li>
 </ul>
-<h3 id="color-customization">Color Customization<a class="headerlink" href="#color-customization" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Use different color palettes</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">plotter</span><span class="o">.</span><span class="n">peak_shapes</span><span class="p">(</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;Plasma&#39;</span><span class="p">,</span>         <span class="c1"># Color palette</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;ms_file_label&#39;</span>     <span class="c1"># Color grouping</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">)</span>
-</code></pre></div>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="processing-tab">Processing Tab<a class="headerlink" href="#processing-tab" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Run Analysis</strong>: Process MS files with loaded targets</li>
+<li><strong>Progress Tracking</strong>: Monitor processing status</li>
+<li><strong>Export Results</strong>: Save results to CSV</li>
+<li><strong>Settings</strong>:<ul>
+<li>Processing mode (standard/parallel)</li>
+<li>RT margin adjustment</li>
+<li>Thread count for parallel processing</li>
+</ul>
+</li>
+</ul>
+<h3 id="results-tab">Results Tab<a class="headerlink" href="#results-tab" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Results Table</strong>: View peak integration results</li>
+<li><strong>Crosstab View</strong>: Pivot table of peak areas by sample and metabolite</li>
+</ul>
+<h3 id="visualization-tab">Visualization Tab<a class="headerlink" href="#visualization-tab" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Heatmaps</strong>: Hierarchical clustering visualization</li>
+<li><strong>Peak Shapes</strong>: Chromatographic peak profiles</li>
+<li><strong>2D Histograms</strong>: Raw data exploration</li>
+<li>Export plots in multiple formats (PNG, PDF, SVG)</li>
+</ul>
+<h2 id="sidebar-settings">Sidebar Settings<a class="headerlink" href="#sidebar-settings" title="Permanent link">&para;</a></h2>
+<p>The sidebar provides global settings:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Working Directory</td>
+<td>Base path for file operations</td>
+</tr>
+<tr>
+<td>RT Unit</td>
+<td>Display retention times in seconds or minutes</td>
+</tr>
+<tr>
+<td>Image Format</td>
+<td>Export format for plots</td>
+</tr>
+<tr>
+<td>Threads</td>
+<td>Number of parallel processing threads</td>
+</tr>
+<tr>
+<td>Session</td>
+<td>Save/load analysis state</td>
+</tr>
+</tbody>
+</table>
+<h2 id="workflow-example">Workflow Example<a class="headerlink" href="#workflow-example" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Data Preprocessing</strong>: Ensure data is clean and standardized</li>
-<li><strong>Choose Appropriate Visualization</strong>: Match plot type to your analysis goals</li>
-<li><strong>Interactive vs. Static</strong>: </li>
-<li>Use interactive for detailed exploration</li>
-<li>Use static for publications/reports</li>
-<li><strong>Color Choices</strong>: Select palettes that are color-blind friendly</li>
+<li><strong>Load MS Files</strong>: Navigate to MS Files tab, enter glob pattern, click Load</li>
+<li><strong>Load Targets</strong>: Switch to Targets tab, upload target list CSV</li>
+<li><strong>Optimize RT</strong> (optional): Click "Optimize RT" to refine retention time windows</li>
+<li><strong>Run Processing</strong>: Go to Processing tab, click Run</li>
+<li><strong>View Results</strong>: Check Results tab for peak areas</li>
+<li><strong>Visualize</strong>: Use Visualization tab for heatmaps and peak shapes</li>
+<li><strong>Export</strong>: Save results and session for later use</li>
 </ol>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h2 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
+<p>Save your analysis state:</p>
 <ul>
-<li><strong>No Data Displayed</strong>: </li>
-<li>Check data filtering</li>
-<li>Verify peak labels and file names</li>
-<li><strong>Performance Issues</strong>: </li>
-<li>Reduce data size</li>
-<li>Use interactive mode for large datasets</li>
-<li><strong>Color Mapping</strong>: Ensure unique color mapping for different groups</li>
+<li><strong>Save Session</strong>: Preserves loaded files, targets, results, and settings</li>
+<li><strong>Load Session</strong>: Restore a previous analysis state</li>
 </ul>
-<h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
+<p>Sessions are saved to the working directory as <code>mint_session.pkl</code>.</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li>For large datasets, use interactive Plotly visualizations</li>
-<li>Limit the number of peaks and files in a single plot</li>
-<li>Use normalization and scaling to improve visualization clarity</li>
-</ul>
-<h2 id="example-workflow">Example Workflow<a class="headerlink" href="#example-workflow" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ms_mint</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mint</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># Create Mint instance</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">mint</span> <span class="o">=</span> <span class="n">Mint</span><span class="p">()</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># Load data</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">mint</span><span class="o">.</span><span class="n">load_targets</span><span class="p">(</span><span class="s1">&#39;targets.csv&#39;</span><span class="p">)</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">mint</span><span class="o">.</span><span class="n">load_ms_files</span><span class="p">(</span><span class="s1">&#39;data_directory/*&#39;</span><span class="p">)</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># Run analysis</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">mint</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="c1"># Create plotter</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="n">plotter</span> <span class="o">=</span> <span class="n">mint</span><span class="o">.</span><span class="n">plot</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="c1"># Visualize results</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="n">plotter</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">col_name</span><span class="o">=</span><span class="s1">&#39;peak_max&#39;</span><span class="p">)</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="n">plotter</span><span class="o">.</span><span class="n">peak_shapes</span><span class="p">(</span><span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="n">plotter</span><span class="o">.</span><span class="n">chromatogram</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Visualization tools are designed to be flexible and intuitive</li>
-<li>Always verify data and visualization parameters</li>
-<li>Experiment with different visualization techniques</li>
+<li><a href="../../quickstart/">Quickstart</a></li>
+<li><a href="../visualization/">Visualization Guide</a></li>
+<li><a href="../target_lists/">Target Lists</a></li>
 </ul>
 
 
