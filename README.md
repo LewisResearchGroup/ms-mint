@@ -4,7 +4,7 @@
 ![](https://github.com/LewisResearchGroup/ms-mint/blob/develop/images/coverage.svg)
 ![PyPI](https://img.shields.io/pypi/v/ms-mint?label=pypi%20package)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ms-mint)
-[![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/doi/10.5281/zenodo.12733875)
+[![DOI](https://zenodo.org/badge/221567356.svg)](https://zenodo.org/badge/latestdoi/221567356)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/LewisResearchGroup/ms-mint/blob/feature/jupyter-gui-improvements/notebooks/MintGui_Colab.ipynb)
 
 # ms-mint: Mass Spectrometry-Metabolomics Integration Toolkit
