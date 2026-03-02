@@ -96,7 +96,7 @@ extra:
         checked: true
   analytics:
     provider: google
-    property: G-383994884 
+    property: G-9RJ7Z0BG5W
 
 extra_css:
   - stylesheets/extra.css
