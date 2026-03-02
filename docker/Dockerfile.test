@@ -1,0 +1,39 @@
+FROM python:3.12-slim
+
+WORKDIR /workspace
+
+# Install system dependencies for HDF5 and building packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libhdf5-dev \
+    pkg-config \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast package management
+RUN pip install --no-cache-dir uv
+
+# Copy both projects
+COPY ms-mint /workspace/ms-mint
+COPY ms-mint-app /workspace/ms-mint-app
+
+# Install ms-mint first (dependency of ms-mint-app)
+WORKDIR /workspace/ms-mint
+RUN uv pip install --system -e ".[dev,gui]"
+
+# Install ms-mint-app deps except ms-mint, then install ms-mint-app itself
+# This ensures the local ms-mint is used instead of PyPI version
+WORKDIR /workspace/ms-mint-app
+RUN uv pip install --system --no-deps -e . && \
+    uv pip install --system xlsxwriter waitress dash "dash[diskcache]" \
+    dash_extensions dash_bootstrap_components flask_login flask_migrate \
+    flask_wtf urllib3 dash_tabulator "dash_uploader==0.7.0a1" beautifulsoup4 \
+    "dask[diskcache]" h5py hdf5plugin "werkzeug==3.0.6" "packaging==21.3.0" email-validator
+
+# Verify local ms-mint is installed
+RUN python -c "import ms_mint; print(f'ms-mint version: {ms_mint.__version__}')"
+
+# Back to ms-mint for running tests
+WORKDIR /workspace/ms-mint
+
+CMD ["pytest", "-v", "tests/"]

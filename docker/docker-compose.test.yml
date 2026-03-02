@@ -1,0 +1,8 @@
+services:
+  test:
+    build:
+      context: ../..
+      dockerfile: ms-mint/docker/Dockerfile.test
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
