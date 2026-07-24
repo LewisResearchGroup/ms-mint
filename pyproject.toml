@@ -31,7 +31,7 @@ dependencies = [
   "pandas",
   "matplotlib",
   "seaborn",
-  "pyteomics",
+  "pyteomics[xml,mzmlb]",
   "scikit-learn",
   "molmass",
   "pymzml",
